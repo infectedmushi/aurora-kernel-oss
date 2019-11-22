@@ -144,3 +144,4 @@ ifeq ($(OPLUS_FEATURE_MEMLEAK_DETECT), yes)
 obj-$(CONFIG_DUMP_TASKS_MEM) += task_mem/
 endif
 #endif /*defined(OPLUS_FEATURE_MEMLEAK_DETECT)
+obj-$(CONFIG_OOM_SCORE_NOTIFIER) += oom_score_notifier.o
