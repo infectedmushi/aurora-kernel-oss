@@ -1071,3 +1071,4 @@ static struct platform_driver arm_memlat_mon_driver = {
 };
 
 module_platform_driver(arm_memlat_mon_driver);
+MODULE_LICENSE("GPL v2");
