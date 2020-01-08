@@ -58,6 +58,7 @@ enum ion_heap_ids {
  * Flags to be used when allocating from the secure heap for
  * content protection
  */
+#define ION_FLAG_CP_CAMERA_ENCODE	ION_BIT(14)
 #define ION_FLAG_CP_TOUCH		ION_BIT(17)
 #define ION_FLAG_CP_BITSTREAM		ION_BIT(18)
 #define ION_FLAG_CP_PIXEL		ION_BIT(19)
@@ -76,7 +77,7 @@ enum ion_heap_ids {
 /* boost pool flag. */
 #define ION_FLAG_CAMERA_BUFFER  ION_BIT(13)
 
-#define ION_FLAGS_CP_MASK	0x6FFE0000
+#define ION_FLAGS_CP_MASK	0x6FFEC000
 
 /**
  * Flag to allow non continguous allocation of memory from secure
