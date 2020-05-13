@@ -184,6 +184,7 @@ struct pstore_info {
 
 	struct mutex	read_mutex;
 
+	int		max_reason;
 	int		flags;
 	void		*data;
 
