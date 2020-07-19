@@ -30,6 +30,11 @@ config OPLUS_HANS
         ---help---
           Key events (signal/network package/binder) report to HAS native.
 #endif /*OPLUS_FEATURE_HANS_FREEZE*/
+
+config ANDROID_TIMED_OUTPUT
+	bool "Timed output class driver"
+	default y
+
 source "drivers/staging/android/ion/Kconfig"
 
 endif # if ANDROID
