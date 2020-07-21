@@ -689,7 +689,7 @@ has_neoverse_n1_erratum_1542419(const struct arm64_cpu_capabilities *entry,
 	return is_midr_in_range(midr, &range) && has_dic;
 }
 
-#ifdef CONFIG_HARDEN_EL2_VECTORS
+#ifdef CONFIG_RANDOMIZE_BASE
 
 static const struct midr_range arm64_harden_el2_vectors[] = {
 	MIDR_ALL_VERSIONS(MIDR_CORTEX_A57),
@@ -895,7 +895,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
 		.matches = check_branch_predictor,
 		.cpu_enable = cpu_enable_branch_predictor_hardening,
 	},
-#ifdef CONFIG_HARDEN_EL2_VECTORS
+#ifdef CONFIG_RANDOMIZE_BASE
 	{
 		.desc = "EL2 vector hardening",
 		.capability = ARM64_HARDEN_EL2_VECTORS,
