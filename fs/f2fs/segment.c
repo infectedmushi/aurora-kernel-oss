@@ -3696,22 +3696,14 @@ int f2fs_trim_fs(struct f2fs_sb_info *sbi, struct fstrim_range *range)
 	if (err)
 		goto out;
 
-	/*
-	 * We filed discard candidates, but actually we don't need to wait for
-	 * all of them, since they'll be issued in idle time along with runtime
-	 * discard option. User configuration looks like using runtime discard
-	 * or periodic fstrim instead of it.
-	 */
-	if (f2fs_realtime_discard_enable(sbi)) {
 #ifdef CONFIG_OPLUS_FEATURE_OF2FS
 		/*
 		 * 2019-10-15, add for oDiscard
 		 */
-		if (sbi->dc_opt_enable)
+		if (sbi->dc_opt_enable && (f2fs_realtime_discard_enable(sbi)))
 			wake_up_discard_thread_aggressive(sbi, DPOLICY_PERFORMANCE);
 #endif
- 		goto out;
-	}
+
 	start_block = START_BLOCK(sbi, start_segno);
 	end_block = START_BLOCK(sbi, end_segno + 1);
 
