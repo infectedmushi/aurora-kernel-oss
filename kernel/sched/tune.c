@@ -868,9 +868,9 @@ boost_write(struct cgroup_subsys_state *css, struct cftype *cft,
 	if (boost < 0 || boost > 100)
 		return -EINVAL;
 
-	st->boost = boost;
+	st->boost = (boost > 10) ? boost : 0;
 #ifdef CONFIG_DYNAMIC_STUNE_BOOST
-	st->boost_default = boost;
+	st->boost_default = (boost > 10) ? boost : 0;
 #endif /* CONFIG_DYNAMIC_STUNE_BOOST */
 
 	/* Update CPU boost */
