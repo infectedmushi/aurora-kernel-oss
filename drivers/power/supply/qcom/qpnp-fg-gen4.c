@@ -4535,10 +4535,16 @@ static int fg_psy_get_property(struct power_supply *psy,
 	struct fg_dev *fg = &chip->fg;
 	int rc = 0, val;
 	int64_t temp;
+	int capacity_major, capacity_minor;
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_CAPACITY:
-		rc = fg_gen4_get_prop_capacity(fg, &pval->intval);
+		rc = fg_gen4_get_prop_capacity_raw(chip, &pval->intval);
+		capacity_major = pval->intval / 100;
+		capacity_minor = pval->intval % 100;
+		if (capacity_minor >= 50)
+			capacity_major++;
+		pval->intval = capacity_major;
 		break;
 	case POWER_SUPPLY_PROP_REAL_CAPACITY:
 		rc = fg_gen4_get_prop_real_capacity(fg, &pval->intval);
