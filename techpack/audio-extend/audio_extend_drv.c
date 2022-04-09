@@ -94,23 +94,23 @@ static struct snd_soc_dai_link_component tfa98xx_dails[] = {
 /*modified for tfa98xx 4PA tdm audio support*/
 static struct snd_soc_dai_link_component tfa98xx_tdm_dails[] = {
 	{
-		.name = "tfa98xx.0-0035",
-		.dai_name = "tfa98xx-aif-0-35",
+		.name = "tfa98xx.2-0035",
+		.dai_name = "tfa98xx-aif-2-35",
 	},
 
 	{
-		.name = "tfa98xx.0-0034",
-		.dai_name = "tfa98xx-aif-0-34",
+		.name = "tfa98xx.2-0034",
+		.dai_name = "tfa98xx-aif-2-34",
 	},
 
 	{
-		.name = "tfa98xx.0-0037",
-		.dai_name = "tfa98xx-aif-0-37",
+		.name = "tfa98xx.2-0037",
+		.dai_name = "tfa98xx-aif-2-37",
 	},
 
 	{
-		.name = "tfa98xx.0-0036",
-		.dai_name = "tfa98xx-aif-0-36",
+		.name = "tfa98xx.2-0036",
+		.dai_name = "tfa98xx-aif-2-36",
 	},
 };
 
