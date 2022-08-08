@@ -355,7 +355,7 @@ int watermark_boost_factor __read_mostly;
 /* Moto huangzq2: Disable watermark boost as it's not working fine on kernel 4.19 */
 int watermark_boost_factor __read_mostly = 0;
 #endif
-int watermark_scale_factor = 100;
+int watermark_scale_factor = 32;
 
 /*
  * Extra memory for the system to try freeing. Used to temporarily
