@@ -7,6 +7,7 @@
 # Compiler: Neutron clang version 17.0.0 (https://github.com/llvm/llvm-project.git d8e9a1a12557cd5e80c3d713d9cbbba0f7406882)
 #
 CONFIG_OPLUS_SYSTEM_KERNEL_QCOM=y
+CONFIG_SONY_SCHED=y
 # CONFIG_OPLUS_SYSTEM_KERNEL_MTK is not set
 CONFIG_OPLUS_SLUB_TEST=""
 CONFIG_OPLUS_KASAN_TEST=""
