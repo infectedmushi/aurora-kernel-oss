@@ -74,7 +74,7 @@ ssize_t get_task_rss(struct task_struct *tsk)
 static inline long zone_threshold_check(struct zone *zone, int zone_type,
 					int threshold)
 {
-	int order;
+	int order, flc;
 	unsigned long flags;
 	unsigned long tot = 0;
 
@@ -83,7 +83,7 @@ static inline long zone_threshold_check(struct zone *zone, int zone_type,
 		struct free_area *area;
 		struct list_head *curr;
 
-		area = &zone->free_area[order];
+		area = &(zone->free_area[flc][order]);
 		list_for_each(curr, &area->free_list[zone_type]) {
 			tot += 1 << order;
 			if (tot >= threshold)
