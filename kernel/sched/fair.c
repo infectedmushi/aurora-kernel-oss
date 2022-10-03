@@ -119,8 +119,8 @@ walt_dec_cfs_rq_stats(struct cfs_rq *cfs_rq, struct task_struct *p) {}
  *
  * (default: 6ms * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_latency			= 10000000ULL;
-unsigned int normalized_sysctl_sched_latency		= 10000000ULL;
+unsigned int sysctl_sched_latency			= 5000000ULL;
+unsigned int normalized_sysctl_sched_latency		= 5000000ULL;
 
 /*
  * Enable/disable honoring sync flag in energy-aware wakeups.
@@ -176,7 +176,7 @@ unsigned int sysctl_sched_child_runs_first __read_mostly = 1;
 unsigned int sysctl_sched_wakeup_granularity		= 5000000UL;
 unsigned int normalized_sysctl_sched_wakeup_granularity	= 5000000UL;
 
-const_debug unsigned int sysctl_sched_migration_cost	= 1000000UL;
+const_debug unsigned int sysctl_sched_migration_cost	= 750000UL;
 DEFINE_PER_CPU_READ_MOSTLY(int, sched_load_boost);
 
 #ifdef CONFIG_SMP
@@ -268,7 +268,11 @@ static unsigned int get_update_sysctl_factor(void)
 		break;
 	case SCHED_TUNABLESCALING_LOG:
 	default:
-		factor = 1 + ilog2(cpus);
+		if (cpus > 6) {
+		  factor = 2;
+		} else { 
+		  factor = 1;
+		}
 		break;
 	}
 
