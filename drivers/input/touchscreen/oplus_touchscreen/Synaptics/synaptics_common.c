@@ -11,17 +11,17 @@
 /*******Part0:LOG TAG Declear********************/
 
 #define TPD_DEVICE "synaptics_common"
-#define TPD_INFO(a, arg...)  pr_err("[TP]"TPD_DEVICE ": " a, ##arg)
+#define TPD_INFO(a, arg...)  pr_debug("[TP]"TPD_DEVICE ": " a, ##arg)
 #define TPD_DEBUG(a, arg...)\
     do{\
         if (LEVEL_DEBUG == tp_debug)\
-            pr_err("[TP]"TPD_DEVICE ": " a, ##arg);\
+            pr_debug("[TP]"TPD_DEVICE ": " a, ##arg);\
     }while(0)
 
 #define TPD_DETAIL(a, arg...)\
     do{\
         if (LEVEL_BASIC != tp_debug)\
-            pr_err("[TP]"TPD_DEVICE ": " a, ##arg);\
+            pr_debug("[TP]"TPD_DEVICE ": " a, ##arg);\
     }while(0)
 
 
@@ -83,7 +83,7 @@ int synaptics_parse_header_v2(struct image_info *image_info, const unsigned char
     magic_value = le4_to_uint(header->magic_value);
 
     if (magic_value != IMAGE_FILE_MAGIC_VALUE) {
-        pr_err("invalid magic number %d\n", magic_value);
+        pr_debug("invalid magic number %d\n", magic_value);
         return -EINVAL;
     }
 
@@ -107,7 +107,7 @@ int synaptics_parse_header_v2(struct image_info *image_info, const unsigned char
                 BOOT_CONFIG_ID,
                 strlen(BOOT_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                pr_err("Boot config checksum error\n");
+                pr_debug("Boot config checksum error\n");
                 return -EINVAL;
             }
             image_info->boot_config.size = length;
@@ -118,7 +118,7 @@ int synaptics_parse_header_v2(struct image_info *image_info, const unsigned char
                 APP_CODE_ID,
                 strlen(APP_CODE_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                pr_err("Application firmware checksum error\n");
+                pr_debug("Application firmware checksum error\n");
                 return -EINVAL;
             }
             image_info->app_firmware.size = length;
@@ -129,7 +129,7 @@ int synaptics_parse_header_v2(struct image_info *image_info, const unsigned char
                 APP_CONFIG_ID,
                 strlen(APP_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                pr_err("Application config checksum error\n");
+                pr_debug("Application config checksum error\n");
                 return -EINVAL;
             }
             image_info->app_config.size = length;
@@ -140,7 +140,7 @@ int synaptics_parse_header_v2(struct image_info *image_info, const unsigned char
                 DISP_CONFIG_ID,
                 strlen(DISP_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                pr_err("Display config checksum error\n");
+                pr_debug("Display config checksum error\n");
                 return -EINVAL;
             }
             image_info->disp_config.size = length;
