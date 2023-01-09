@@ -140,3 +140,12 @@ kernel/configs/android-*.cfg
 #Ignoring Android.bp link file
 #
 Android.bp
+
+#
+# Personnal Stuff
+#
+build.sh
+out/
+AnyKernel3/
+clang/
+error.log
