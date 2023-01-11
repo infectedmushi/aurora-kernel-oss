@@ -7193,7 +7193,7 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	unsigned long best_active_util = ULONG_MAX;
 	unsigned long best_active_cuml_util = ULONG_MAX;
 	unsigned long best_idle_cuml_util = ULONG_MAX;
-	bool prefer_idle = schedtune_prefer_idle(p);
+	bool prefer_idle;
 	bool boosted;
 	bool crucial = sched_feat(EAS_CRUCIAL) ?
 				(schedtune_crucial(p) > 0) : false;
@@ -7229,8 +7229,12 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	 * performance CPU, thus requiring to maximise target_capacity. In this
 	 * case we initialise target_capacity to 0.
 	 */
-	prefer_idle = uclamp_latency_sensitive(p);
-	boosted = fbt_env->boosted || uclamp_boosted(p);
+	prefer_idle = schedtune_prefer_idle(p);
+	int task_boost = per_task_boost(p);
+	bool schedtune_boosted = schedtune_task_boost(p) > 0 ||
+			task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
+			task_boost == TASK_BOOST_ON_MID;
+	boosted = fbt_env->boosted || schedtune_boosted;
 	if (prefer_idle && boosted)
 		target_capacity = 0;
 
@@ -7921,8 +7925,11 @@ static void select_cpu_candidates(struct sched_domain *sd, cpumask_t *cpus,
 {
 	int highest_spare_cap_cpu = prev_cpu, best_idle_cpu = -1;
 	unsigned long spare_cap, max_spare_cap, util, cpu_cap;
-	bool prefer_idle = uclamp_latency_sensitive(p);
-	bool boosted = uclamp_boosted(p);
+	bool prefer_idle = schedtune_prefer_idle(p);
+	int task_boost = per_task_boost(p); 
+	bool boosted = schedtune_task_boost(p) > 0 ||
+			task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
+			task_boost == TASK_BOOST_ON_MID;
 	unsigned long target_cap = boosted ? 0 : ULONG_MAX;
 	unsigned long highest_spare_cap = 0;
 	unsigned int min_exit_lat = UINT_MAX;
