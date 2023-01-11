@@ -528,16 +528,15 @@ VL53L1_Error VL53L1_data_init(
 
 
 
-	if (status == VL53L1_ERROR_NONE)
-		status = VL53L1_set_preset_mode(
-			Dev,
-			pdev->preset_mode,
-			pdev->dss_config__target_total_rate_mcps,
-
-			pdev->phasecal_config_timeout_us,
-			pdev->mm_config_timeout_us,
-			pdev->range_config_timeout_us,
-			pdev->inter_measurement_period_ms);
+		if (status == VL53L1_ERROR_NONE)
+			status = VL53L1_set_preset_mode(
+				Dev,
+				pdev->preset_mode,
+				pdev->dss_config__target_total_rate_mcps,
+				pdev->phasecal_config_timeout_us,
+				pdev->mm_config_timeout_us,
+				pdev->range_config_timeout_us,
+				pdev->inter_measurement_period_ms);
 
 
 
