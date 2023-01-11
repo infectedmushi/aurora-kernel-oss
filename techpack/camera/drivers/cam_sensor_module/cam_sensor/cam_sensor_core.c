@@ -223,11 +223,11 @@ static int sensor_gc5035_write_dpc_data(struct cam_sensor_ctrl_t * s_ctrl)
     if (totalDpcFlag == 0)
         return 0;
 
-	sensor_setting.reg_setting = gc5035OTPWrite_setting[3].reg_setting;
-	sensor_setting.addr_type = gc5035OTPWrite_setting[3].addr_type;
-	sensor_setting.data_type = gc5035OTPWrite_setting[3].data_type;
-	sensor_setting.size = gc5035OTPWrite_setting[3].size;
-	sensor_setting.delay = gc5035OTPWrite_setting[3].delay;
+		sensor_setting.reg_setting = gc5035OTPWrite_setting[3].reg_setting;
+		sensor_setting.addr_type = gc5035OTPWrite_setting[3].addr_type;
+		sensor_setting.data_type = gc5035OTPWrite_setting[3].data_type;
+		sensor_setting.size = gc5035OTPWrite_setting[3].size;
+		sensor_setting.delay = gc5035OTPWrite_setting[3].delay;
 
 	rc = camera_io_dev_write(&(s_ctrl->io_master_info), &sensor_setting);
 
