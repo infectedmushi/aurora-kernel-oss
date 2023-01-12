@@ -7585,6 +7585,9 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 		INIT_WORK(&ts->read_delta_work, touch_read_delta);
 	}
 
+	if (ts->game_switch_support)
+		ts->ts_ops->mode_switch(ts->chip_data, MODE_GAME, true);
+
 	if (ts->health_monitor_support) {
 		ts->monitor_data.eli_ver_pos = kzalloc((ts->monitor_data.eli_ver_range / ts->monitor_data.eli_size) * (ts->resolution_info.max_y / ts->monitor_data.eli_size) * sizeof(int), GFP_KERNEL);
 		ts->monitor_data.eli_hor_pos = kzalloc((ts->monitor_data.eli_hor_range / ts->monitor_data.eli_size) * (ts->resolution_info.max_x / ts->monitor_data.eli_size) * sizeof(int), GFP_KERNEL);
@@ -7629,6 +7632,7 @@ int register_common_touch_device(struct touchpanel_data *pdata)
 	ts->firmware_update_type = 0;
 	ts->report_point_first_enable = 0;//reporting point first ,when baseline error
 	ts->resume_finished = 1;
+	ts->noise_level = 1;
 	if (ts->is_noflash_ic) {
 		ts->irq = ts->s_client->irq;
 	} else {
