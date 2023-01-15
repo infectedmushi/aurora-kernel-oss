@@ -236,6 +236,9 @@ EXPORT_SYMBOL(vfs_fsync);
 
 static int do_fsync(unsigned int fd, int datasync)
 {
+#ifdef CONFIG_OPLUS_HEALTHINFO
+    unsigned long fsync_time = jiffies;
+#endif
 	struct fd f;
 	int ret = -EBADF;
 
@@ -246,9 +249,6 @@ static int do_fsync(unsigned int fd, int datasync)
 
 #ifdef OPLUS_FEATURE_HEALTHINFO
 // Add for record  fsync  time
-#ifdef CONFIG_OPLUS_HEALTHINFO
-    unsigned long fsync_time = jiffies;
-#endif
 #endif /* OPLUS_FEATURE_HEALTHINFO */
 	if (f.file) {
 		ret = vfs_fsync(f.file, datasync);
