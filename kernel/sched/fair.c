@@ -7202,6 +7202,7 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	struct sched_domain *start_sd;
 	unsigned long crucial_max_cap = 0;
 	struct sched_group *sg;
+	int task_boost = per_task_boost(p);
 	int best_active_cpu = -1;
 	int best_idle_cpu = -1;
 	int target_cpu = -1;
@@ -7217,6 +7218,9 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	bool rtg_high_prio_task = task_rtg_high_prio(p);
 	cpumask_t new_allowed_cpus;
 	bool skip_big_cluster = false;
+	bool schedtune_boosted = schedtune_task_boost(p) > 0 ||
+		task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
+		task_boost == TASK_BOOST_ON_MID;
 #if defined(OPLUS_FEATURE_SCHED_ASSIST) && defined(CONFIG_OPLUS_FEATURE_SCHED_SPREAD)
 	bool strict = fbt_env->strict_max;
 #endif
@@ -7230,10 +7234,6 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	 * case we initialise target_capacity to 0.
 	 */
 	prefer_idle = schedtune_prefer_idle(p);
-	int task_boost = per_task_boost(p);
-	bool schedtune_boosted = schedtune_task_boost(p) > 0 ||
-			task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
-			task_boost == TASK_BOOST_ON_MID;
 	boosted = fbt_env->boosted || schedtune_boosted;
 	if (prefer_idle && boosted)
 		target_capacity = 0;
