@@ -60,8 +60,8 @@
 #include "cq.h"
 #include "mad.h"
 
-#define rvt_pr_info(rdi, fmt, ...) \
-	__rvt_pr_info(rdi->driver_f.get_pci_dev(rdi), \
+#define rvt_pr_debug(rdi, fmt, ...) \
+	__rvt_pr_debug(rdi->driver_f.get_pci_dev(rdi), \
 		      rvt_get_ibdev_name(rdi), \
 		      fmt, \
 		      ##__VA_ARGS__)
@@ -78,7 +78,7 @@
 		     fmt, \
 		     ##__VA_ARGS__)
 
-#define __rvt_pr_info(pdev, name, fmt, ...) \
+#define __rvt_pr_debug(pdev, name, fmt, ...) \
 	dev_info(&pdev->dev, "%s: " fmt, name, ##__VA_ARGS__)
 
 #define __rvt_pr_warn(pdev, name, fmt, ...) \

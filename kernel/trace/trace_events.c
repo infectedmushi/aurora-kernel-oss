@@ -461,7 +461,7 @@ static int __ftrace_event_enable_disable(struct trace_event_file *file,
 					tracing_stop_cmdline_record();
 				if (tgid)
 					tracing_stop_tgid_record();
-				pr_info("event trace: Could not enable event "
+				pr_debug("event trace: Could not enable event "
 					"%s\n", trace_event_name(call));
 				break;
 			}
@@ -3247,7 +3247,7 @@ static __init int event_test_thread(void *unused)
 
 	test_malloc = kmalloc(1234, GFP_KERNEL);
 	if (!test_malloc)
-		pr_info("failed to kmalloc\n");
+		pr_debug("failed to kmalloc\n");
 
 	schedule_on_each_cpu(test_work);
 
@@ -3292,7 +3292,7 @@ static __init void event_trace_self_tests(void)
 	if (!tr)
 		return;
 
-	pr_info("Running tests on trace events:\n");
+	pr_debug("Running tests on trace events:\n");
 
 	list_for_each_entry(file, &tr->events, list) {
 
@@ -3314,7 +3314,7 @@ static __init void event_trace_self_tests(void)
 			continue;
 #endif
 
-		pr_info("Testing event %s: ", trace_event_name(call));
+		pr_debug("Testing event %s: ", trace_event_name(call));
 
 		/*
 		 * If an event is already enabled, someone is using
@@ -3335,7 +3335,7 @@ static __init void event_trace_self_tests(void)
 
 	/* Now test at the sub system level */
 
-	pr_info("Running tests on trace event systems:\n");
+	pr_debug("Running tests on trace event systems:\n");
 
 	list_for_each_entry(dir, &tr->systems, list) {
 
@@ -3345,7 +3345,7 @@ static __init void event_trace_self_tests(void)
 		if (strcmp(system->name, "ftrace") == 0)
 			continue;
 
-		pr_info("Testing event system %s: ", system->name);
+		pr_debug("Testing event system %s: ", system->name);
 
 		ret = __ftrace_set_clr_event(tr, NULL, system->name, NULL, 1);
 		if (WARN_ON_ONCE(ret)) {
@@ -3368,8 +3368,8 @@ static __init void event_trace_self_tests(void)
 
 	/* Test with all events enabled */
 
-	pr_info("Running tests on all trace events:\n");
-	pr_info("Testing all events: ");
+	pr_debug("Running tests on all trace events:\n");
+	pr_debug("Testing all events: ");
 
 	ret = __ftrace_set_clr_event(tr, NULL, NULL, NULL, 1);
 	if (WARN_ON_ONCE(ret)) {
@@ -3449,10 +3449,10 @@ static __init void event_trace_self_test_with_function(void)
 
 	ret = register_ftrace_function(&trace_ops);
 	if (WARN_ON(ret < 0)) {
-		pr_info("Failed to enable function tracer for event tests\n");
+		pr_debug("Failed to enable function tracer for event tests\n");
 		return;
 	}
-	pr_info("Running tests again, along with the function tracer\n");
+	pr_debug("Running tests again, along with the function tracer\n");
 	event_trace_self_tests();
 	unregister_ftrace_function(&trace_ops);
 }

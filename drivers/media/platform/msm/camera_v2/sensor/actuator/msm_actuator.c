@@ -1931,7 +1931,7 @@ static int32_t msm_actuator_i2c_probe(struct i2c_client *client,
 	act_ctrl_t->msm_sd.sd.devnode->fops =
 		&msm_actuator_v4l2_subdev_fops;
 	act_ctrl_t->actuator_state = ACT_DISABLE_STATE;
-	pr_info("%s : succeeded\n", __func__);
+	pr_debug("%s : succeeded\n", __func__);
 	CDBG("Exit\n");
 
 	return 0;

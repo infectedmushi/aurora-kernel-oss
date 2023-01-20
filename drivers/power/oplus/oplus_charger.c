@@ -7955,7 +7955,7 @@ static void oplus_check_battery_vol_diff(struct oplus_chg_chip *chg)
 			chg->bat_volt_different = true;
 			chg->authenticate = false;
 			chg->check_battery_vol_count = 0;
-			pr_info("BATTERY_SOFT_DIFF_VOLTAGE disable chg\n");
+			pr_debug("BATTERY_SOFT_DIFF_VOLTAGE disable chg\n");
 		}
 	} else {
 		if (chg->bat_volt_different) {
@@ -7964,7 +7964,7 @@ static void oplus_check_battery_vol_diff(struct oplus_chg_chip *chg)
 				chg->bat_volt_different = false;
 				chg->authenticate = true;
 				chg->check_battery_vol_count = 0;
-				pr_info("Recovery BATTERY_SOFT_DIFF_VOLTAGE\n");
+				pr_debug("Recovery BATTERY_SOFT_DIFF_VOLTAGE\n");
 				oplus_pps_set_batcell_vol_diff_status(false);
 			}
 		} else {
@@ -8181,7 +8181,7 @@ void oplus_charger_detect_check(struct oplus_chg_chip *chip)
 						&& !oplus_vooc_get_fastchg_dummy_started()
 						&& !oplus_vooc_get_fastchg_to_normal()
 						&& !oplus_vooc_get_fastchg_to_warm()) {
-					pr_info("%s delay800ms to set mcu sleep\n", __func__);
+					pr_debug("%s delay800ms to set mcu sleep\n", __func__);
 					oplus_vooc_set_mcu_sleep();
 					mcu_status = 0;
 				}

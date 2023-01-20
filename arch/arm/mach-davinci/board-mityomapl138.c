@@ -146,7 +146,7 @@ static void read_factory_config(struct nvmem_device *nvmem, void *context)
 		goto bad_config;
 	}
 
-	pr_info("Found MAC = %pM\n", factory_config.mac);
+	pr_debug("Found MAC = %pM\n", factory_config.mac);
 	if (is_valid_ether_addr(factory_config.mac))
 		memcpy(soc_info->emac_pdata->mac_addr,
 			factory_config.mac, ETH_ALEN);
@@ -154,7 +154,7 @@ static void read_factory_config(struct nvmem_device *nvmem, void *context)
 		pr_warn("Invalid MAC found in factory config block\n");
 
 	partnum = factory_config.partnum;
-	pr_info("Part Number = %s\n", partnum);
+	pr_debug("Part Number = %s\n", partnum);
 
 bad_config:
 	/* default maximum speed is valid for all platforms */
@@ -504,11 +504,11 @@ static void __init mityomapl138_config_emac(void)
 	if (soc_info->emac_pdata->rmii_en) {
 		val |= BIT(8);
 		ret = davinci_cfg_reg_list(mityomap_rmii_pins);
-		pr_info("RMII PHY configured\n");
+		pr_debug("RMII PHY configured\n");
 	} else {
 		val &= ~BIT(8);
 		ret = davinci_cfg_reg_list(mityomap_mii_pins);
-		pr_info("MII PHY configured\n");
+		pr_debug("MII PHY configured\n");
 	}
 
 	if (ret) {

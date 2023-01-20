@@ -534,7 +534,7 @@ static ssize_t sgm41512_access_store(struct device *dev,
 	}
 
 	if (buf != NULL && size != 0) {
-		pr_info("[%s] buf is %s and size is %zu\n", __func__, buf, size);
+		pr_debug("[%s] buf is %s and size is %zu\n", __func__, buf, size);
 
 		pvalue = (char *)buf;
 		if (size > 3) {

@@ -253,7 +253,7 @@ static int batched_hyp_assign(struct sg_table *table, struct scm_desc *desc)
 					   batch_assign_start_ts));
 		i++;
 		if (ret) {
-			pr_info("%s: Failed to assign memory protection, ret = %d\n",
+			pr_debug("%s: Failed to assign memory protection, ret = %d\n",
 				__func__, ret);
 			/*
 			 * Make it clear to clients that the memory may no

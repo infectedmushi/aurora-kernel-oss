@@ -65,10 +65,10 @@ static void sdhci_dump_state(struct sdhci_host *host)
 {
 	struct mmc_host *mmc = host->mmc;
 
-	pr_info("%s: clk: %d claimer: %s pwr: %d\n",
+	pr_debug("%s: clk: %d claimer: %s pwr: %d\n",
 		mmc_hostname(mmc), host->clock,
 		mmc->claimer->task->comm, host->pwr);
-	pr_info("%s: rpmstatus[pltfm](runtime-suspend:usage_count:disable_depth)(%d:%d:%d)\n",
+	pr_debug("%s: rpmstatus[pltfm](runtime-suspend:usage_count:disable_depth)(%d:%d:%d)\n",
 	mmc_hostname(mmc), mmc->parent->power.runtime_status,
 		atomic_read(&mmc->parent->power.usage_count),
 		mmc->parent->power.disable_depth);
@@ -290,7 +290,7 @@ retry_reset:
 
 	if ((host->quirks2 & SDHCI_QUIRK2_USE_RESET_WORKAROUND) &&
 			host->ops->reset_workaround && host->reset_wa_applied) {
-		pr_info("%s: Reset 0x%x successful with workaround\n",
+		pr_debug("%s: Reset 0x%x successful with workaround\n",
 				mmc_hostname(host->mmc), (int)mask);
 		/* clear the workaround */
 		host->ops->reset_workaround(host, 0);
@@ -2745,7 +2745,7 @@ static void __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			mdelay(host->tuning_delay);
 	}
 
-	pr_info("%s: Tuning failed, falling back to fixed sampling clock\n",
+	pr_debug("%s: Tuning failed, falling back to fixed sampling clock\n",
 		mmc_hostname(host->mmc));
 	sdhci_reset_tuning(host);
 }
@@ -3173,7 +3173,7 @@ static void sdhci_timeout_data_timer(struct timer_list *t)
 		sdhci_dumpregs(host);
 
 		if (host->data) {
-			pr_info("%s: bytes to transfer: %d transferred: %d\n",
+			pr_debug("%s: bytes to transfer: %d transferred: %d\n",
 				mmc_hostname(host->mmc),
 				(host->data->blksz * host->data->blocks),
 				(sdhci_readw(host, SDHCI_BLOCK_SIZE) & 0xFFF) *
@@ -4210,7 +4210,7 @@ static int sdhci_allocate_bounce_buffer(struct sdhci_host *host)
 	mmc->max_seg_size = bounce_size;
 	mmc->max_req_size = bounce_size;
 
-	pr_info("%s bounce up to %u segments into one, max segment size %u bytes\n",
+	pr_debug("%s bounce up to %u segments into one, max segment size %u bytes\n",
 		mmc_hostname(mmc), max_blocks, bounce_size);
 
 	return 0;
@@ -4833,7 +4833,7 @@ int __sdhci_add_host(struct sdhci_host *host)
 		sdhci_writel(host, host->ier, SDHCI_SIGNAL_ENABLE);
 	}
 
-	pr_info("%s: SDHCI controller on %s [%s] using %s in %s mode\n",
+	pr_debug("%s: SDHCI controller on %s [%s] using %s in %s mode\n",
 	mmc_hostname(mmc), host->hw_name, dev_name(mmc_dev(mmc)),
 		(host->flags & SDHCI_USE_ADMA) ?
 		((host->flags & SDHCI_USE_64_BIT_DMA) ?
@@ -4953,9 +4953,9 @@ EXPORT_SYMBOL_GPL(sdhci_free_host);
 
 static int __init sdhci_drv_init(void)
 {
-	pr_info(DRIVER_NAME
+	pr_debug(DRIVER_NAME
 		": Secure Digital Host Controller Interface driver\n");
-	pr_info(DRIVER_NAME ": Copyright(c) Pierre Ossman\n");
+	pr_debug(DRIVER_NAME ": Copyright(c) Pierre Ossman\n");
 
 	return 0;
 }

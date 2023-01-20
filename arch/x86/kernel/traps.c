@@ -271,7 +271,7 @@ do_trap(int trapnr, int signr, char *str, struct pt_regs *regs,
 
 	if (show_unhandled_signals && unhandled_signal(tsk, signr) &&
 	    printk_ratelimit()) {
-		pr_info("%s[%d] trap %s ip:%lx sp:%lx error:%lx",
+		pr_debug("%s[%d] trap %s ip:%lx sp:%lx error:%lx",
 			tsk->comm, tsk->pid, str,
 			regs->ip, regs->sp, error_code);
 		print_vma_addr(KERN_CONT " in ", regs->ip);
@@ -567,7 +567,7 @@ do_general_protection(struct pt_regs *regs, long error_code)
 
 	if (show_unhandled_signals && unhandled_signal(tsk, SIGSEGV) &&
 			printk_ratelimit()) {
-		pr_info("%s[%d] general protection ip:%lx sp:%lx error:%lx",
+		pr_debug("%s[%d] general protection ip:%lx sp:%lx error:%lx",
 			tsk->comm, task_pid_nr(tsk),
 			regs->ip, regs->sp, error_code);
 		print_vma_addr(KERN_CONT " in ", regs->ip);

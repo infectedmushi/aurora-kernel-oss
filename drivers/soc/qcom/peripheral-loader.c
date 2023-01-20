@@ -465,9 +465,9 @@ void __adsp_send_uevent(struct device *dev, char *reason)
 	if(dev){
 		ret_val = kobject_uevent_env(&(dev->kobj), KOBJ_CHANGE, envp);
 		if(!ret_val){
-			pr_info("adsp_crash:kobject_uevent_env success!\n");
+			pr_debug("adsp_crash:kobject_uevent_env success!\n");
 		}else{
-			pr_info("adsp_crash:kobject_uevent_env fail,error=%d!\n", ret_val);
+			pr_debug("adsp_crash:kobject_uevent_env fail,error=%d!\n", ret_val);
 		}
 	}
 }
@@ -503,15 +503,15 @@ int pil_do_ramdump(struct pil_desc *desc,
 		return -1;
 	}
 #endif
-		pr_info("Minidump : md_ss_toc->md_ss_toc_init is 0x%x\n",
+		pr_debug("Minidump : md_ss_toc->md_ss_toc_init is 0x%x\n",
 			(unsigned int)desc->minidump_ss->md_ss_toc_init);
-		pr_info("Minidump : md_ss_toc->md_ss_enable_status is 0x%x\n",
+		pr_debug("Minidump : md_ss_toc->md_ss_enable_status is 0x%x\n",
 			(unsigned int)desc->minidump_ss->md_ss_enable_status);
-		pr_info("Minidump : md_ss_toc->encryption_status is 0x%x\n",
+		pr_debug("Minidump : md_ss_toc->encryption_status is 0x%x\n",
 			(unsigned int)desc->minidump_ss->encryption_status);
-		pr_info("Minidump : md_ss_toc->ss_region_count is 0x%x\n",
+		pr_debug("Minidump : md_ss_toc->ss_region_count is 0x%x\n",
 			(unsigned int)desc->minidump_ss->ss_region_count);
-		pr_info("Minidump : md_ss_toc->md_ss_smem_regions_baseptr is 0x%x\n",
+		pr_debug("Minidump : md_ss_toc->md_ss_smem_regions_baseptr is 0x%x\n",
 			(unsigned int)
 			desc->minidump_ss->md_ss_smem_regions_baseptr);
 
@@ -529,7 +529,7 @@ int pil_do_ramdump(struct pil_desc *desc,
 			//Add for skip mini dump encryption
 			if (desc->minidump_ss->encryption_status ==
 			    MD_SS_ENCR_DONE) {
-				pr_info("Dumping Minidump for %s\n",
+				pr_debug("Dumping Minidump for %s\n",
 					desc->name);
 				return pil_do_minidump(desc, minidump_dev);
 			}
@@ -1746,7 +1746,7 @@ static int __init msm_pil_init(void)
 		goto out;
 	}
 	if (__raw_readl(pil_info_base) == 0x53444247) {
-		pr_info("pil: pil-imem set to disable pil timeouts\n");
+		pr_debug("pil: pil-imem set to disable pil timeouts\n");
 		disable_timeouts = true;
 	}
 	for (i = 0; i < resource_size(&res)/sizeof(u32); i++)

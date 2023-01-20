@@ -580,7 +580,7 @@ static unsigned long quick_pit_calibrate(void)
 			goto success;
 		}
 	}
-	pr_info("Fast TSC calibration failed\n");
+	pr_debug("Fast TSC calibration failed\n");
 	return 0;
 
 success:
@@ -599,7 +599,7 @@ success:
 	 */
 	delta *= PIT_TICK_RATE;
 	do_div(delta, i*256*1000);
-	pr_info("Fast TSC calibration using PIT\n");
+	pr_debug("Fast TSC calibration using PIT\n");
 	return delta;
 }
 
@@ -767,7 +767,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 		 * use the reference value, as it is more precise.
 		 */
 		if (delta >= 90 && delta <= 110) {
-			pr_info("PIT calibration matches %s. %d loops\n",
+			pr_debug("PIT calibration matches %s. %d loops\n",
 				hpet ? "HPET" : "PMTIMER", i + 1);
 			return tsc_ref_min;
 		}
@@ -805,7 +805,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 		}
 
 		/* Use the alternative source */
-		pr_info("using %s reference calibration\n",
+		pr_debug("using %s reference calibration\n",
 			hpet ? "HPET" : "PMTIMER");
 
 		return tsc_ref_min;
@@ -813,7 +813,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 
 	/* We don't have an alternative source, use the PIT calibration value */
 	if (!hpet && !ref1 && !ref2) {
-		pr_info("Using PIT calibration value\n");
+		pr_debug("Using PIT calibration value\n");
 		return tsc_pit_min;
 	}
 
@@ -830,7 +830,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 	 */
 	pr_warn("PIT calibration deviates from %s: %lu %lu\n",
 		hpet ? "HPET" : "PMTIMER", tsc_pit_min, tsc_ref_min);
-	pr_info("Using PIT calibration value\n");
+	pr_debug("Using PIT calibration value\n");
 	return tsc_pit_min;
 }
 
@@ -1075,7 +1075,7 @@ static void tsc_cs_mark_unstable(struct clocksource *cs)
 	if (using_native_sched_clock())
 		clear_sched_clock_stable();
 	disable_sched_clock_irqtime();
-	pr_info("Marking TSC unstable due to clocksource watchdog\n");
+	pr_debug("Marking TSC unstable due to clocksource watchdog\n");
 }
 
 static void tsc_cs_tick_stable(struct clocksource *cs)
@@ -1133,7 +1133,7 @@ void mark_tsc_unstable(char *reason)
 	if (using_native_sched_clock())
 		clear_sched_clock_stable();
 	disable_sched_clock_irqtime();
-	pr_info("Marking TSC unstable due to %s\n", reason);
+	pr_debug("Marking TSC unstable due to %s\n", reason);
 
 	clocksource_mark_unstable(&clocksource_tsc_early);
 	clocksource_mark_unstable(&clocksource_tsc);
@@ -1316,7 +1316,7 @@ static void tsc_refine_calibration_work(struct work_struct *work)
 		goto out;
 
 	tsc_khz = freq;
-	pr_info("Refined TSC clocksource calibration: %lu.%03lu MHz\n",
+	pr_debug("Refined TSC clocksource calibration: %lu.%03lu MHz\n",
 		(unsigned long)tsc_khz / 1000,
 		(unsigned long)tsc_khz % 1000);
 
@@ -1402,12 +1402,12 @@ static bool __init determine_cpu_tsc_frequencies(bool early)
 	if (tsc_khz == 0)
 		return false;
 
-	pr_info("Detected %lu.%03lu MHz processor\n",
+	pr_debug("Detected %lu.%03lu MHz processor\n",
 		(unsigned long)cpu_khz / KHZ,
 		(unsigned long)cpu_khz % KHZ);
 
 	if (cpu_khz != tsc_khz) {
-		pr_info("Detected %lu.%03lu MHz TSC",
+		pr_debug("Detected %lu.%03lu MHz TSC",
 			(unsigned long)tsc_khz / KHZ,
 			(unsigned long)tsc_khz % KHZ);
 	}

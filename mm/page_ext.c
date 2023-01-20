@@ -201,7 +201,7 @@ void __init page_ext_init_flatmem(void)
 		if (fail)
 			goto fail;
 	}
-	pr_info("allocated %ld bytes of page_ext\n", total_usage);
+	pr_debug("allocated %ld bytes of page_ext\n", total_usage);
 	return;
 
 fail:
@@ -424,7 +424,7 @@ void __init page_ext_init(void)
 		}
 	}
 	hotplug_memory_notifier(page_ext_callback, 0);
-	pr_info("allocated %ld bytes of page_ext\n", total_usage);
+	pr_debug("allocated %ld bytes of page_ext\n", total_usage);
 	invoke_init_callbacks();
 	return;
 

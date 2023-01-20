@@ -261,7 +261,7 @@ static void wdog_disable(struct msm_watchdog_data *wdog_dd)
 	/* Make sure watchdog is disabled before setting enable */
 	mb();
 	wdog_dd->enabled = false;
-	pr_info("MSM Apps Watchdog deactivated.\n");
+	pr_debug("MSM Apps Watchdog deactivated.\n");
 }
 
 static ssize_t wdog_disable_get(struct device *dev,
@@ -293,7 +293,7 @@ static ssize_t wdog_disable_set(struct device *dev,
 	if (disable == 1) {
 		mutex_lock(&wdog_dd->disable_lock);
 		if (enable == 0) {
-			pr_info("MSM Apps Watchdog already disabled\n");
+			pr_debug("MSM Apps Watchdog already disabled\n");
 			mutex_unlock(&wdog_dd->disable_lock);
 			return count;
 		}
@@ -756,7 +756,7 @@ void msm_trigger_wdog_bite(void)
 		return;
 
 	compute_irq_stat(&wdog_data->irq_counts_work);
-	pr_info("Causing a watchdog bite!");
+	pr_debug("Causing a watchdog bite!");
 	__raw_writel(1, wdog_data->base + WDT0_BITE_TIME);
 	/* Mke sure bite time is written before we reset */
 	mb();
@@ -886,7 +886,7 @@ static void log_buf_work_fn(struct work_struct *work)
 
 	minidump_reg_init_log_buf();
 	memcpy(init_log_buf, *addr, (size_t)(*log_buf_size));
-	pr_info("boot log copy done\n");
+	pr_debug("boot log copy done\n");
 out:
 	return;
 }
@@ -1104,13 +1104,13 @@ static int msm_watchdog_probe(struct platform_device *pdev)
 	md_entry.size = sizeof(*wdog_dd);
 	md_entry.id = MINIDUMP_DEFAULT_ID;
 	if (msm_minidump_add_region(&md_entry) < 0)
-		pr_info("Failed to add Watchdog data in Minidump\n");
+		pr_debug("Failed to add Watchdog data in Minidump\n");
 
 #ifdef OPLUS_BUG_STABILITY
         /* Add for init oplus watch dog log, checklist 64*/
 	ret = init_oplus_watchlog();
     if (ret < 0) {
-    	pr_info("Failed to init oplus watchlog");
+    	pr_debug("Failed to init oplus watchlog");
     }
 #endif
 

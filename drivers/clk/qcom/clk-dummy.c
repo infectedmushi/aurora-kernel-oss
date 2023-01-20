@@ -115,7 +115,7 @@ static struct clk *clk_register_dummy(struct device *dev, const char *name,
 	if (reset_controller_register(&dummy->reset))
 		pr_err("Failed to register reset controller for %s\n", name);
 	else
-		pr_info("Successfully registered dummy reset controller for %s\n",
+		pr_debug("Successfully registered dummy reset controller for %s\n",
 								name);
 
 	return clk;
@@ -140,7 +140,7 @@ static void of_dummy_clk_setup(struct device_node *node)
 		return;
 	}
 
-	pr_info("Successfully registered dummy clock controller for %s\n",
+	pr_debug("Successfully registered dummy clock controller for %s\n",
 								clk_name);
 }
 CLK_OF_DECLARE(dummy_clk, "qcom,dummycc", of_dummy_clk_setup);

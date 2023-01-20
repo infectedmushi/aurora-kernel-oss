@@ -1180,7 +1180,7 @@ static void rejuvenate_ind_cb(struct qmi_handle *qmi, struct sockaddr_qrtr *sq,
 		memset(priv->function_name, 0,
 		       QMI_WLFW_FUNCTION_NAME_LEN_V01 + 1);
 
-	icnss_pr_info("Cause for rejuvenation: 0x%x, requesting sub-system: 0x%x, line number: %u, function name: %s\n",
+	icnss_pr_debug("Cause for rejuvenation: 0x%x, requesting sub-system: 0x%x, line number: %u, function name: %s\n",
 		      priv->cause_for_rejuvenation,
 		      priv->requesting_sub_system,
 		      priv->line_number,
@@ -1245,7 +1245,7 @@ int icnss_connect_to_fw_server(struct icnss_priv *priv, void *data)
 		goto out;
 	}
 
-	icnss_pr_info("QMI Server Connected: state: 0x%lx\n", priv->state);
+	icnss_pr_debug("QMI Server Connected: state: 0x%lx\n", priv->state);
 
 	kfree(data);
 	return 0;
@@ -1263,7 +1263,7 @@ int icnss_clear_server(struct icnss_priv *priv)
 	if (!priv)
 		return -ENODEV;
 
-	icnss_pr_info("QMI Service Disconnected: 0x%lx\n", priv->state);
+	icnss_pr_debug("QMI Service Disconnected: 0x%lx\n", priv->state);
 	clear_bit(ICNSS_WLFW_CONNECTED, &priv->state);
 
 	icnss_unregister_fw_service(priv);
@@ -1286,7 +1286,7 @@ static int wlfw_new_server(struct qmi_handle *qmi,
 	struct icnss_event_server_arrive_data *event_data;
 
 	if (priv && test_bit(ICNSS_DEL_SERVER, &priv->state)) {
-		icnss_pr_info("WLFW server delete in progress, Ignore server arrive: 0x%lx\n",
+		icnss_pr_debug("WLFW server delete in progress, Ignore server arrive: 0x%lx\n",
 			      priv->state);
 		return 0;
 	}
@@ -1313,7 +1313,7 @@ static void wlfw_del_server(struct qmi_handle *qmi,
 	struct icnss_priv *priv = container_of(qmi, struct icnss_priv, qmi);
 
 	if (priv && test_bit(ICNSS_DEL_SERVER, &priv->state)) {
-		icnss_pr_info("WLFW server delete in progress, Ignore server delete:  0x%lx\n",
+		icnss_pr_debug("WLFW server delete in progress, Ignore server delete:  0x%lx\n",
 			      priv->state);
 		return;
 	}

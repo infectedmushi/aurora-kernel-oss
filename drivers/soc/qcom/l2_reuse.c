@@ -46,7 +46,7 @@ static int __init l2_reuse_driver_init(void)
 	l2_reuse_kobj = kobject_create_and_add("l2_reuse", power_kobj);
 
 	if (!l2_reuse_kobj) {
-		pr_info("kobj creation for l2_reuse failed\n");
+		pr_debug("kobj creation for l2_reuse failed\n");
 		return 0;
 	}
 

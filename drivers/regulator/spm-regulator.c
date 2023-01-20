@@ -1274,7 +1274,7 @@ static int spm_regulator_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(&pdev->dev, vreg);
 
-	pr_info("name=%s, range=%s, voltage=%d uV, mode=%s, step rate=%d uV/us\n",
+	pr_debug("name=%s, range=%s, voltage=%d uV, mode=%s, step rate=%d uV/us\n",
 		vreg->rdesc.name,
 		spm_regulator_using_range0(vreg) ? "LV" : "MV",
 		vreg->uV,

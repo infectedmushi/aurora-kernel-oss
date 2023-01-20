@@ -11,7 +11,7 @@
 
 #include <linux/types.h>	/* u32 */
 #include <linux/list.h>		/* list_head */
-#include <linux/kernel.h>	/* pr_info() */
+#include <linux/kernel.h>	/* pr_debug() */
 #include <linux/compiler.h>
 #include <linux/ratelimit.h>
 #include <linux/ipc_logging.h>
@@ -134,7 +134,7 @@ extern u8 print_limit_option;
 		SPS_IPC(4, sps, msg, args); \
 		if (sps) { \
 			if (sps->ipc_log4 == NULL) \
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		} \
 	} while (0)
 #define SPS_ERR(dev, msg, args...) do {					\
@@ -151,7 +151,7 @@ extern u8 print_limit_option;
 			if (unlikely(print_limit_option > 1))	\
 				pr_info_ratelimited(msg, ##args);	\
 			else	\
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		}	\
 		SPS_IPC(3, dev, msg, args); \
 	} while (0)
@@ -161,7 +161,7 @@ extern u8 print_limit_option;
 			if (unlikely(print_limit_option > 0))	\
 				pr_info_ratelimited(msg, ##args);	\
 			else	\
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		} else	\
 			pr_debug(msg, ##args);	\
 		if (dev) { \
@@ -175,7 +175,7 @@ extern u8 print_limit_option;
 			if (unlikely(print_limit_option > 0))	\
 				pr_info_ratelimited(msg, ##args);	\
 			else	\
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		} else	\
 			pr_debug(msg, ##args);	\
 		if (dev) { \
@@ -189,7 +189,7 @@ extern u8 print_limit_option;
 			if (unlikely(print_limit_option > 0))	\
 				pr_info_ratelimited(msg, ##args);	\
 			else	\
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		} else	\
 			pr_debug(msg, ##args);	\
 		if (dev) { \
@@ -203,7 +203,7 @@ extern u8 print_limit_option;
 			if (unlikely(print_limit_option > 0))	\
 				pr_info_ratelimited(msg, ##args);	\
 			else	\
-				pr_info(msg, ##args);	\
+				pr_debug(msg, ##args);	\
 		} else	\
 			pr_debug(msg, ##args);	\
 		if (dev) { \
@@ -216,9 +216,9 @@ extern u8 print_limit_option;
 #define SPS_DBG2(dev, msg, args...)             pr_debug(msg, ##args)
 #define SPS_DBG1(dev, msg, args...)             pr_debug(msg, ##args)
 #define SPS_DBG(dev, msg, args...)              pr_debug(msg, ##args)
-#define SPS_INFO(dev, msg, args...)             pr_info(msg, ##args)
+#define SPS_INFO(dev, msg, args...)             pr_debug(msg, ##args)
 #define SPS_ERR(dev, msg, args...)              pr_err(msg, ##args)
-#define SPS_DUMP(msg, args...)                  pr_info(msg, ##args)
+#define SPS_DUMP(msg, args...)                  pr_debug(msg, ##args)
 #endif
 
 /* End point parameters */

@@ -563,7 +563,7 @@ static int hbtp_pinctrl_enable(struct hbtp_data *ts, bool on)
 	int rc = 0;
 
 	if (!ts->manage_pin_ctrl) {
-		pr_info("%s: pinctrl info is not available\n", __func__);
+		pr_debug("%s: pinctrl info is not available\n", __func__);
 		return 0;
 	}
 
@@ -1320,7 +1320,7 @@ static int hbtp_pdev_probe(struct platform_device *pdev)
 
 	error = hbtp_pinctrl_init(hbtp);
 	if (error) {
-		pr_info("%s: pinctrl isn't available, rc=%d\n", __func__,
+		pr_debug("%s: pinctrl isn't available, rc=%d\n", __func__,
 			error);
 	}
 

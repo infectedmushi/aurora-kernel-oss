@@ -39,7 +39,7 @@ static unsigned int proc_modemsleep_perms = S_IRUGO;
 
 int rpmh_modem_sleepinfo_buffer_clear(void)
 {
-	pr_info("%s: wr_offset restart\n", __func__);
+	pr_debug("%s: wr_offset restart\n", __func__);
 	mutex_lock(&modeminfo_stats.buf_mlock);
 	modeminfo_stats.wr_offset = 0;
 	snprintf(modeminfo_stats.buf_base, modeminfo_stats.buf_size, "restart state\n");
@@ -50,7 +50,7 @@ EXPORT_SYMBOL(rpmh_modem_sleepinfo_buffer_clear);
 
 static int inner_rpmh_modem_sleepinfo_buffer_clear(void)
 {
-	pr_info("%s: wr_offset restart\n", __func__);
+	pr_debug("%s: wr_offset restart\n", __func__);
 	modeminfo_stats.wr_offset = 0;
 	snprintf(modeminfo_stats.buf_base, modeminfo_stats.buf_size, "restart state\n");
 	return 0;
@@ -87,7 +87,7 @@ static ssize_t modem_sleepinfo_proc_write(struct file *file,
 				return count;
 			}
 		} else {
-			pr_info("%s: warning line%d\n", __func__, __LINE__);
+			pr_debug("%s: warning line%d\n", __func__, __LINE__);
 		}
 	}
 

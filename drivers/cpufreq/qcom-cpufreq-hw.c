@@ -531,7 +531,7 @@ static int qcom_cpufreq_hw_read_lut(struct platform_device *pdev,
 	c->table[i].frequency = CPUFREQ_TABLE_END;
 
 	if (c->skip_data.skip) {
-		pr_info("%s Skip: Index[%u], Frequency[%u], Core Count %u, Final Index %u Actual Index %u Prev_Freq[%u] Prev_Index[%u] Prev_CC[%u]\n",
+		pr_debug("%s Skip: Index[%u], Frequency[%u], Core Count %u, Final Index %u Actual Index %u Prev_Freq[%u] Prev_Index[%u] Prev_CC[%u]\n",
 				__func__, c->skip_data.high_temp_index,
 				c->skip_data.freq, c->skip_data.cc,
 				c->skip_data.final_index,
@@ -812,7 +812,7 @@ static int cpufreq_hw_register_cooling_device(struct platform_device *pdev)
 						c->skip_data.high_temp_index;
 					break;
 				}
-				pr_info("CPUFREQ-HW cooling device %d %s\n",
+				pr_debug("CPUFREQ-HW cooling device %d %s\n",
 						cpu, cdev_name);
 				break;
 			}

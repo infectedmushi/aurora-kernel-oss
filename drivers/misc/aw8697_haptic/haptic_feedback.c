@@ -592,7 +592,7 @@ static int oplus_haptic_feedback_probe(struct platform_device *pdev)
 
 	hapric_track->trigger_upload_wq = create_workqueue("haptic_chg_trigger_upload_wq");
 	g_haptic_track_chip = hapric_track;
-	pr_info("probe done\n");
+	pr_debug("probe done\n");
 
 	return 0;
 track_kthread_init_err:
@@ -640,14 +640,14 @@ static struct platform_driver oplus_haptic_feedback_driver = {
 
 static int __init haptic_feedback_init(void)
 {
-	pr_info("sensor_feedback_init call\n");
+	pr_debug("sensor_feedback_init call\n");
 
 	return platform_driver_register(&oplus_haptic_feedback_driver);
 }
 
 static void __exit haptic_feedback_exit(void)
 {
-	pr_info("sensor_feedback_exit call\n");
+	pr_debug("sensor_feedback_exit call\n");
 
 	platform_driver_unregister(&oplus_haptic_feedback_driver);
 }

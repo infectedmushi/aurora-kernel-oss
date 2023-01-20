@@ -291,7 +291,7 @@ static int watchdog_stop(struct watchdog_device *wdd)
 		return 0;
 
 	if (test_bit(WDOG_NO_WAY_OUT, &wdd->status)) {
-		pr_info("watchdog%d: nowayout prevents watchdog being stopped!\n",
+		pr_debug("watchdog%d: nowayout prevents watchdog being stopped!\n",
 			wdd->id);
 		return -EBUSY;
 	}
@@ -1009,7 +1009,7 @@ static int watchdog_cdev_register(struct watchdog_device *wdd)
 		if (handle_boot_enabled)
 			hrtimer_start(&wd_data->timer, 0, HRTIMER_MODE_REL);
 		else
-			pr_info("watchdog%d running and kernel based pre-userspace handler disabled\n",
+			pr_debug("watchdog%d running and kernel based pre-userspace handler disabled\n",
 				wdd->id);
 	}
 

@@ -87,7 +87,7 @@ void oplus_adfr_init(void *panel_node)
 	int rc = 0;
 	struct device_node *of_node = panel_node;
 
-	pr_info("kVRR oplus_adfr_init now.");
+	pr_debug("kVRR oplus_adfr_init now.");
 
 	if (!of_node) {
 		pr_err("kVRR oplus_adfr_init: the param is null.");
@@ -113,7 +113,7 @@ void oplus_adfr_init(void *panel_node)
 
 	inited = true;
 
-	pr_info("kVRR adfr config = %#X, adfr compatibility mode = %d\n", oplus_adfr_config, oplus_adfr_compatibility_mode);
+	pr_debug("kVRR adfr config = %#X, adfr compatibility mode = %d\n", oplus_adfr_config, oplus_adfr_compatibility_mode);
 }
 
 ssize_t oplus_adfr_get_debug(struct device *dev,

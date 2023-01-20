@@ -99,7 +99,7 @@ struct test_arg_end {
  */
 
 #if VERBOSE
-#define verbose(fmt, ...) pr_info(fmt, ##__VA_ARGS__)
+#define verbose(fmt, ...) pr_debug(fmt, ##__VA_ARGS__)
 #else
 #define verbose(fmt, ...)
 #endif

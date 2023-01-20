@@ -3951,7 +3951,7 @@ static int __init msm_geni_serial_init(void)
 		return ret;
 	}
 
-	pr_info("%s: Driver initialized\n", __func__);
+	pr_debug("%s: Driver initialized\n", __func__);
 
 	return ret;
 }

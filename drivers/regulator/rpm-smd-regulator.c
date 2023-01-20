@@ -421,7 +421,7 @@ static void rpm_regulator_req(struct rpm_regulator *regulator, int set,
 	}
 
 	pos += scnprintf(buf + pos, buflen - pos, "\n");
-	pr_info("%s\n", buf);
+	pr_debug("%s\n", buf);
 }
 
 #define RPM_VREG_SET_PARAM(_regulator, _param, _val) \

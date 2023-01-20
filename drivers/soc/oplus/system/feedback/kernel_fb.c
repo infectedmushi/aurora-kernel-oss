@@ -92,15 +92,15 @@ static int fb_keventupload_sendpid_cmd(struct sk_buff *skb,
 	struct nlattr *na = NULL;
 	unsigned int *p_data = NULL;
 
-	pr_info(" kernel recv cmd \n");
+	pr_debug(" kernel recv cmd \n");
 
 	if (info->attrs[FB_GUARD_CMD_ATTR_MSG]) {
 		na = info->attrs[FB_GUARD_CMD_ATTR_MSG];
 		/*PRINT_FORMAT(nla_data(na),  nla_len(na));*/
-		pr_info(" nla_len(na) is %d  \n", nla_len(na));
+		pr_debug(" nla_len(na) is %d  \n", nla_len(na));
 		p_data = nla_data(na);
 		kevent_pid = *p_data;
-		pr_info(" kevent_pid is 0x%x  \n", kevent_pid);
+		pr_debug(" kevent_pid is 0x%x  \n", kevent_pid);
 	}
 
 	return 0;
@@ -115,15 +115,15 @@ static int fb_keventupload_test_upload(struct sk_buff *skb,
 	struct kernel_packet_info *p_dcs_event = NULL;
 	size_t data_len = 0;
 
-	pr_info(" fb_keventupload_test_upload \n");
+	pr_debug(" fb_keventupload_test_upload \n");
 
 	if (info->attrs[FB_GUARD_CMD_ATTR_OPT]) {
 		na = info->attrs[FB_GUARD_CMD_ATTR_OPT];
 		/*PRINT_FORMAT(nla_data(na),  nla_len(na));*/
-		pr_info(" nla_len(na) is %d  \n", nla_len(na));
+		pr_debug(" nla_len(na) is %d  \n", nla_len(na));
 		p_test_upload = (struct msg_test_upload *)nla_data(na);
 		kevent_pid = p_test_upload->pro_pid;
-		pr_info(" p_test_upload->pro_pid is %u, p_test_upload->val is %u, \n",
+		pr_debug(" p_test_upload->pro_pid is %u, p_test_upload->val is %u, \n",
 			p_test_upload->pro_pid, p_test_upload->val);
 
 
@@ -133,7 +133,7 @@ static int fb_keventupload_test_upload(struct sk_buff *skb,
 		}
 
 		data_len = p_test_upload->val + sizeof(struct kernel_packet_info);
-		pr_info(" data_len is %u\n", data_len);
+		pr_debug(" data_len is %u\n", data_len);
 		p_dcs_event = (struct kernel_packet_info *)kmalloc(data_len, GFP_ATOMIC);
 
 		if (NULL == p_dcs_event) {
@@ -141,7 +141,7 @@ static int fb_keventupload_test_upload(struct sk_buff *skb,
 			return -1;
 		}
 
-		pr_info(" p_dcs_event kmalloc ok .\n");
+		pr_debug(" p_dcs_event kmalloc ok .\n");
 
 		memset((unsigned char *)p_dcs_event, 0x00, data_len);
 		p_dcs_event->type = 1;
@@ -234,7 +234,7 @@ int fb_kevent_send_to_user(struct kernel_packet_info *userinfo)
 	size_t data_len = 0;
 
 	/*max_len */
-	pr_info(" fb_kevent_send_to_user\n");
+	pr_debug(" fb_kevent_send_to_user\n");
 
 	if (userinfo->payload_length >= OPLUS_KEVENT_MAX_UP_PALOAD_LEN) {
 		pr_err("[ERROR]:fb_kevent_send_to_user: payload_length out of range\n");
@@ -243,7 +243,7 @@ int fb_kevent_send_to_user(struct kernel_packet_info *userinfo)
 	}
 
 	data_len = userinfo->payload_length + sizeof(struct kernel_packet_info);
-	pr_info(" data_len is %u\n", data_len);
+	pr_debug(" data_len is %u\n", data_len);
 
 	ret = genl_msg_prepare_usr_msg(FB_GUARD_CMD_GENL_UPLOAD, data_len, kevent_pid,
 			&skbuff);
@@ -589,7 +589,7 @@ static int __init kernel_fb_init(void)
 		goto failed_proc_create_data;
 	}
 
-	pr_info("kernel_fb_init probe ok\n");
+	pr_debug("kernel_fb_init probe ok\n");
 	return 0;
 
 failed_proc_create_data:

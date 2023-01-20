@@ -66,7 +66,7 @@ static inline void *zalloc(size_t size)
 }
 
 #define pr_err(format, ...) fprintf(stderr, format, ## __VA_ARGS__)
-#define pr_info(format, ...) fprintf(stdout, format, ## __VA_ARGS__)
+#define pr_debug(format, ...) fprintf(stdout, format, ## __VA_ARGS__)
 #ifdef DEBUG
 #define pr_debug(format, ...) fprintf(stderr, format, ## __VA_ARGS__)
 #else

@@ -2009,7 +2009,7 @@ static int oplus_discrete_usb_get_prop(struct power_supply *psy,
 		val->intval = POWER_SUPPLY_TYPE_USB_PD;
 		break;
 	default:
-		pr_info("get prop %d is not supported in usb\n", psp);
+		pr_debug("get prop %d is not supported in usb\n", psp);
 		rc = -EINVAL;
 		break;
 	}
@@ -2030,7 +2030,7 @@ static int oplus_discrete_usb_set_prop(struct power_supply *psy,
 
 	switch (psp) {
 	default:
-		pr_info("Set prop %d is not supported in usb psy\n",
+		pr_debug("Set prop %d is not supported in usb psy\n",
 				psp);
 		rc = -EINVAL;
 		break;

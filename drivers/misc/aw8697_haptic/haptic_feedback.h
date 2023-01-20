@@ -84,7 +84,7 @@ static inline void getnstimeofday(struct timespec *ts) {
 	pr_err("[haptic_hv]" format, ##__VA_ARGS__)
 
 #define haptic_fb_info(format, ...) \
-	pr_info("[haptic_hv]" format, ##__VA_ARGS__)
+	pr_debug("[haptic_hv]" format, ##__VA_ARGS__)
 
 #define haptic_fb_dbg(format, ...) \
 	pr_debug("[haptic_hv]" format, ##__VA_ARGS__)

@@ -580,7 +580,7 @@ static int __init sbprof_tb_init(void)
 	sbp.open = SB_CLOSED;
 	wmb();
 	tb_period = zbbus_mhz * 10000LL;
-	pr_info(DEVNAME ": initialized - tb_period = %lld\n",
+	pr_debug(DEVNAME ": initialized - tb_period = %lld\n",
 		(long long) tb_period);
 	return 0;
 

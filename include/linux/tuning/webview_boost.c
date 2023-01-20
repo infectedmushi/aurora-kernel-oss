@@ -63,7 +63,7 @@ void task_rename_hook(struct task_struct *p)
 				if ((p->prio < DEFAULT_PRIO) && strnstr(buf, temp, strlen(buf))) {
 					oplus_set_im_flag(p, im_flag);
 					if (DEBUG) {
-						pr_info("record webview: pid=%d comm=%s prio=%d leader_pid=%d leader_comm=%s\n",
+						pr_debug("record webview: pid=%d comm=%s prio=%d leader_pid=%d leader_comm=%s\n",
 						p->pid, buf, p->prio, leader->pid, leader->comm);
 					}
 					break;

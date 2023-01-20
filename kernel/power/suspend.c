@@ -333,12 +333,12 @@ static int suspend_test(int level)
 {
 #ifdef CONFIG_PM_DEBUG
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("%s pm_test_level:%d, level:%d\n", __func__,
+	pr_debug("%s pm_test_level:%d, level:%d\n", __func__,
 		pm_test_level, level);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 	if (pm_test_level == level) {
 		#ifndef OPLUS_FEATURE_POWERINFO_STANDBY
-		pr_info("suspend debug: Waiting for %d second(s).\n",
+		pr_debug("suspend debug: Waiting for %d second(s).\n",
 				pm_test_delay);
 		#else
 		pr_err("suspend debug: Waiting for %d second(s).\n",
@@ -417,7 +417,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Platform_finish;
 	#else
 	if (error) {
-		pr_info("%s platform_suspend_prepare fail\n", __func__);
+		pr_debug("%s platform_suspend_prepare fail\n", __func__);
 		goto Platform_finish;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -437,7 +437,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Devices_early_resume;
 	#else
 	if (error) {
-		pr_info("%s prepare late fail\n", __func__);
+		pr_debug("%s prepare late fail\n", __func__);
 		goto Devices_early_resume;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -462,7 +462,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Platform_wake;
 	#else
 	if (error) {
-		pr_info("%s prepare_noirq fail\n", __func__);
+		pr_debug("%s prepare_noirq fail\n", __func__);
 		goto Platform_wake;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -472,7 +472,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 		goto Platform_wake;
 	#else
 	if (suspend_test(TEST_PLATFORM)) {
-		pr_info("%s test_platform fail\n", __func__);
+		pr_debug("%s test_platform fail\n", __func__);
 		goto Platform_wake;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -486,7 +486,7 @@ static int suspend_enter(suspend_state_t state, bool *wakeup)
 	arch_suspend_disable_irqs();
 	BUG_ON(!irqs_disabled());
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("%s syscore_suspend\n", __func__);
+	pr_debug("%s syscore_suspend\n", __func__);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
 	system_state = SYSTEM_SUSPEND;
@@ -543,7 +543,7 @@ int suspend_devices_and_enter(suspend_state_t state)
 		return -ENOSYS;
 	#else
 	if (!sleep_state_supported(state)) {
-		pr_info("sleep_state_supported false\n");
+		pr_debug("sleep_state_supported false\n");
 		return -ENOSYS;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -556,7 +556,7 @@ int suspend_devices_and_enter(suspend_state_t state)
 		goto Close;
 	#else
 	if (error) {
-		pr_info("%s platform_suspend_begin fail\n", __func__);
+		pr_debug("%s platform_suspend_begin fail\n", __func__);
 		goto Close;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -576,7 +576,7 @@ int suspend_devices_and_enter(suspend_state_t state)
 		goto Recover_platform;
 	#else
 	if (suspend_test(TEST_DEVICES)) {
-		pr_info("%s TEST_DEVICES fail\n", __func__);
+		pr_debug("%s TEST_DEVICES fail\n", __func__);
 		goto Recover_platform;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -586,7 +586,7 @@ int suspend_devices_and_enter(suspend_state_t state)
 	} while (!error && !wakeup && platform_suspend_again(state));
 
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("suspend_enter end, error:%d, wakeup:%d\n", error, wakeup);
+	pr_debug("suspend_enter end, error:%d, wakeup:%d\n", error, wakeup);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
  Resume_devices:
@@ -635,7 +635,7 @@ static DECLARE_WAIT_QUEUE_HEAD(sys_sync_wait);
 static void sys_sync_work_func(struct work_struct *work)
 {
     trace_suspend_resume(TPS("sync_filesystems"), 0, true);
-    pr_info(KERN_INFO "PM: Syncing filesystems ... ");
+    pr_debug(KERN_INFO "PM: Syncing filesystems ... ");
     ksys_sync();
     pr_cont("done.\n");
     trace_suspend_resume(TPS("sync_filesystems"), 0, false);
@@ -667,7 +667,7 @@ static int enter_state(suspend_state_t state)
 #endif
 	} else if (!valid_state(state)) {
 		#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-		pr_info("%s invalid_state\n", __func__);
+		pr_debug("%s invalid_state\n", __func__);
 		#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 		return -EINVAL;
 	}
@@ -677,7 +677,7 @@ static int enter_state(suspend_state_t state)
 		return -EBUSY;
 	#else
 	if (!mutex_trylock(&system_transition_mutex)) {
-		pr_info("%s mutex_trylock fail\n", __func__);
+		pr_debug("%s mutex_trylock fail\n", __func__);
 		return -EBUSY;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -688,7 +688,7 @@ static int enter_state(suspend_state_t state)
 #ifndef CONFIG_SUSPEND_SKIP_SYNC
 #ifndef OPLUS_BUG_STABILITY
 	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
-	pr_info("Syncing filesystems ... ");
+	pr_debug("Syncing filesystems ... ");
 	ksys_sync();
 	pr_cont("done.\n");
 	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
@@ -709,13 +709,13 @@ static int enter_state(suspend_state_t state)
 		goto Unlock;
 	#else
 	if (error) {
-		pr_info("%s suspend_prepare error:%d\n", __func__, error);
+		pr_debug("%s suspend_prepare error:%d\n", __func__, error);
 		goto Unlock;
 	}
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("%s suspend_prepare success\n", __func__);
+	pr_debug("%s suspend_prepare success\n", __func__);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
 	if (suspend_test(TEST_FREEZER))
@@ -727,7 +727,7 @@ static int enter_state(suspend_state_t state)
 	error = suspend_devices_and_enter(state);
 	pm_restore_gfp_mask();
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("%s suspend_devices_and_enter end\n", __func__);
+	pr_debug("%s suspend_devices_and_enter end\n", __func__);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
  Finish:
@@ -753,7 +753,7 @@ int pm_suspend(suspend_state_t state)
 	if (state <= PM_SUSPEND_ON || state >= PM_SUSPEND_MAX)
 		return -EINVAL;
 
-	pr_info("suspend entry (%s)\n", mem_sleep_labels[state]);
+	pr_debug("suspend entry (%s)\n", mem_sleep_labels[state]);
 	error = enter_state(state);
 	if (error) {
 		suspend_stats.fail++;
@@ -761,7 +761,7 @@ int pm_suspend(suspend_state_t state)
 	} else {
 		suspend_stats.success++;
 	}
-	pr_info("suspend exit\n");
+	pr_debug("suspend exit\n");
 	return error;
 }
 EXPORT_SYMBOL(pm_suspend);

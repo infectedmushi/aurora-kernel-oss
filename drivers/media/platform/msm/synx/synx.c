@@ -1645,11 +1645,11 @@ int synx_register_ops(const struct synx_register_params *params)
 		strlcpy(client_ops->name, params->name,
 			sizeof(client_ops->name));
 		client_ops->type = params->type;
-		pr_info("registered bind ops for %s\n",
+		pr_debug("registered bind ops for %s\n",
 			params->name);
 		rc = 0;
 	} else {
-		pr_info("client already registered by %s\n",
+		pr_debug("client already registered by %s\n",
 			client_ops->name);
 		rc = -EINVAL;
 	}
@@ -1671,7 +1671,7 @@ int synx_deregister_ops(const struct synx_register_params *params)
 	mutex_lock(&synx_dev->vtbl_lock);
 	client_ops = &synx_dev->bind_vtbl[params->type];
 	memset(client_ops, 0, sizeof(*client_ops));
-	pr_info("deregistered bind ops for %s\n",
+	pr_debug("deregistered bind ops for %s\n",
 		params->name);
 	mutex_unlock(&synx_dev->vtbl_lock);
 
@@ -1683,7 +1683,7 @@ static int __init synx_init(void)
 	int rc;
 	int idx;
 
-	pr_info("synx device init start\n");
+	pr_debug("synx device init start\n");
 
 	synx_dev = kzalloc(sizeof(*synx_dev), GFP_KERNEL);
 	if (!synx_dev)
@@ -1735,7 +1735,7 @@ static int __init synx_init(void)
 	synx_dev->dma_context = dma_fence_context_alloc(1);
 
 	synx_dev->debugfs_root = init_synx_debug_dir(synx_dev);
-	pr_info("synx device init success\n");
+	pr_debug("synx device init success\n");
 
 	return 0;
 

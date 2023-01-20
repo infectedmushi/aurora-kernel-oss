@@ -197,7 +197,7 @@ void __init omap2xxx_check_revision(void)
 	sprintf(soc_name, "OMAP%04x", omap_rev() >> 16);
 	sprintf(soc_rev, "ES%x", (omap_rev() >> 12) & 0xf);
 
-	pr_info("%s", soc_name);
+	pr_debug("%s", soc_name);
 	if ((omap_rev() >> 8) & 0x0f)
 		pr_cont("%s", soc_rev);
 	pr_cont("\n");
@@ -267,7 +267,7 @@ static void __init omap3_cpuinfo(void)
 	if (*(buf + n - 1) == ' ')
 		n--;
 	n += scnprintf(buf + n, sizeof(buf) - n, ")\n");
-	pr_info("%s", buf);
+	pr_debug("%s", buf);
 }
 
 #define OMAP3_CHECK_FEATURE(status,feat)				\
@@ -607,7 +607,7 @@ void __init omap4xxx_check_revision(void)
 	sprintf(soc_name, "OMAP%04x", omap_rev() >> 16);
 	sprintf(soc_rev, "ES%d.%d", (omap_rev() >> 12) & 0xf,
 						(omap_rev() >> 8) & 0xf);
-	pr_info("%s %s\n", soc_name, soc_rev);
+	pr_debug("%s %s\n", soc_name, soc_rev);
 }
 
 void __init omap5xxx_check_revision(void)
@@ -650,7 +650,7 @@ void __init omap5xxx_check_revision(void)
 	sprintf(soc_name, "OMAP%04x", omap_rev() >> 16);
 	sprintf(soc_rev, "ES%d.0", (omap_rev() >> 12) & 0xf);
 
-	pr_info("%s %s\n", soc_name, soc_rev);
+	pr_debug("%s %s\n", soc_name, soc_rev);
 }
 
 void __init dra7xxx_check_revision(void)
@@ -726,7 +726,7 @@ void __init dra7xxx_check_revision(void)
 	sprintf(soc_rev, "ES%d.%d", (omap_rev() >> 12) & 0xf,
 		(omap_rev() >> 8) & 0xf);
 
-	pr_info("%s %s\n", soc_name, soc_rev);
+	pr_debug("%s %s\n", soc_name, soc_rev);
 }
 
 /*

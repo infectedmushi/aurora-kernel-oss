@@ -165,7 +165,7 @@ static s32 sy6529_set_predata(struct oplus_voocphy_manager *chip, u16 val)
 		pr_err("failed: write predata\n");
 		return -1;
 	}
-	pr_info("write predata 0x%0x\n", val);
+	pr_debug("write predata 0x%0x\n", val);
 	return ret;
 }
 
@@ -180,7 +180,7 @@ static s32 sy6529_set_txbuff(struct oplus_voocphy_manager *chip, u16 val)
 
 	/*txbuff*/
 	ret = sy6529_write_word(chip->client, sy6529_REG_2C, val);
-	pr_info("sy6529_REG_2C = 0x%0x\n", val);
+	pr_debug("sy6529_REG_2C = 0x%0x\n", val);
 	if (ret < 0) {
 		pr_err("failed: write txbuff\n");
 		return -1;
@@ -209,7 +209,7 @@ static s32 sy6529_get_adapter_request_info(struct oplus_voocphy_manager *chip)
 
 	VOOCPHY_DATA16_SPLIT(data, chip->voocphy_rx_buff, chip->vooc_flag);
 
-	pr_info("data: 0x%0x, vooc_flag: 0x%0x, vooc_rxdata: 0x%0x\n", data, chip->vooc_flag, chip->voocphy_rx_buff);
+	pr_debug("data: 0x%0x, vooc_flag: 0x%0x, vooc_rxdata: 0x%0x\n", data, chip->vooc_flag, chip->voocphy_rx_buff);
 
 	return 0;
 }
@@ -266,7 +266,7 @@ static void sy6529_update_chg_data(struct oplus_voocphy_manager *chip)
 	 */
 	i2c_smbus_read_i2c_block_data(chip->client, sy6529_REG_12, UPDATE_DATA_BLOCK_LENGTH, data_block);
 	for (i = 0; i < UPDATE_DATA_BLOCK_LENGTH; i++) {
-		pr_info("data_block[%d] = %u\n", i, data_block[i]);
+		pr_debug("data_block[%d] = %u\n", i, data_block[i]);
 	}
 
 	chip->cp_ichg = ((data_block[2] << CHAR_BITS) | data_block[3]) * IBUS_VBAT_LSB;		/* SY6529's ibus adc:reg14,15 LSB=0.15625mA */
@@ -275,11 +275,11 @@ static void sy6529_update_chg_data(struct oplus_voocphy_manager *chip)
 
 	chip->cp_vsys = oplus_gauge_get_batt_mvolts();
 
-	pr_info("cp_ichg = %d cp_vbus = %d, cp_vsys = %d cp_vbat = %d int_flag = %d",
+	pr_debug("cp_ichg = %d cp_vbus = %d, cp_vsys = %d cp_vbat = %d int_flag = %d",
 		chip->cp_ichg, chip->cp_vbus, chip->cp_vsys, chip->cp_vbat, chip->int_flag);
 
 	sy6529_read_byte(chip->client, sy6529_REG_00, &value);
-	pr_info("sy6529_REG_00 = 0x%0x\n", value);
+	pr_debug("sy6529_REG_00 = 0x%0x\n", value);
 
 
 }
@@ -297,13 +297,13 @@ static int sy6529_set_chg_enable(struct oplus_voocphy_manager *chip, bool enable
 	}
 
 	sy6529_read_byte(chip->client, sy6529_REG_00, &tmp);
-	pr_info("start chg sy6529_REG_00 0x%0x\n", tmp);
+	pr_debug("start chg sy6529_REG_00 0x%0x\n", tmp);
 
 	sy6529_read_byte(chip->client, sy6529_REG_02, &value);
-	pr_info("enable chg sy6529_REG_02 0x%0x\n", value);
+	pr_debug("enable chg sy6529_REG_02 0x%0x\n", value);
 
 	sy6529_read_byte(chip->client, sy6529_REG_02, &value);
-	pr_info("enable chg sy6529_REG_02 0x%0x\n", value);
+	pr_debug("enable chg sy6529_REG_02 0x%0x\n", value);
 
 	if (enable) {
 		if (chip->adapter_type == ADAPTER_VOOC20||chip->adapter_type == ADAPTER_VOOC30) {  /*mode:1:1*/
@@ -313,12 +313,12 @@ static int sy6529_set_chg_enable(struct oplus_voocphy_manager *chip, bool enable
 		}
 		ret = sy6529_write_byte(chip->client, sy6529_REG_00, tmp);
 		sy6529_read_byte(chip->client, sy6529_REG_00, &value);
-		pr_info("enable chg sy6529_REG_00 0x%0x\n", value);
+		pr_debug("enable chg sy6529_REG_00 0x%0x\n", value);
 		return ret;
 	} else {
 		ret = sy6529_write_byte(chip->client, sy6529_REG_00, tmp);
 		sy6529_read_byte(chip->client, sy6529_REG_00, &value);
-		pr_info("chg sy6529_REG_00 0x%0x\n", value);
+		pr_debug("chg sy6529_REG_00 0x%0x\n", value);
 		return ret;
 	}
 }
@@ -330,7 +330,7 @@ static int sy6529_get_cp_vbat(struct oplus_voocphy_manager *chip)
 	i2c_smbus_read_i2c_block_data(chip->client, sy6529_REG_16, 2, data_block);
 
 	chip->cp_vbat = ((data_block[0] << CHAR_BITS) | data_block[1]) * IBUS_VBAT_LSB;		/* SY6529's VBAT adc:reg16,17 LSB=0.15625mV*/
-	pr_info("cp_vbat = %d\n", chip->cp_vbat);
+	pr_debug("cp_vbat = %d\n", chip->cp_vbat);
 	return chip->cp_vbat;
 }
 
@@ -359,7 +359,7 @@ static int sy6529_direct_chg_enable(struct oplus_voocphy_manager *chip, u8 *data
 	else
 		*data=0;	/* SY6529 not working, return 0*/
 
-	pr_info("data = %d\n", *data);
+	pr_debug("data = %d\n", *data);
 	return ret;
 }
 
@@ -376,7 +376,7 @@ static int sy6529_get_cp_ichg(struct oplus_voocphy_manager *chip)
 	/*parse data_block for improving time of interrupt*/
 	i2c_smbus_read_i2c_block_data(chip->client, sy6529_REG_14, 2, data_block);
 	chip->cp_ichg = ((data_block[0] << CHAR_BITS) | data_block[1]) * IBUS_VBAT_LSB;			/* SY6529's ibus adc:reg14,15 LSB=0.15625mA*/
-	pr_info("cp_ichg = %d\n", chip->cp_ichg);
+	pr_debug("cp_ichg = %d\n", chip->cp_ichg);
 	return cp_ichg;
 }
 
@@ -455,7 +455,7 @@ static int sy6529_get_adc_enable(struct oplus_voocphy_manager *chip, u8 *data)
 	}
 
 	*data = *data >> sy6529_ADC_EN_SHIFT;
-	pr_info("data = %d", *data);
+	pr_debug("data = %d", *data);
 	return ret;
 }
 
@@ -467,10 +467,10 @@ static int sy6529_set_adc_enable(struct oplus_voocphy_manager *chip, bool enable
 	}
 
 	if (enable) {
-		pr_info("enable adc sy6529_REG_11 0x80\n");
+		pr_debug("enable adc sy6529_REG_11 0x80\n");
 		return sy6529_write_byte(chip->client, sy6529_REG_11, 0x80);
 	} else {
-		pr_info("adc sy6529_REG_11 0x00\n");
+		pr_debug("adc sy6529_REG_11 0x00\n");
 		return sy6529_write_byte(chip->client, sy6529_REG_11, 0x00);
 	}
 }
@@ -647,9 +647,9 @@ void oplus_vooc_send_handshake_seq(struct oplus_voocphy_manager *chip)
 	u8 value;
 
 	sy6529_write_byte(chip->client, sy6529_REG_2B, 0x81);
-	pr_info("sy6529_REG_2B = 0x81");
+	pr_debug("sy6529_REG_2B = 0x81");
 	sy6529_read_byte(chip->client, sy6529_REG_2B, &value);
-	pr_info("read sy6529_REG_2B = %d", value);
+	pr_debug("read sy6529_REG_2B = %d", value);
 }
 
 static int oplus_vooc_reactive_voocphy(struct oplus_voocphy_manager *chip)
@@ -710,7 +710,7 @@ static int sy6529_init_device(struct oplus_voocphy_manager *chip)
 	sy6529_write_byte(chip->client, sy6529_REG_05, 0x35);	/* SY6529: Vdrop = 300mV */
 	sy6529_write_byte(chip->client, sy6529_REG_0A, 0x00);	/* SY6529: disable REGULATION */
 	sy6529_write_byte(chip->client, sy6529_REG_10, 0x80);	/* SY6529: disable VBUS INSERT */
-	pr_info("sy6529_init_device done");
+	pr_debug("sy6529_init_device done");
 	return 0;
 }
 
@@ -727,7 +727,7 @@ int sy6529_init_vooc(struct oplus_voocphy_manager *chip)
 	sy6529_write_word(chip->client, sy6529_REG_31, 0x0);
 	sy6529_read_byte(chip->client, sy6529_REG_3A, &value);
 
-	pr_info("value = %d\n", value);
+	pr_debug("value = %d\n", value);
 
 	value = value | (1 << 6);
 
@@ -925,7 +925,7 @@ static int sy6529_svooc_hw_setting(struct oplus_voocphy_manager *chip)
 
 	sy6529_write_byte(chip->client, sy6529_REG_33, 0xD1);	/*SY6529: Loose_det=1*/
 
-	pr_info("sy6529_svooc_hw_setting done");
+	pr_debug("sy6529_svooc_hw_setting done");
 	return 0;
 }
 
@@ -941,7 +941,7 @@ static int sy6529_vooc_hw_setting(struct oplus_voocphy_manager *chip)
 
 	sy6529_write_byte(chip->client, sy6529_REG_33, 0xD1);	/*SY6529: Loose_det*/
 
-	pr_info("sy6529_vooc_hw_setting done");
+	pr_debug("sy6529_vooc_hw_setting done");
 	return 0;
 }
 
@@ -957,7 +957,7 @@ static int sy6529_5v2a_hw_setting(struct oplus_voocphy_manager *chip)
 	sy6529_write_byte(chip->client, sy6529_REG_11, 0x00);	/*SY6529: ADC_CTRL:*/
 	sy6529_write_byte(chip->client, sy6529_REG_2B, 0x00);	/*SY6529: VOOC_CTRL*/
 
-	pr_info("sy6529_5v2a_hw_setting done");
+	pr_debug("sy6529_5v2a_hw_setting done");
 	return 0;
 }
 
@@ -969,7 +969,7 @@ static int sy6529_pdqc_hw_setting(struct oplus_voocphy_manager *chip)
 	sy6529_write_byte(chip->client, sy6529_REG_00, 0x0B);	/*WD:*/
 	sy6529_write_byte(chip->client, sy6529_REG_11, 0x00);	/*ADC_CTRL:*/
 	sy6529_write_byte(chip->client, sy6529_REG_2B, 0x00);	/*VOOC_CTRL*/
-	pr_info("sy6529_pdqc_hw_setting");
+	pr_debug("sy6529_pdqc_hw_setting");
 	return 0;
 }
 
@@ -984,23 +984,23 @@ static int sy6529_hw_setting(struct oplus_voocphy_manager *chip, int reason)
 		case SETTING_REASON_PROBE:
 		case SETTING_REASON_RESET:
 			sy6529_init_device(chip);
-			pr_info("SETTING_REASON_RESET OR PROBE\n");
+			pr_debug("SETTING_REASON_RESET OR PROBE\n");
 			break;
 		case SETTING_REASON_SVOOC:
 			sy6529_svooc_hw_setting(chip);
-			pr_info("SETTING_REASON_SVOOC\n");
+			pr_debug("SETTING_REASON_SVOOC\n");
 			break;
 		case SETTING_REASON_VOOC:
 			sy6529_vooc_hw_setting(chip);
-			pr_info("SETTING_REASON_VOOC\n");
+			pr_debug("SETTING_REASON_VOOC\n");
 			break;
 		case SETTING_REASON_5V2A:
 			sy6529_5v2a_hw_setting(chip);
-			pr_info("SETTING_REASON_5V2A\n");
+			pr_debug("SETTING_REASON_5V2A\n");
 			break;
 		case SETTING_REASON_PDQC:
 			sy6529_pdqc_hw_setting(chip);
-			pr_info("SETTING_REASON_PDQC\n");
+			pr_debug("SETTING_REASON_PDQC\n");
 			break;
 		default:
 			pr_err("do nothing\n");

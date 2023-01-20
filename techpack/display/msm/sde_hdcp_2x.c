@@ -341,7 +341,7 @@ static void sde_hdcp_2x_force_encryption(void *data, bool enable)
 	}
 
 	hdcp->force_encryption = enable;
-	pr_info("force_encryption=%d\n", hdcp->force_encryption);
+	pr_debug("force_encryption=%d\n", hdcp->force_encryption);
 }
 
 static void sde_hdcp_2x_clean(struct sde_hdcp_2x_ctrl *hdcp)

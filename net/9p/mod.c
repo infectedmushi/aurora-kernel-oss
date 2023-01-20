@@ -178,7 +178,7 @@ static int __init init_p9(void)
 		return ret;
 
 	p9_error_init();
-	pr_info("Installing 9P2000 support\n");
+	pr_debug("Installing 9P2000 support\n");
 	p9_trans_fd_init();
 
 	return ret;
@@ -191,7 +191,7 @@ static int __init init_p9(void)
 
 static void __exit exit_p9(void)
 {
-	pr_info("Unloading 9P2000 support\n");
+	pr_debug("Unloading 9P2000 support\n");
 
 	p9_trans_fd_exit();
 	p9_client_exit();

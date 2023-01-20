@@ -71,7 +71,7 @@ int _debug_hotplug_cpu(int cpu, int action)
 	case 0:
 		ret = cpu_down(cpu);
 		if (!ret) {
-			pr_info("CPU %u is now offline\n", cpu);
+			pr_debug("CPU %u is now offline\n", cpu);
 			dev->offline = true;
 			kobject_uevent(&dev->kobj, KOBJ_OFFLINE);
 		} else

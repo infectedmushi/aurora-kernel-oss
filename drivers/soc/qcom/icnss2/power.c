@@ -70,7 +70,7 @@ static int icnss_get_vreg_single(struct icnss_priv *priv,
 		if (ret == -ENODEV) {
 			return ret;
 		} else if (ret == -EPROBE_DEFER) {
-			icnss_pr_info("EPROBE_DEFER for regulator: %s\n",
+			icnss_pr_debug("EPROBE_DEFER for regulator: %s\n",
 				      vreg->cfg.name);
 			goto out;
 		} else if (priv->device_id == ADRASTEA_DEVICE_ID) {
@@ -808,7 +808,7 @@ out:
 	return ret;
 }
 
-int icnss_get_cpr_info(struct icnss_priv *priv)
+int icnss_get_cpr_debug(struct icnss_priv *priv)
 {
 	struct platform_device *plat_dev = priv->pdev;
 	struct icnss_cpr_info *cpr_info = &priv->cpr_info;
@@ -865,7 +865,7 @@ out:
 	return ret;
 }
 
-int icnss_update_cpr_info(struct icnss_priv *priv)
+int icnss_update_cpr_debug(struct icnss_priv *priv)
 {
 	struct icnss_cpr_info *cpr_info = &priv->cpr_info;
 	u32 pmic_addr, voltage = 0, voltage_tmp, offset;

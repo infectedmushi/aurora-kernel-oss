@@ -253,7 +253,7 @@ static inline bool rdt_get_mb_table(struct rdt_resource *r)
 	/*
 	 * There are no Intel SKUs as of now to support non-linear delay.
 	 */
-	pr_info("MBA b/w map not implemented for cpu:%d, model:%d",
+	pr_debug("MBA b/w map not implemented for cpu:%d, model:%d",
 		boot_cpu_data.x86, boot_cpu_data.x86_model);
 
 	return false;
@@ -896,10 +896,10 @@ static int __init intel_rdt_late_init(void)
 	rdt_online = state;
 
 	for_each_alloc_capable_rdt_resource(r)
-		pr_info("Intel RDT %s allocation detected\n", r->name);
+		pr_debug("Intel RDT %s allocation detected\n", r->name);
 
 	for_each_mon_capable_rdt_resource(r)
-		pr_info("Intel RDT %s monitoring detected\n", r->name);
+		pr_debug("Intel RDT %s monitoring detected\n", r->name);
 
 	return 0;
 }

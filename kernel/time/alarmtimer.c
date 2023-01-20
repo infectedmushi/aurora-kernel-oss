@@ -303,7 +303,7 @@ static int alarmtimer_suspend(struct device *dev)
 		#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
 		alarmtimer_suspend_flag_clear();
 		alarmtimer_busy_flag_set();
-		pr_info("alarmtimer: keep system alive 2 seconds.\n");
+		pr_debug("alarmtimer: keep system alive 2 seconds.\n");
 		#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 		return -EBUSY;
 	}

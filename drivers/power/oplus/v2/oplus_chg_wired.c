@@ -287,7 +287,7 @@ static int oplus_wired_set_err_code(struct oplus_chg_wired *chip,
 		return 0;
 
 	chip->err_code = err_code;
-	pr_info("set err_code=%08x\n", err_code);
+	pr_debug("set err_code=%08x\n", err_code);
 
 	if (err_code & (BIT(OPLUS_ERR_CODE_OVP) | BIT(OPLUS_ERR_CODE_UVP)))
 		vote(chip->input_suspend_votable, UOVP_VOTER, true, 1, false);

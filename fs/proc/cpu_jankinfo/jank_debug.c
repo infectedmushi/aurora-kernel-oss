@@ -218,16 +218,16 @@ static int jank_unit_test(char *buf)
 			break;
 
 		pd_mask = perf_domain_span(pd);
-		pr_info("DEBUG BYHP0: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
+		pr_debug("DEBUG BYHP0: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
 						cpu, pd, cpumask_pr_args(pd_mask));
 
 		for (; pd; pd = pd->next) {
 			pd_mask = perf_domain_span(pd);
-			pr_info("DEBUG BYHP1: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
+			pr_debug("DEBUG BYHP1: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
 				cpu, pd, cpumask_pr_args(pd_mask));
 		}
 
-		pr_info("DEBUG BYHP2: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
+		pr_debug("DEBUG BYHP2: cpu=%d, 0x=%x, pd_mask=[%*pbl]\n",
 				cpu, pd, cpumask_pr_args(pd_mask));
 		break;
 	case 2:
@@ -235,7 +235,7 @@ static int jank_unit_test(char *buf)
 			cpumask_clear(&mask);
 			for (j = 0; j < 8; j++) {
 				cpumask_set_cpu(j, &mask);
-				pr_info("DEBUG BYHP case2:i=%d, cpu[%*pbl], "
+				pr_debug("DEBUG BYHP case2:i=%d, cpu[%*pbl], "
 						"load=%d, load32=%d\n",
 						i, cpumask_pr_args(&mask),
 						get_cpu_load(i, &mask),
@@ -265,7 +265,7 @@ static int jank_unit_test(char *buf)
 		pelt_util_est(runtime, sleeptime, cpu, second, flag);
 		break;
 	case 6:
-		pr_info("DEBUG BYHP: all_cpu[%*pbl], "
+		pr_debug("DEBUG BYHP: all_cpu[%*pbl], "
 						"silver_cpu[%*pbl], "
 						"gold_cpu[%*pbl]\n",
 						cpumask_pr_args(&all_cpu),

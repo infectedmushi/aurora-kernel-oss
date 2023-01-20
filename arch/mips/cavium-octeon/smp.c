@@ -99,7 +99,7 @@ void octeon_send_ipi_single(int cpu, unsigned int action)
 {
 	int coreid = cpu_logical_map(cpu);
 	/*
-	pr_info("SMP: Mailbox send cpu=%d, coreid=%d, action=%u\n", cpu,
+	pr_debug("SMP: Mailbox send cpu=%d, coreid=%d, action=%u\n", cpu,
 	       coreid, action);
 	*/
 	cvmx_write_csr(CVMX_CIU_MBOX_SETX(coreid), action);
@@ -127,7 +127,7 @@ static void octeon_smp_hotplug_setup(void)
 
 	labi = (struct linux_app_boot_info *)PHYS_TO_XKSEG_CACHED(LABI_ADDR_IN_BOOTLOADER);
 	if (labi->labi_signature != LABI_SIGNATURE) {
-		pr_info("The bootloader on this board does not support HOTPLUG_CPU.");
+		pr_debug("The bootloader on this board does not support HOTPLUG_CPU.");
 		return;
 	}
 
@@ -209,7 +209,7 @@ static int octeon_boot_secondary(int cpu, struct task_struct *idle)
 {
 	int count;
 
-	pr_info("SMP: Booting CPU%02d (CoreId %2d)...\n", cpu,
+	pr_debug("SMP: Booting CPU%02d (CoreId %2d)...\n", cpu,
 		cpu_logical_map(cpu));
 
 	octeon_processor_sp = __KSTK_TOS(idle);
@@ -337,7 +337,7 @@ static void octeon_cpu_die(unsigned int cpu)
 		new_mask = *p;
 	}
 
-	pr_info("Reset core %d. Available Coremask = 0x%x \n", coreid, new_mask);
+	pr_debug("Reset core %d. Available Coremask = 0x%x \n", coreid, new_mask);
 	mb();
 	cvmx_write_csr(CVMX_CIU_PP_RST, 1 << coreid);
 	cvmx_write_csr(CVMX_CIU_PP_RST, 0);

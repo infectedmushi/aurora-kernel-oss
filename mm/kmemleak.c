@@ -1619,7 +1619,7 @@ static void kmemleak_scan(void)
 	if (new_leaks) {
 		kmemleak_found_leaks = true;
 
-		pr_info("%d new suspected memory leaks (see /sys/kernel/debug/kmemleak)\n",
+		pr_debug("%d new suspected memory leaks (see /sys/kernel/debug/kmemleak)\n",
 			new_leaks);
 	}
 
@@ -1633,7 +1633,7 @@ static int kmemleak_scan_thread(void *arg)
 {
 	static int first_run = 1;
 
-	pr_info("Automatic memory scanning thread started\n");
+	pr_debug("Automatic memory scanning thread started\n");
 	set_user_nice(current, 10);
 
 	/*
@@ -1658,7 +1658,7 @@ static int kmemleak_scan_thread(void *arg)
 			timeout = schedule_timeout_interruptible(timeout);
 	}
 
-	pr_info("Automatic memory scanning thread ended\n");
+	pr_debug("Automatic memory scanning thread ended\n");
 
 	return 0;
 }
@@ -1793,7 +1793,7 @@ static int dump_str_object_info(const char *str)
 		return -EINVAL;
 	object = find_and_get_object(addr, 0);
 	if (!object) {
-		pr_info("Unknown object at 0x%08lx\n", addr);
+		pr_debug("Unknown object at 0x%08lx\n", addr);
 		return -EINVAL;
 	}
 
@@ -1955,7 +1955,7 @@ static void kmemleak_do_cleanup(struct work_struct *work)
 	if (!kmemleak_found_leaks)
 		__kmemleak_do_cleanup();
 	else
-		pr_info("Kmemleak disabled without freeing internal data. Reclaim the memory with \"echo clear > /sys/kernel/debug/kmemleak\".\n");
+		pr_debug("Kmemleak disabled without freeing internal data. Reclaim the memory with \"echo clear > /sys/kernel/debug/kmemleak\".\n");
 }
 
 static DECLARE_WORK(cleanup_work, kmemleak_do_cleanup);
@@ -1979,7 +1979,7 @@ static void kmemleak_disable(void)
 	else
 		kmemleak_free_enabled = 0;
 
-	pr_info("Kernel memory leak detector disabled\n");
+	pr_debug("Kernel memory leak detector disabled\n");
 }
 
 /*
@@ -2148,7 +2148,7 @@ static int __init kmemleak_late_init(void)
 	start_scan_thread();
 	mutex_unlock(&scan_mutex);
 
-	pr_info("Kernel memory leak detector initialized\n");
+	pr_debug("Kernel memory leak detector initialized\n");
 
 	return 0;
 }

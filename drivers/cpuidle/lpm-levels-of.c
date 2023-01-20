@@ -469,7 +469,7 @@ static int get_cpumask_for_node(struct device_node *node, struct cpumask *mask)
 
 	cpu_node = of_parse_phandle(node, "qcom,cpu", idx++);
 	if (!cpu_node) {
-		pr_info("%s: No CPU phandle, assuming single cluster\n",
+		pr_debug("%s: No CPU phandle, assuming single cluster\n",
 				node->full_name);
 		/*
 		 * Not all targets have the cpu node populated in the device
@@ -736,13 +736,13 @@ void cluster_dt_walkthrough(struct lpm_cluster *cluster)
 	for (i = 0; i < cluster->nlevels; i++) {
 		struct lpm_cluster_level *l = &cluster->levels[i];
 
-		pr_info("cluster: %s \t level: %s\n", cluster->cluster_name,
+		pr_debug("cluster: %s \t level: %s\n", cluster->cluster_name,
 							l->level_name);
 	}
 
 	list_for_each_entry(cpu, &cluster->cpu, list) {
 		for (j = 0; j < cpu->nlevels; j++)
-			pr_info("%s\tCPU level name: %s\n", str,
+			pr_debug("%s\tCPU level name: %s\n", str,
 						cpu->levels[j].name);
 	}
 

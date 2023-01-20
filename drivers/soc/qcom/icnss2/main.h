@@ -457,7 +457,7 @@ int icnss_soc_wake_event_post(struct icnss_priv *priv,
 			      u32 flags, void *data);
 int icnss_get_iova(struct icnss_priv *priv, u64 *addr, u64 *size);
 int icnss_get_iova_ipa(struct icnss_priv *priv, u64 *addr, u64 *size);
-int icnss_get_cpr_info(struct icnss_priv *priv);
-int icnss_update_cpr_info(struct icnss_priv *priv);
+int icnss_get_cpr_debug(struct icnss_priv *priv);
+int icnss_update_cpr_debug(struct icnss_priv *priv);
 #endif
 

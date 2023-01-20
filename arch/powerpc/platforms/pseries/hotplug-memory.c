@@ -413,7 +413,7 @@ static int dlpar_memory_remove_by_count(u32 lmbs_to_remove)
 	int lmbs_available = 0;
 	int rc;
 
-	pr_info("Attempting to hot-remove %d LMB(s)\n", lmbs_to_remove);
+	pr_debug("Attempting to hot-remove %d LMB(s)\n", lmbs_to_remove);
 
 	if (lmbs_to_remove == 0)
 		return -EINVAL;
@@ -428,7 +428,7 @@ static int dlpar_memory_remove_by_count(u32 lmbs_to_remove)
 	}
 
 	if (lmbs_available < lmbs_to_remove) {
-		pr_info("Not enough LMBs available (%d of %d) to satisfy request\n",
+		pr_debug("Not enough LMBs available (%d of %d) to satisfy request\n",
 			lmbs_available, lmbs_to_remove);
 		return -EINVAL;
 	}
@@ -470,7 +470,7 @@ static int dlpar_memory_remove_by_count(u32 lmbs_to_remove)
 				continue;
 
 			dlpar_release_drc(lmb->drc_index);
-			pr_info("Memory at %llx was hot-removed\n",
+			pr_debug("Memory at %llx was hot-removed\n",
 				lmb->base_addr);
 
 			drmem_remove_lmb_reservation(lmb);
@@ -487,7 +487,7 @@ static int dlpar_memory_remove_by_index(u32 drc_index)
 	int lmb_found;
 	int rc;
 
-	pr_info("Attempting to hot-remove LMB, drc index %x\n", drc_index);
+	pr_debug("Attempting to hot-remove LMB, drc index %x\n", drc_index);
 
 	lmb_found = 0;
 	for_each_drmem_lmb(lmb) {
@@ -505,10 +505,10 @@ static int dlpar_memory_remove_by_index(u32 drc_index)
 		rc = -EINVAL;
 
 	if (rc)
-		pr_info("Failed to hot-remove memory at %llx\n",
+		pr_debug("Failed to hot-remove memory at %llx\n",
 			lmb->base_addr);
 	else
-		pr_info("Memory at %llx was hot-removed\n", lmb->base_addr);
+		pr_debug("Memory at %llx was hot-removed\n", lmb->base_addr);
 
 	return rc;
 }
@@ -519,7 +519,7 @@ static int dlpar_memory_readd_by_index(u32 drc_index)
 	int lmb_found;
 	int rc;
 
-	pr_info("Attempting to update LMB, drc index %x\n", drc_index);
+	pr_debug("Attempting to update LMB, drc index %x\n", drc_index);
 
 	lmb_found = 0;
 	for_each_drmem_lmb(lmb) {
@@ -539,10 +539,10 @@ static int dlpar_memory_readd_by_index(u32 drc_index)
 		rc = -EINVAL;
 
 	if (rc)
-		pr_info("Failed to update memory at %llx\n",
+		pr_debug("Failed to update memory at %llx\n",
 			lmb->base_addr);
 	else
-		pr_info("Memory at %llx was updated\n", lmb->base_addr);
+		pr_debug("Memory at %llx was updated\n", lmb->base_addr);
 
 	return rc;
 }
@@ -553,7 +553,7 @@ static int dlpar_memory_remove_by_ic(u32 lmbs_to_remove, u32 drc_index)
 	int lmbs_available = 0;
 	int rc;
 
-	pr_info("Attempting to hot-remove %u LMB(s) at %x\n",
+	pr_debug("Attempting to hot-remove %u LMB(s) at %x\n",
 		lmbs_to_remove, drc_index);
 
 	if (lmbs_to_remove == 0)
@@ -607,7 +607,7 @@ static int dlpar_memory_remove_by_ic(u32 lmbs_to_remove, u32 drc_index)
 				continue;
 
 			dlpar_release_drc(lmb->drc_index);
-			pr_info("Memory at %llx (drc index %x) was hot-removed\n",
+			pr_debug("Memory at %llx (drc index %x) was hot-removed\n",
 				lmb->base_addr, lmb->drc_index);
 
 			drmem_remove_lmb_reservation(lmb);
@@ -698,7 +698,7 @@ static int dlpar_memory_add_by_count(u32 lmbs_to_add)
 	int lmbs_added = 0;
 	int rc;
 
-	pr_info("Attempting to hot-add %d LMB(s)\n", lmbs_to_add);
+	pr_debug("Attempting to hot-add %d LMB(s)\n", lmbs_to_add);
 
 	if (lmbs_to_add == 0)
 		return -EINVAL;
@@ -761,7 +761,7 @@ static int dlpar_memory_add_by_count(u32 lmbs_to_add)
 			if (!drmem_lmb_reserved(lmb))
 				continue;
 
-			pr_info("Memory at %llx (drc index %x) was hot-added\n",
+			pr_debug("Memory at %llx (drc index %x) was hot-added\n",
 				lmb->base_addr, lmb->drc_index);
 			drmem_remove_lmb_reservation(lmb);
 		}
@@ -776,7 +776,7 @@ static int dlpar_memory_add_by_index(u32 drc_index)
 	struct drmem_lmb *lmb;
 	int rc, lmb_found;
 
-	pr_info("Attempting to hot-add LMB, drc index %x\n", drc_index);
+	pr_debug("Attempting to hot-add LMB, drc index %x\n", drc_index);
 
 	lmb_found = 0;
 	for_each_drmem_lmb(lmb) {
@@ -797,9 +797,9 @@ static int dlpar_memory_add_by_index(u32 drc_index)
 		rc = -EINVAL;
 
 	if (rc)
-		pr_info("Failed to hot-add memory, drc index %x\n", drc_index);
+		pr_debug("Failed to hot-add memory, drc index %x\n", drc_index);
 	else
-		pr_info("Memory at %llx (drc index %x) was hot-added\n",
+		pr_debug("Memory at %llx (drc index %x) was hot-added\n",
 			lmb->base_addr, drc_index);
 
 	return rc;
@@ -811,7 +811,7 @@ static int dlpar_memory_add_by_ic(u32 lmbs_to_add, u32 drc_index)
 	int lmbs_available = 0;
 	int rc;
 
-	pr_info("Attempting to hot-add %u LMB(s) at index %x\n",
+	pr_debug("Attempting to hot-add %u LMB(s) at index %x\n",
 		lmbs_to_add, drc_index);
 
 	if (lmbs_to_add == 0)
@@ -871,7 +871,7 @@ static int dlpar_memory_add_by_ic(u32 lmbs_to_add, u32 drc_index)
 			if (!drmem_lmb_reserved(lmb))
 				continue;
 
-			pr_info("Memory at %llx (drc index %x) was hot-added\n",
+			pr_debug("Memory at %llx (drc index %x) was hot-added\n",
 				lmb->base_addr, lmb->drc_index);
 			drmem_remove_lmb_reservation(lmb);
 		}

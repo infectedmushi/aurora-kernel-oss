@@ -753,7 +753,7 @@ void __init dump_numa_cpu_topology(void)
 		return;
 
 	for_each_online_node(node) {
-		pr_info("Node %d CPUs:", node);
+		pr_debug("Node %d CPUs:", node);
 
 		count = 0;
 		/*
@@ -792,11 +792,11 @@ static void __init setup_node_data(int nid, u64 start_pfn, u64 end_pfn)
 	nd = __va(nd_pa);
 
 	/* report and initialize */
-	pr_info("  NODE_DATA [mem %#010Lx-%#010Lx]\n",
+	pr_debug("  NODE_DATA [mem %#010Lx-%#010Lx]\n",
 		nd_pa, nd_pa + nd_size - 1);
 	tnid = early_pfn_to_nid(nd_pa >> PAGE_SHIFT);
 	if (tnid != nid)
-		pr_info("    NODE_DATA(%d) on node %d\n", nid, tnid);
+		pr_debug("    NODE_DATA(%d) on node %d\n", nid, tnid);
 
 	node_data[nid] = nd;
 	memset(NODE_DATA(nid), 0, sizeof(pg_data_t));
@@ -913,7 +913,7 @@ static int __init early_topology_updates(char *p)
 		return 0;
 
 	if (!strcmp(p, "off")) {
-		pr_info("Disabling topology updates\n");
+		pr_debug("Disabling topology updates\n");
 		topology_updates_enabled = false;
 	}
 
@@ -1329,7 +1329,7 @@ int numa_update_cpu_topology(bool cpus_locked)
 		 */
 		if (!cpumask_subset(cpu_sibling_mask(cpu),
 					&cpu_associativity_changes_mask)) {
-			pr_info("Sibling bits not set for associativity "
+			pr_debug("Sibling bits not set for associativity "
 					"change, cpu%d\n", cpu);
 			cpumask_or(&cpu_associativity_changes_mask,
 					&cpu_associativity_changes_mask,

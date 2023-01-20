@@ -49,7 +49,7 @@ static int rmnet_vnd_total;
 /* Enable smart hashing capability upon call to initialize module*/
 int __init rmnet_shs_module_init(void)
 {
-	pr_info("%s(): Starting rmnet SHS module\n", __func__);
+	pr_debug("%s(): Starting rmnet SHS module\n", __func__);
 	trace_rmnet_shs_high(RMNET_SHS_MODULE, RMNET_SHS_MODULE_INIT,
 			    0xDEF, 0xDEF, 0xDEF, 0xDEF, NULL, NULL);
 
@@ -69,7 +69,7 @@ void __exit rmnet_shs_module_exit(void)
 
 	rmnet_shs_wq_genl_deinit();
 
-	pr_info("%s(): Exiting rmnet SHS module\n", __func__);
+	pr_debug("%s(): Exiting rmnet SHS module\n", __func__);
 }
 
 static int rmnet_shs_dev_notify_cb(struct notifier_block *nb,
@@ -101,7 +101,7 @@ static int rmnet_shs_dev_notify_cb(struct notifier_block *nb,
 		if (!rmnet_vnd_total && rmnet_shs_cfg.rmnet_shs_init_complete) {
 			unsigned int cpu_switch;
 
-			pr_info("rmnet_shs deinit %s going down ", dev->name);
+			pr_debug("rmnet_shs deinit %s going down ", dev->name);
 			RCU_INIT_POINTER(rmnet_shs_skb_entry, NULL);
 			qmi_rmnet_ps_ind_deregister(rmnet_shs_cfg.port,
 					    &rmnet_shs_cfg.rmnet_idl_ind_cb);
@@ -120,7 +120,7 @@ static int rmnet_shs_dev_notify_cb(struct notifier_block *nb,
 		rmnet_vnd_total++;
 
 		if (rmnet_vnd_total && !rmnet_shs_cfg.rmnet_shs_init_complete) {
-			pr_info("rmnet_shs initializing %s", dev->name);
+			pr_debug("rmnet_shs initializing %s", dev->name);
 			priv = netdev_priv(dev);
 			port = rmnet_get_port(priv->real_dev);
 			if (!port) {

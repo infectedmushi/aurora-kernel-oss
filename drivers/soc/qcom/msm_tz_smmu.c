@@ -83,7 +83,7 @@ static int __msm_tz_smmu_atos(struct device *dev, int cb_num, int operation)
 	ret = scm_call2(SCM_SIP_FNID(SCM_SVC_MP, TZ_SMMU_PREPARE_ATOS_ID),
 			&desc);
 	if (ret)
-		pr_info("%s: TZ SMMU ATOS %s failed, ret = %d\n",
+		pr_debug("%s: TZ SMMU ATOS %s failed, ret = %d\n",
 			__func__,
 			operation == TZ_SMMU_ATOS_START ? "start" : "end",
 			ret);

@@ -98,7 +98,7 @@ static void __init vmware_sched_clock_setup(void)
 					   d->cyc2ns_shift);
 
 	pv_time_ops.sched_clock = vmware_sched_clock;
-	pr_info("using sched offset of %llu ns\n", d->cyc2ns_offset);
+	pr_debug("using sched offset of %llu ns\n", d->cyc2ns_offset);
 }
 
 static void __init vmware_paravirt_ops_setup(void)
@@ -142,7 +142,7 @@ static void __init vmware_platform_setup(void)
 		lpj = tsc_khz = eax | (((uint64_t)ebx) << 32);
 		do_div(tsc_khz, 1000);
 		WARN_ON(tsc_khz >> 32);
-		pr_info("TSC freq read from hypervisor : %lu.%03lu MHz\n",
+		pr_debug("TSC freq read from hypervisor : %lu.%03lu MHz\n",
 			(unsigned long) tsc_khz / 1000,
 			(unsigned long) tsc_khz % 1000);
 
@@ -158,7 +158,7 @@ static void __init vmware_platform_setup(void)
 #ifdef CONFIG_X86_LOCAL_APIC
 		/* Skip lapic calibration since we know the bus frequency. */
 		lapic_timer_frequency = ecx / HZ;
-		pr_info("Host bus clock speed read from hypervisor : %u Hz\n",
+		pr_debug("Host bus clock speed read from hypervisor : %u Hz\n",
 			ecx);
 #endif
 	} else {

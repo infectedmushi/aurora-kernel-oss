@@ -534,7 +534,7 @@ int rsc_hw_init_v3(struct sde_rsc_priv *rsc)
 
 	wmb(); /* make sure that hw is initialized */
 
-	pr_info("sde rsc init successfully done\n");
+	pr_debug("sde rsc init successfully done\n");
 end:
 	return rc;
 }

@@ -769,7 +769,7 @@ static void oplus_parse_service_name(struct binder_transaction_data *tr,
 			}
 			sname[len] = '\0';
 		}
-		pr_info("context.name[%s] tr.size:%lu service:%s\n",
+		pr_debug("context.name[%s] tr.size:%lu service:%s\n",
 			proc->context->name, (unsigned long)tr->data_size, sname);
 	} else {
 		if (NULL != tr && 0 != tr->target.handle) {
@@ -1241,7 +1241,7 @@ void obwork_check_restrict_off(struct binder_proc *proc)
 		if (now - w->ob_begin < OBWORK_TIMEOUT_NS)
 			break;
 		list_del_init(&w->entry);
-		//pr_info("%s timeoutinfo:t->from:%d,t->start:%llu now:%llu",__func__,t->from->pid,w->ob_begin,now);
+		//pr_debug("%s timeoutinfo:t->from:%d,t->start:%llu now:%llu",__func__,t->from->pid,w->ob_begin,now);
 		binder_enqueue_work_ilocked(w, &proc->todo);
 	}
 	ob_target.ob_check_ts = sched_clock();
@@ -1320,7 +1320,7 @@ void obtarget_init(struct binder_proc *proc)
 		ob_target.ob_check_ts = sched_clock();
 		INIT_LIST_HEAD(&ob_target.ob_list);
 		ob_target.init = true;
-		//pr_info("%s: ob_target->pid:%d ob_target->name:%s\n", __func__, proc->tsk->pid,proc->tsk->comm);
+		//pr_debug("%s: ob_target->pid:%d ob_target->name:%s\n", __func__, proc->tsk->pid,proc->tsk->comm);
 	}
 }
 
@@ -1331,7 +1331,7 @@ void obthread_init(struct binder_proc *proc, struct binder_thread *thread)
 	if (proc->requested_threads_started == BG_THREAD) {
 		thread->looper |= BINDER_LOOPER_STATE_BACKGROUND;
 		ob_pid = thread->task->pid;
-		//pr_info("%s :bg thread->name:%s thread->pid:%d", __func__,thread->task->comm,thread->task->pid);
+		//pr_debug("%s :bg thread->name:%s thread->pid:%d", __func__,thread->task->comm,thread->task->pid);
 	}
 }
 
@@ -1401,7 +1401,7 @@ struct binder_thread *obthread_get(struct binder_proc *proc, struct binder_trans
 		list_for_each_entry(thread, &proc->waiting_threads, waiting_thread_node)
 			if (thread && (thread->looper & BINDER_LOOPER_STATE_BACKGROUND)) {
 				list_del_init(&thread->waiting_thread_node);
-				pr_info("%s :bg thread->name:%s thread->pid:%d", __func__, thread->task->comm, thread->task->pid);
+				pr_debug("%s :bg thread->name:%s thread->pid:%d", __func__, thread->task->comm, thread->task->pid);
 				return thread;
 			}
 		return NULL;
@@ -1419,7 +1419,7 @@ int sysctl_ob_control_handler(struct ctl_table *table, int write, void __user *b
 	if (!write)
 		goto out;
 	if (!sysctl_ob_control_enable) {
-		pr_info("_%s dequeue all bg work", __func__);
+		pr_debug("_%s dequeue all bg work", __func__);
 		oblist_dequeue_all();
 	}
 out:
@@ -5785,7 +5785,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	unsigned int size = _IOC_SIZE(cmd);
 	void __user *ubuf = (void __user *)arg;
 
-	/*pr_info("binder_ioctl: %d:%d %x %lx\n",
+	/*pr_debug("binder_ioctl: %d:%d %x %lx\n",
 			proc->pid, current->pid, cmd, arg);*/
 
 	binder_selftest_alloc(&proc->alloc);

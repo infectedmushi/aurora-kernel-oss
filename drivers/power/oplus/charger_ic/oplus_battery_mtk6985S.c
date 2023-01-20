@@ -6734,7 +6734,7 @@ static int oplus_chg_usb_event_notifier_call(struct notifier_block *nb,
 		}
 
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
-			pr_info("%s wls %s\n", __func__, val == OPLUS_CHG_EVENT_ONLINE ? "online" : "offline");
+			pr_debug("%s wls %s\n", __func__, val == OPLUS_CHG_EVENT_ONLINE ? "online" : "offline");
 			oplus_chg_wake_update_work();
 		}
 		break;

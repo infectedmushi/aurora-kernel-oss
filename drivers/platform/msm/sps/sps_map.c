@@ -7,7 +7,7 @@
  */
 
 #include <linux/types.h>	/* u32 */
-#include <linux/kernel.h>	/* pr_info() */
+#include <linux/kernel.h>	/* pr_debug() */
 #include <linux/memory.h>	/* memset */
 
 #include "spsi.h"

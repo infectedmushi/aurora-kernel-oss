@@ -660,7 +660,7 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
 	if(panel->nt36523w_ktz8866) {
 		/* add for oslo bringup */
 		/*ktz8866 power*/
-		pr_info("%d %s dis_set_first_level=%d\n", __LINE__, __func__, dis_set_first_level);
+		pr_debug("%d %s dis_set_first_level=%d\n", __LINE__, __func__, dis_set_first_level);
 		rc = turn_on_ktz8866_hw_en(true);
 		if (rc) {
 			DSI_ERR("[%s] failed to turn_on_ktz8866_hw_en, rc=%d\n",
@@ -668,7 +668,7 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
 			goto error_disable_vregs;
 		}
 		rc = lcd_set_bias(true);
-		pr_info("lcd_set_bias(true)\n");
+		pr_debug("lcd_set_bias(true)\n");
 		if (rc) {
 			DSI_ERR("[%s] failed to lcd_set_bias, rc=%d\n",
 				panel->name, rc);
@@ -857,7 +857,7 @@ static int dsi_panel_power_off(struct dsi_panel *panel)
 	if(panel->nt36523w_ktz8866) {
 	/* add for oslo bringup */
 	/*ktz8866 power off*/
-		pr_info("lcd_set_bias false\n");
+		pr_debug("lcd_set_bias false\n");
 		rc = lcd_set_bias(false);
 		if (rc) {
 			DSI_ERR("[%s] failed set lcd_set_bias false, rc=%d\n", panel->name, rc);
@@ -1315,7 +1315,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 					panel->oplus_priv.low_light_gamma_is_adjusted = false;
 				} else {
 					panel->oplus_priv.low_light_gamma_is_adjusted = true;
-					pr_info("bl_lvl=%d, send DSI_GAMMA_LOWBL_COMMAND ok\n", bl_lvl);
+					pr_debug("bl_lvl=%d, send DSI_GAMMA_LOWBL_COMMAND ok\n", bl_lvl);
 				}
 			}
 		} else if (bl_lvl > panel->oplus_priv.low_light_adjust_gamma_level){
@@ -1326,7 +1326,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 					panel->oplus_priv.low_light_gamma_is_adjusted = true;
 				} else {
 					panel->oplus_priv.low_light_gamma_is_adjusted = false;
-					pr_info("bl_lvl=%d, send DSI_GAMMA_NOMAL_COMMAND ok\n", bl_lvl);
+					pr_debug("bl_lvl=%d, send DSI_GAMMA_NOMAL_COMMAND ok\n", bl_lvl);
 				}
 			}
 		}
@@ -5140,7 +5140,7 @@ int dsi_panel_pre_prepare(struct dsi_panel *panel)
 		}
 		if ((0 == mdss_tp_black_gesture_status()) || (1 == tp_black_power_on_ff_flag)) {
 			tp_black_power_on_ff_flag = 0;
-			pr_info("%s:[TP] tp_black_power_on_ff_flag = %d\n",__func__,tp_black_power_on_ff_flag);
+			pr_debug("%s:[TP] tp_black_power_on_ff_flag = %d\n",__func__,tp_black_power_on_ff_flag);
 			dsi_panel_1p8_on_off(panel,true);
 			rc = dsi_pwr_enable_regulator(&panel->power_info, true);
 			if (rc) {
@@ -5691,7 +5691,7 @@ int dsi_panel_fps_change(struct dsi_panel *panel)
 			}
 	}
 	fps_tmp = panel->cur_mode->timing.refresh_rate;
-	pr_info("fps_tmp = %d\n", fps_tmp);
+	pr_debug("fps_tmp = %d\n", fps_tmp);
 	return rc;
 }
 
@@ -6010,7 +6010,7 @@ int dsi_panel_unprepare(struct dsi_panel *panel)
 #ifdef OPLUS_BUG_STABILITY
 	if (strstr(panel->oplus_priv.vendor_name,"NT36672C")) {
 		if (1 != tp_gesture_enable_flag()) {
-			pr_info("%s:%d tp gesture is off set reset 0\n", __func__, __LINE__);
+			pr_debug("%s:%d tp gesture is off set reset 0\n", __func__, __LINE__);
 			if (gpio_is_valid(panel->reset_config.reset_gpio))
 				gpio_set_value(panel->reset_config.reset_gpio, 0);
 			usleep_range(5000, 6000);

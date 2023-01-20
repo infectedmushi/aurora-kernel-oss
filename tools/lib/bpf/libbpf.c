@@ -87,7 +87,7 @@ do {				\
 } while (0)
 
 #define pr_warning(fmt, ...)	__pr(__pr_warning, fmt, ##__VA_ARGS__)
-#define pr_info(fmt, ...)	__pr(__pr_info, fmt, ##__VA_ARGS__)
+#define pr_debug(fmt, ...)	__pr(__pr_info, fmt, ##__VA_ARGS__)
 #define pr_debug(fmt, ...)	__pr(__pr_debug, fmt, ##__VA_ARGS__)
 
 void libbpf_set_print(libbpf_print_fn_t warn,

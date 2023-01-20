@@ -644,7 +644,7 @@ static int vmem_probe(struct platform_device *pdev)
 	__disable_interrupts(v);
 
 	/* Everything good so far, set up the global context and debug hooks */
-	pr_info("Up and running with %d banks of memory from %pR\n",
+	pr_debug("Up and running with %d banks of memory from %pR\n",
 			v->num_banks, &v->mem.resource);
 	v->debugfs_root = vmem_debugfs_init(pdev);
 	platform_set_drvdata(pdev, v);

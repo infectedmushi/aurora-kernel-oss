@@ -962,7 +962,7 @@ static int pp_pcc_set_config(char __iomem *base_addr,
 		return -EINVAL;
 	}
 	if (!(pcc_cfg_data->ops & ~(MDP_PP_OPS_READ))) {
-		pr_info("only read ops is set %d\n", pcc_cfg_data->ops);
+		pr_debug("only read ops is set %d\n", pcc_cfg_data->ops);
 		return 0;
 	}
 	pcc_data = pcc_cfg_data->cfg_payload;
@@ -1300,7 +1300,7 @@ static int pp_pa_set_config(char __iomem *base_addr,
 		return -EINVAL;
 	}
 	if (!(pa_cfg_data->flags & ~(MDP_PP_OPS_READ))) {
-		pr_info("only read ops is set %d\n", pa_cfg_data->flags);
+		pr_debug("only read ops is set %d\n", pa_cfg_data->flags);
 		return 0;
 	}
 	if (pa_cfg_data->flags & MDP_PP_OPS_DISABLE) {
@@ -1973,7 +1973,7 @@ static int pp_pgc_get_config(char __iomem *base_addr, void *cfg_data,
 		return -EFAULT;
 	}
 	if (!(pgc_data->flags & MDP_PP_OPS_READ)) {
-		pr_info("read ops is not set %d\n", pgc_data->flags);
+		pr_debug("read ops is not set %d\n", pgc_data->flags);
 		return -EINVAL;
 	}
 	sz = PGC_LUT_ENTRIES * sizeof(u32);

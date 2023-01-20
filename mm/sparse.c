@@ -344,7 +344,7 @@ static void __init check_usemap_section_nr(int nid, unsigned long *usemap)
 
 	usemap_nid = sparse_early_nid(__nr_to_section(usemap_snr));
 	if (usemap_nid != nid) {
-		pr_info("node %d must be removed before remove section %ld\n",
+		pr_debug("node %d must be removed before remove section %ld\n",
 			nid, usemap_snr);
 		return;
 	}
@@ -354,7 +354,7 @@ static void __init check_usemap_section_nr(int nid, unsigned long *usemap)
 	 * gather other removable sections for dynamic partitioning.
 	 * Just notify un-removable section's number here.
 	 */
-	pr_info("Section %ld and %ld (node %d) have a circular dependency on usemap and pgdat allocations\n",
+	pr_debug("Section %ld and %ld (node %d) have a circular dependency on usemap and pgdat allocations\n",
 		usemap_snr, pgdat_snr, nid);
 }
 #else

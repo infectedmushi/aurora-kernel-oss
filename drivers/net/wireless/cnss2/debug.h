@@ -32,7 +32,7 @@ extern void *cnss_ipc_log_long_context;
 		cnss_ipc_log_string("%scnss: " _fmt, "", ##__VA_ARGS__);\
 	} while (0)
 
-#define cnss_pr_info(_fmt, ...) do {					\
+#define cnss_pr_debug(_fmt, ...) do {					\
 		printk("%scnss: " _fmt, KERN_INFO, ##__VA_ARGS__);	\
 		cnss_ipc_log_string("%scnss: " _fmt, "", ##__VA_ARGS__);\
 	} while (0)

@@ -439,7 +439,7 @@ int charger_manager_enable_high_voltage_charging(
 	else if (en && consumer->hv_charging_disabled == true)
 		consumer->hv_charging_disabled = false;
 	else {
-		pr_info("[%s] already set: %d %d\n", __func__,
+		pr_debug("[%s] already set: %d %d\n", __func__,
 			consumer->hv_charging_disabled, en);
 		return 0;
 	}
@@ -456,7 +456,7 @@ int charger_manager_enable_high_voltage_charging(
 	}
 	mutex_unlock(&consumer_mutex);
 
-	pr_info("%s: user: %s, en = %d\n", __func__, dev_name(consumer->dev),
+	pr_debug("%s: user: %s, en = %d\n", __func__, dev_name(consumer->dev),
 		info->enable_hv_charging);
 
 	if (mtk_pe50_get_is_connect(info) && !info->enable_hv_charging)
@@ -504,7 +504,7 @@ int charger_manager_enable_power_path(struct charger_consumer *consumer,
 		return 0;
 	}
 
-	pr_info("%s: enable power path = %d\n", __func__, en);
+	pr_debug("%s: enable power path = %d\n", __func__, en);
 	return charger_dev_enable_powerpath(chg_dev, en);
 }
 
@@ -5213,7 +5213,7 @@ int oplus_chg_ntc_init(struct oplus_chg_chip *chip)
 		pr_err("%s ntc gpio init failed\n", __func__);
 		return -1;
 	}
-	pr_info("%s ntc channel init success, %d\n", __func__);
+	pr_debug("%s ntc channel init success, %d\n", __func__);
 
 	return 0;
 }

@@ -139,7 +139,7 @@ int send_to_user(int sock_no, size_t len, const int *data)
 	/* fill the data */
 	for (i = 0; i + SEND_DATA_LEN < num; i++) {
 		dt[i + SEND_DATA_LEN] = data[i];
-		pr_info("cpu_netlink: send_to_user: %d\n", data[i]);
+		pr_debug("cpu_netlink: send_to_user: %d\n", data[i]);
 	}
 
 	len = sizeof(int) * num;
@@ -190,7 +190,7 @@ static int recv_from_user(struct sk_buff *skb, struct genl_info *info)
 	if (tmp_skb->len >= NLMSG_SPACE(0)) {
 		nlh = nlmsg_hdr(tmp_skb);
 		recv_pid = nlh->nlmsg_pid;
-		pr_info("cpu_netlink: recv_from_user: %d\n", recv_pid);
+		pr_debug("cpu_netlink: recv_from_user: %d\n", recv_pid);
 	}
 
 	return 0;

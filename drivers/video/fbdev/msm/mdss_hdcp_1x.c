@@ -766,7 +766,7 @@ static int hdcp_1x_authentication_part1(struct hdcp_1x *hdcp)
 	if (rc)
 		goto error;
 
-	pr_info("SUCCESSFUL\n");
+	pr_debug("SUCCESSFUL\n");
 
 	return 0;
 error:
@@ -1097,7 +1097,7 @@ error:
 	} else {
 		hdcp->hdcp_state = HDCP_STATE_AUTHENTICATED;
 
-		pr_info("SUCCESSFUL\n");
+		pr_debug("SUCCESSFUL\n");
 	}
 
 	return rc;

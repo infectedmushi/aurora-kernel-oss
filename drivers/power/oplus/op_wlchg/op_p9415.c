@@ -230,7 +230,7 @@ static int p9415_set_vbat_en_val(struct op_p9415_ic *chip, int value)
 		pinctrl_select_state(chip->pinctrl, chip->vbat_en_sleep);
 	}
 
-	pr_info("set value:%d, gpio_val:%d\n", value,
+	pr_debug("set value:%d, gpio_val:%d\n", value,
 		gpio_get_value(chip->vbat_en_gpio));
 	return 0;
 }
@@ -588,7 +588,7 @@ static int p9415_set_idt_en_val(struct op_p9415_ic *chip, int value) // 0 active
 		gpio_direction_output(chip->idt_en_gpio, 0);
 		pinctrl_select_state(chip->pinctrl, chip->idt_en_default);
 	}
-	pr_info("set value:%d, gpio_val:%d\n", value,
+	pr_debug("set value:%d, gpio_val:%d\n", value,
 		gpio_get_value(chip->idt_en_gpio));
 	return 0;
 }
@@ -721,7 +721,7 @@ static int p9415_get_cep_val(struct op_p9415_ic *chip, int *val)
 
 	rc = p9415_get_cep_change_status(chip);
 	if (rc) {
-		pr_info("cep val is not updated\n");
+		pr_debug("cep val is not updated\n");
 		return rc;
 	}
 
@@ -776,13 +776,13 @@ static int p9415_get_rx_run_mode(struct op_p9415_ic *chip, int *val)
 		 return rc;
 	}
 	if (temp == 0x31) {
-		pr_info("RX running in EPP!\n");
+		pr_debug("RX running in EPP!\n");
 		*val = RX_RUNNING_MODE_EPP;
 	} else if (temp == 0x04) {
-		pr_info("RX running in BPP!\n");
+		pr_debug("RX running in BPP!\n");
 		*val = RX_RUNNING_MODE_BPP;
 	} else{
-		pr_info("RX running in Others!\n");
+		pr_debug("RX running in Others!\n");
 		*val = RX_RUNNING_MODE_OTHERS;
 	}
 	return 0;
@@ -856,7 +856,7 @@ static int p9415_ftm_test(struct op_p9415_ic *chip)
 		pr_err("[FTM_TEST]Couldn't read p9415 fw version, rc=%d\n", rc);
 		err_no |= WLCHG_FTM_TEST_RX_ERR;
 	}
-	pr_info("[FTM_TEST]p9415 fw: %02x %02x %02x %02x\n", temp[0], temp[1], temp[2], temp[3]);
+	pr_debug("[FTM_TEST]p9415 fw: %02x %02x %02x %02x\n", temp[0], temp[1], temp[2], temp[3]);
 
 	if (wlchg_get_usbin_val() != 0) {
 		pr_err("[FTM_TEST]usb_int status exception\n");
@@ -1104,7 +1104,7 @@ static unsigned char p9415_calculate_checksum(const unsigned char *data, int len
 	while(len--)
 		temp ^= *data++;
 
-	pr_info("checksum = %d\n", temp);
+	pr_debug("checksum = %d\n", temp);
 	return temp;
 }
 
@@ -1571,11 +1571,11 @@ static int p9415_MTP(struct op_p9415_ic *chip, unsigned char *fw_buf, int fw_siz
 
 	msleep(100);
 	// disable pm8150b vbus out.
-	pr_info("<IDT UPDATE>disable pm8150b vbus out\n");
+	pr_debug("<IDT UPDATE>disable pm8150b vbus out\n");
 	smblib_vbus_regulator_disable(normal_charger->vbus_vreg->rdev);
 	msleep(3000);
 	// enable pm8150b vbus out.
-	pr_info("<IDT UPDATE>enable pm8150b vbus out\n");
+	pr_debug("<IDT UPDATE>enable pm8150b vbus out\n");
 	smblib_set_charge_param(normal_charger, &normal_charger->param.otg_cl,
 				WIRELESS_CHARGE_UPGRADE_CURR_LIMT);
 	smblib_set_charge_param(normal_charger, &normal_charger->param.otg_vol,
@@ -1728,7 +1728,7 @@ static int p9415_check_idt_fw_update(struct op_p9415_ic *chip)
 
 	// get idt id.
 	rc = p9415_read_reg(chip, 0x5870, temp, 2);
-	pr_info("<IDT UPDATE> ID= %02x %02x", temp[0], temp[1]);
+	pr_debug("<IDT UPDATE> ID= %02x %02x", temp[0], temp[1]);
 	if (!rc)
 		snprintf(chip->manu_name, 10, "IDTP9415");
 
@@ -1764,7 +1764,7 @@ static int p9415_check_idt_fw_update(struct op_p9415_ic *chip)
 		    (temp[3] != fw_buf[fw_ver_start_addr + 0x07]) ||
 		    (idt_update_retry_cnt > 0)) {
 #endif
-			pr_info("<IDT UPDATE>Need update the idt fw!\n");
+			pr_debug("<IDT UPDATE>Need update the idt fw!\n");
 			if (p9415_MTP(chip, fw_buf, fw_size) == 0) {
 				idt_update_retry_cnt = 0;
 				chip->check_fw_update = true;
@@ -1777,7 +1777,7 @@ static int p9415_check_idt_fw_update(struct op_p9415_ic *chip)
 				rc = -1;
 			}
 		} else {
-			pr_info("<IDT UPDATE>No Need update the idt fw!\n");
+			pr_debug("<IDT UPDATE>No Need update the idt fw!\n");
 			fw_upgrade_successful = true;
 			chip->check_fw_update = true;
 		}
@@ -1877,11 +1877,11 @@ static void p9415_commu_data_process(struct op_p9415_ic *chip)
 		pr_err("Couldn't read 0x%04x rc = %x\n", P9415_STATUS_REG, rc);
 		temp[0] = 0;
 	} else {
-		pr_info("read 0x0036 = 0x%02x 0x%02x\n", temp[0], temp[1]);
+		pr_debug("read 0x0036 = 0x%02x 0x%02x\n", temp[0], temp[1]);
 	}
 
 	if (temp[0] & P9415_LDO_ON_MASK) {
-		pr_info("<~WPC~> LDO is on, connected.");
+		pr_debug("<~WPC~> LDO is on, connected.");
 		if (p9415_firmware_is_updating(chip)) {
 			pr_err("firmware_is_updating is true, return directly.");
 			return;
@@ -1897,17 +1897,17 @@ static void p9415_commu_data_process(struct op_p9415_ic *chip)
 		if (rc) {
 			pr_err("Couldn't read 0x%04x rc = %x\n", 0x0058, rc);
 		} else {
-			pr_info("Received TX data: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x",
+			pr_debug("Received TX data: 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x",
 				val_buf[0], val_buf[1], val_buf[2], val_buf[3], val_buf[4], val_buf[5]);
 			temp[0] = ~val_buf[2];
 			temp[1] = ~val_buf[4];
 			if ((val_buf[0] == 0x4F) && (val_buf[1] == temp[0]) &&
 			    (val_buf[3] == temp[1])) {
 				rc = wlchg_send_msg(WLCHG_MSG_CMD_RESULT, val_buf[3], val_buf[1]);
-				pr_info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
-				pr_info("<~WPC~> Received TX command: 0x%02X, data: 0x%02X\n",
+				pr_debug("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
+				pr_debug("<~WPC~> Received TX command: 0x%02X, data: 0x%02X\n",
 					val_buf[1], val_buf[3]);
-				pr_info("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
+				pr_debug("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n");
 				if (rc < 0) {
 					pr_err("send cmd result err, try again\n");
 					msleep(2);
@@ -1915,7 +1915,7 @@ static void p9415_commu_data_process(struct op_p9415_ic *chip)
 				}
 			} else if (val_buf[0] == 0x5F) {
 				if (val_buf[5] == 0x04 && (val_buf[4] == 0x03 || val_buf[4] == 0x02)) {
-					pr_info("It's on OP Trx phone.");
+					pr_debug("It's on OP Trx phone.");
 					rx_chip->on_op_trx = true;
 				}
 				rc = wlchg_send_msg(WLCHG_MSG_CMD_RESULT, 0, val_buf[0]);
@@ -2328,7 +2328,7 @@ start:
 			pr_err("<IDT UPDATE>image header verification succeeded, fw_size=%d\n", fw_size);
 			memcpy(fw_buf, buf + sizeof(struct idt_fw_head), count - sizeof(struct idt_fw_head));
 			fw_index = count - sizeof(struct idt_fw_head);
-			pr_info("<IDT UPDATE>Receiving image, fw_size=%d, fw_index=%d\n", fw_size, fw_index);
+			pr_debug("<IDT UPDATE>Receiving image, fw_size=%d, fw_index=%d\n", fw_size, fw_index);
 			if (fw_index >= fw_size) {
 				upgrade_step = UPGRADE_END;
 				goto start;
@@ -2343,7 +2343,7 @@ start:
 	case UPGRADE_FW:
 		memcpy(fw_buf + fw_index, buf, count);
 		fw_index += count;
-		pr_info("<IDT UPDATE>Receiving image, fw_size=%d, fw_index=%d\n", fw_size, fw_index);
+		pr_debug("<IDT UPDATE>Receiving image, fw_size=%d, fw_index=%d\n", fw_size, fw_index);
 		if (fw_index >= fw_size) {
 			upgrade_step = UPGRADE_END;
 			goto start;

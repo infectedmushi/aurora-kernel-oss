@@ -620,7 +620,7 @@ int bq2589x_force_dpdm(struct bq2589x *bq)
 	ret = bq2589x_update_bits(bq, BQ2589X_REG_02, 
 						BQ2589X_FORCE_DPDM_MASK, val);
 
-	pr_info("Force DPDM %s\n", !ret ?  "successfully" : "failed");
+	pr_debug("Force DPDM %s\n", !ret ?  "successfully" : "failed");
 	bq2589x_set_input_current_limit(bq, 1400);
 	g_oplus_chip->sub_chg_ops->input_current_write(600);
 	return ret;
@@ -1135,7 +1135,7 @@ static irqreturn_t bq2589x_irq_handler(int irq, void *data)
 			bq->nonstand_retry_bc = true;
 			if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 				bq2589x_force_dpdm(bq);//even-c
-				pr_info("not dpdm [%s] \n",__func__);
+				pr_debug("not dpdm [%s] \n",__func__);
 			} else
 				bq2589x_force_dpdm(bq);
 			return IRQ_HANDLED;
@@ -1180,7 +1180,7 @@ static int bq2589x_register_interrupt(struct device_node *np,struct bq2589x *bq)
 	int ret = 0;
 	
 	bq->irq = irq_of_parse_and_map(np, 0);
-	pr_info("irq = %d\n", bq->irq);
+	pr_debug("irq = %d\n", bq->irq);
 
 	ret = devm_request_threaded_irq(bq->dev, bq->irq, NULL,
 					bq2589x_irq_handler,
@@ -1785,7 +1785,7 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 			cptime[j][0] = PEOFFTIME;
 			cptime[j][1] = dtime(j);
 			if (cptime[j][1] < 30 || cptime[j][1] > 65) {
-				pr_info(
+				pr_debug(
 					"charging_set_ta20_current_pattern fail1: idx:%d target:%d actual:%d\n",
 					i, PEOFFTIME, cptime[j][1]);
 				return -EIO;
@@ -1798,7 +1798,7 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 			cptime[j][0] = PEONTIME;
 			cptime[j][1] = dtime(j);
 			if (cptime[j][1] < 90 || cptime[j][1] > 115) {
-				pr_info(
+				pr_debug(
 					"charging_set_ta20_current_pattern fail2: idx:%d target:%d actual:%d\n",
 					i, PEOFFTIME, cptime[j][1]);
 				return -EIO;
@@ -1813,7 +1813,7 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 			cptime[j][0] = PEONTIME;
 			cptime[j][1] = dtime(j);
 			if (cptime[j][1] < 90 || cptime[j][1] > 115) {
-				pr_info(
+				pr_debug(
 					"charging_set_ta20_current_pattern fail3: idx:%d target:%d actual:%d\n",
 					i, PEOFFTIME, cptime[j][1]);
 				return -EIO;
@@ -1827,7 +1827,7 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 			cptime[j][0] = PEOFFTIME;
 			cptime[j][1] = dtime(j);
 			if (cptime[j][1] < 30 || cptime[j][1] > 65) {
-				pr_info(
+				pr_debug(
 					"charging_set_ta20_current_pattern fail4: idx:%d target:%d actual:%d\n",
 					i, PEOFFTIME, cptime[j][1]);
 				return -EIO;
@@ -1843,7 +1843,7 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 	cptime[j][0] = 160;
 	cptime[j][1] = dtime(j);
 	if (cptime[j][1] < 150 || cptime[j][1] > 240) {
-		pr_info(
+		pr_debug(
 			"charging_set_ta20_current_pattern fail5: idx:%d target:%d actual:%d\n",
 			i, PEOFFTIME, cptime[j][1]);
 		return -EIO;
@@ -1856,13 +1856,13 @@ static int bq2589x_set_pep20_current_pattern(struct charger_device *chg_dev,
 	//bq25890_set_iinlim(0xc);
 	bq2589x_set_input_current_limit(bq, 700);
 
-	pr_info(
+	pr_debug(
 	"[charging_set_ta20_current_pattern]:chr_vol:%d bit:%d time:%3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d!!\n",
 	chr_vol, value,
 	cptime[1][0], cptime[2][0], cptime[3][0], cptime[4][0], cptime[5][0],
 	cptime[6][0], cptime[7][0], cptime[8][0], cptime[9][0], cptime[10][0], cptime[11][0]);
 
-	pr_info(
+	pr_debug(
 	"[charging_set_ta20_current_pattern2]:chr_vol:%d bit:%d time:%3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d!!\n",
 	chr_vol, value,
 	cptime[1][1], cptime[2][1], cptime[3][1], cptime[4][1], cptime[5][1],
@@ -2214,7 +2214,7 @@ void oplus_bq2589x_safe_camera_status_check()
 				bq2589x_disable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2230,7 +2230,7 @@ void oplus_bq2589x_safe_camera_status_check()
 				bq2589x_enable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2259,7 +2259,7 @@ void oplus_bq2589x_cool_down_status_check()
 				bq2589x_disable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2274,7 +2274,7 @@ void oplus_bq2589x_cool_down_status_check()
 				bq2589x_enable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2304,7 +2304,7 @@ void oplus_bq2589x_batt_temp_status_check()
 				bq2589x_disable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2320,7 +2320,7 @@ void oplus_bq2589x_batt_temp_status_check()
 				bq2589x_enable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2436,7 +2436,7 @@ int oplus_bq2589x_charging_disable(void)
 			bq2589x_disable_hvdcp(g_bq);
 			if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 				bq2589x_force_dpdm(g_bq);//even-c
-				pr_info("not dpdm [%s] \n",__func__);
+				pr_debug("not dpdm [%s] \n",__func__);
 			} else
 				bq2589x_force_dpdm(g_bq);
 		} else {
@@ -2680,7 +2680,7 @@ int oplus_bq2589x_set_qc_config(void)
 			bq2589x_disable_hvdcp(g_bq);
 			if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 				bq2589x_force_dpdm(g_bq);//even-c
-				pr_info("not dpdm [%s] \n",__func__);
+				pr_debug("not dpdm [%s] \n",__func__);
 			} else
 				bq2589x_force_dpdm(g_bq);
 		} else
@@ -2695,7 +2695,7 @@ int oplus_bq2589x_set_qc_config(void)
 			bq2589x_disable_hvdcp(g_bq);
 			if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 				bq2589x_force_dpdm(g_bq);//even-c
-				pr_info("not dpdm [%s] \n",__func__);
+				pr_debug("not dpdm [%s] \n",__func__);
 			} else
 				bq2589x_force_dpdm(g_bq);
 		} else
@@ -2713,7 +2713,7 @@ int oplus_bq2589x_set_qc_config(void)
 				bq2589x_enable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2774,7 +2774,7 @@ int oplus_bq2589x_chg_set_high_vbus(bool en)
 				bq2589x_enable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 			} else {
@@ -2786,7 +2786,7 @@ int oplus_bq2589x_chg_set_high_vbus(bool en)
 				bq2589x_disable_hvdcp(g_bq);
 				if (is_project(0x216AF) || is_project(0x216B0) || is_project(0x216B1)){
 					bq2589x_force_dpdm(g_bq);//even-c
-					pr_info("not dpdm [%s] \n",__func__);
+					pr_debug("not dpdm [%s] \n",__func__);
 				} else
 					bq2589x_force_dpdm(g_bq);
 		  } else {
@@ -2988,7 +2988,7 @@ static void charging_current_setting_work(struct work_struct *work)
 	uA-=temp_uA;
 	chip->sub_chg_ops->charging_current_write_fast(uA/1000);
 	if(ret) {
-		pr_info("bq2589x set cur:%d %d failed\n", g_bq->chg_cur, temp_uA);
+		pr_debug("bq2589x set cur:%d %d failed\n", g_bq->chg_cur, temp_uA);
 	}
 }
 
@@ -3016,7 +3016,7 @@ static int bq2589x_charger_probe(struct i2c_client *client,
 	struct device_node *node = client->dev.of_node;
 	int ret = 0;
 
-	pr_info("bq2589x probe enter\n");
+	pr_debug("bq2589x probe enter\n");
 	bq = devm_kzalloc(&client->dev, sizeof(struct bq2589x), GFP_KERNEL);
 	if (!bq)
 		return -ENOMEM;

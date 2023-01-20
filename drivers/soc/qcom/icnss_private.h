@@ -34,7 +34,7 @@
 			     ##__VA_ARGS__);				\
 	} while (0)
 
-#define icnss_pr_info(_fmt, ...) do {					\
+#define icnss_pr_debug(_fmt, ...) do {					\
 	printk("%s" pr_fmt(_fmt), KERN_INFO, ##__VA_ARGS__);		\
 	icnss_ipc_log_string("%s" pr_fmt(_fmt), "",			\
 			     ##__VA_ARGS__);				\

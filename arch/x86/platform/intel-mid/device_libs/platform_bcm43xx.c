@@ -80,7 +80,7 @@ static void __init *bcm43xx_platform_data(void *info)
 	if (ret)
 		return NULL;
 
-	pr_info("Using generic wifi platform data\n");
+	pr_debug("Using generic wifi platform data\n");
 
 	/* For now it's empty */
 	return NULL;

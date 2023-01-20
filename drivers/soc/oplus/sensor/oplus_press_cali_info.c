@@ -107,7 +107,7 @@ int oplus_press_cali_data_init(void)
 
     struct oplus_press_cali_data *data = NULL;
 
-    pr_info("%s call\n", __func__);
+    pr_debug("%s call\n", __func__);
     if (gdata) {
         printk("%s:just can be call one time\n", __func__);
         return 0;

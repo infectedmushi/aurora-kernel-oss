@@ -426,7 +426,7 @@ void __init pnv_tm_init(void)
 	if (opal_reinit_cpus(OPAL_REINIT_CPUS_TM_SUSPEND_DISABLED) != OPAL_SUCCESS)
 		return;
 
-	pr_info("Enabling TM (Transactional Memory) with Suspend Disabled\n");
+	pr_debug("Enabling TM (Transactional Memory) with Suspend Disabled\n");
 	cur_cpu_spec->cpu_features |= CPU_FTR_TM;
 	/* Make sure "normal" HTM is off (it should be) */
 	cur_cpu_spec->cpu_user_features2 &= ~PPC_FEATURE2_HTM;

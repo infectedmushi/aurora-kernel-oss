@@ -22,7 +22,7 @@ extern void wake_oom_reaper(struct task_struct *tsk);
 #define lowmem_print(level, x...)			\
 	do {						\
 		if (lowmem_debug_level >= (level))	\
-			pr_info(x);			\
+			pr_debug(x);			\
 	} while (0)
 
 int __init lowmemorykiller_register_oom_notifier(void);

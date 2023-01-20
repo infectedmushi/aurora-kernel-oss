@@ -34,7 +34,7 @@
  *
  *	// Read MAC addr from EEPROM
  *	if (nvmem_device_read(nvmem, offset, ETH_ALEN, mac_addr) == ETH_ALEN)
- *		pr_info("Read MAC addr from EEPROM: %pM\n", mac_addr);
+ *		pr_debug("Read MAC addr from EEPROM: %pM\n", mac_addr);
  * }
  *
  * This function pointer and context can now be set up in at24_platform_data.

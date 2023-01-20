@@ -205,7 +205,7 @@ static int __init pas_add_bridge(struct device_node *dev)
 
 	setup_pa_pxp(hose);
 
-	pr_info("Found PA-PXP PCI host bridge.\n");
+	pr_debug("Found PA-PXP PCI host bridge.\n");
 
 	/* Interpret the "ranges" property */
 	pci_process_bridge_OF_ranges(hose, dev, 1);

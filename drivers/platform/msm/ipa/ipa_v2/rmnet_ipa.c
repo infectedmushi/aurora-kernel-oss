@@ -1953,24 +1953,24 @@ static int get_ipa_rmnet_dts_configuration(struct platform_device *pdev,
 	ipa_rmnet_drv_res->ipa_rmnet_ssr =
 			of_property_read_bool(pdev->dev.of_node,
 			"qcom,rmnet-ipa-ssr");
-	pr_info("IPA SSR support = %s\n",
+	pr_debug("IPA SSR support = %s\n",
 		ipa_rmnet_drv_res->ipa_rmnet_ssr ? "True" : "False");
 	ipa_rmnet_drv_res->ipa_loaduC =
 			of_property_read_bool(pdev->dev.of_node,
 			"qcom,ipa-loaduC");
-	pr_info("IPA ipa-loaduC = %s\n",
+	pr_debug("IPA ipa-loaduC = %s\n",
 		ipa_rmnet_drv_res->ipa_loaduC ? "True" : "False");
 
 	ipa_rmnet_drv_res->ipa_advertise_sg_support =
 			of_property_read_bool(pdev->dev.of_node,
 			"qcom,ipa-advertise-sg-support");
-	pr_info("IPA SG support = %s\n",
+	pr_debug("IPA SG support = %s\n",
 		ipa_rmnet_drv_res->ipa_advertise_sg_support ? "True" : "False");
 
 	ipa_rmnet_drv_res->ipa_napi_enable =
 		of_property_read_bool(pdev->dev.of_node,
 			"qcom,ipa-napi-enable");
-	pr_info("IPA Napi Enable = %s\n",
+	pr_debug("IPA Napi Enable = %s\n",
 		ipa_rmnet_drv_res->ipa_napi_enable ? "True" : "False");
 
 	/* Get IPA WAN RX desc fifo size */
@@ -1978,7 +1978,7 @@ static int get_ipa_rmnet_dts_configuration(struct platform_device *pdev,
 			"qcom,wan-rx-desc-size",
 			&ipa_rmnet_drv_res->wan_rx_desc_size);
 	if (result)
-		pr_info("using default for wan-rx-desc-size = %u\n",
+		pr_debug("using default for wan-rx-desc-size = %u\n",
 				ipa_rmnet_drv_res->wan_rx_desc_size);
 	else
 		IPAWANDBG(": found ipa_drv_res->wan-rx-desc-size = %u\n",
@@ -2007,7 +2007,7 @@ static int ipa_wwan_probe(struct platform_device *pdev)
 	struct ipa_rm_create_params ipa_rm_params;	/* IPA_RM */
 	struct ipa_rm_perf_profile profile;			/* IPA_RM */
 
-	pr_info("rmnet_ipa started initialization\n");
+	pr_debug("rmnet_ipa started initialization\n");
 
 	if (!ipa2_is_ready()) {
 		IPAWANERR("IPA driver not loaded\n");
@@ -2156,7 +2156,7 @@ static int ipa_wwan_probe(struct platform_device *pdev)
 	}
 	atomic_set(&is_ssr, 0);
 
-	pr_info("rmnet_ipa completed initialization\n");
+	pr_debug("rmnet_ipa completed initialization\n");
 	return 0;
 config_err:
 	if (ipa_rmnet_res.ipa_napi_enable)
@@ -2207,7 +2207,7 @@ static int ipa_wwan_remove(struct platform_device *pdev)
 
 	wwan_ptr = netdev_priv(ipa_netdevs[0]);
 
-	pr_info("rmnet_ipa started deinitialization\n");
+	pr_debug("rmnet_ipa started deinitialization\n");
 	mutex_lock(&ipa_to_apps_pipe_handle_guard);
 	ret = ipa2_teardown_sys_pipe(ipa_to_apps_hdl);
 	if (ret < 0)
@@ -2247,7 +2247,7 @@ static int ipa_wwan_remove(struct platform_device *pdev)
 		wwan_del_ul_flt_rule_to_ipa();
 	ipa_cleanup_deregister_intf();
 	atomic_set(&is_initialized, 0);
-	pr_info("rmnet_ipa completed deinitialization\n");
+	pr_debug("rmnet_ipa completed deinitialization\n");
 	return 0;
 }
 
@@ -2375,7 +2375,7 @@ static int ssr_notifier_cb(struct notifier_block *this,
 {
 	if (ipa_rmnet_ctx.ipa_rmnet_ssr) {
 		if (code == SUBSYS_BEFORE_SHUTDOWN) {
-			pr_info("IPA received MPSS BEFORE_SHUTDOWN\n");
+			pr_debug("IPA received MPSS BEFORE_SHUTDOWN\n");
 			/* send SSR before-shutdown notification to IPACM */
 			rmnet_ipa_send_ssr_notification(false);
 			atomic_set(&is_ssr, 1);
@@ -2387,31 +2387,31 @@ static int ssr_notifier_cb(struct notifier_block *this,
 			ipa_stop_polling_stats();
 			if (atomic_read(&is_initialized))
 				platform_driver_unregister(&rmnet_ipa_driver);
-			pr_info("IPA BEFORE_SHUTDOWN handling is complete\n");
+			pr_debug("IPA BEFORE_SHUTDOWN handling is complete\n");
 			return NOTIFY_DONE;
 		}
 		if (code == SUBSYS_AFTER_SHUTDOWN) {
-			pr_info("IPA received MPSS AFTER_SHUTDOWN\n");
+			pr_debug("IPA received MPSS AFTER_SHUTDOWN\n");
 			if (atomic_read(&is_ssr))
 				ipa_q6_post_shutdown_cleanup();
-			pr_info("IPA AFTER_SHUTDOWN handling is complete\n");
+			pr_debug("IPA AFTER_SHUTDOWN handling is complete\n");
 			return NOTIFY_DONE;
 		}
 		if (code == SUBSYS_AFTER_POWERUP) {
-			pr_info("IPA received MPSS AFTER_POWERUP\n");
+			pr_debug("IPA received MPSS AFTER_POWERUP\n");
 			if (!atomic_read(&is_initialized)
 				&& atomic_read(&is_ssr))
 				platform_driver_register(&rmnet_ipa_driver);
-			pr_info("IPA AFTER_POWERUP handling is complete\n");
+			pr_debug("IPA AFTER_POWERUP handling is complete\n");
 			return NOTIFY_DONE;
 		}
 		if (code == SUBSYS_BEFORE_POWERUP) {
-			pr_info("IPA received MPSS BEFORE_POWERUP\n");
+			pr_debug("IPA received MPSS BEFORE_POWERUP\n");
 			if (atomic_read(&is_ssr))
 				/* clean up cached QMI msg/handlers */
 				ipa_qmi_service_exit();
 			ipa2_proxy_clk_vote();
-			pr_info("IPA BEFORE_POWERUP handling is complete\n");
+			pr_debug("IPA BEFORE_POWERUP handling is complete\n");
 			return NOTIFY_DONE;
 		}
 	}

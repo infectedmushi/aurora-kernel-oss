@@ -170,7 +170,7 @@ static int msm_notifier_probe(struct platform_device *pdev)
 		}
 	}
 
-	pr_info("msm notifier probed successfully\n");
+	pr_debug("msm notifier probed successfully\n");
 
 	return ret;
 fail:

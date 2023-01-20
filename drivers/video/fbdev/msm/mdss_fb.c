@@ -1297,7 +1297,7 @@ static int mdss_fb_probe(struct platform_device *pdev)
 	mfd->split_fb_left = mfd->split_fb_right = 0;
 
 	mdss_fb_set_split_mode(mfd, pdata);
-	pr_info("fb%d: split_mode:%d left:%d right:%d\n", mfd->index,
+	pr_debug("fb%d: split_mode:%d left:%d right:%d\n", mfd->index,
 		mfd->split_mode, mfd->split_fb_left, mfd->split_fb_right);
 
 	mfd->mdp = *mdp_instance;
@@ -2758,7 +2758,7 @@ static int mdss_fb_register(struct msm_fb_data_type *mfd)
 	snprintf(panel_name, ARRAY_SIZE(panel_name), "mdss_panel_fb%d",
 		mfd->index);
 	mdss_panel_debugfs_init(panel_info, panel_name);
-	pr_info("FrameBuffer[%d] %dx%d registered successfully!\n", mfd->index,
+	pr_debug("FrameBuffer[%d] %dx%d registered successfully!\n", mfd->index,
 					fbi->var.xres, fbi->var.yres);
 
 	return 0;
@@ -2825,7 +2825,7 @@ static int mdss_fb_release_all(struct fb_info *info, bool release_all)
 	struct task_struct *task = current->group_leader;
 
 	if (!mfd->ref_cnt) {
-		pr_info("try to close unopened fb %d! from pid:%d name:%s\n",
+		pr_debug("try to close unopened fb %d! from pid:%d name:%s\n",
 			mfd->index, current->tgid, task->comm);
 		return -EINVAL;
 	}
@@ -5147,7 +5147,7 @@ int mdss_register_panel(struct platform_device *pdev,
 		if (rc == 0)
 			master_panel = false;
 	} else {
-		pr_info("adding framebuffer device %s\n", dev_name(&pdev->dev));
+		pr_debug("adding framebuffer device %s\n", dev_name(&pdev->dev));
 		fb_pdev = of_platform_device_create(node, NULL,
 				&mdss_pdev->dev);
 		if (fb_pdev)

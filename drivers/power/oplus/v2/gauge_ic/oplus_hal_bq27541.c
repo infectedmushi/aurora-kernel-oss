@@ -418,12 +418,12 @@ static bool zy0603_fg_condition_check(void)
 	}
 
 	if (atomic_read(&gauge_ic->suspended) == 1) {
-		pr_info("%s gauge_ic->locked return\n", __func__);
+		pr_debug("%s gauge_ic->locked return\n", __func__);
 		return false;
 	}
 
 	if (!zy0603_afi_update_done()) {
-		pr_info("%s afi_update return\n", __func__);
+		pr_debug("%s afi_update return\n", __func__);
 		return false;
 	}
 
@@ -433,7 +433,7 @@ static bool zy0603_fg_condition_check(void)
 		return true;
 
 	if (atomic_read(&gauge_ic->locked) == 1) {
-		pr_info("%s gauge_ic->locked or no mcu vooc return\n",
+		pr_debug("%s gauge_ic->locked or no mcu vooc return\n",
 			__func__);
 		return false;
 	}
@@ -444,7 +444,7 @@ static int zy0603_read_altmac_block(u16 reg, u8* buf,
 						u8 offset, u8 length)
 {
 	if (!zy0603_fg_condition_check()) {
-		pr_info("%s zy0603_fg_condition_check fail\n", __func__);
+		pr_debug("%s zy0603_fg_condition_check fail\n", __func__);
 		return -1;
 	}
 
@@ -500,7 +500,7 @@ static int oplus_zy0603_check_sfr(bool *need_reset)
 	*need_reset = !!(abs(rc_sfr) > qmax0);
 
 check_end:
-	pr_info("%s: RC_SFR=%d, qmax=%d, ret=%d is_need_reset_sfr = %s",
+	pr_debug("%s: RC_SFR=%d, qmax=%d, ret=%d is_need_reset_sfr = %s",
 		__func__, rc_sfr, qmax0, ret,
 		*need_reset == true ?"true":"false");
 	return 0;
@@ -565,7 +565,7 @@ static bool zy0603_get_fw_version(int *fwversion)
 
 	if (!zy0603_fg_condition_check()) {
 		*fwversion = -1;
-		pr_info("%s zy0603_fg_condition_check fail\n", __func__);
+		pr_debug("%s zy0603_fg_condition_check fail\n", __func__);
 		return false;
 	}
 
@@ -583,7 +583,7 @@ fg_read_altmac_block_end:
 		*fwversion =  (version_data[3] << 8) | version_data[2];
 		ret = true;
 	}
-	pr_info("%s [0x%02x][0x%02x][0x%02x][0x%02x] fg_version %d %s\n",
+	pr_debug("%s [0x%02x][0x%02x][0x%02x][0x%02x] fg_version %d %s\n",
 		__func__, version_data[0], version_data[1],
 		version_data[2], version_data[3], *fwversion,
 		ret == true ?"i2c ok":"i2c error");
@@ -600,7 +600,7 @@ static int zy0603_full_access_mode(void)
 	int rc = 0;
 
 	if (!zy0603_fg_condition_check()) {
-		pr_info("%s zy0603_fg_condition_check fail\n", __func__);
+		pr_debug("%s zy0603_fg_condition_check fail\n", __func__);
 		return -1;
 	}
 
@@ -608,21 +608,21 @@ static int zy0603_full_access_mode(void)
 	do {
 		bq27541_write_i2c_block(ZY0603_CTRL_REG, 2,
 			full_access_cmd_1);
-		pr_info("%s write {0xEF, 0xCD} --> 0x00\n", __func__);
+		pr_debug("%s write {0xEF, 0xCD} --> 0x00\n", __func__);
 		usleep_range(U_DELAY_1_MS, U_DELAY_1_MS);
 
 		bq27541_write_i2c_block(ZY0603_CTRL_REG, 2,
 			full_access_cmd_2);
-		pr_info("%s write {0xAB, 0x90} --> 0x00\n", __func__);
+		pr_debug("%s write {0xAB, 0x90} --> 0x00\n", __func__);
 		usleep_range(U_DELAY_1_MS, U_DELAY_1_MS);
 
 		bq27541_write_i2c_block(ZY0603_CMD_ALTMAC, 2,
 			full_access_op_st);
-		pr_info("%s write {0x54, 0x00} --> 0x3E\n", __func__);
+		pr_debug("%s write {0x54, 0x00} --> 0x3E\n", __func__);
 		usleep_range(U_DELAY_1_MS, U_DELAY_1_MS);
 
 		bq27541_read_i2c_block(ZY0603_CMD_ALTMAC, 4, read_buf);
-		pr_info("%s 0x3E -->read [0x%02x][0x%02x] [0x%02x][0x%02x]\n",
+		pr_debug("%s 0x3E -->read [0x%02x][0x%02x] [0x%02x][0x%02x]\n",
 			__func__, read_buf[0], read_buf[1], read_buf[2],
 			read_buf[3]);
 		if ((read_buf[3] & 0x02) == 0) {
@@ -634,7 +634,7 @@ static int zy0603_full_access_mode(void)
 		}
 	} while (retry > 0);
 	mutex_unlock(&bq28z610_alt_manufacturer_access);
-	pr_info("%s full_access flag [%d]\n", __func__, rc);
+	pr_debug("%s full_access flag [%d]\n", __func__, rc);
 
 	return rc;
 }
@@ -645,26 +645,26 @@ static bool zy0603_fg_softreset(void)
 	int ret = -1;
 
 	if (!zy0603_fg_condition_check()) {
-		pr_info("%s zy0603_fg_condition_check fail\n", __func__);
+		pr_debug("%s zy0603_fg_condition_check fail\n", __func__);
 		return false;
 	}
 
-	pr_info("%s need soft  reset\n", __func__);
+	pr_debug("%s need soft  reset\n", __func__);
 	mutex_lock(&bq28z610_alt_manufacturer_access);
 	ret = zy0603_unseal();
 	mutex_unlock(&bq28z610_alt_manufacturer_access);
 
 	if (ret != 0) {
-		pr_info("%s zy0603_unseal fail\n", __func__);
+		pr_debug("%s zy0603_unseal fail\n", __func__);
 		return false;
 	}
 
 	ret = zy0603_full_access_mode();
 	if (ret == 0) {
 		bq27541_i2c_txsubcmd(ZY0603_CMD_ALTMAC, ZY0603_SOFT_RESET_CMD);
-		pr_info("%s w 0x3E \n", __func__);
+		pr_debug("%s w 0x3E \n", __func__);
 		if (i2c_err)
-			pr_info("%s soft reset fail", __func__);
+			pr_debug("%s soft reset fail", __func__);
 		else
 			is_reset_done = true;
 	}
@@ -679,7 +679,7 @@ static bool zy0603_fg_softreset(void)
 static int oplus_zy0603_reset_dynamic_para(bool *reset_done)
 {
 	if (!zy0603_fg_condition_check()) {
-		pr_info("%s zy0603_fg_condition_check fail\n", __func__);
+		pr_debug("%s zy0603_fg_condition_check fail\n", __func__);
 		return -1;
 	}
 
@@ -690,11 +690,11 @@ static int oplus_zy0603_reset_dynamic_para(bool *reset_done)
 	}
 
 	if (gauge_ic->fg_soft_version  == -1) {
-		pr_info("%s check_fw_version fail!", __func__);
+		pr_debug("%s check_fw_version fail!", __func__);
 		return -1;
 	}
 
-	pr_info("%s fwversion = 0x%04X \n",
+	pr_debug("%s fwversion = 0x%04X \n",
 		__func__, gauge_ic->fg_soft_version);
 	if (gauge_ic->fg_soft_version > ZY0603_SOFT_RESET_VERSION_THRESHOLD) {
 		if (zy0603_fg_softreset())
@@ -702,7 +702,7 @@ static int oplus_zy0603_reset_dynamic_para(bool *reset_done)
 	} else {
 		/*fg version number lower than 0x16 must implement
 		the hardware reset interface*/
-		pr_info("%s fwversion = 0x%04X  need hard reset\n",
+		pr_debug("%s fwversion = 0x%04X  need hard reset\n",
 			__func__, gauge_ic->fg_soft_version);
 		*reset_done = true;
 	}
@@ -715,7 +715,7 @@ static int oplus_fg_reset(struct oplus_chg_ic_dev *ic_dev,
 	if (gauge_ic && gauge_ic->batt_zy0603 &&
 	    gauge_ic->zy0603_soc_opt) {
 		oplus_zy0603_reset_dynamic_para(reset_done);
-		pr_info("%s: reset_done = %s", __func__,
+		pr_debug("%s: reset_done = %s", __func__,
 			*reset_done == true ?"true":"false");
 	}
 	return 0;
@@ -793,17 +793,17 @@ static int zy0603_disable_ssdf_and_pf(struct chip_bq27541 *chip)
 		if (gauge_ic->zy0603_soc_opt) {
 			/* modelratio */
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL1, 4, w_modelratio);
-			pr_info("%s modelratio write {0x14, 0x47, 0xF7, 0x1D} --> 0x3e\n",
+			pr_debug("%s modelratio write {0x14, 0x47, 0xF7, 0x1D} --> 0x3e\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL2, 2, w_modelratio+4);
-			pr_info("%s modelratio write {0x96, 0x06} --> 0x60\n",
+			pr_debug("%s modelratio write {0x96, 0x06} --> 0x60\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 4, read_buf);
-			pr_info("%s modelratio 0x3E -->read"
+			pr_debug("%s modelratio 0x3E -->read"
 				"[0x%02x][0x%02x] [0x%02x] [0x%02x]\n", __func__,
 				read_buf[0], read_buf[1], read_buf[2], read_buf[3]);
 			if(!((read_buf[0] == w_modelratio[0]) &&
@@ -816,17 +816,17 @@ static int zy0603_disable_ssdf_and_pf(struct chip_bq27541 *chip)
 
 			/* w_cfconfig_chgp */
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL1, 3, w_cfconfig_chgp);
-			pr_info("%s w_cfconfig_chgp write {0x52, 0x47, 0xF7} --> 0x3e\n",
+			pr_debug("%s w_cfconfig_chgp write {0x52, 0x47, 0xF7} --> 0x3e\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL2, 2, w_cfconfig_chgp+3);
-			pr_info("%s  w_cfconfig_chgp write {0xAF, 0x05} --> 0x60\n",
+			pr_debug("%s  w_cfconfig_chgp write {0xAF, 0x05} --> 0x60\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 3, read_buf);
-			pr_info("%s w_cfconfig_chgp 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
+			pr_debug("%s w_cfconfig_chgp 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
 				__func__, read_buf[0], read_buf[1], read_buf[2]);
 			if(!((read_buf[0] == w_cfconfig_chgp[0]) &&
 			    (read_buf[1] == w_cfconfig_chgp[1]) &&
@@ -837,7 +837,7 @@ static int zy0603_disable_ssdf_and_pf(struct chip_bq27541 *chip)
 
 			/* w_cfconfig_r2d */
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL1, 3, w_cfconfig_r2d);
-			pr_info("%s w_cfconfig_r2d write {0x5A, 0x47, 0xBB} --> 0x3e\n",
+			pr_debug("%s w_cfconfig_r2d write {0x5A, 0x47, 0xBB} --> 0x3e\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
@@ -847,7 +847,7 @@ static int zy0603_disable_ssdf_and_pf(struct chip_bq27541 *chip)
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 3, read_buf);
-			pr_info("%s w_cfconfig_r2d 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
+			pr_debug("%s w_cfconfig_r2d 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
 				__func__, read_buf[0], read_buf[1], read_buf[2]);
 			if(!((read_buf[0] == w_cfconfig_r2d[0]) &&
 			    (read_buf[1] == w_cfconfig_r2d[1]) &&
@@ -858,17 +858,17 @@ static int zy0603_disable_ssdf_and_pf(struct chip_bq27541 *chip)
 
 			/* w_fgmaxdelta */
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL1, 3, w_fgmaxdelta);
-			pr_info("%s w_fgmaxdelta write {0x9B, 0x47, 0x9B} --> 0x3e\n",
+			pr_debug("%s w_fgmaxdelta write {0x9B, 0x47, 0x9B} --> 0x3e\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_write_i2c_block(BQ28Z610_REG_CNTL2, 2, w_fgmaxdelta+3);
-			pr_info("%s w_fgmaxdelta write {0x82, 0x05} --> 0x60\n",
+			pr_debug("%s w_fgmaxdelta write {0x82, 0x05} --> 0x60\n",
 				__func__);
 			usleep_range(U_DELAY_5_MS, U_DELAY_5_MS);
 
 			bq27541_read_i2c_block(BQ28Z610_REG_CNTL1, 3, read_buf);
-			pr_info("%s w_fgmaxdelta 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
+			pr_debug("%s w_fgmaxdelta 0x3E -->read [0x%02x][0x%02x] [0x%02x]\n",
 				__func__, read_buf[0], read_buf[1], read_buf[2]);
 			if(!((read_buf[0] == w_fgmaxdelta[0]) &&
 			    (read_buf[1] == w_fgmaxdelta[1]) &&
@@ -1606,7 +1606,7 @@ static int bq27541_soc_calibrate(int soc)
 		soc_calib = 0;
 	}
 	gauge_ic->soc_pre = soc_calib;
-	/*pr_info("soc:%d, soc_calib:%d\n", soc, soc_calib); */
+	/*pr_debug("soc:%d, soc_calib:%d\n", soc, soc_calib); */
 	return soc_calib;
 }
 
@@ -5083,16 +5083,16 @@ static int get_auth_msg(u8 *source, u8 *rst) {
 		pr_err("Asynchronous authentication is not supported!!!\n");
 		return -1;
 	}
-	pr_info("%s\n", str);
+	pr_debug("%s\n", str);
 	str += strlen(AUTH_TAG);
 	for (i = 0; i < AUTH_MESSAGE_LEN; i++) {
 		source[i] = (str[2 * i] - 64) | ((str[2 * i + 1] - 64) << 4);
-		pr_info("source index %d = %x\n", i, source[i]);
+		pr_debug("source index %d = %x\n", i, source[i]);
 	}
 	str += AUTH_MESSAGE_LEN * 2;
 	for (i = 0; i < AUTH_MESSAGE_LEN; i++) {
 		rst[i] = (str[2 * i] - 64) | ((str[2 * i + 1] - 64) << 4);
-		pr_info("expected index %d = %x\n", i, rst[i]);
+		pr_debug("expected index %d = %x\n", i, rst[i]);
 	}
 	return 0;
 }
@@ -5128,7 +5128,7 @@ static int bq27541_sha1_hmac_authenticate(
 
 #ifdef XBL_AUTH_DEBUG
 	for (i = 0; i < GAUGE_AUTH_MSG_LEN - 3; i = i + 4) {
-		pr_info("%s: sending msg[%d]=%x, sending msg[%d]=%x,sending msg[%d]=%x, sending msg[%d]=%x\n",
+		pr_debug("%s: sending msg[%d]=%x, sending msg[%d]=%x,sending msg[%d]=%x, sending msg[%d]=%x\n",
 			__func__, i, authenticate_data->message[i], i + 1,
 			authenticate_data->message[i + 1], i + 2,
 			authenticate_data->message[i + 2], i + 3,
@@ -5162,7 +5162,7 @@ static int bq27541_sha1_hmac_authenticate(
 	}
 #ifdef XBL_AUTH_DEBUG
 	for (i = 0; i < GAUGE_AUTH_MSG_LEN - 3; i = i + 4) {
-		pr_info("%s: hw[%d]=%x,hw[%d]=%x,hw[%d]=%x,hw[%d]=%x\n",
+		pr_debug("%s: hw[%d]=%x,hw[%d]=%x,hw[%d]=%x,hw[%d]=%x\n",
 			__func__, i, recv_buf[i], i + 1, recv_buf[i + 1], i + 2,
 			recv_buf[i + 2], i + 3, recv_buf[i + 3]);
 	}
@@ -5209,7 +5209,7 @@ static bool get_smem_batt_info(oplus_gauge_auth_result *auth, int kk)
 		smem_data = (oplus_gauge_auth_info_type *)smem_addr;
 		if (smem_data == ERR_PTR(-EPROBE_DEFER)) {
 			smem_data = NULL;
-			pr_info("fail to get smem_data\n");
+			pr_debug("fail to get smem_data\n");
 			return false;
 		} else {
 			if (0 == kk) {
@@ -5218,13 +5218,13 @@ static bool get_smem_batt_info(oplus_gauge_auth_result *auth, int kk)
 			} else {
 				memcpy(auth, &smem_data->rst_k1,
 				       sizeof(oplus_gauge_auth_result));
-				pr_info("%s: auth result=%d\n", __func__,
+				pr_debug("%s: auth result=%d\n", __func__,
 					auth->result);
 
 #ifdef XBL_AUTH_DEBUG
 				for (i = 0; i < GAUGE_AUTH_MSG_LEN - 3;
 				     i = i + 4) {
-					pr_info("%s: msg[%d]=%x,msg[%d]=%x,msg[%d]=%x,msg[%d]=%x\n",
+					pr_debug("%s: msg[%d]=%x,msg[%d]=%x,msg[%d]=%x,msg[%d]=%x\n",
 						__func__, i, auth->msg[i],
 						i + 1, auth->msg[i + 1], i + 2,
 						auth->msg[i + 2], i + 3,
@@ -5232,7 +5232,7 @@ static bool get_smem_batt_info(oplus_gauge_auth_result *auth, int kk)
 				}
 				for (i = 0; i < GAUGE_AUTH_MSG_LEN - 3;
 				     i = i + 4) {
-					pr_info("%s: rcv_msg[%d]=%x,rcv_msg[%d]=%x,rcv_msg[%d]=%x,rcv_msg[%d]=%x\n",
+					pr_debug("%s: rcv_msg[%d]=%x,rcv_msg[%d]=%x,rcv_msg[%d]=%x,rcv_msg[%d]=%x\n",
 						__func__, i, auth->rcv_msg[i],
 						i + 1, auth->rcv_msg[i + 1],
 						i + 2, auth->rcv_msg[i + 2],

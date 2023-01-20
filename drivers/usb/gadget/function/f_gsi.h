@@ -96,7 +96,7 @@
 #define log_event_info(x, ...) do { \
 	if (gsi) { \
 		ipc_log_string(gsi->ipc_log_ctxt, x, ##__VA_ARGS__); \
-		pr_info(x, ##__VA_ARGS__); \
+		pr_debug(x, ##__VA_ARGS__); \
 	} \
 } while (0)
 

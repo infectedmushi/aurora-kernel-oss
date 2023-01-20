@@ -1552,7 +1552,7 @@ static void * __init pcpu_alloc_bootmem(unsigned int cpu, size_t size,
 
 	if (!node_online(node) || !NODE_DATA(node)) {
 		ptr = __alloc_bootmem(size, align, goal);
-		pr_info("cpu %d has no node %d or node-local memory\n",
+		pr_debug("cpu %d has no node %d or node-local memory\n",
 			cpu, node);
 		pr_debug("per cpu data for cpu%d %lu bytes at %016lx\n",
 			 cpu, size, __pa(ptr));

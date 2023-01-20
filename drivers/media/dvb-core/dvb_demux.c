@@ -1548,7 +1548,7 @@ static void dvb_dmx_swfilter_one_packet(struct dvb_demux *demux, const u8 *buf,
 				speed_timedelta = ktime_ms_delta(cur_time,
 							demux->speed_last_time);
 				if (speed_timedelta)
-					pr_info("TS speed %llu Kbits/sec\n",
+					pr_debug("TS speed %llu Kbits/sec\n",
 						div64_u64(speed_bytes,
 							  speed_timedelta));
 			}

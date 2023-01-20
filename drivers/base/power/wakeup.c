@@ -952,7 +952,7 @@ void pm_print_active_wakeup_sources(void)
 	list_for_each_entry_rcu(ws, &wakeup_sources, entry) {
 		if (ws->active) {
 			#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-			pr_info("active wakeup source: %s\n", ws->name);
+			pr_debug("active wakeup source: %s\n", ws->name);
 			#else
 			pr_debug("active wakeup source: %s\n", ws->name);
 			#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
@@ -971,7 +971,7 @@ void pm_print_active_wakeup_sources(void)
 
 	if (!active && last_activity_ws) {
 		#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-		pr_info("last active wakeup source: %s\n",
+		pr_debug("last active wakeup source: %s\n",
 			last_activity_ws->name);
 		#else
 		pr_debug("last active wakeup source: %s\n",
@@ -1003,7 +1003,7 @@ bool ws_all_release(void)
 {
 	unsigned int cnt, inpr;
 
-	pr_info("Enter: %s\n", __func__);
+	pr_debug("Enter: %s\n", __func__);
 	split_counters(&cnt, &inpr);
 	return (!inpr) ? true : false;
 }
@@ -1037,13 +1037,13 @@ bool pm_wakeup_pending(void)
 		#ifndef OPLUS_FEATURE_POWERINFO_STANDBY
 		pr_debug("PM: Wakeup pending, aborting suspend\n");
 		#else
-		pr_info("PM: Wakeup pending, aborting suspend\n");
+		pr_debug("PM: Wakeup pending, aborting suspend\n");
 		wakeup_reasons_statics(IRQ_NAME_ABORT, WS_CNT_ABORT);
 		#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 		pm_get_active_wakeup_sources(suspend_abort,
 					     MAX_SUSPEND_ABORT_LEN);
 		log_suspend_abort_reason(suspend_abort);
-		pr_info("PM: %s\n", suspend_abort);
+		pr_debug("PM: %s\n", suspend_abort);
 	}
 
 	return ret || atomic_read(&pm_abort_suspend) > 0;
@@ -1084,7 +1084,7 @@ void pm_system_irq_wakeup(unsigned int irq_number)
 		pr_warn("%s: %d triggered %s\n", __func__, irq_number, name);
 
 		#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-		pr_info("%s: resume caused by irq=%d, name=%s\n", __func__, irq_number, name);
+		pr_debug("%s: resume caused by irq=%d, name=%s\n", __func__, irq_number, name);
 		wakeup_reasons_statics(name, WS_CNT_POWERKEY|WS_CNT_RTCALARM);
 		#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 

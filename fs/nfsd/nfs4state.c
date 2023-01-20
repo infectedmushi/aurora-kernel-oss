@@ -6574,7 +6574,7 @@ nfsd_inject_print_clients(void)
 	spin_lock(&nn->client_lock);
 	list_for_each_entry(clp, &nn->client_lru, cl_lru) {
 		rpc_ntop((struct sockaddr *)&clp->cl_addr, buf, sizeof(buf));
-		pr_info("NFS Client: %s\n", buf);
+		pr_debug("NFS Client: %s\n", buf);
 		++count;
 	}
 	spin_unlock(&nn->client_lock);

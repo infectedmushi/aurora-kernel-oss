@@ -203,14 +203,14 @@ static void ch101_read_range_data(struct ch101_data *data,
 	int ind, int *range)
 {
 	*range = data->buffer.distance[ind];
-	pr_info(TAG "%s: %d: range: %d\n", __func__, ind, *range);
+	pr_debug(TAG "%s: %d: range: %d\n", __func__, ind, *range);
 }
 
 static void ch101_read_amplitude_data(struct ch101_data *data,
 	int ind, int *amplitude)
 {
 	*amplitude = data->buffer.amplitude[ind];
-	pr_info(TAG "%s: %d: amplitude: %d\n", __func__, ind, *amplitude);
+	pr_debug(TAG "%s: %d: amplitude: %d\n", __func__, ind, *amplitude);
 }
 
 static void ch101_set_freq(struct ch101_data *data, int freq)
@@ -329,7 +329,7 @@ static int ch101_write_raw(struct iio_dev *indio_dev,
 	struct ch101_data *data = iio_priv(indio_dev);
 	int ind;
 
-	pr_info(TAG "%s: type: %d, mask: %lu val: %d val2: %d\n", __func__,
+	pr_debug(TAG "%s: type: %d, mask: %lu val: %d val2: %d\n", __func__,
 		chan->type, mask, val, val2);
 
 	switch (mask) {
@@ -405,7 +405,7 @@ static irqreturn_t ch101_store_time(int irq, void *p)
 	struct iio_poll_func *pf = p;
 
 	pf->timestamp = ktime_get_boot_ns();
-	pr_info(TAG "%s: t: %llu\n", __func__, pf->timestamp);
+	pr_debug(TAG "%s: t: %llu\n", __func__, pf->timestamp);
 
 	return IRQ_WAKE_THREAD;
 }
@@ -436,7 +436,7 @@ static int ch101_push_to_buffer(void *input_data)
 	u8 mode;
 	int cur_max_samples;
 
-	pr_info(TAG "%s: mask: %02x\n", __func__,
+	pr_debug(TAG "%s: mask: %02x\n", __func__,
 			*indio_dev->active_scan_mask);
 
 	mutex_lock(&data->lock);
@@ -456,7 +456,7 @@ static int ch101_push_to_buffer(void *input_data)
 		goto out;
 
 	buf = ch101_iio_buffer;
-	pr_info(TAG "scan bytes: %d, ts=%lld\n", indio_dev->scan_bytes,
+	pr_debug(TAG "scan bytes: %d, ts=%lld\n", indio_dev->scan_bytes,
 						starting_ts);
 
 	for (i = 0; i < cur_max_samples; i += CH101_IQ_PACK) {
@@ -473,7 +473,7 @@ static int ch101_push_to_buffer(void *input_data)
 				ind = bit - IQ_0;
 				memcpy(pbuf, &(buffer->iq_data[ind][i]), len);
 				pbuf += CH101_IQ_PACK_BYTES;
-				//pr_info("iq_data: %d %d\n",
+				//pr_debug("iq_data: %d %d\n",
 					//buffer->iq_data[ind][i].I,
 					//buffer->iq_data[ind][i].Q);
 			} else if (bit >= DISTANCE_0 && bit < INTENSITY_0) {
@@ -489,14 +489,14 @@ static int ch101_push_to_buffer(void *input_data)
 				mode = buffer->mode[ind];
 				memcpy(pbuf, &mode, 1);
 				pbuf += sizeof(u8);
-				//pr_info("mode copy=%d, %d\n", ind, mode);
+				//pr_debug("mode copy=%d, %d\n", ind, mode);
 			}
 		}
 		pbuf += sizeof(u64);
 		ret = iio_push_to_buffers_with_timestamp(indio_dev, buf,
 						starting_ts);
 
-		pr_info(TAG "push tobuffer=%d, size=%d\n", i,
+		pr_debug(TAG "push tobuffer=%d, size=%d\n", i,
 			(int)(pbuf-buf));
 	}
 out:
@@ -547,14 +547,14 @@ static enum hrtimer_restart ch101_hrtimer_handler(struct hrtimer *t)
 	if (!data)
 		return HRTIMER_NORESTART;
 
-	pr_info(TAG "%s: %d\n", __func__, data->counter);
+	pr_debug(TAG "%s: %d\n", __func__, data->counter);
 	if (data->counter-- <= 0) {
 		data->counter = ss_count;
-		pr_info(TAG "%s: Stop\n", __func__);
+		pr_debug(TAG "%s: Stop\n", __func__);
 		return HRTIMER_NORESTART;
 	}
 
-	pr_info(TAG "%s: t: %lld, counter: %d\n",
+	pr_debug(TAG "%s: t: %lld, counter: %d\n",
 		__func__, ktime_get_boot_ns(), data->counter);
 
 	complete(&data->data_completion);

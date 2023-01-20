@@ -431,10 +431,10 @@ int mdss_rgb_panel_init(struct device_node *node,
 	pinfo->panel_name[0] = '\0';
 	panel_name = of_get_property(node, "qcom,mdss-rgb-panel-name", NULL);
 	if (!panel_name) {
-		pr_info("%s:%d, Panel name not specified\n",
+		pr_debug("%s:%d, Panel name not specified\n",
 				__func__, __LINE__);
 	} else {
-		pr_info("%s: Panel Name = %s\n", __func__, panel_name);
+		pr_debug("%s: Panel Name = %s\n", __func__, panel_name);
 		strlcpy(&pinfo->panel_name[0], panel_name,
 				sizeof(pinfo->panel_name));
 	}

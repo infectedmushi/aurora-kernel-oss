@@ -7916,7 +7916,7 @@ static int32_t qdsp_cvs_callback(struct apr_client_data *data, void *priv)
 					ret = rtac_make_voice_callback(RTAC_CVP,
 						data->payload,
 						data->payload_size);
-					pr_info("%s: rtac_make_voice_callback = %d\n",
+					pr_debug("%s: rtac_make_voice_callback = %d\n",
 						__func__, ret);
 #else /* OPLUS_FEATURE_AUDIODETECT */
 					rtac_make_voice_callback(RTAC_CVP,
@@ -8065,12 +8065,12 @@ static int32_t qdsp_cvs_callback(struct apr_client_data *data, void *priv)
 #ifdef OPLUS_FEATURE_AUDIODETECT
 		ret = rtac_make_voice_callback(RTAC_CVS, data->payload,
 					data->payload_size);
-		pr_info("%s: VSS_ICOMMON_RSP_GET_PARAM rtac_make_voice_callback = %d\n",
+		pr_debug("%s: VSS_ICOMMON_RSP_GET_PARAM rtac_make_voice_callback = %d\n",
 			__func__, ret);
 
 		v->cvs_state = CMD_STATUS_SUCCESS;
 		//v->async_err = ptr[1];
-		pr_info("%s: VSS_ICOMMON_RSP_GET_PARAM ptr1 = %d\n",
+		pr_debug("%s: VSS_ICOMMON_RSP_GET_PARAM ptr1 = %d\n",
 			__func__, ptr[1]);
 		wake_up(&v->cvs_wait);
 #else /* OPLUS_FEATURE_AUDIODETECT */
@@ -8249,7 +8249,7 @@ static int32_t qdsp_cvp_callback(struct apr_client_data *data, void *priv)
 					ret = rtac_make_voice_callback(RTAC_CVP,
 						data->payload,
 						data->payload_size);
-					pr_info("%s: rtac_make_voice_callback = %d\n",
+					pr_debug("%s: rtac_make_voice_callback = %d\n",
 						__func__, ret);
 #else /* OPLUS_FEATURE_AUDIODETECT */
 					rtac_make_voice_callback(RTAC_CVP,
@@ -8326,12 +8326,12 @@ static int32_t qdsp_cvp_callback(struct apr_client_data *data, void *priv)
 #ifdef OPLUS_FEATURE_AUDIODETECT
 		ret = rtac_make_voice_callback(RTAC_CVP, data->payload,
 			data->payload_size);
-		pr_info("%s: VSS_ICOMMON_RSP_GET_PARAM rtac_make_voice_callback = %d\n",
+		pr_debug("%s: VSS_ICOMMON_RSP_GET_PARAM rtac_make_voice_callback = %d\n",
 			__func__, ret);
 
 		v->cvp_state = CMD_STATUS_SUCCESS;
 		//v->async_err = ptr[1];
-		pr_info("%s: VSS_ICOMMON_RSP_GET_PARAM ptr0 = %d, ptr1 = %d, ptr2 = %d, ptr3 = %d, ptr4 = %d, ptr5 = %d, ptr6 = %d, ptr7 = %d, ptr8 = %d\n",
+		pr_debug("%s: VSS_ICOMMON_RSP_GET_PARAM ptr0 = %d, ptr1 = %d, ptr2 = %d, ptr3 = %d, ptr4 = %d, ptr5 = %d, ptr6 = %d, ptr7 = %d, ptr8 = %d\n",
 			__func__, ptr[0], ptr[1], ptr[2], ptr[3], ptr[4], ptr[5], ptr[6], ptr[7], ptr[8]);	//ptr[5] is the param we got
 		voice_cvpparam_tmp_buf[0] = ptr[5];
 		voice_cvpparam_tmp_buf[1] = ptr[6];
@@ -9942,7 +9942,7 @@ int voice_set_cvp_auddet_param(u8 bEnable)
 		v = &common.voice[i];
 		if (is_voc_state_active(v->voc_state)) {
 			for (j = 0; j < 2; j++) {
-				pr_info("%s: active voice session = %d\n", __func__, v->session_id);
+				pr_debug("%s: active voice session = %d\n", __func__, v->session_id);
 
 				if (j == 0) {
 					param_hdr.instance_id = INSTANCE_ID_0;
@@ -9992,7 +9992,7 @@ int voice_get_cvp_param(void)
 				pr_err("%s: apr_cvp is NULL\n", __func__);
 				return -EINVAL;
 			}
-			pr_info("%s: active voice session = %d\n", __func__, v->session_id);
+			pr_debug("%s: active voice session = %d\n", __func__, v->session_id);
 
 			pkt_size = sizeof(struct vss_icommon_cmd_get_param);
 
@@ -10000,7 +10000,7 @@ int voice_get_cvp_param(void)
 			if (!get_param)
 				return -ENOMEM;
 
-			pr_info("%s: pkt_size = %d\n", __func__, pkt_size);
+			pr_debug("%s: pkt_size = %d\n", __func__, pkt_size);
 
 			get_param->apr_hdr.hdr_field =
 				APR_HDR_FIELD(APR_MSG_TYPE_SEQ_CMD, APR_HDR_LEN(APR_HDR_SIZE),
@@ -10042,7 +10042,7 @@ int voice_get_cvp_param(void)
 						 v->cvp_state == CMD_STATUS_SUCCESS,
 						 msecs_to_jiffies(TIMEOUT_MS));
 
-			pr_info("%s: send wait done\n", __func__);
+			pr_debug("%s: send wait done\n", __func__);
 
 			if (!ret) {
 				pr_err("%s: wait_event timeout\n", __func__);
@@ -10060,13 +10060,13 @@ int voice_get_cvp_param(void)
 			}
 
 			if (j == 0) {
-				pr_info("%s: get voice rx param\n", __func__);
+				pr_debug("%s: get voice rx param\n", __func__);
 				voice_rx_muted_cnt = voice_cvpparam_tmp_buf[0];
 				voice_rx_zd_cnt =  voice_cvpparam_tmp_buf[1];
 				voice_rx_pop_cnt =  voice_cvpparam_tmp_buf[2];
 				voice_rx_clip_cnt =  voice_cvpparam_tmp_buf[3];
 			} else {
-				pr_info("%s: get voice tx param\n", __func__);
+				pr_debug("%s: get voice tx param\n", __func__);
 				voice_tx_muted_cnt = voice_cvpparam_tmp_buf[0];
 				voice_tx_zd_cnt =  voice_cvpparam_tmp_buf[1];
 				voice_tx_pop_cnt =  voice_cvpparam_tmp_buf[2];

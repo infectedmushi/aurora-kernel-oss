@@ -1811,7 +1811,7 @@ static struct f_cdev *f_cdev_alloc(char *func_name, int portno)
 
 	usb_cser_debugfs_init(port);
 
-	pr_info("port_name:%s (%pK) portno:(%d)\n",
+	pr_debug("port_name:%s (%pK) portno:(%d)\n",
 			port->name, port, port->port_num);
 	return port;
 

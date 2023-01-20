@@ -5,7 +5,7 @@
 /* Resource management for the SPS device driver. */
 
 #include <linux/types.h>	/* u32 */
-#include <linux/kernel.h>	/* pr_info() */
+#include <linux/kernel.h>	/* pr_debug() */
 #include <linux/mutex.h>	/* mutex */
 #include <linux/list.h>		/* list_head */
 #include <linux/slab.h>		/* kzalloc() */

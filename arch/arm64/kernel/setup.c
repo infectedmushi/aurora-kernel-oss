@@ -114,7 +114,7 @@ void __init smp_setup_processor_id(void)
 	 * access percpu variable inside lock_release
 	 */
 	set_my_cpu_offset(0);
-	pr_info("Booting Linux on physical CPU 0x%010lx [0x%08x]\n",
+	pr_debug("Booting Linux on physical CPU 0x%010lx [0x%08x]\n",
 		(unsigned long)mpidr, read_cpuid_id());
 }
 
@@ -216,7 +216,7 @@ static void __init setup_machine_fdt(phys_addr_t dt_phys)
 	if (!name)
 		return;
 
-	pr_info("Machine model: %s\n", name);
+	pr_debug("Machine model: %s\n", name);
 	dump_stack_set_arch_desc("%s (DT)", name);
 }
 

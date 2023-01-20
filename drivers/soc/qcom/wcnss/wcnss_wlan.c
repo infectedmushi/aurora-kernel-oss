@@ -505,7 +505,7 @@ void wcnss_log(enum wcnss_log_type type, const char *_fmt, ...)
 		wcnss_ipc_log_string("wcnss: %pV", &vaf);
 		break;
 	case INFO:
-		pr_info("wcnss: %pV\n", &vaf);
+		pr_debug("wcnss: %pV\n", &vaf);
 		wcnss_ipc_log_string("wcnss: %pV", &vaf);
 		break;
 	case DBG:

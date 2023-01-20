@@ -8,7 +8,7 @@
 #include <linux/printk.h>
 #include "../ch101_client.h"
 
-#define printf(...) pr_info(TAG __VA_ARGS__)
+#define printf(...) pr_debug(TAG __VA_ARGS__)
 
 #define UINT8_MAX	0xFF
 #define UINT16_MAX	0xFFFF

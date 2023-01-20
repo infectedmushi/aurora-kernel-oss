@@ -371,7 +371,7 @@ static int __init test_bitmap_init(void)
 	test_mem_optimisations();
 
 	if (failed_tests == 0)
-		pr_info("all %u tests passed\n", total_tests);
+		pr_debug("all %u tests passed\n", total_tests);
 	else
 		pr_warn("failed %u out of %u tests\n",
 			failed_tests, total_tests);

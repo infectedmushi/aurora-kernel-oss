@@ -260,7 +260,7 @@ static int olc_genl_init(void)
         return ret;
     }
 
-    pr_info("[olc] genl_register_family complete, id=%d \n", olc_genl_family.id);
+    pr_debug("[olc] genl_register_family complete, id=%d \n", olc_genl_family.id);
     return 0;
 }
 

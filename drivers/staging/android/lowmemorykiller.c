@@ -118,7 +118,7 @@ int lowmem_min_param_size(void)
 #define lowmem_print(level, x...)			\
 	do {						\
 		if (lowmem_debug_level >= (level))	\
-			pr_info(x);			\
+			pr_debug(x);			\
 	} while (0)
 
 static unsigned long lowmem_count(struct shrinker *s,

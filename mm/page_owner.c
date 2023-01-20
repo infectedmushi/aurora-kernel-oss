@@ -627,7 +627,7 @@ static void init_pages_in_zone(pg_data_t *pgdat, struct zone *zone)
 		cond_resched();
 	}
 
-	pr_info("Node %d, zone %8s: page owner found early allocated %lu pages\n",
+	pr_debug("Node %d, zone %8s: page owner found early allocated %lu pages\n",
 		pgdat->node_id, zone->name, count);
 }
 
@@ -661,7 +661,7 @@ static int __init pageowner_init(void)
 	struct dentry *dentry;
 
 	if (!static_branch_unlikely(&page_owner_inited)) {
-		pr_info("page_owner is disabled\n");
+		pr_debug("page_owner is disabled\n");
 		return 0;
 	}
 

@@ -31,7 +31,7 @@ int riscv_of_processor_hart(struct device_node *node)
 		return -(ENODEV);
 	}
 	if (hart >= NR_CPUS) {
-		pr_info("Found hart ID %d, which is above NR_CPUs.  Disabling this hart\n", hart);
+		pr_debug("Found hart ID %d, which is above NR_CPUs.  Disabling this hart\n", hart);
 		return -(ENODEV);
 	}
 
@@ -40,7 +40,7 @@ int riscv_of_processor_hart(struct device_node *node)
 		return -(ENODEV);
 	}
 	if (strcmp(status, "okay")) {
-		pr_info("CPU with hartid=%d has a non-okay status of \"%s\"\n", hart, status);
+		pr_debug("CPU with hartid=%d has a non-okay status of \"%s\"\n", hart, status);
 		return -(ENODEV);
 	}
 

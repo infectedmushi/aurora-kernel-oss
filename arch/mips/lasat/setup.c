@@ -149,5 +149,5 @@ void __init plat_mem_setup(void)
 	serial_init();
 #endif
 
-	pr_info("Lasat specific initialization complete\n");
+	pr_debug("Lasat specific initialization complete\n");
 }

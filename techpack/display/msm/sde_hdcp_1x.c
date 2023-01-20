@@ -686,7 +686,7 @@ static int sde_hdcp_1x_authentication_part1(struct sde_hdcp_1x *hdcp)
 	if (rc)
 		goto error;
 
-	pr_info("SUCCESSFUL\n");
+	pr_debug("SUCCESSFUL\n");
 
 	return 0;
 error:
@@ -1016,7 +1016,7 @@ error:
 	} else {
 		hdcp->hdcp_state = HDCP_STATE_AUTHENTICATED;
 
-		pr_info("SUCCESSFUL\n");
+		pr_debug("SUCCESSFUL\n");
 	}
 
 	return rc;
@@ -1374,7 +1374,7 @@ static void sde_hdcp_1x_force_encryption(void *input, bool enable)
 		return;
 	}
 	hdcp->force_encryption = enable;
-	pr_info("force_encryption=%d\n", hdcp->force_encryption);
+	pr_debug("force_encryption=%d\n", hdcp->force_encryption);
 }
 
 static bool sde_hdcp_1x_sink_support(void *input)

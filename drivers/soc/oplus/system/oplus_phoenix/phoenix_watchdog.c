@@ -75,7 +75,7 @@ static int __init hang_oplus_main_on_init(char *str)
 {
     get_option(&str,&hang_oplus_main_on);
 
-    pr_info("hang_oplus_main_on %d\n", hang_oplus_main_on);
+    pr_debug("hang_oplus_main_on %d\n", hang_oplus_main_on);
 
     return 1;
 }
@@ -85,7 +85,7 @@ static int __init hang_oplus_recovery_method_init(char *str)
 {
     get_option(&str,&hang_oplus_recovery_method);
 
-    pr_info("hang_oplus_recovery_method %d\n", hang_oplus_recovery_method);
+    pr_debug("hang_oplus_recovery_method %d\n", hang_oplus_recovery_method);
 
     return 1;
 }
@@ -95,7 +95,7 @@ static int __init phx_hlos_wd_pet_time_init(char *str)
 {
     get_option(&str,&phx_hlos_wd_pet_time);
 
-    pr_info("phx_hlos_wd_pet_time %d\n", phx_hlos_wd_pet_time);
+    pr_debug("phx_hlos_wd_pet_time %d\n", phx_hlos_wd_pet_time);
 
     return 1;
 }

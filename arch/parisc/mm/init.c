@@ -199,7 +199,7 @@ static void __init setup_bootmem(void)
 #endif
 
 	/* Print the memory ranges */
-	pr_info("Memory Ranges:\n");
+	pr_debug("Memory Ranges:\n");
 
 	for (i = 0; i < npmem_ranges; i++) {
 		struct resource *res = &sysram_resources[i];
@@ -208,7 +208,7 @@ static void __init setup_bootmem(void)
 
 		size = (pmem_ranges[i].pages << PAGE_SHIFT);
 		start = (pmem_ranges[i].start_pfn << PAGE_SHIFT);
-		pr_info("%2d) Start 0x%016lx End 0x%016lx Size %6ld MB\n",
+		pr_debug("%2d) Start 0x%016lx End 0x%016lx Size %6ld MB\n",
 			i, start, start + (size - 1), size >> 20);
 
 		/* request memory resource */

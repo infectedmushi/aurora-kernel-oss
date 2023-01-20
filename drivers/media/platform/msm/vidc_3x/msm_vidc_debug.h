@@ -107,7 +107,7 @@ static inline char *VIDC_MSG_PRIO2STRING(int __level)
 	do { \
 		if (msm_vidc_debug & __level) { \
 			if (msm_vidc_debug_out == VIDC_OUT_PRINTK) { \
-				pr_info(VIDC_DBG_TAG __fmt, \
+				pr_debug(VIDC_DBG_TAG __fmt, \
 						VIDC_MSG_PRIO2STRING(__level), \
 						## arg); \
 			} \

@@ -133,7 +133,7 @@ static void sde_rot_dump_debug_bus(u32 bus_dump_flag, u32 **dump_mem)
 	if (!base || !mdata->rot_dbg_bus || !mdata->rot_dbg_bus_size)
 		return;
 
-	pr_info("======== SDE Rotator Debug bus DUMP =========\n");
+	pr_debug("======== SDE Rotator Debug bus DUMP =========\n");
 
 	if (in_mem) {
 		if (!(*dump_mem))
@@ -143,7 +143,7 @@ static void sde_rot_dump_debug_bus(u32 bus_dump_flag, u32 **dump_mem)
 
 		if (*dump_mem) {
 			dump_addr = *dump_mem;
-			pr_info("%s: start_addr:0x%pK end_addr:0x%pK\n",
+			pr_debug("%s: start_addr:0x%pK end_addr:0x%pK\n",
 				__func__, dump_addr,
 				dump_addr + (u32)mdata->rot_dbg_bus_size * 16);
 		} else {
@@ -182,7 +182,7 @@ static void sde_rot_dump_debug_bus(u32 bus_dump_flag, u32 **dump_mem)
 
 	sde_smmu_ctrl(0);
 
-	pr_info("========End Debug bus=========\n");
+	pr_debug("========End Debug bus=========\n");
 }
 
 /*
@@ -255,7 +255,7 @@ static void sde_rot_dump_vbif_debug_bus(u32 bus_dump_flag,
 	struct sde_rot_vbif_debug_bus *dbg_bus;
 	u32 bus_size;
 
-	pr_info("======== NRT VBIF Debug bus DUMP =========\n");
+	pr_debug("======== NRT VBIF Debug bus DUMP =========\n");
 	vbif_base = mdata->vbif_nrt_io.base;
 	dbg_bus = mdata->nrt_vbif_dbg_bus;
 	bus_size = mdata->nrt_vbif_dbg_bus_size;
@@ -282,7 +282,7 @@ static void sde_rot_dump_vbif_debug_bus(u32 bus_dump_flag,
 
 		if (*dump_mem) {
 			dump_addr = *dump_mem;
-			pr_info("%s: start_addr:0x%pK end_addr:0x%pK\n",
+			pr_debug("%s: start_addr:0x%pK end_addr:0x%pK\n",
 				__func__, dump_addr, dump_addr + list_size);
 		} else {
 			in_mem = false;
@@ -313,7 +313,7 @@ static void sde_rot_dump_vbif_debug_bus(u32 bus_dump_flag,
 
 	sde_smmu_ctrl(0);
 
-	pr_info("========End VBIF Debug bus=========\n");
+	pr_debug("========End VBIF Debug bus=========\n");
 }
 
 /*
@@ -353,7 +353,7 @@ void sde_rot_dump_reg(const char *dump_name, u32 reg_dump_flag,
 
 		if (*dump_mem) {
 			dump_addr = *dump_mem;
-			pr_info("%s: start_addr:0x%p end_addr:0x%p reg_addr=0x%X\n",
+			pr_debug("%s: start_addr:0x%p end_addr:0x%p reg_addr=0x%X\n",
 				dump_name, dump_addr, dump_addr + (u32)len * 16,
 				addr);
 		} else {
@@ -378,7 +378,7 @@ void sde_rot_dump_reg(const char *dump_name, u32 reg_dump_flag,
 		xc = readl_relaxed(base + addr+0xc);
 
 		if (in_log)
-			pr_info("0x%08X : %08x %08x %08x %08x\n",
+			pr_debug("0x%08X : %08x %08x %08x %08x\n",
 					addr, x0, x4, x8, xc);
 
 		if (dump_addr && in_mem) {
@@ -528,7 +528,7 @@ static void sde_rot_evtlog_dump_all(void)
 
 	while (__sde_rot_evtlog_dump_calc_range()) {
 		sde_rot_evtlog_dump_entry(evtlog_buf, SDE_ROT_EVTLOG_BUF_MAX);
-		pr_info("%s\n", evtlog_buf);
+		pr_debug("%s\n", evtlog_buf);
 	}
 }
 
@@ -1007,7 +1007,7 @@ static int sde_rotator_evtlog_create_debugfs(
 	sde_rot_dbg_evtlog.enable_rot_dbgbus_dump =
 		SDE_EVTLOG_DEFAULT_ROT_DBGBUSDUMP;
 
-	pr_info("evtlog_status: enable:%d, panic:%d, dump:%d\n",
+	pr_debug("evtlog_status: enable:%d, panic:%d, dump:%d\n",
 			sde_rot_dbg_evtlog.evtlog_enable,
 			sde_rot_dbg_evtlog.panic_on_err,
 			sde_rot_dbg_evtlog.enable_reg_dump);

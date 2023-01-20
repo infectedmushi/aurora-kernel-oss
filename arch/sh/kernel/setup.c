@@ -169,7 +169,7 @@ void __init check_for_initrd(void)
 	return;
 
 disable:
-	pr_info("initrd disabled\n");
+	pr_debug("initrd disabled\n");
 	initrd_start = initrd_end = 0;
 #endif
 }

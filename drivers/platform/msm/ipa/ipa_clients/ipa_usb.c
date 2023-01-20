@@ -54,7 +54,7 @@
 
 #define IPA_USB_INFO(fmt, args...) \
 	do { \
-		pr_info(IPA_USB_DRV_NAME " %s:%d " fmt, \
+		pr_debug(IPA_USB_DRV_NAME " %s:%d " fmt, \
 			__func__, __LINE__, ## args); \
 		IPA_IPC_LOGGING(ipa_get_ipc_logbuf(), \
 			IPA_USB_DRV_NAME " %s:%d " fmt, ## args); \
@@ -2607,7 +2607,7 @@ static int __init ipa3_usb_init(void)
 
 	ipa_usb_debugfs_init();
 
-	pr_info("exit: IPA_USB init success!\n");
+	pr_debug("exit: IPA_USB init success!\n");
 
 	return 0;
 

@@ -314,7 +314,7 @@ static void __check_cadence_pattern(struct mdss_dbg_frc_stat *frc_stat,
 		int i;
 
 		if (!pattern) {
-			pr_info("Can't match pattern in the beginning\n");
+			pr_debug("Can't match pattern in the beginning\n");
 			return;
 		}
 
@@ -323,7 +323,7 @@ static void __check_cadence_pattern(struct mdss_dbg_frc_stat *frc_stat,
 					pattern[i % pattern_len]) {
 				int kidx =
 					frc_stat->cadence_info[i].kickoff_idx;
-				pr_info("\tUnexpected Sample: repeat=%d, kickoff=%lld, vsync=%lld\n",
+				pr_debug("\tUnexpected Sample: repeat=%d, kickoff=%lld, vsync=%lld\n",
 					frc_stat->cadence_info[i].repeat,
 					ks->samples[kidx].kickoff_ts,
 					vs->samples[kidx].vsync_ts);
@@ -401,15 +401,15 @@ static void __dump_frc_samples(struct mdss_dbg_frc_stat *frc_stat, int cnt)
 	struct vsync_samples *vs = &frc_stat->vs;
 	int i = 0;
 
-	pr_info("===== Collected FRC statistics: Cadence %d, FPS %d =====\n",
+	pr_debug("===== Collected FRC statistics: Cadence %d, FPS %d =====\n",
 		frc_stat->cadence_id, frc_stat->display_fp1000s);
-	pr_info("\tKickoff VS. VSYNC:\n");
+	pr_debug("\tKickoff VS. VSYNC:\n");
 	for (i = 0; i < cnt; i++) {
 		struct cadence *p_info = &frc_stat->cadence_info[i];
 		struct kick_stat *kickoff = &ks->samples[p_info->kickoff_idx];
 		struct vsync_stat *vsync = &vs->samples[p_info->vsync_idx];
 
-		pr_info("\t[K: %lld V: (%d)%lld R: %d] c_ts: %lld c_cnt: %d b_ts: %lld b_cnt: %d l_ts: %lld l_cnt: %d b_v: %d l_v: %d l_r: %d pos: %d vs: %d remain: %d\n",
+		pr_debug("\t[K: %lld V: (%d)%lld R: %d] c_ts: %lld c_cnt: %d b_ts: %lld b_cnt: %d l_ts: %lld l_cnt: %d b_v: %d l_v: %d l_r: %d pos: %d vs: %d remain: %d\n",
 			kickoff->kickoff_ts,
 			vsync->vsync_cnt,
 			vsync->vsync_ts,
@@ -428,7 +428,7 @@ static void __dump_frc_samples(struct mdss_dbg_frc_stat *frc_stat, int cnt)
 			kickoff->remain);
 	}
 
-	pr_info("===== End FRC statistics: =====\n");
+	pr_debug("===== End FRC statistics: =====\n");
 }
 
 static bool __is_frc_stat_empty(struct mdss_dbg_frc_stat *frc_stat)
@@ -462,9 +462,9 @@ static void mdss_frc_dump_debug_stat(struct mdss_dbg_frc *frc_debug)
 	__dump_frc_samples(frc_stat, cnt);
 
 	if (__is_cadence_check_supported(frc_stat)) {
-		pr_info("===== Check Cadence Pattern: =====\n");
+		pr_debug("===== Check Cadence Pattern: =====\n");
 		__check_cadence_pattern(frc_stat, 0, cnt);
-		pr_info("===== Check Cadence Pattern End =====\n");
+		pr_debug("===== Check Cadence Pattern End =====\n");
 	}
 }
 
@@ -513,7 +513,7 @@ static ssize_t mdss_frc_log_write(struct file *file,
 	}
 	mdss_dbg_frc.log_enable = enable;
 
-	pr_info("log_enable = %d\n", mdss_dbg_frc.log_enable);
+	pr_debug("log_enable = %d\n", mdss_dbg_frc.log_enable);
 
 	return count;
 }

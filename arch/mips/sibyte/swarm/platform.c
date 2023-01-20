@@ -65,12 +65,12 @@ static int __init swarm_pata_init(void)
 	offset = G_IO_START_ADDR(offset) << S_IO_ADDRBASE;
 	size = (G_IO_MULT_SIZE(size) + 1) << S_IO_REGSIZE;
 	if (offset < A_PHYS_GENBUS || offset >= A_PHYS_GENBUS_END) {
-		pr_info(DRV_NAME ": PATA interface at GenBus disabled\n");
+		pr_debug(DRV_NAME ": PATA interface at GenBus disabled\n");
 
 		return -EBUSY;
 	}
 
-	pr_info(DRV_NAME ": PATA interface at GenBus slot %i\n", IDE_CS);
+	pr_debug(DRV_NAME ": PATA interface at GenBus slot %i\n", IDE_CS);
 
 	r = swarm_pata_resource;
 	r[0].start = offset + (SWARM_IDE_BASE << SWARM_IDE_SHIFT);

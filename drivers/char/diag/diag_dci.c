@@ -222,7 +222,7 @@ static void dci_handshake_work_fn(struct work_struct *work)
 
 	if (status->retry_count == max_retries) {
 		status->retry_count = 0;
-		pr_info("diag: dci channel connection handshake timed out, id: %d\n",
+		pr_debug("diag: dci channel connection handshake timed out, id: %d\n",
 			status->id);
 		err = diagfwd_bridge_close(TOKEN_TO_BRIDGE(status->id));
 		if (err) {

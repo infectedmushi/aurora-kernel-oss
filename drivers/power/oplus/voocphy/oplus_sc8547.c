@@ -209,7 +209,7 @@ static int sc8547_track_get_local_time_s(void)
 	int local_time_s;
 
 	local_time_s = local_clock() / TRACK_LOCAL_T_NS_TO_S_THD;
-	pr_info("local_time_s:%d\n", local_time_s);
+	pr_debug("local_time_s:%d\n", local_time_s);
 
 	return local_time_s;
 }
@@ -242,7 +242,7 @@ static int sc8547_track_upload_i2c_err_info(
 
 	mutex_lock(&chip->track_i2c_err_lock);
 	if (chip->i2c_err_uploading) {
-		pr_info("i2c_err_uploading, should return\n");
+		pr_debug("i2c_err_uploading, should return\n");
 		mutex_unlock(&chip->track_i2c_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -289,7 +289,7 @@ static int sc8547_track_upload_i2c_err_info(
 			"$$access_reg@@0x%02x", reg);
 	schedule_delayed_work(&chip->i2c_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -374,7 +374,7 @@ static int sc8547_track_upload_cp_err_info(
 
 	mutex_lock(&chip->track_cp_err_lock);
 	if (chip->cp_err_uploading) {
-		pr_info("cp_err_uploading, should return\n");
+		pr_debug("cp_err_uploading, should return\n");
 		mutex_unlock(&chip->track_cp_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -422,7 +422,7 @@ static int sc8547_track_upload_cp_err_info(
 			"$$reg_info@@%s", chip->dump_info);
 	schedule_delayed_work(&chip->cp_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -517,7 +517,7 @@ static int sc8547_set_predata(struct oplus_voocphy_manager *chip, u16 val)
 		pr_err("failed: write predata\n");
 		return -1;
 	}
-	pr_info("write predata 0x%0x\n", val);
+	pr_debug("write predata 0x%0x\n", val);
 	return ret;
 }
 
@@ -555,7 +555,7 @@ static int sc8547_get_adapter_info(struct oplus_voocphy_manager *chip)
 	}
 
 	VOOCPHY_DATA16_SPLIT(data, chip->voocphy_rx_buff, chip->vooc_flag);
-	pr_info("data: 0x%0x, vooc_flag: 0x%0x, vooc_rxdata: 0x%0x\n", data, chip->vooc_flag, chip->voocphy_rx_buff);
+	pr_debug("data: 0x%0x, vooc_flag: 0x%0x, vooc_rxdata: 0x%0x\n", data, chip->vooc_flag, chip->voocphy_rx_buff);
 
 	return 0;
 }
@@ -580,7 +580,7 @@ static void sc8547_update_data(struct oplus_voocphy_manager *chip)
 		sc8547_i2c_error(false);
 	}
 	for (i = 0; i < 4; i++) {
-		pr_info("read vsys vbat data_block[%d] = %u\n", i, data_block[i]);
+		pr_debug("read vsys vbat data_block[%d] = %u\n", i, data_block[i]);
 	}
 
 	chip->cp_vsys = ((data_block[0] << 8) | data_block[1])*125 / 100;
@@ -596,7 +596,7 @@ static void sc8547_update_data(struct oplus_voocphy_manager *chip)
 		sc8547_i2c_error(false);
 	}
 	for (i = 0; i< 4; i++) {
-		pr_info("read ichg vbus data_block[%d] = %u\n", i, data_block[i]);
+		pr_debug("read ichg vbus data_block[%d] = %u\n", i, data_block[i]);
 	}
 
 	chip->cp_ichg = ((data_block[0] << 8) | data_block[1]) * SC8547_IBUS_ADC_LSB;
@@ -613,13 +613,13 @@ static void sc8547_update_data(struct oplus_voocphy_manager *chip)
 		sc8547_i2c_error(false);
 	}
 	for (i = 0; i< 2; i++) {
-		pr_info("read vac data_block[%d] = %u\n", i, data_block[i]);
+		pr_debug("read vac data_block[%d] = %u\n", i, data_block[i]);
 	}
 
 	chip->cp_vac = (((data_block[0] & SC8547_VAC_POL_H_MASK) << 8) |
 			    data_block[1]) * SC8547_VAC_ADC_LSB;
 
-	pr_info("cp_ichg = %d cp_vbus = %d, cp_vsys = %d cp_vbat = %d cp_vac = %d int_flag = %d",
+	pr_debug("cp_ichg = %d cp_vbus = %d, cp_vsys = %d cp_vbat = %d cp_vac = %d int_flag = %d",
 	        chip->cp_ichg, chip->cp_vbus, chip->cp_vsys, chip->cp_vbat, chip->cp_vac, chip->int_flag);
 }
 
@@ -1223,23 +1223,23 @@ static int sc8547_hw_setting(struct oplus_voocphy_manager *chip, int reason)
 	case SETTING_REASON_PROBE:
 	case SETTING_REASON_RESET:
 		sc8547_init_device(chip);
-		pr_info("SETTING_REASON_RESET OR PROBE\n");
+		pr_debug("SETTING_REASON_RESET OR PROBE\n");
 		break;
 	case SETTING_REASON_SVOOC:
 		sc8547_svooc_hw_setting(chip);
-		pr_info("SETTING_REASON_SVOOC\n");
+		pr_debug("SETTING_REASON_SVOOC\n");
 		break;
 	case SETTING_REASON_VOOC:
 		sc8547_vooc_hw_setting(chip);
-		pr_info("SETTING_REASON_VOOC\n");
+		pr_debug("SETTING_REASON_VOOC\n");
 		break;
 	case SETTING_REASON_5V2A:
 		sc8547_5v2a_hw_setting(chip);
-		pr_info("SETTING_REASON_5V2A\n");
+		pr_debug("SETTING_REASON_5V2A\n");
 		break;
 	case SETTING_REASON_PDQC:
 		sc8547_pdqc_hw_setting(chip);
-		pr_info("SETTING_REASON_PDQC\n");
+		pr_debug("SETTING_REASON_PDQC\n");
 		break;
 	default:
 		pr_err("do nothing\n");

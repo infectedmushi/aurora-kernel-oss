@@ -1818,7 +1818,7 @@ void rmnet_shs_wq_update_ep_rps_msk(struct rmnet_shs_wq_ep_s *ep)
 
 	rcu_read_lock();
 	if (!ep->ep) {
-		pr_info(" rmnet_shs invalid state %p", ep->ep);
+		pr_debug(" rmnet_shs invalid state %p", ep->ep);
 		rmnet_shs_crit_err[RMNET_SHS_WQ_EP_ACCESS_ERR]++;
 		return;
 	}

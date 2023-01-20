@@ -456,7 +456,7 @@ static int p9415_set_rx_enable(struct oplus_chg_ic_dev *dev, bool en)
 	if (rc < 0)
 		pr_err("can't %s rx\n", en ? "enable" : "disable");
 	else
-		pr_info("set rx %s\n", en ? "enable" : "disable");
+		pr_debug("set rx %s\n", en ? "enable" : "disable");
 
 	pr_err("vt_sleep: set value:%d, gpio_val:%d\n", !en, gpio_get_value(chip->rx_en_gpio));
 
@@ -1236,14 +1236,14 @@ static int p9415_mtp(struct oplus_p9415 *chip, unsigned char *fw_buf, int fw_siz
 	}
 
 	msleep(100);
-	pr_info("<IDT UPDATE>disable trx boost\n");
+	pr_debug("<IDT UPDATE>disable trx boost\n");
 	rc = p9415_set_trx_boost_enable(chip, false);
 	if (rc < 0) {
 		pr_err("disable trx power error, rc=%d\n", rc);
 		goto MTP_ERROR;
 	}
 	msleep(3000);
-	pr_info("<IDT UPDATE>enable trx boost\n");
+	pr_debug("<IDT UPDATE>enable trx boost\n");
 	rc = p9415_set_trx_boost_vol(chip, P9415_MTP_VOL_MV);
 	if (rc < 0) {
 		pr_err("set trx power vol(=%d), rc=%d\n", P9415_MTP_VOL_MV, rc);
@@ -1520,7 +1520,7 @@ static void p9415_event_process(struct oplus_p9415 *chip)
 	char val_buf[6] = { 0, 0, 0, 0, 0, 0};
 
 	if(!p9415_rx_is_enable(chip->ic_dev)) {
-		pr_info("RX is sleep, Ignore events");
+		pr_debug("RX is sleep, Ignore events");
 		return;
 	}
 
@@ -1529,11 +1529,11 @@ static void p9415_event_process(struct oplus_p9415 *chip)
 		pr_err("Couldn't read 0x%04x rc = %x\n", P9415_REG_STATUS, rc);
 		temp[0] = 0;
 	} else {
-		pr_info("read P9415_REG_STATUS = 0x%02x 0x%02x\n", temp[0], temp[1]);
+		pr_debug("read P9415_REG_STATUS = 0x%02x 0x%02x\n", temp[0], temp[1]);
 	}
 
 	if (temp[0] & P9415_LDO_ON) {
-		pr_info("LDO is on, connected.");
+		pr_debug("LDO is on, connected.");
 		complete(&chip->ldo_on);
 		if (is_wls_ocm_available(chip))
 			oplus_chg_anon_mod_event(chip->wls_ocm, OPLUS_CHG_EVENT_ONLINE);
@@ -1633,7 +1633,7 @@ static void p9415_check_event_work(struct work_struct *work)
 
 	od2_state = p9415_get_rx_event_gpio_val(chip);
 
-	pr_info("od2_state = %s", od2_state ? "true" : "false");
+	pr_debug("od2_state = %s", od2_state ? "true" : "false");
 	if (od2_state == false){
 		msleep(50);
 		od2_state = p9415_get_rx_event_gpio_val(chip);
@@ -1654,7 +1654,7 @@ static void p9415_check_ldo_on_work(struct work_struct *work)
 	char buf[1] = {0};
 	int rc;
 
-	pr_info("connected_ldo_on = %s", chip->connected_ldo_on ? "true" : "false");
+	pr_debug("connected_ldo_on = %s", chip->connected_ldo_on ? "true" : "false");
 	if ((!chip->connected_ldo_on) && p9415_rx_is_connected(chip->ic_dev)) {
 		pr_err("Connect but no ldo on event irq, check again.");
 		p9415_event_process(chip);

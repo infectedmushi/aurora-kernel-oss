@@ -47,7 +47,7 @@ static void ssc_interactive_set_fifo(uint8_t type, uint16_t data)
 	struct fifo_frame fifo_fm;
 	struct ssc_interactive *ssc_cxt = g_ssc_cxt;
 	int ret = 0;
-	/*pr_info("type= %u, data=%d\n", type, data);*/
+	/*pr_debug("type= %u, data=%d\n", type, data);*/
 	memset(&fifo_fm, 0, sizeof(struct fifo_frame));
 	fifo_fm.type = type;
 	fifo_fm.data = data;
@@ -64,11 +64,11 @@ static void ssc_interactive_set_dc_mode(uint16_t dc_mode)
 	struct ssc_interactive *ssc_cxt = g_ssc_cxt;
 	spin_lock(&ssc_cxt->rw_lock);
 	if (dc_mode == ssc_cxt->a_info.dc_mode) {
-		/*pr_info("dc_mode=%d is the same\n", dc_mode);*/
+		/*pr_debug("dc_mode=%d is the same\n", dc_mode);*/
 		spin_unlock(&ssc_cxt->rw_lock);
 		return;
 	}
-	pr_info("start dc_mode=%d\n", dc_mode);
+	pr_debug("start dc_mode=%d\n", dc_mode);
 	ssc_cxt->a_info.dc_mode = dc_mode;
 	spin_unlock(&ssc_cxt->rw_lock);
 
@@ -98,11 +98,11 @@ static void ssc_interactive_set_brightness(uint16_t brigtness)
 */
 
 	if (brigtness == ssc_cxt->a_info.brightness) {
-		/*pr_info("brigtness=%d is the same\n", brigtness);*/
+		/*pr_debug("brigtness=%d is the same\n", brigtness);*/
 		spin_unlock(&ssc_cxt->rw_lock);
 		return;
 	}
-	/*pr_info("brigtness=%d brightness=%d\n", brigtness, ssc_cxt->a_info.brightness);*/
+	/*pr_debug("brigtness=%d brightness=%d\n", brigtness, ssc_cxt->a_info.brightness);*/
 
 	ssc_cxt->a_info.brightness = brigtness;
 	spin_unlock(&ssc_cxt->rw_lock);
@@ -114,7 +114,7 @@ static ssize_t ssc_interactive_write(struct file *file, const char __user * buf,
                 size_t count, loff_t * ppos)
 {
 	struct ssc_interactive *ssc_cxt = g_ssc_cxt;
-	pr_info("ssc_interactive_write start\n");
+	pr_debug("ssc_interactive_write start\n");
 	if (count > *ppos) {
 		count -= *ppos;
 	} else
@@ -174,7 +174,7 @@ static ssize_t ssc_interactive_read(struct file *file, char __user *buf, size_t 
 
 static int ssc_interactive_release (struct inode *inode, struct file *file)
 {
-	pr_info("%s\n", __func__);
+	pr_debug("%s\n", __func__);
 	return 0;
 }
 
@@ -196,7 +196,7 @@ static ssize_t brightness_store(struct device *dev,
 	int err = 0;
 
 	err = sscanf(buf, "%hhu %hu", &type, &data);
-	pr_info("brightness_store2 start = %s, brightness =%d\n", buf, data);
+	pr_debug("brightness_store2 start = %s, brightness =%d\n", buf, data);
 	if (err < 0) {
 		pr_err("brightness_store error: err = %d\n", err);
 		return err;
@@ -209,7 +209,7 @@ static ssize_t brightness_store(struct device *dev,
 
 	ssc_interactive_set_brightness(data);
 
-	pr_info("brightness_store = %s, brightness =%d\n", buf, data);
+	pr_debug("brightness_store = %s, brightness =%d\n", buf, data);
 
 	return count;
 }
@@ -224,7 +224,7 @@ static ssize_t brightness_show(struct device *dev,
 	brightness = ssc_cxt->a_info.brightness;
 	spin_unlock(&ssc_cxt->rw_lock);
 
-	pr_info("brightness_show brightness=  %d\n", brightness);
+	pr_debug("brightness_show brightness=  %d\n", brightness);
 
 	return sprintf(buf, "%d\n", brightness);
 }
@@ -261,7 +261,7 @@ static ssize_t dc_mode_show(struct device *dev,
 	dc_mode = ssc_cxt->a_info.dc_mode;
 	spin_unlock(&ssc_cxt->rw_lock);
 
-	pr_info("dc_mode_show dc_mode= %u\n", dc_mode);
+	pr_debug("dc_mode_show dc_mode= %u\n", dc_mode);
 
 	return snprintf(buf, PAGE_SIZE, "%d\n", dc_mode);
 }
@@ -518,7 +518,7 @@ static int __init ssc_interactive_init(void)
 	ssc_cxt->m_dvb_coef.dvb_h2l      = 320;
 
 
-	pr_info("ssc_interactive_init success!\n");
+	pr_debug("ssc_interactive_init success!\n");
 
 	return 0;
 sysfs_create_failed:

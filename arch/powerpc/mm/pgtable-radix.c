@@ -252,7 +252,7 @@ static inline void __meminit print_mapping(unsigned long start,
 
 	string_get_size(size, 1, STRING_UNITS_2, buf, sizeof(buf));
 
-	pr_info("Mapped 0x%016lx-0x%016lx with %s pages\n", start, end, buf);
+	pr_debug("Mapped 0x%016lx-0x%016lx with %s pages\n", start, end, buf);
 }
 
 static int __meminit create_physical_mapping(unsigned long start,
@@ -391,7 +391,7 @@ void __init radix_init_pgtable(void)
 	 * physical address here.
 	 */
 	register_process_table(__pa(process_tb), 0, PRTB_SIZE_SHIFT - 12);
-	pr_info("Process table %p and radix root for kernel: %p\n", process_tb, init_mm.pgd);
+	pr_debug("Process table %p and radix root for kernel: %p\n", process_tb, init_mm.pgd);
 	asm volatile("ptesync" : : : "memory");
 	asm volatile(PPC_TLBIE_5(%0,%1,2,1,1) : :
 		     "r" (TLBIEL_INVAL_SET_LPID), "r" (0));
@@ -424,8 +424,8 @@ static void __init radix_init_partition_table(void)
 	dw0 = rts_field | __pa(init_mm.pgd) | RADIX_PGD_INDEX_SIZE | PATB_HR;
 	mmu_partition_table_set_entry(0, dw0, 0);
 
-	pr_info("Initializing Radix MMU\n");
-	pr_info("Partition table %p\n", partition_tb);
+	pr_debug("Initializing Radix MMU\n");
+	pr_debug("Partition table %p\n", partition_tb);
 }
 
 void __init radix_init_native(void)
@@ -478,7 +478,7 @@ static int __init radix_dt_scan_page_sizes(unsigned long node,
 	if (!prop)
 		return 0;
 
-	pr_info("Page sizes from device-tree:\n");
+	pr_debug("Page sizes from device-tree:\n");
 	for (; size >= 4; size -= 4, ++prop) {
 
 		struct mmu_psize_def *def;
@@ -486,7 +486,7 @@ static int __init radix_dt_scan_page_sizes(unsigned long node,
 		/* top 3 bit is AP encoding */
 		shift = be32_to_cpu(prop[0]) & ~(0xe << 28);
 		ap = be32_to_cpu(prop[0]) >> 29;
-		pr_info("Page size shift = %d AP=0x%x\n", shift, ap);
+		pr_debug("Page size shift = %d AP=0x%x\n", shift, ap);
 
 		idx = get_idx_from_shift(shift);
 		if (idx < 0)

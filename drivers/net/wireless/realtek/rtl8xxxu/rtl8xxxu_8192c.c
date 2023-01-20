@@ -457,7 +457,7 @@ static int rtl8192cu_power_on(struct rtl8xxxu_priv *priv)
 	}
 
 	if (!i) {
-		pr_info("%s: Poll failed\n", __func__);
+		pr_debug("%s: Poll failed\n", __func__);
 		return -ENODEV;
 	}
 
@@ -470,7 +470,7 @@ static int rtl8192cu_power_on(struct rtl8xxxu_priv *priv)
 
 	val8 = rtl8xxxu_read8(priv, REG_LDOV12D_CTRL);
 	if (!(val8 & LDOV12D_ENABLE)) {
-		pr_info("%s: Enabling LDOV12D (%02x)\n", __func__, val8);
+		pr_debug("%s: Enabling LDOV12D (%02x)\n", __func__, val8);
 		val8 |= LDOV12D_ENABLE;
 		rtl8xxxu_write8(priv, REG_LDOV12D_CTRL, val8);
 
@@ -494,7 +494,7 @@ static int rtl8192cu_power_on(struct rtl8xxxu_priv *priv)
 			break;
 	}
 	if (!i) {
-		pr_info("%s: FSMCO_MAC_ENABLE poll failed\n", __func__);
+		pr_debug("%s: FSMCO_MAC_ENABLE poll failed\n", __func__);
 		return -EBUSY;
 	}
 
@@ -522,7 +522,7 @@ static int rtl8192cu_power_on(struct rtl8xxxu_priv *priv)
 	}
 
 	if (!i) {
-		pr_info("%s: APSD_CTRL poll failed\n", __func__);
+		pr_debug("%s: APSD_CTRL poll failed\n", __func__);
 		return -EBUSY;
 	}
 

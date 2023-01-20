@@ -325,7 +325,7 @@ static int olpc_xo1_ec_probe(struct platform_device *pdev)
 	if (olpc_platform_info.ecver >= 0x5f)
 		olpc_platform_info.flags |= OLPC_F_EC_WIDE_SCI;
 
-	pr_info("OLPC board revision %s%X (EC=%x)\n",
+	pr_debug("OLPC board revision %s%X (EC=%x)\n",
 			((olpc_platform_info.boardrev & 0xf) < 8) ? "pre" : "",
 			olpc_platform_info.boardrev >> 4,
 			olpc_platform_info.ecver);

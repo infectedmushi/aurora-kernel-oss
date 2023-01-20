@@ -41,7 +41,7 @@
 #endif
 
 #ifdef JANK_DEBUG
-#define jank_dbg(fmt, args...)  pr_info("[BYHP:%s:%d] " fmt, __func__, __LINE__, ##args)
+#define jank_dbg(fmt, args...)  pr_debug("[BYHP:%s:%d] " fmt, __func__, __LINE__, ##args)
 #else
 #define jank_dbg(fmt, args...)
 #endif

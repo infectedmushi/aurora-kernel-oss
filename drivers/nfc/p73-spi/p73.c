@@ -419,7 +419,7 @@ static ssize_t p61_dev_write(struct file *filp, const char *buf, size_t count,
     //#else /* VENDOR_EDIT */
     tmp = memdup_user(buf, count);
     if (IS_ERR(tmp)) {
-        pr_info("%s: memdup_user failed\n", __func__);
+        pr_debug("%s: memdup_user failed\n", __func__);
         mutex_unlock(&p61_dev->write_mutex);
         ret = PTR_ERR(tmp);
         return ret;
@@ -548,7 +548,7 @@ static ssize_t p61_dev_read(struct file *filp, char *buf, size_t count,
     //#else /* VENDOR_EDIT */
     tmp = p61_dev->kbuf;
     if (!tmp) {
-        pr_info("%s: device doesn't exist anymore.\n", __func__);
+        pr_debug("%s: device doesn't exist anymore.\n", __func__);
         ret = -ENODEV;
         goto fail;
     }

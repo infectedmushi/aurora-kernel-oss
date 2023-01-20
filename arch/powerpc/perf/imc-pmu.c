@@ -618,7 +618,7 @@ static int ppc_core_imc_cpu_online(unsigned int cpu)
 	if (!is_core_imc_mem_inited(cpu)) {
 		ret = core_imc_mem_init(cpu, core_imc_pmu->counter_mem_size);
 		if (ret) {
-			pr_info("core_imc memory allocation for cpu %d failed\n", cpu);
+			pr_debug("core_imc memory allocation for cpu %d failed\n", cpu);
 			return ret;
 		}
 	}
@@ -1397,7 +1397,7 @@ int init_imc_pmu(struct device_node *parent, struct imc_pmu *pmu_ptr, int pmu_id
 	if (ret)
 		goto err_free_cpuhp_mem;
 
-	pr_info("%s performance monitor hardware support registered\n",
+	pr_debug("%s performance monitor hardware support registered\n",
 							pmu_ptr->pmu.name);
 
 	return 0;

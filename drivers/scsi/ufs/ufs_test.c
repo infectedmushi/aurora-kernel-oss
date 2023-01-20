@@ -430,7 +430,7 @@ static struct gendisk *ufs_test_get_rq_disk(void)
 	struct gendisk *gd;
 
 	if (!req_q) {
-		pr_info("%s: Could not fetch request_queue\n", __func__);
+		pr_debug("%s: Could not fetch request_queue\n", __func__);
 		gd = NULL;
 		goto exit;
 	}
@@ -440,7 +440,7 @@ static struct gendisk *ufs_test_get_rq_disk(void)
 	dev = &sd->sdev_gendev;
 	sdkp = scsi_disk_get_from_dev(dev);
 	if (!sdkp) {
-		pr_info("%s: Could not fatch scsi disk\n", __func__);
+		pr_debug("%s: Could not fatch scsi disk\n", __func__);
 		gd = NULL;
 		goto exit;
 	}
@@ -492,7 +492,7 @@ static int ufs_test_run_write_read_test(struct test_data *td)
 		num_bios = DEFAULT_NUM_OF_BIOS;
 
 	/* Adding a write request */
-	pr_info(
+	pr_debug(
 		"%s: Adding a write request with %d bios to Q, req_id=%d\n"
 			, __func__, num_bios, td->wr_rd_next_req_id);
 
@@ -510,7 +510,7 @@ static int ufs_test_run_write_read_test(struct test_data *td)
 	wait_event(utd->wait_q, utd->queue_complete);
 
 	/* Adding a read request*/
-	pr_info("%s: Adding a read request to Q\n", __func__);
+	pr_debug("%s: Adding a read request to Q\n", __func__);
 
 	ret = test_iosched_add_wr_rd_test_req(0, READ, start_sec,
 			num_bios, TEST_PATTERN_5A, NULL);
@@ -969,7 +969,7 @@ static int run_long_test(struct test_data *td)
 
 	seed = utd->random_test_seed ? utd->random_test_seed : MAGIC_SEED;
 
-	pr_info("%s: Adding %d requests, first req_id=%d\n", __func__,
+	pr_debug("%s: Adding %d requests, first req_id=%d\n", __func__,
 	     utd->long_test_num_reqs, test_iosched->wr_rd_next_req_id);
 
 	do {
@@ -1038,8 +1038,8 @@ static int run_mixed_long_seq_test(struct test_data *td)
 	if (ret)
 		goto out;
 
-	pr_info("%s: First write iteration completed.\n", __func__);
-	pr_info("%s: Starting mixed write and reads sequence.\n", __func__);
+	pr_debug("%s: First write iteration completed.\n", __func__);
+	pr_debug("%s: Starting mixed write and reads sequence.\n", __func__);
 	utd->test_stage = UFS_TEST_LONG_SEQUENTIAL_MIXED_STAGE2;
 	ret = run_long_test(td);
 out:
@@ -1053,7 +1053,7 @@ static int long_rand_test_calc_iops(struct test_data *td)
 	mtime = ktime_to_ms(utd->test_info.test_duration);
 	num_ios = utd->completed_req_count;
 
-	pr_info("%s: time is %lu msec, IOS count is %lu\n", __func__, mtime,
+	pr_debug("%s: time is %lu msec, IOS count is %lu\n", __func__, mtime,
 				num_ios);
 
 	/* preserve some precision */
@@ -1061,7 +1061,7 @@ static int long_rand_test_calc_iops(struct test_data *td)
 	/* calculate those iops */
 	iops = num_ios / mtime;
 
-	pr_info("%s: IOPS: %lu IOP/sec\n", __func__, iops);
+	pr_debug("%s: IOPS: %lu IOP/sec\n", __func__, iops);
 
 	return 0;
 }
@@ -1074,7 +1074,7 @@ static int long_seq_test_calc_throughput(struct test_data *td)
 	mtime = ktime_to_ms(utd->test_info.test_duration);
 	byte_count = utd->test_info.test_byte_count;
 
-	pr_info("%s: time is %lu msec, size is %lu.%lu MiB\n", __func__, mtime,
+	pr_debug("%s: time is %lu msec, size is %lu.%lu MiB\n", __func__, mtime,
 				LONG_TEST_SIZE_INTEGER(byte_count),
 				LONG_TEST_SIZE_FRACTION(byte_count));
 
@@ -1089,7 +1089,7 @@ static int long_seq_test_calc_throughput(struct test_data *td)
 	/* and calculate the MiB value fraction */
 	fraction -= integer * 10;
 
-	pr_info("%s: Throughput: %lu.%lu MiB/sec\n", __func__, integer,
+	pr_debug("%s: Throughput: %lu.%lu MiB/sec\n", __func__, integer,
 				fraction);
 
 	return 0;
@@ -1133,7 +1133,7 @@ static int ufs_test_run_data_integrity_test(struct test_data *td)
 	}
 
 	/* Adding write requests */
-	pr_info("%s: Adding %d write requests, first req_id=%d\n", __func__,
+	pr_debug("%s: Adding %d write requests, first req_id=%d\n", __func__,
 		     QUEUE_MAX_REQUESTS, td->wr_rd_next_req_id);
 
 	for (i = 0; i < QUEUE_MAX_REQUESTS; i++) {
@@ -1168,7 +1168,7 @@ static int ufs_test_run_data_integrity_test(struct test_data *td)
 	wait_event(utd->wait_q, utd->queue_complete);
 
 	/* Adding read requests */
-	pr_info("%s: Adding %d read requests, first req_id=%d\n", __func__,
+	pr_debug("%s: Adding %d read requests, first req_id=%d\n", __func__,
 		     QUEUE_MAX_REQUESTS, td->wr_rd_next_req_id);
 
 	for (i = 0; i < QUEUE_MAX_REQUESTS; i++) {
@@ -1203,7 +1203,7 @@ static ssize_t ufs_test_write(struct file *file, const char __user *buf,
 	if (number <= 0)
 		number = 1;
 
-	pr_info("%s:the test will run for %d iterations.\n", __func__, number);
+	pr_debug("%s:the test will run for %d iterations.\n", __func__, number);
 	memset(&utd->test_info, 0, sizeof(struct test_info));
 
 	/* Initializing test */
@@ -1267,8 +1267,8 @@ static ssize_t ufs_test_write(struct file *file, const char __user *buf,
 
 	/* Running the test multiple times */
 	for (i = 0; i < number; ++i) {
-		pr_info("%s: Cycle # %d / %d\n", __func__, i+1, number);
-		pr_info("%s: ====================\n", __func__);
+		pr_debug("%s: Cycle # %d / %d\n", __func__, i+1, number);
+		pr_debug("%s: ====================\n", __func__);
 
 		utd->test_info.test_byte_count = 0;
 		ret = test_iosched_start_test(&utd->test_info);
@@ -1281,7 +1281,7 @@ static ssize_t ufs_test_write(struct file *file, const char __user *buf,
 		msleep(1000);
 	}
 
-	pr_info("%s: Completed all the ufs test iterations.\n", __func__);
+	pr_debug("%s: Completed all the ufs test iterations.\n", __func__);
 
 	return count;
 }

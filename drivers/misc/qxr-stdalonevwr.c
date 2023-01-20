@@ -77,7 +77,7 @@ static int qxr_stdalonevwr_probe(struct platform_device *pdev)
 	/*pdata->ndi_5v_en = 1237;*/
 	pdata->initDone = false;
 	qxr_stdalonevwr_allocate_res();
-	pr_info("%s done\n", __func__);
+	pr_debug("%s done\n", __func__);
 	return 0;
 }
 

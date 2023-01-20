@@ -49,7 +49,7 @@
 #define  OPLUS_KE_PROC_ENTRY(name, entry, mode)\
 	({if (!proc_create(#name, S_IFREG | mode, oplus_ke_proc_dir, \
 		&proc_##entry##_fops)){ \
-		pr_info("proc_create %s failed\n", #name);}})
+		pr_debug("proc_create %s failed\n", #name);}})
 
 #define OPLUS_KE_FILE_OPS(entry) \
 	static const struct file_operations proc_##entry##_fops = { \
@@ -343,12 +343,12 @@ static int pmicWd_pm_notifier(struct notifier_block *nb,
 	switch (event) {
 	case PM_SUSPEND_PREPARE:
 		pon->suspend_state = 0x80 ;
-		pr_info("pmicwd start suspend\n");
+		pr_debug("pmicwd start suspend\n");
 		break;
 
 	case PM_POST_SUSPEND:
 		pon->suspend_state = 0;
-		pr_info("pmicwd finish resume\n");
+		pr_debug("pmicwd finish resume\n");
 		break;
 	}
 
@@ -459,7 +459,7 @@ void pmicwd_init(struct platform_device *pdev, struct qpnp_pon *pon, bool sys_re
 
 	oplus_ke_proc_dir = proc_mkdir("oplus_ke", NULL);
 	if (oplus_ke_proc_dir == NULL) {
-		pr_info("oplus_ke proc_mkdir failed\n");
+		pr_debug("oplus_ke proc_mkdir failed\n");
 	}
 
 	OPLUS_KE_PROC_ENTRY(force_shutdown, force_shutdown, 0600);

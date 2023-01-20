@@ -235,9 +235,9 @@ static int mdss_pll_probe(struct platform_device *pdev)
 
 	label = of_get_property(pdev->dev.of_node, "label", NULL);
 	if (!label)
-		pr_info("MDSS pll label not specified\n");
+		pr_debug("MDSS pll label not specified\n");
 	else
-		pr_info("MDSS pll label = %s\n", label);
+		pr_debug("MDSS pll label = %s\n", label);
 
 	pll_res = devm_kzalloc(&pdev->dev, sizeof(struct mdss_pll_resources),
 								GFP_KERNEL);
@@ -257,7 +257,7 @@ static int mdss_pll_probe(struct platform_device *pdev)
 						"qcom,dsi-pll-ssc-en");
 
 	if (pll_res->ssc_en) {
-		pr_info("%s: label=%s PLL SSC enabled\n", __func__, label);
+		pr_debug("%s: label=%s PLL SSC enabled\n", __func__, label);
 
 		rc = of_property_read_u32(pdev->dev.of_node,
 			"qcom,ssc-frequency-hz", &pll_res->ssc_freq);

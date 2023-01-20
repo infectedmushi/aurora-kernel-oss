@@ -31,10 +31,10 @@ static int smartpa_pm_ctrl_put(struct snd_kcontrol *kcontrol,
 
 	ret = set_smartpa_pm_status_apr(&val, sizeof(int));
 	if (ret != 0) {
-    	pr_info("%s(), apr set failed, ret = %d", __func__, ret);
+    	pr_debug("%s(), apr set failed, ret = %d", __func__, ret);
 	}
 	#ifdef TEST_DEBUG_LOG
-	pr_info("%s(), ret = %d", __func__, ret);
+	pr_debug("%s(), ret = %d", __func__, ret);
 	#endif
 
 	return ret;
@@ -58,12 +58,12 @@ static int smartpa_pm_result_get(struct snd_kcontrol *kcontrol,
 		ucontrol->value.integer.value[0] = *(unsigned int *) (buffer + len);
 		ucontrol->value.integer.value[1] = *(unsigned int *)(buffer + len + sizeof(int));
 		#ifdef TEST_DEBUG_LOG
-		pr_info("%s(), get 10000*lspk=(%d), 10000*rspk=(%d)", __func__,
+		pr_debug("%s(), get 10000*lspk=(%d), 10000*rspk=(%d)", __func__,
 				(unsigned int)(*(float *)(buffer+len)*10000),
 				(unsigned int)(*(float *)(buffer+len+sizeof(int))*10000));
 		#endif
 	} else {
-    	pr_info("%s(), apr get failed, ret = %d", __func__, ret);
+    	pr_debug("%s(), apr get failed, ret = %d", __func__, ret);
 	}
 	kfree(buffer);
 
@@ -96,7 +96,7 @@ static const struct snd_kcontrol_new smartpa_pm_controls[] = {
 void add_smartpa_pm_controls(struct snd_soc_component *component)
 {
 	#ifdef TEST_DEBUG_LOG
-	pr_info("%s(), enter", __func__);
+	pr_debug("%s(), enter", __func__);
 	#endif
 	snd_soc_add_component_controls(component, smartpa_pm_controls,
 				ARRAY_SIZE(smartpa_pm_controls));

@@ -1212,7 +1212,7 @@ static void fg_tembase_zdscon(struct sm_fg_chip *sm)
 					} else {
 						if (data != ltim_value) {
 							fg_write_word(sm, FG_REG_RS_1, ltim_value);
-							pr_info("%s: ltim_value value set 0x%x tem(%d) i(%d)\n", __func__, ltim_value, sm->batt_temp, sm->batt_curr);
+							pr_debug("%s: ltim_value value set 0x%x tem(%d) i(%d)\n", __func__, ltim_value, sm->batt_temp, sm->batt_curr);
 						}
 					}
 				} else {
@@ -1222,7 +1222,7 @@ static void fg_tembase_zdscon(struct sm_fg_chip *sm)
 					} else {
 						if (data != sm->rs_value[1]) {
 							fg_write_word(sm, FG_REG_RS_1, sm->rs_value[1]);
-							pr_info("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
+							pr_debug("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
 						}
 					}
 				}
@@ -1233,7 +1233,7 @@ static void fg_tembase_zdscon(struct sm_fg_chip *sm)
 				} else {
 					if (data != sm->rs_value[1]) {
 						fg_write_word(sm, FG_REG_RS_1, sm->rs_value[1]);
-						pr_info("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
+						pr_debug("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
 					}
 				}
 			}
@@ -1271,7 +1271,7 @@ static void fg_tembase_zdscon(struct sm_fg_chip *sm)
 			} else {
 				if (data != sm->rs_value[1]) {
 					fg_write_word(sm, FG_REG_RS_1, sm->rs_value[1]);
-					pr_info("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
+					pr_debug("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
 				}
 			}
 #endif
@@ -1294,7 +1294,7 @@ static void fg_tembase_zdscon(struct sm_fg_chip *sm)
 		} else {
 			if (data != sm->rs_value[1]) {
 				fg_write_word(sm, FG_REG_RS_1, sm->rs_value[1]);
-				pr_info("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
+				pr_debug("%s: ltimfactor value restore 0x%x -> 0x%x tem(%d)\n", __func__, data, sm->rs_value[1], sm->batt_temp);
 			}
 		}
 #endif

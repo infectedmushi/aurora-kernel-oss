@@ -487,8 +487,8 @@ void cnss_unregister_ramdump(struct cnss_plat_data *plat_priv);
 int cnss_do_ramdump(struct cnss_plat_data *plat_priv);
 int cnss_do_elf_ramdump(struct cnss_plat_data *plat_priv);
 void cnss_set_pin_connect_status(struct cnss_plat_data *plat_priv);
-int cnss_get_cpr_info(struct cnss_plat_data *plat_priv);
-int cnss_update_cpr_info(struct cnss_plat_data *plat_priv);
+int cnss_get_cpr_debug(struct cnss_plat_data *plat_priv);
+int cnss_update_cpr_debug(struct cnss_plat_data *plat_priv);
 int cnss_va_to_pa(struct device *dev, size_t size, void *va, dma_addr_t dma,
 		  phys_addr_t *pa, unsigned long attrs);
 int cnss_minidump_add_region(struct cnss_plat_data *plat_priv,

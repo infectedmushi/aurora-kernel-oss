@@ -2552,7 +2552,7 @@ static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
 rt_info_handler rt_handler = NULL;
 void register_rt_info_handler(rt_info_handler h) {
     rt_handler = h;
-    pr_info("Add a rt_info handler\n");
+    pr_debug("Add a rt_info handler\n");
 }
 #endif
 /*
@@ -3028,7 +3028,7 @@ static void set_schedstats(bool enabled)
 void force_schedstat_enabled(void)
 {
 	if (!schedstat_enabled()) {
-		pr_info("kernel profiling enabled schedstats, disable via kernel.sched_schedstats.\n");
+		pr_debug("kernel profiling enabled schedstats, disable via kernel.sched_schedstats.\n");
 		static_branch_enable(&sched_schedstats);
 	}
 }
@@ -8732,7 +8732,7 @@ struct cgroup_subsys cpu_cgrp_subsys = {
 
 void dump_cpu_task(int cpu)
 {
-	pr_info("Task dump for CPU %d:\n", cpu);
+	pr_debug("Task dump for CPU %d:\n", cpu);
 	sched_show_task(cpu_curr(cpu));
 }
 

@@ -37,7 +37,7 @@ static ssize_t ch101_fw_read(char *buf, loff_t off, size_t count,
 		if (read_count > end_addr - addr)
 			read_count = end_addr - addr;
 
-		pr_info(TAG "%s: %d, %p, %p, %d", __func__,
+		pr_debug(TAG "%s: %d, %p, %p, %d", __func__,
 			i, &buf[i], addr, read_count);
 		memcpy((void *)&buf[i], (const void *)addr, read_count);
 
@@ -45,7 +45,7 @@ static ssize_t ch101_fw_read(char *buf, loff_t off, size_t count,
 		i += read_count;
 		count -= read_count;
 	}
-	pr_info(TAG "%s: %d", __func__, read_count);
+	pr_debug(TAG "%s: %d", __func__, read_count);
 
 	return read_count;
 }
@@ -75,12 +75,12 @@ static ssize_t ch101_firmware_write(struct file *fp, struct kobject *kobj,
 		return -EFBIG;
 	}
 
-	pr_info(TAG "%s: %d, %d, %d", __func__,
+	pr_debug(TAG "%s: %d, %d, %d", __func__,
 		pos, size, len);
 
 	if (current_part == CH101_PART_NUMBER) {
 
-		pr_info(TAG "write CH101");
+		pr_debug(TAG "write CH101");
 		memcpy(ch101_gpr_fw + pos, buf, len - pos);
 
 		if ((len - pos) == size) {
@@ -99,7 +99,7 @@ static ssize_t ch101_firmware_write(struct file *fp, struct kobject *kobj,
 				&ch101_gpr_fw[CH101_FW_SIZE + 3], ram_size);
 		}
 	} else {
-		pr_info(TAG "write CH201");
+		pr_debug(TAG "write CH201");
 		memcpy(ch201_gprmt_fw + pos, buf, len - pos);
 
 		if ((len - pos) == size) {
@@ -150,15 +150,15 @@ static ssize_t ch101_firmware_write_vers(struct file *fp, struct kobject *kobj,
 		return -EFBIG;
 	}
 
-	pr_info(TAG "%s: %d, %d, %d", __func__,
+	pr_debug(TAG "%s: %d, %d, %d", __func__,
 		pos, size, len);
 
 	memcpy(input_file, buf, sizeof(input_file));
-	pr_info("size=%d, size2=%d, %s\n",
+	pr_debug("size=%d, size2=%d, %s\n",
 		sizeof(input_file), sizeof(ch201_fw_name), input_file);
 	res = memcmp(buf, ch201_fw_name, sizeof(ch201_fw_name)-1);
 
-	pr_info(TAG "%d, %s\n", res, buf);
+	pr_debug(TAG "%d, %s\n", res, buf);
 
 	if (res) {
 		memcpy(ch101_gpr_version + pos, buf, len - pos);

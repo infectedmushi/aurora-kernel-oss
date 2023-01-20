@@ -1161,7 +1161,7 @@ int oplus_dsi_update_dynamic_osc_clock(void)
 			display->panel->oplus_priv.osc_clk_rate_lastest = osc_clock_rate;
 		}
 	} else {
-		pr_info("[%s] osc clk rate is 0, not config !\n", __func__);
+		pr_debug("[%s] osc clk rate is 0, not config !\n", __func__);
 	}
 
 	if (display->config.panel_mode == DSI_OP_CMD_MODE) {
@@ -1198,7 +1198,7 @@ int oplus_display_panel_set_dynamic_osc_clock(void *data)
 		return -EFAULT;
 	}
 
-	pr_info("%s: osc clk param value: '%d'\n", __func__, osc_clk);
+	pr_debug("%s: osc clk param value: '%d'\n", __func__, osc_clk);
 	dynamic_osc_clock = osc_clk;
 	oplus_dsi_update_dynamic_osc_clock();
 

@@ -605,7 +605,7 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 	int error;
 
 	#ifdef OPLUS_FEATURE_POWERINFO_STANDBY
-	pr_info("PM: enter state_store, buf=%s.\n", buf);
+	pr_debug("PM: enter state_store, buf=%s.\n", buf);
 	#endif /* OPLUS_FEATURE_POWERINFO_STANDBY */
 
 	error = pm_autosleep_lock();
@@ -672,7 +672,7 @@ static void pm_wakeup_count_marker(char *annotation)
 
 	getnstimeofday(&ts);
 	rtc_time_to_tm(ts.tv_sec, &tm);
-	pr_info("PM: wakeup_count %s %d-%02d-%02d %02d:%02d:%02d.%09lu UTC\n",
+	pr_debug("PM: wakeup_count %s %d-%02d-%02d %02d:%02d:%02d.%09lu UTC\n",
 		annotation, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 		tm.tm_hour, tm.tm_min, tm.tm_sec, ts.tv_nsec);
 }

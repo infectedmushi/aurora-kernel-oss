@@ -798,7 +798,7 @@ There are a number of driver model diagnostic macros in <linux/device.h>
 which you should use to make sure messages are matched to the right device
 and driver, and are tagged with the right level:  dev_err(), dev_warn(),
 dev_info(), and so forth.  For messages that aren't associated with a
-particular device, <linux/printk.h> defines pr_notice(), pr_info(),
+particular device, <linux/printk.h> defines pr_notice(), pr_debug(),
 pr_warn(), pr_err(), etc.
 
 Coming up with good debugging messages can be quite a challenge; and once

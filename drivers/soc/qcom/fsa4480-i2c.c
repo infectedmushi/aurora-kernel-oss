@@ -404,7 +404,7 @@ int fsa4480_switch_event(struct device_node *node,
 		return -EINVAL;
 
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s - switch event: %d\n", __func__, event);
+	pr_debug("%s - switch event: %d\n", __func__, event);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
 	switch (event) {

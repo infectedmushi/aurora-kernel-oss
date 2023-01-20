@@ -395,7 +395,7 @@ int cam_hw_cdm_submit_bl(struct cam_hw_info *cdm_hw,
 	int write_count = 0;
 
 	if (req->data->cmd_arrary_count > CAM_CDM_HWFIFO_SIZE) {
-		pr_info("requested BL more than max size, cnt=%d max=%d",
+		pr_debug("requested BL more than max size, cnt=%d max=%d",
 			req->data->cmd_arrary_count, CAM_CDM_HWFIFO_SIZE);
 	}
 

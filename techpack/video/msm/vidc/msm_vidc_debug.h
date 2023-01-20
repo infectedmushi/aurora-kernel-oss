@@ -95,7 +95,7 @@ extern int msm_vidc_err_recovery_disable;
 					log_length); \
 			} \
 			if (msm_vidc_debug & VIDC_PRINTK) { \
-				pr_info(VIDC_DBG_TAG __fmt, \
+				pr_debug(VIDC_DBG_TAG __fmt, \
 					get_debug_level_str(__level), \
 					sid, \
 					get_codec_name(sid), \
@@ -139,7 +139,7 @@ extern int msm_vidc_err_recovery_disable;
 				log_length); \
 		} \
 		if (__level & FW_PRINTK) { \
-			pr_info(FW_DBG_TAG __fmt, \
+			pr_debug(FW_DBG_TAG __fmt, \
 				"fw", \
 				##__VA_ARGS__); \
 		} \

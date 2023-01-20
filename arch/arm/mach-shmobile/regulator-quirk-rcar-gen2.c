@@ -134,7 +134,7 @@ static int __init rcar_gen2_regulator_quirk(void)
 		return 0;
 	}
 
-	pr_info("IRQ2 is asserted, installing da9063/da9210 regulator quirk\n");
+	pr_debug("IRQ2 is asserted, installing da9063/da9210 regulator quirk\n");
 
 	bus_register_notifier(&i2c_bus_type, &regulator_quirk_nb);
 	return 0;

@@ -1048,7 +1048,7 @@ int rgb_panel_device_register(struct platform_device *ctrl_pdev,
 		util->panel_intf_status(pinfo->pdest,
 				MDSS_PANEL_INTF_RGB) ? true : false;
 
-	pr_info("%s: Continuous splash %s\n", __func__,
+	pr_debug("%s: Continuous splash %s\n", __func__,
 			pinfo->cont_splash_enabled ? "enabled" : "disabled");
 
 	rc = mdss_register_panel(ctrl_pdev, &(rgb_data->panel_data));

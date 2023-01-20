@@ -606,7 +606,7 @@ int dsi_pll_clock_register_14nm(struct platform_device *pdev,
 	}
 
 	if (!rc) {
-		pr_info("Registered DSI PLL ndx=%d clocks successfully\n",
+		pr_debug("Registered DSI PLL ndx=%d clocks successfully\n",
 						pll_res->index);
 		return rc;
 	}

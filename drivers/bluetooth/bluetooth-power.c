@@ -34,7 +34,7 @@
 #include <linux/fs.h>
 
 #define BT_PWR_DBG(fmt, arg...)  pr_debug("%s: " fmt "\n", __func__, ## arg)
-#define BT_PWR_INFO(fmt, arg...) pr_info("%s: " fmt "\n", __func__, ## arg)
+#define BT_PWR_INFO(fmt, arg...) pr_debug("%s: " fmt "\n", __func__, ## arg)
 #define BT_PWR_ERR(fmt, arg...)  pr_err("%s: " fmt "\n", __func__, ## arg)
 
 #define PWR_SRC_NOT_AVAILABLE -2

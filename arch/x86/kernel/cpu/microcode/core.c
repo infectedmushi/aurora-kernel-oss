@@ -881,7 +881,7 @@ int __init microcode_init(void)
 	cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "x86/microcode:online",
 				  mc_cpu_online, mc_cpu_down_prep);
 
-	pr_info("Microcode Update Driver: v%s.", DRIVER_VERSION);
+	pr_debug("Microcode Update Driver: v%s.", DRIVER_VERSION);
 
 	return 0;
 

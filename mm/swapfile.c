@@ -3371,7 +3371,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 	}
 	enable_swap_info(p, prio, swap_map, cluster_info, frontswap_map);
 
-	pr_info("Adding %uk swap on %s.  Priority:%d extents:%d across:%lluk %s%s%s%s%s\n",
+	pr_debug("Adding %uk swap on %s.  Priority:%d extents:%d across:%lluk %s%s%s%s%s\n",
 		p->pages<<(PAGE_SHIFT-10), name->name, p->prio,
 		nr_extents, (unsigned long long)span<<(PAGE_SHIFT-10),
 		(p->flags & SWP_SOLIDSTATE) ? "SS" : "",
@@ -3876,7 +3876,7 @@ static int swapoff_pm_notifier(struct notifier_block *notifier,
 	case PM_SUSPEND_PREPARE:
 		spin_lock(&swapoff_lock);
 		if (swapoff_flag & 0x01) {
-			pr_info("stop suspending until swapoff is done");
+			pr_debug("stop suspending until swapoff is done");
 			spin_unlock(&swapoff_lock);
 			return NOTIFY_BAD;
 		}

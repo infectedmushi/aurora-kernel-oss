@@ -79,7 +79,7 @@ static ssize_t proc_va_feature_write(struct file *file, const char __user *buf,
 			mm->zygoteheap_in_MB = heapsize;
 
 		if (mm->va_feature & ANTI_FRAGMENT_AREA)
-			pr_info("%s (%d): rnd val is 0x%llx, mmap_base 0x%llx -> 0x%llx\n",
+			pr_debug("%s (%d): rnd val is 0x%llx, mmap_base 0x%llx -> 0x%llx\n",
 					current->group_leader->comm, current->pid,
 					mm->va_feature_rnd, old_mmap_base, mm->mmap_base);
 		mmput(mm);

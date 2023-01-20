@@ -235,11 +235,11 @@ int get_rpmh_deep_sleep_info(u64 *aosd, u64 *cxsd)
 	u64 accumulated_cxsd = 0;
 
 	if(rpm_phys_addr == NULL) {
-		pr_info("%s %d : rpm_phys_addr is null\n", __func__, __LINE__);
+		pr_debug("%s %d : rpm_phys_addr is null\n", __func__, __LINE__);
 		return -1;
 	}
 	if(num_records_backup < 2) {
-		pr_info("%s %d : num_records_backup is %d, force return\n", __func__, __LINE__, num_records_backup);
+		pr_debug("%s %d : num_records_backup is %d, force return\n", __func__, __LINE__, num_records_backup);
 		return -1;
 	}
 
@@ -253,7 +253,7 @@ int get_rpmh_deep_sleep_info(u64 *aosd, u64 *cxsd)
 
 	*aosd = get_time_in_msec(accumulated_aosd);
 	*cxsd = get_time_in_msec(accumulated_cxsd);
-	pr_info("%s %d : aosd=%llumS, cxsd=%llumS\n", __func__, __LINE__, *aosd, *cxsd);
+	pr_debug("%s %d : aosd=%llumS, cxsd=%llumS\n", __func__, __LINE__, *aosd, *cxsd);
 	return 0;
 }
 EXPORT_SYMBOL(get_rpmh_deep_sleep_info);

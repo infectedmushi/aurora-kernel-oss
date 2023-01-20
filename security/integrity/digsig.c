@@ -103,7 +103,7 @@ int __init integrity_init_keyring(const unsigned int id)
 				    restriction, NULL);
 	if (IS_ERR(keyring[id])) {
 		err = PTR_ERR(keyring[id]);
-		pr_info("Can't allocate %s keyring (%d)\n",
+		pr_debug("Can't allocate %s keyring (%d)\n",
 			keyring_name[id], err);
 		keyring[id] = NULL;
 	}

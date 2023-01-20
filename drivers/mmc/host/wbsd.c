@@ -1718,7 +1718,7 @@ static int wbsd_init(struct device *dev, int base, int irq, int dma,
 		return ret;
 	}
 
-	pr_info("%s: W83L51xD", mmc_hostname(mmc));
+	pr_debug("%s: W83L51xD", mmc_hostname(mmc));
 	if (host->chip_id != 0)
 		printk(" id %x", (int)host->chip_id);
 	printk(" at 0x%x irq %d", (int)host->base, (int)host->irq);
@@ -1943,9 +1943,9 @@ static int __init wbsd_drv_init(void)
 {
 	int result;
 
-	pr_info(DRIVER_NAME
+	pr_debug(DRIVER_NAME
 		": Winbond W83L51xD SD/MMC card interface driver\n");
-	pr_info(DRIVER_NAME ": Copyright(c) Pierre Ossman\n");
+	pr_debug(DRIVER_NAME ": Copyright(c) Pierre Ossman\n");
 
 #ifdef CONFIG_PNP
 

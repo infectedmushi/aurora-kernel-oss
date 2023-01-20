@@ -1737,7 +1737,7 @@ static int sy6974_driver_probe(struct i2c_client *client, const struct i2c_devic
 	chg_debug("call OK!\n");
     sy6974_suspend_charger();
     set_charger_ic(SY6974);
-    pr_info("SY6974 charger driver probe successfully\n");
+    pr_debug("SY6974 charger driver probe successfully\n");
 
 	return 0;
 }

@@ -171,7 +171,7 @@ static int init_qpn_table(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt)
 	/* Starting with the first reserved bit map */
 	map = &qpt->map[qpt->nmaps];
 
-	rvt_pr_info(rdi, "Reserving QPNs from 0x%x to 0x%x for non-verbs use\n",
+	rvt_pr_debug(rdi, "Reserving QPNs from 0x%x to 0x%x for non-verbs use\n",
 		    rdi->dparms.qpn_res_start, rdi->dparms.qpn_res_end);
 	for (i = rdi->dparms.qpn_res_start; i <= rdi->dparms.qpn_res_end; i++) {
 		if (!map->page) {

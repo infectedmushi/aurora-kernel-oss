@@ -455,16 +455,16 @@ void dump_callstacks(struct task_struct *task, unsigned long *cs, u64 delta)
 	if (!task)
 		return;
 
-	pr_info("[CALL_STACK] ====== [task:%s - %llu] ======\n", task->comm, delta);
-	pr_info("[CALL_STACK] ====== tracing start ======\n");
+	pr_debug("[CALL_STACK] ====== [task:%s - %llu] ======\n", task->comm, delta);
+	pr_debug("[CALL_STACK] ====== tracing start ======\n");
 	for (i = 0; i < CALL_STACK_LEVEL; i++) {
 		if (cs[i]) {
-			pr_info("[CALL_STACK] level-%d: %pS\n", i, (void *)cs[i]);
+			pr_debug("[CALL_STACK] level-%d: %pS\n", i, (void *)cs[i]);
 		} else {
 			break;
 		}
 	}
-	pr_info("[CALL_STACK] ====== tracing end ======\n");
+	pr_debug("[CALL_STACK] ====== tracing end ======\n");
 }
 #endif
 

@@ -25,13 +25,13 @@
 #define tpd_logv(fmt...) \
 	do { \
 		if (tpd_log_lv < 1) \
-			pr_info(TPD_TAG fmt); \
+			pr_debug(TPD_TAG fmt); \
 	} while (0)
 
 #define tpd_logi(fmt...) \
 	do { \
 		if (tpd_log_lv < 2) \
-			pr_info(TPD_TAG fmt); \
+			pr_debug(TPD_TAG fmt); \
 	} while (0)
 
 #define tpd_logw(fmt...) \

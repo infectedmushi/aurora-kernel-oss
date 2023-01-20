@@ -74,10 +74,10 @@ static int eeh_event_handler(void * dummy)
 		pe = event->pe;
 		if (pe) {
 			if (pe->type & EEH_PE_PHB)
-				pr_info("EEH: Detected error on PHB#%x\n",
+				pr_debug("EEH: Detected error on PHB#%x\n",
 					 pe->phb->global_number);
 			else
-				pr_info("EEH: Detected PCI bus error on "
+				pr_debug("EEH: Detected PCI bus error on "
 					"PHB#%x-PE#%x\n",
 					pe->phb->global_number, pe->addr);
 			eeh_handle_normal_event(pe);

@@ -89,6 +89,6 @@ extern void clk_debug_print_hw(struct clk_core *clk, struct seq_file *f);
 		else if (c)					\
 			pr_alert(fmt, ##__VA_ARGS__);		\
 		else						\
-			pr_info(fmt, ##__VA_ARGS__);		\
+			pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)
 #endif

@@ -1493,7 +1493,7 @@ int mce_notify_irq(void)
 		mce_work_trigger();
 
 		if (__ratelimit(&ratelimit))
-			pr_info(HW_ERR "Machine check events logged\n");
+			pr_debug(HW_ERR "Machine check events logged\n");
 
 		return 1;
 	}
@@ -1620,7 +1620,7 @@ static int __mcheck_cpu_apply_quirks(struct cpuinfo_x86 *c)
 	struct mca_config *cfg = &mca_cfg;
 
 	if (c->x86_vendor == X86_VENDOR_UNKNOWN) {
-		pr_info("unknown CPU type - not enabling MCE support\n");
+		pr_debug("unknown CPU type - not enabling MCE support\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -1943,7 +1943,7 @@ static int __init mcheck_enable(char *str)
 		if (get_option(&str, &cfg->tolerant) == 2)
 			get_option(&str, &(cfg->monarch_timeout));
 	} else {
-		pr_info("mce argument %s ignored. Please use /sys\n", str);
+		pr_debug("mce argument %s ignored. Please use /sys\n", str);
 		return 0;
 	}
 	return 1;
@@ -2487,7 +2487,7 @@ EXPORT_SYMBOL_GPL(mcsafe_key);
 
 static int __init mcheck_late_init(void)
 {
-	pr_info("Using %d MCE banks\n", mca_cfg.banks);
+	pr_debug("Using %d MCE banks\n", mca_cfg.banks);
 
 	if (mca_cfg.recovery)
 		static_branch_inc(&mcsafe_key);

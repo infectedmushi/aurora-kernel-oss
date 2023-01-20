@@ -122,7 +122,7 @@ static bool do_compare_op(u64 op1, u64 op2, int op)
 		ret = true;
 		break;
 	default:
-		pr_info("Invalid OP %d\n", op);
+		pr_debug("Invalid OP %d\n", op);
 		break;
 	}
 	return ret;
@@ -372,21 +372,21 @@ static void print_rules(struct rule_node_info *node_it)
 		return;
 	}
 
-	pr_info("\n Now printing rules for Node %d  cur rule %d\n",
+	pr_debug("\n Now printing rules for Node %d  cur rule %d\n",
 			node_it->id,
 			(node_it->cur_rule ? node_it->cur_rule->rule_id : -1));
 	list_for_each_entry(node_rule, &node_it->node_rules, link) {
-		pr_info("\n num Rules %d  rule Id %d\n",
+		pr_debug("\n num Rules %d  rule Id %d\n",
 				node_it->num_rules, node_rule->rule_id);
-		pr_info("Rule: src_field %d\n", node_rule->rule_ops.src_field);
+		pr_debug("Rule: src_field %d\n", node_rule->rule_ops.src_field);
 		for (i = 0; i < node_rule->rule_ops.num_src; i++)
-			pr_info("Rule: src %d\n",
+			pr_debug("Rule: src %d\n",
 					node_rule->rule_ops.src_id[i]);
 		for (i = 0; i < node_rule->rule_ops.num_dst; i++)
-			pr_info("Rule: dst %d dst_bw %llu\n",
+			pr_debug("Rule: dst %d dst_bw %llu\n",
 						node_rule->rule_ops.dst_node[i],
 						node_rule->rule_ops.dst_bw);
-		pr_info("Rule: thresh %llu op %d mode %d State %d\n",
+		pr_debug("Rule: thresh %llu op %d mode %d State %d\n",
 					node_rule->rule_ops.thresh,
 					node_rule->rule_ops.op,
 					node_rule->rule_ops.mode,
@@ -519,7 +519,7 @@ static bool __rule_register(int num_rules, struct bus_rule_type *rule,
 
 			node = gen_node(id, nb);
 			if (!node) {
-				pr_info("Error getting rule\n");
+				pr_debug("Error getting rule\n");
 				reg_success = false;
 				goto exit_rule_register;
 			}

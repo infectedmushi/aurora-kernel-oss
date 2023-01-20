@@ -83,13 +83,13 @@ int lcd_bl_set_led_brightness(int value)//for set bringhtness
 		return 0;
 	}
 	mapping_value = backlight_buf[value];
-	pr_info("%s:hyper bl = %d, mapping value = %d\n", __func__, value, mapping_value);
+	pr_debug("%s:hyper bl = %d, mapping value = %d\n", __func__, value, mapping_value);
 
 	if (value > 0) {
 		if(dis_set_first_level) {
 			lcd_bl_enable(true); /* BL enabled and Current sink 1/2/3/4/5 enabled */
 			dis_set_first_level = 0;
-			pr_info("%d %s dis_set_first_level=%d\n", __LINE__, __func__, dis_set_first_level);
+			pr_debug("%d %s dis_set_first_level=%d\n", __LINE__, __func__, dis_set_first_level);
 		}
 		lcd_bl_write_byte(0x04, mapping_value & 0x07); /* lsb */
 		lcd_bl_write_byte(0x05, (mapping_value >> 3) & 0xFF); /* msb */
@@ -106,7 +106,7 @@ EXPORT_SYMBOL(lcd_bl_set_led_brightness);
 
 int lcd_set_bias(bool enable)
 {
-	pr_info("--lcd, enter lcd_disable_bias function,value = %d", enable);
+	pr_debug("--lcd, enter lcd_disable_bias function,value = %d", enable);
 	if (enable) {
 		lcd_bl_write_byte(0x0C, 0x2C);/* LCD_BOOST_CFG 6.2V*/
 		lcd_bl_write_byte(0x0D, 0x24);/* OUTP_CFG OUTP = 5.8V */
@@ -228,7 +228,7 @@ static struct i2c_driver lcd_ktz8866_i2c_driver = {
 
 static int __init lcd_ktz8866_init(void)
 {
-	pr_info("lcd_ktz8866_init\n");
+	pr_debug("lcd_ktz8866_init\n");
 
 	if (i2c_add_driver(&lcd_ktz8866_i2c_driver)) {
 		pr_err("[LCD][BL] Failed to register lcd_ktz8866_i2c_driver!\n");

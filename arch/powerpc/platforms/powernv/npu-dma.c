@@ -999,7 +999,7 @@ int pnv_npu2_init(struct pnv_phb *phb)
 							i, &mmio_atsd); i++)
 		phb->npu.mmio_atsd_regs[i] = ioremap(mmio_atsd, 32);
 
-	pr_info("NPU%lld: Found %d MMIO ATSD registers", phb->opal_id, i);
+	pr_debug("NPU%lld: Found %d MMIO ATSD registers", phb->opal_id, i);
 	phb->npu.mmio_atsd_count = i;
 	phb->npu.mmio_atsd_usage = 0;
 	npu_index++;

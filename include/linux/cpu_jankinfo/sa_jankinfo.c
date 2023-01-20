@@ -76,7 +76,7 @@ void jankinfo_android_rvh_schedule_handler(void *unused,
 			nowtype = TRACE_OTHER;
 #ifdef JANKINFO_DEBUG
 			jank_systrace_print(prev->pid, "dbg999_state", prev->state);
-			pr_info("DEBUG BYHP: comm=%s dbg999_state=0x%lx(%ld)\n",
+			pr_debug("DEBUG BYHP: comm=%s dbg999_state=0x%lx(%ld)\n",
 				prev->comm, prev->state, prev->state);
 #endif
 		}

@@ -970,7 +970,7 @@ check_done:
 	if (chip->batt_status == batt_status)
 		return;
 	chip->batt_status = batt_status;
-	pr_info("batt_status is %s\n", POWER_SUPPLY_STATUS_TEXT[batt_status]);
+	pr_debug("batt_status is %s\n", POWER_SUPPLY_STATUS_TEXT[batt_status]);
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_BATT_STATUS);
 	if (msg == NULL) {
@@ -1005,7 +1005,7 @@ static void oplus_comm_check_battery_health(struct oplus_chg_comm *chip)
 	if (chip->batt_health == batt_health)
 		return;
 	chip->batt_health = batt_health;
-	pr_info("batt_health is %s\n", POWER_SUPPLY_HEALTH_TEXT[batt_health]);
+	pr_debug("batt_health is %s\n", POWER_SUPPLY_HEALTH_TEXT[batt_health]);
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_BATT_HEALTH);
 	if (msg == NULL) {
@@ -1051,7 +1051,7 @@ check_done:
 	if (chip->batt_chg_type == batt_chg_type)
 		return;
 	chip->batt_chg_type = batt_chg_type;
-	pr_info("batt_chg_type is %s\n",
+	pr_debug("batt_chg_type is %s\n",
 		POWER_SUPPLY_CHARGE_TYPE_TEXT[chip->batt_chg_type]);
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_BATT_CHG_TYPE);
@@ -1958,7 +1958,7 @@ static int oplus_comm_set_cool_down_level(struct oplus_chg_comm *chip, int level
 	if (chip->cool_down == level)
 		return 0;
 	chip->cool_down = level;
-	pr_info("set cool_down=%d\n", level);
+	pr_debug("set cool_down=%d\n", level);
 
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_COOL_DOWN);
@@ -2060,7 +2060,7 @@ static int oplus_comm_set_notify_code(struct oplus_chg_comm *chip,
 		return 0;
 
 	chip->notify_code = notify_code;
-	pr_info("set notify_code=%08x\n", notify_code);
+	pr_debug("set notify_code=%08x\n", notify_code);
 
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_NOTIFY_CODE);
@@ -2087,7 +2087,7 @@ static int oplus_comm_set_notify_flag(struct oplus_chg_comm *chip,
 		return 0;
 
 	chip->notify_flag = notify_flag;
-	pr_info("set notify_flag=%d\n", notify_flag);
+	pr_debug("set notify_flag=%d\n", notify_flag);
 
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_MEDIUM,
 				  COMM_ITEM_NOTIFY_FLAG);

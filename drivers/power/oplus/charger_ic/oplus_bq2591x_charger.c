@@ -764,17 +764,17 @@ static void bq2591x_stat_handler(struct bq2591x *bq)
 		return;
 
 	bq->prev_stat_flag = bq->reg_stat_flag;
-	pr_info("%s\n", (bq->reg_stat & BQ2591X_PG_STAT_MASK) ?
+	pr_debug("%s\n", (bq->reg_stat & BQ2591X_PG_STAT_MASK) ?
 					"Power Good" : "Power Poor");
 
 	if (bq->reg_stat & BQ2591X_IINDPM_STAT_MASK)
-		pr_info("IINDPM Triggered\n");
+		pr_debug("IINDPM Triggered\n");
 
 	if (bq->reg_stat & BQ2591X_VINDPM_STAT_MASK)
-		pr_info("VINDPM Triggered\n");
+		pr_debug("VINDPM Triggered\n");
 
 	if (bq->reg_stat & BQ2591X_TREG_STAT_MASK)
-		pr_info("TREG Triggered\n");
+		pr_debug("TREG Triggered\n");
 
 	if (bq->reg_stat & BQ2591X_WD_STAT_MASK)
 		pr_err("Watchdog overflow\n");
@@ -782,11 +782,11 @@ static void bq2591x_stat_handler(struct bq2591x *bq)
 	bq->charge_state = (bq->reg_stat & BQ2591X_CHRG_STAT_MASK)
 					>> BQ2591X_CHRG_STAT_SHIFT;
 	if (bq->charge_state == BQ2591X_CHRG_STAT_NCHG)
-		pr_info("Not Charging\n");
+		pr_debug("Not Charging\n");
 	else if (bq->charge_state == BQ2591X_CHRG_STAT_FCHG)
-		pr_info("Fast Charging\n");
+		pr_debug("Fast Charging\n");
 	else if (bq->charge_state == BQ2591X_CHRG_STAT_TCHG)
-		pr_info("Taper Charging\n");
+		pr_debug("Taper Charging\n");
 
 }
 
@@ -798,27 +798,27 @@ static void bq2591x_fault_handler(struct bq2591x *bq)
 	bq->prev_fault_flag = bq->reg_fault_flag;
 
 	if (bq->reg_fault_flag & BQ2591X_VBUS_OVP_FLAG_MASK)
-		pr_info("VBus OVP fault occured, current stat:%d",
+		pr_debug("VBus OVP fault occured, current stat:%d",
 				bq->reg_fault & BQ2591X_VBUS_OVP_STAT_MASK);
 
 	if (bq->reg_fault_flag & BQ2591X_TSHUT_FLAG_MASK)
-		pr_info("Thermal shutdown occured, current stat:%d",
+		pr_debug("Thermal shutdown occured, current stat:%d",
 				bq->reg_fault & BQ2591X_TSHUT_STAT_MASK);
 
 	if (bq->reg_fault_flag & BQ2591X_BATOVP_FLAG_MASK)
-		pr_info("Battery OVP fault occured, current stat:%d",
+		pr_debug("Battery OVP fault occured, current stat:%d",
 				bq->reg_fault & BQ2591X_BATOVP_STAT_MASK);
 
 	if (bq->reg_fault_flag & BQ2591X_CFLY_FLAG_MASK)
-		pr_info("CFLY fault occured, current stat:%d",
+		pr_debug("CFLY fault occured, current stat:%d",
 				bq->reg_fault & BQ2591X_CFLY_STAT_MASK);
 
 	if (bq->reg_fault_flag & BQ2591X_TMR_FLAG_MASK)
-		pr_info("Charge safety timer fault, current stat:%d",
+		pr_debug("Charge safety timer fault, current stat:%d",
 				bq->reg_fault & BQ2591X_TMR_STAT_MASK);
 
 	if (bq->reg_fault_flag & BQ2591X_CAP_COND_FLAG_MASK)
-		pr_info("CAP conditon fault occured, current stat:%d",
+		pr_debug("CAP conditon fault occured, current stat:%d",
 				bq->reg_fault & BQ2591X_CAP_COND_STAT_MASK);
 }
 
@@ -829,7 +829,7 @@ static irqreturn_t bq2591x_charger_interrupt(int irq, void *data)
 	int ret;
 	u8  val;
 
-	pr_info("bq2591x_charger_interrupt Triggered\n");
+	pr_debug("bq2591x_charger_interrupt Triggered\n");
 
 	ret = bq2591x_read_byte(bq, &val, BQ2591X_REG_07);
 	if (ret)
@@ -1394,7 +1394,7 @@ static int bq2591x_charger_probe(struct i2c_client *client,
 	struct bq2591x *bq = NULL;
 	int ret;
 
-	pr_info("bq2591x probe enter\n");
+	pr_debug("bq2591x probe enter\n");
 
 	bq = devm_kzalloc(&client->dev, sizeof(struct bq2591x), GFP_KERNEL);
 	if (!bq) {
@@ -1412,10 +1412,10 @@ static int bq2591x_charger_probe(struct i2c_client *client,
 
 	ret = bq2591x_detect_device(bq);
 	if (!ret && bq->part_no == BQ25910) {
-		pr_info("charger device bq2591x detected, revision:%d\n",
+		pr_debug("charger device bq2591x detected, revision:%d\n",
 							bq->revision);
 	} else {
-		pr_info("no bq2591x charger device found:%d\n", ret);
+		pr_debug("no bq2591x charger device found:%d\n", ret);
 		ret= -ENODEV;
 		goto err_detect_device;
 	}
@@ -1462,7 +1462,7 @@ static int bq2591x_charger_probe(struct i2c_client *client,
 	}
 	
 	set_charger_ic(BQ2591X);
-	pr_info("BQ2591X charger driver probe successfully\n");
+	pr_debug("BQ2591X charger driver probe successfully\n");
 
 	return 0;
 	
@@ -1493,7 +1493,7 @@ static int bq2591x_charger_remove(struct i2c_client *client)
 
 static void bq2591x_charger_shutdown(struct i2c_client *client)
 {
-	pr_info("shutdown\n");
+	pr_debug("shutdown\n");
 
 }
 

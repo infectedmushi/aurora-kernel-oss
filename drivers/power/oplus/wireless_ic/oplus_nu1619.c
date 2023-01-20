@@ -1420,7 +1420,7 @@ static int oplus_wpc_get_local_time_s(void)
 	int local_time_s;
 
 	local_time_s = local_clock() / WPC_LOCAL_T_NS_TO_S_THD;
-	pr_info("local_time_s:%d\n", local_time_s);
+	pr_debug("local_time_s:%d\n", local_time_s);
 
 	return local_time_s;
 }
@@ -1453,7 +1453,7 @@ static void oplus_wpc_update_track_info(
 		chg_status->max_iout, chg_status->min_cool_down,
 		chg_status->min_skewing_current, chg_status->wls_auth_fail,
 		chg_status->work_silent_mode);
-	pr_info("%s\n", crux_info);
+	pr_debug("%s\n", crux_info);
 }
 
 static int nu1619_wpc_get_break_sub_crux_info(char *crux_info)
@@ -1494,7 +1494,7 @@ static int oplus_wpc_track_upload_trx_general_info(struct oplus_nu1619_ic *chip,
 			trx_crux_info);
 
 	schedule_delayed_work(&chip->trx_info_load_trigger_work, 0);
-	pr_info("%s\n", chip->trx_info_load_trigger.crux_info);
+	pr_debug("%s\n", chip->trx_info_load_trigger.crux_info);
 
 	return 0;
 }
@@ -5827,7 +5827,7 @@ static int oplus_wpc_track_upload_trx_err_info(
 			trx_crux_info);
 
 	schedule_delayed_work(&chip->trx_err_load_trigger_work, 0);
-	pr_info("%s\n", chip->trx_err_load_trigger.crux_info);
+	pr_debug("%s\n", chip->trx_err_load_trigger.crux_info);
 
 	return 0;
 }
@@ -10441,7 +10441,7 @@ static void oplus_chg_wls_status_keep_clean_work(struct work_struct *work)
 	oplus_chg_set_wls_status_keep(WLS_SK_NULL);
 
 	if (chip->status_wake_lock_on) {
-		pr_info("release status_wake_lock\n");
+		pr_debug("release status_wake_lock\n");
 		__pm_relax(chip->status_wake_lock);
 		chip->status_wake_lock_on = false;
 	}
@@ -10489,7 +10489,7 @@ static int nu1619_wireless_get_prop(struct power_supply *psy,
 		} else {
 			if (pre_wls_online && val->intval == 0) {
 				if (!chip->status_wake_lock_on) {
-					pr_info("acquire status_wake_lock\n");
+					pr_debug("acquire status_wake_lock\n");
 					__pm_stay_awake(chip->status_wake_lock);
 					chip->status_wake_lock_on = true;
 				}

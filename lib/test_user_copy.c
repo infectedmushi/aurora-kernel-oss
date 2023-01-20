@@ -221,7 +221,7 @@ static int __init test_user_copy_init(void)
 		ret |= test(val_##size != check,			  \
 		    "legitimate get_user (" #size ") failed to do copy"); \
 		if (val_##size != check) {				  \
-			pr_info("0x%llx != 0x%llx\n",			  \
+			pr_debug("0x%llx != 0x%llx\n",			  \
 				(unsigned long long)val_##size,		  \
 				(unsigned long long)check);		  \
 		}							  \
@@ -283,7 +283,7 @@ static int __init test_user_copy_init(void)
 		ret |= test(val_##size != (size)0,			    \
 		    "zeroing failure for illegal get_user (" #size ")");    \
 		if (val_##size != (size)0) {				    \
-			pr_info("0x%llx != 0\n",			    \
+			pr_debug("0x%llx != 0\n",			    \
 				(unsigned long long)val_##size);	    \
 		}							    \
 		ret |= test(!put_user(val_##size, (size __user *)kmem),	    \
@@ -302,7 +302,7 @@ static int __init test_user_copy_init(void)
 	kfree(kmem);
 
 	if (ret == 0) {
-		pr_info("tests passed.\n");
+		pr_debug("tests passed.\n");
 		return 0;
 	}
 
@@ -313,7 +313,7 @@ module_init(test_user_copy_init);
 
 static void __exit test_user_copy_exit(void)
 {
-	pr_info("unloaded.\n");
+	pr_debug("unloaded.\n");
 }
 
 module_exit(test_user_copy_exit);

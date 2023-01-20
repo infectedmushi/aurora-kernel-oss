@@ -15,7 +15,7 @@
 		if (m)		    \
 			seq_printf(m, x);	\
 		else		    \
-			pr_info(x);	    \
+			pr_debug(x);	    \
 	} while (0)
 
 

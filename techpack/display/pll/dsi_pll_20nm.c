@@ -584,7 +584,7 @@ int dsi_pll_clock_register_20nm(struct platform_device *pdev,
 	}
 
 	if (!rc)
-		pr_info("Registered DSI PLL clocks successfully\n");
+		pr_debug("Registered DSI PLL clocks successfully\n");
 
 	return rc;
 }

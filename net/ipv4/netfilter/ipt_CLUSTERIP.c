@@ -238,7 +238,7 @@ clusterip_config_init(struct net *net, const struct ipt_clusterip_tgt_info *i,
 	int err;
 
 	if (iniface[0] == '\0') {
-		pr_info("Please specify an interface name\n");
+		pr_debug("Please specify an interface name\n");
 		return ERR_PTR(-EINVAL);
 	}
 
@@ -248,7 +248,7 @@ clusterip_config_init(struct net *net, const struct ipt_clusterip_tgt_info *i,
 
 	dev = dev_get_by_name(net, iniface);
 	if (!dev) {
-		pr_info("no such interface %s\n", iniface);
+		pr_debug("no such interface %s\n", iniface);
 		kfree(c);
 		return ERR_PTR(-ENOENT);
 	}
@@ -378,7 +378,7 @@ clusterip_hashfn(const struct sk_buff *skb,
 		hashval = 0;
 		/* This cannot happen, unless the check function wasn't called
 		 * at rule load time */
-		pr_info("unknown mode %u\n", config->hash_mode);
+		pr_debug("unknown mode %u\n", config->hash_mode);
 		BUG();
 		break;
 	}
@@ -474,23 +474,23 @@ static int clusterip_tg_check(const struct xt_tgchk_param *par)
 	if (cipinfo->hash_mode != CLUSTERIP_HASHMODE_SIP &&
 	    cipinfo->hash_mode != CLUSTERIP_HASHMODE_SIP_SPT &&
 	    cipinfo->hash_mode != CLUSTERIP_HASHMODE_SIP_SPT_DPT) {
-		pr_info("unknown mode %u\n", cipinfo->hash_mode);
+		pr_debug("unknown mode %u\n", cipinfo->hash_mode);
 		return -EINVAL;
 
 	}
 	if (e->ip.dmsk.s_addr != htonl(0xffffffff) ||
 	    e->ip.dst.s_addr == 0) {
-		pr_info("Please specify destination IP\n");
+		pr_debug("Please specify destination IP\n");
 		return -EINVAL;
 	}
 	if (cipinfo->num_local_nodes > ARRAY_SIZE(cipinfo->local_nodes)) {
-		pr_info("bad num_local_nodes %u\n", cipinfo->num_local_nodes);
+		pr_debug("bad num_local_nodes %u\n", cipinfo->num_local_nodes);
 		return -EINVAL;
 	}
 	for (i = 0; i < cipinfo->num_local_nodes; i++) {
 		if (cipinfo->local_nodes[i] - 1 >=
 		    sizeof(config->local_nodes) * 8) {
-			pr_info("bad local_nodes[%d] %u\n",
+			pr_debug("bad local_nodes[%d] %u\n",
 				i, cipinfo->local_nodes[i]);
 			return -EINVAL;
 		}
@@ -499,7 +499,7 @@ static int clusterip_tg_check(const struct xt_tgchk_param *par)
 	config = clusterip_config_find_get(par->net, e->ip.dst.s_addr, 1);
 	if (!config) {
 		if (!(cipinfo->flags & CLUSTERIP_FLAG_NEW)) {
-			pr_info("no config found for %pI4, need 'new'\n",
+			pr_debug("no config found for %pI4, need 'new'\n",
 				&e->ip.dst.s_addr);
 			return -EINVAL;
 		} else {
@@ -517,7 +517,7 @@ static int clusterip_tg_check(const struct xt_tgchk_param *par)
 
 	ret = nf_ct_netns_get(par->net, par->family);
 	if (ret < 0) {
-		pr_info("cannot load conntrack support for proto=%u\n",
+		pr_debug("cannot load conntrack support for proto=%u\n",
 			par->family);
 		clusterip_config_entry_put(config);
 		clusterip_config_put(config);
@@ -525,7 +525,7 @@ static int clusterip_tg_check(const struct xt_tgchk_param *par)
 	}
 
 	if (!par->net->xt.clusterip_deprecated_warning) {
-		pr_info("ipt_CLUSTERIP is deprecated and it will removed soon, "
+		pr_debug("ipt_CLUSTERIP is deprecated and it will removed soon, "
 			"use xt_cluster instead\n");
 		par->net->xt.clusterip_deprecated_warning = true;
 	}
@@ -887,7 +887,7 @@ static int __init clusterip_tg_init(void)
 	if (ret < 0)
 		goto unregister_target;
 
-	pr_info("ClusterIP Version %s loaded successfully\n",
+	pr_debug("ClusterIP Version %s loaded successfully\n",
 		CLUSTERIP_VERSION);
 
 	return 0;
@@ -901,7 +901,7 @@ cleanup_subsys:
 
 static void __exit clusterip_tg_exit(void)
 {
-	pr_info("ClusterIP Version %s unloading\n", CLUSTERIP_VERSION);
+	pr_debug("ClusterIP Version %s unloading\n", CLUSTERIP_VERSION);
 
 	unregister_netdevice_notifier(&cip_netdev_notifier);
 	xt_unregister_target(&clusterip_tg_reg);

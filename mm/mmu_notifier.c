@@ -187,7 +187,7 @@ int __mmu_notifier_invalidate_range_start(struct mm_struct *mm,
 		if (mn->ops->invalidate_range_start) {
 			int _ret = mn->ops->invalidate_range_start(mn, mm, start, end, blockable);
 			if (_ret) {
-				pr_info("%pS callback failed with %d in %sblockable context.\n",
+				pr_debug("%pS callback failed with %d in %sblockable context.\n",
 						mn->ops->invalidate_range_start, _ret,
 						!blockable ? "non-" : "");
 				ret = _ret;

@@ -912,7 +912,7 @@ char *mhi_get_restart_reason(const char *name);
 
 #define MHI_CNTRL_LOG(fmt, ...) do {	\
 		if (mhi_cntrl->klog_lvl <= MHI_MSG_LVL_INFO) \
-			pr_info("[I][%s] " fmt, __func__, ##__VA_ARGS__);\
+			pr_debug("[I][%s] " fmt, __func__, ##__VA_ARGS__);\
 } while (0)
 
 #define MHI_CNTRL_ERR(fmt, ...) do {	\
@@ -922,7 +922,7 @@ char *mhi_get_restart_reason(const char *name);
 
 #define MHI_LOG(fmt, ...) do {	\
 		if (mhi_cntrl->klog_lvl <= MHI_MSG_LVL_INFO) \
-			pr_info("[I][%s] " fmt, __func__, ##__VA_ARGS__);\
+			pr_debug("[I][%s] " fmt, __func__, ##__VA_ARGS__);\
 } while (0)
 
 #define MHI_ERR(fmt, ...) do {	\

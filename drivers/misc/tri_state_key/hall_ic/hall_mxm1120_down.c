@@ -59,9 +59,9 @@
 
 #define TRI_KEY_TAG                  "[tri_state_key] "
 #define TRI_KEY_ERR(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 #define TRI_KEY_LOG(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 
 static struct m1120_data_t *p_m1120_data;
 

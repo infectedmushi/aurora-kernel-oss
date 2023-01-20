@@ -2791,7 +2791,7 @@ static int dsi_display_ctrl_init(struct dsi_display *display)
 
 			if ((cur_mode->dsi_mode_flags & DSI_MODE_FLAG_DMS) &&
 			    is_cont_splash_enabled) {
-				pr_info("[%s] Forcing DSI CTRL reinit for "
+				pr_debug("[%s] Forcing DSI CTRL reinit for "
 					"Dynamic Mode Setting usecase during "
 					"continuous splash.\n", display->name);
 				is_cont_splash_enabled = false;
@@ -5091,7 +5091,7 @@ static int dsi_display_set_mode_sub(struct dsi_display *display,
 					rc = dsi_phy_set_timing_params_commit(ctrl->phy,
 						priv_info->phy_timing_val,
 						priv_info->phy_timing_len);
-					pr_info("[%s] Force commit PHY timing params "
+					pr_debug("[%s] Force commit PHY timing params "
 						"for seamless DMS usecase\n",
 						display->name);
 				} else {
@@ -8216,7 +8216,7 @@ int dsi_display_enable(struct dsi_display *display)
 		 * the splash screen) and the Command Mode Engine is also up:
 		 * send the commands to switch the resolution NOW!
 		 */
-		pr_info("[%s] Dynamic Mode Setting: switching now!\n",
+		pr_debug("[%s] Dynamic Mode Setting: switching now!\n",
 			display->name);
 		rc = dsi_panel_post_switch(display->panel);
 		if (rc)

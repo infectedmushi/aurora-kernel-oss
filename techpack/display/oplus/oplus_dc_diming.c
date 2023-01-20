@@ -241,7 +241,7 @@ int oplus_dsi_display_enable_and_waiting_for_next_te_irq(void)
 	}
 
 	oplus_dsi_display_change_te_irq_status(display, true);
-	pr_info("Waiting for the next TE to switch\n");
+	pr_debug("Waiting for the next TE to switch\n");
 
 	display->vsync_switch_pending = true;
 	reinit_completion(&display->switch_te_gate);
@@ -1149,7 +1149,7 @@ int oplus_display_panel_set_dimlayer_enable(void *data)
 	}
 
 	if (!strcmp(display->panel->name, "samsung ams662zs01 dsc cmd 21623")) {
-		pr_info("DC BKL %s\n", *dimlayer_enable?"ON":"OFF");
+		pr_debug("DC BKL %s\n", *dimlayer_enable?"ON":"OFF");
 		return 0;
 	}
 

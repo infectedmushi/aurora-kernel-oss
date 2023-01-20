@@ -105,7 +105,7 @@ int pcibios_map_irq(const struct pci_dev *dev, uint8_t slot, uint8_t pin)
 		pr_crit("pci %s: no irq found for pin %u\n",
 			pci_name((struct pci_dev *) dev), pin);
 	else
-		pr_info("pci %s: using irq %d for pin %u\n",
+		pr_debug("pci %s: using irq %d for pin %u\n",
 			pci_name((struct pci_dev *) dev), irq, pin);
 
 	return irq;

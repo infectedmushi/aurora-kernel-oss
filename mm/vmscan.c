@@ -912,7 +912,7 @@ static pageout_t pageout(struct page *page, struct address_space *mapping,
 		if (page_has_private(page)) {
 			if (try_to_free_buffers(page)) {
 				ClearPageDirty(page);
-				pr_info("%s: orphaned page\n", __func__);
+				pr_debug("%s: orphaned page\n", __func__);
 				return PAGE_CLEAN;
 			}
 		}
@@ -5097,7 +5097,7 @@ static ssize_t store_enabled(struct kobject *kobj, struct kobj_attribute *attr,
 		else
 			static_branch_disable(&lru_gen_caps[i]);
 	}
-	pr_info("switch mglru_gen enabled: 0x%04x\n", caps);
+	pr_debug("switch mglru_gen enabled: 0x%04x\n", caps);
 	return len;
 }
 

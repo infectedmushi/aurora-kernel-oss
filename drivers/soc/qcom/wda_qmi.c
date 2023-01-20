@@ -358,7 +358,7 @@ static void wda_svc_config(struct work_struct *work)
 
 	rtnl_unlock();
 
-	pr_info("Connection established with the WDA Service, DL Marker %s\n",
+	pr_debug("Connection established with the WDA Service, DL Marker %s\n",
 		dl_marker ? "enabled" : "disabled");
 }
 
@@ -382,7 +382,7 @@ static void wda_svc_exit(struct qmi_handle *qmi, struct qmi_service *svc)
 						 handle);
 
 	if (!data)
-		pr_info("%s() data is null\n", __func__);
+		pr_debug("%s() data is null\n", __func__);
 }
 
 static struct qmi_ops server_ops = {
@@ -446,7 +446,7 @@ void wda_qmi_client_exit(void *wda_data)
 	struct wda_qmi_data *data = (struct wda_qmi_data *)wda_data;
 
 	if (!data) {
-		pr_info("%s() data is null\n", __func__);
+		pr_debug("%s() data is null\n", __func__);
 		return;
 	}
 

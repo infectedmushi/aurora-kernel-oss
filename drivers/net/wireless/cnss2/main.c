@@ -1345,21 +1345,21 @@ int cnss_force_fw_assert_async(struct device *dev)
 	}
 
 	if (plat_priv->device_id == QCA6174_DEVICE_ID) {
-		cnss_pr_info("Forced FW assert is not supported\n");
+		cnss_pr_debug("Forced FW assert is not supported\n");
 		return -EOPNOTSUPP;
 	}
 
 	if (cnss_bus_is_device_down(plat_priv)) {
-		cnss_pr_info("Device is already in bad state, ignore force assert\n");
+		cnss_pr_debug("Device is already in bad state, ignore force assert\n");
 		return 0;
 	}
 
 	if (test_bit(CNSS_DRIVER_RECOVERY, &plat_priv->driver_state)) {
-		cnss_pr_info("Recovery is already in progress, ignore forced FW assert\n");
+		cnss_pr_debug("Recovery is already in progress, ignore forced FW assert\n");
 		return 0;
 	}
 
-	cnss_pr_info("Force assert (async)\n");
+	cnss_pr_debug("Force assert (async)\n");
 
 	cnss_driver_event_post(plat_priv,
 			       CNSS_DRIVER_EVENT_FORCE_FW_ASSERT,
@@ -1380,21 +1380,21 @@ int cnss_force_fw_assert(struct device *dev)
 	}
 
 	if (plat_priv->device_id == QCA6174_DEVICE_ID) {
-		cnss_pr_info("Forced FW assert is not supported\n");
+		cnss_pr_debug("Forced FW assert is not supported\n");
 		return -EOPNOTSUPP;
 	}
 
 	if (cnss_bus_is_device_down(plat_priv)) {
-		cnss_pr_info("Device is already in bad state, ignore force assert\n");
+		cnss_pr_debug("Device is already in bad state, ignore force assert\n");
 		return 0;
 	}
 
 	if (test_bit(CNSS_DRIVER_RECOVERY, &plat_priv->driver_state)) {
-		cnss_pr_info("Recovery is already in progress, ignore forced FW assert\n");
+		cnss_pr_debug("Recovery is already in progress, ignore forced FW assert\n");
 		return 0;
 	}
 
-	cnss_pr_info("Force assert (%s)\n", post ? "async" : "sync");
+	cnss_pr_debug("Force assert (%s)\n", post ? "async" : "sync");
 
 	if (post)
 		cnss_driver_event_post(plat_priv,
@@ -1419,17 +1419,17 @@ int cnss_force_collect_rddm(struct device *dev)
 	}
 
 	if (plat_priv->device_id == QCA6174_DEVICE_ID) {
-		cnss_pr_info("Force collect rddm is not supported\n");
+		cnss_pr_debug("Force collect rddm is not supported\n");
 		return -EOPNOTSUPP;
 	}
 
 	if (cnss_bus_is_device_down(plat_priv)) {
-		cnss_pr_info("Device is already in bad state, ignore force collect rddm\n");
+		cnss_pr_debug("Device is already in bad state, ignore force collect rddm\n");
 		return 0;
 	}
 
 	if (test_bit(CNSS_DRIVER_RECOVERY, &plat_priv->driver_state)) {
-		cnss_pr_info("Recovery is already in progress, ignore forced collect rddm\n");
+		cnss_pr_debug("Recovery is already in progress, ignore forced collect rddm\n");
 		return 0;
 	}
 
@@ -1437,7 +1437,7 @@ int cnss_force_collect_rddm(struct device *dev)
 	    test_bit(CNSS_DRIVER_UNLOADING, &plat_priv->driver_state) ||
 	    test_bit(CNSS_DRIVER_IDLE_RESTART, &plat_priv->driver_state) ||
 	    test_bit(CNSS_DRIVER_IDLE_SHUTDOWN, &plat_priv->driver_state)) {
-		cnss_pr_info("Loading/Unloading/idle restart/shutdown is in progress, ignore forced collect rddm\n");
+		cnss_pr_debug("Loading/Unloading/idle restart/shutdown is in progress, ignore forced collect rddm\n");
 		return 0;
 	}
 
@@ -2125,7 +2125,7 @@ static int cnss_register_ramdump_v1(struct cnss_plat_data *plat_priv)
 		    ramdump_info->ramdump_va, &ramdump_info->ramdump_pa);
 
 	if (ramdump_info->ramdump_size == 0) {
-		cnss_pr_info("Ramdump will not be collected");
+		cnss_pr_debug("Ramdump will not be collected");
 		goto out;
 	}
 
@@ -2739,7 +2739,7 @@ static ssize_t icnss_show_fw_ready(struct device_driver *driver, char *buf)
            bdfloadsuccess = test_bit(CNSS_LOAD_BDF_SUCCESS, &plat_env->loadBdfState);
            #ifdef OPLUS_FEATURE_WIFI_DCS_SWITCH
            //avoid wifi firmware ready check fail when idle shutdown
-           cnss_pr_info("firmware_ready: %d; power_on: %d", firmware_ready, plat_env->powered_on);
+           cnss_pr_debug("firmware_ready: %d; power_on: %d", firmware_ready, plat_env->powered_on);
            if (!firmware_ready && !plat_env->powered_on && regdbloadsuccess && bdfloadsuccess) {
                firmware_ready = true;
            }
@@ -2822,7 +2822,7 @@ static int cnss_probe(struct platform_device *plat_dev)
 	INIT_LIST_HEAD(&plat_priv->clk_list);
 
 	cnss_get_wlaon_pwr_ctrl_info(plat_priv);
-	cnss_get_cpr_info(plat_priv);
+	cnss_get_cpr_debug(plat_priv);
 	cnss_init_control_params(plat_priv);
 
     #ifdef OPLUS_FEATURE_WIFI_DCS_SWITCH
@@ -2882,7 +2882,7 @@ static int cnss_probe(struct platform_device *plat_dev)
 	cnssprobestate = CNSS_PROBE_SUCCESS;
 	#endif /* OPLUS_FEATURE_WIFI_DCS_SWITCH */
 
-	cnss_pr_info("Platform driver probed successfully.\n");
+	cnss_pr_debug("Platform driver probed successfully.\n");
 
 	return 0;
 
@@ -2958,7 +2958,7 @@ static struct platform_driver cnss_platform_driver = {
 //Add for wifi switch monitor
 static void icnss_create_fw_state_kobj(void) {
 	if (driver_create_file(&(cnss_platform_driver.driver), &fw_ready_attr)) {
-		cnss_pr_info("failed to create %s", fw_ready_attr.attr.name);
+		cnss_pr_debug("failed to create %s", fw_ready_attr.attr.name);
 	}
 }
 

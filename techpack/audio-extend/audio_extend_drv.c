@@ -145,7 +145,7 @@ static int ak4376_audrx_init(struct snd_soc_pcm_runtime *rtd)
 
 	dapm = snd_soc_component_get_dapm(component);
 
-	pr_info("%s() dev_name %s\n", __func__, dev_name(codec_dai->dev));
+	pr_debug("%s() dev_name %s\n", __func__, dev_name(codec_dai->dev));
 
 	snd_soc_dapm_ignore_suspend(dapm, "AK4376 HPL");
 	snd_soc_dapm_ignore_suspend(dapm, "AK4376 HPR");
@@ -167,7 +167,7 @@ static int extend_codec_prop_parse(struct device *dev, const char *codec_prop[],
 			__func__, codec_prop[CODEC_VENDOR], dev->of_node->full_name);
 		return -EINVAL;
 	} else {
-		pr_info("%s: codec vendor: %s\n", __func__, codec_info->codec_vendor);
+		pr_debug("%s: codec vendor: %s\n", __func__, codec_info->codec_vendor);
 	}
 
 	ret = of_property_read_u32(dev->of_node, codec_prop[CODEC_I2S_ID], &codec_info->i2s_id);
@@ -176,7 +176,7 @@ static int extend_codec_prop_parse(struct device *dev, const char *codec_prop[],
 			__func__, codec_prop[CODEC_I2S_ID], dev->of_node->full_name);
 		return -EINVAL;
 	} else {
-		pr_info("%s: i2s id: %d\n", __func__, codec_info->i2s_id);
+		pr_debug("%s: i2s id: %d\n", __func__, codec_info->i2s_id);
 	}
 
 	ret = of_property_count_strings(dev->of_node, codec_prop[CODEC_NAME]);
@@ -186,7 +186,7 @@ static int extend_codec_prop_parse(struct device *dev, const char *codec_prop[],
 		return -EINVAL;
 	} else {
 		codec_info->dev_cnt = ret;
-		pr_info("%s: dev_cnt %d\n", __func__, codec_info->dev_cnt);
+		pr_debug("%s: dev_cnt %d\n", __func__, codec_info->dev_cnt);
 	}
 
 	codec_info->codec_name = devm_kzalloc(dev, codec_info->dev_cnt * sizeof(char *), GFP_KERNEL);
@@ -248,31 +248,31 @@ static void extend_codec_be_dailink(struct codec_prop_info *codec_info, struct s
 	}
 
 	i2s_id = codec_info->i2s_id;
-	pr_info("%s: i2s_id=%d, size=%d!\n", __func__, i2s_id, size);
+	pr_debug("%s: i2s_id=%d, size=%d!\n", __func__, i2s_id, size);
 	if ((i2s_id * 2 + 1) >= size) {
 		pr_err("%s: i2s_id param invalid!\n", __func__);
 		return;
 	}
 
-	pr_info("%s: codec vendor: %s, dev_cnt: %d.\n", __func__, codec_info->codec_vendor, codec_info->dev_cnt);
+	pr_debug("%s: codec vendor: %s, dev_cnt: %d.\n", __func__, codec_info->codec_vendor, codec_info->dev_cnt);
 
 	if (!strcmp(codec_info->codec_vendor, extend_codec_vendor[CODEC_VENDOR_NXP])) {
 		if (codec_info->dev_cnt == 1) {
 			if (soc_find_component(NULL, codec_info->codec_name[0])) {
-				pr_info("%s: use %s mono dailink replace\n", __func__, codec_info->codec_vendor);
+				pr_debug("%s: use %s mono dailink replace\n", __func__, codec_info->codec_vendor);
 				dailink[i2s_id*2].codec_name = codec_info->codec_name[0];
 				dailink[i2s_id*2].codec_dai_name = codec_info->codec_dai_name[0];
 			}
 		} else if (codec_info->dev_cnt == 2) {
 			if (soc_find_component(NULL, codec_info->codec_name[0])
 				|| soc_find_component(NULL, codec_info->codec_name[1])) {
-				pr_info("%s: use %s stereo dailink replace\n", __func__, codec_info->codec_vendor);
+				pr_debug("%s: use %s stereo dailink replace\n", __func__, codec_info->codec_vendor);
 				for (i = 0; i < codec_info->dev_cnt; i++) {
 					tfa98xx_dails[i].name = codec_info->codec_name[i];
 					tfa98xx_dails[i].dai_name = codec_info->codec_dai_name[i];
 				}
-				pr_info("%s: tfa98xx_dails[0] name:%s, dai_name:%s \n", __func__, tfa98xx_dails[0].name, tfa98xx_dails[0].dai_name);
-				pr_info("%s: tfa98xx_dails[1] name:%s, dai_name:%s \n", __func__, tfa98xx_dails[1].name, tfa98xx_dails[1].dai_name);
+				pr_debug("%s: tfa98xx_dails[0] name:%s, dai_name:%s \n", __func__, tfa98xx_dails[0].name, tfa98xx_dails[0].dai_name);
+				pr_debug("%s: tfa98xx_dails[1] name:%s, dai_name:%s \n", __func__, tfa98xx_dails[1].name, tfa98xx_dails[1].dai_name);
 				dailink[i2s_id*2].codec_name = NULL;
 				dailink[i2s_id*2].codec_dai_name = NULL;
 				dailink[i2s_id*2].codecs = tfa98xx_dails;
@@ -284,15 +284,15 @@ static void extend_codec_be_dailink(struct codec_prop_info *codec_info, struct s
 				|| soc_find_component(NULL, codec_info->codec_name[1])
 				|| soc_find_component(NULL, codec_info->codec_name[2])
 				|| soc_find_component(NULL, codec_info->codec_name[3])) {
-				pr_info("%s: use %s stereo dailink replace\n", __func__, codec_info->codec_vendor);
+				pr_debug("%s: use %s stereo dailink replace\n", __func__, codec_info->codec_vendor);
 				for (i = 0; i < codec_info->dev_cnt; i++) {
 					tfa98xx_tdm_dails[i].name = codec_info->codec_name[i];
 					tfa98xx_tdm_dails[i].dai_name = codec_info->codec_dai_name[i];
 				}
-				pr_info("%s: tfa98xx_tdm_dails[0] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[0].name, tfa98xx_tdm_dails[0].dai_name);
-				pr_info("%s: tfa98xx_tdm_dails[1] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[1].name, tfa98xx_tdm_dails[1].dai_name);
-				pr_info("%s: tfa98xx_tdm_dails[2] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[2].name, tfa98xx_tdm_dails[2].dai_name);
-				pr_info("%s: tfa98xx_tdm_dails[3] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[3].name, tfa98xx_tdm_dails[3].dai_name);
+				pr_debug("%s: tfa98xx_tdm_dails[0] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[0].name, tfa98xx_tdm_dails[0].dai_name);
+				pr_debug("%s: tfa98xx_tdm_dails[1] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[1].name, tfa98xx_tdm_dails[1].dai_name);
+				pr_debug("%s: tfa98xx_tdm_dails[2] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[2].name, tfa98xx_tdm_dails[2].dai_name);
+				pr_debug("%s: tfa98xx_tdm_dails[3] name:%s, dai_name:%s \n", __func__, tfa98xx_tdm_dails[3].name, tfa98xx_tdm_dails[3].dai_name);
 				dailink[i2s_id*2].codec_name = NULL;
 				dailink[i2s_id*2].codec_dai_name = NULL;
 				dailink[i2s_id*2].codecs = tfa98xx_tdm_dails;
@@ -303,7 +303,7 @@ static void extend_codec_be_dailink(struct codec_prop_info *codec_info, struct s
 
 	if (!strcmp(codec_info->codec_vendor, extend_codec_vendor[CODEC_VENDOR_MAXIM])) {
 		if (soc_find_component(NULL, codec_info->codec_name[0])) {
-			pr_info("%s: use %s dailink replace\n", __func__, codec_info->codec_vendor);
+			pr_debug("%s: use %s dailink replace\n", __func__, codec_info->codec_vendor);
 			//RX dailink
 			dailink[i2s_id*2].codec_name = codec_info->codec_name[0];
 			dailink[i2s_id*2].codec_dai_name = codec_info->codec_dai_name[0];
@@ -316,7 +316,7 @@ static void extend_codec_be_dailink(struct codec_prop_info *codec_info, struct s
 
 	if (!strcmp(codec_info->codec_vendor, extend_codec_vendor[CODEC_VENDOR_AKM])) {
 		if (soc_find_component(NULL, codec_info->codec_name[0])) {
-			pr_info("%s: use %s dailink replace\n", __func__, codec_info->codec_vendor);
+			pr_debug("%s: use %s dailink replace\n", __func__, codec_info->codec_vendor);
 			//RX dailink
 			dailink[i2s_id*2].codec_name = codec_info->codec_name[0];
 			dailink[i2s_id*2].codec_dai_name = codec_info->codec_dai_name[0];
@@ -332,12 +332,12 @@ void extend_codec_i2s_be_dailinks(struct snd_soc_dai_link *dailink, size_t size)
 		return;
 	}
 
-	pr_info("%s: use_extern_spk %d\n", __func__, g_extend_pdata->use_extern_spk);
+	pr_debug("%s: use_extern_spk %d\n", __func__, g_extend_pdata->use_extern_spk);
 	if (g_extend_pdata->use_extern_spk && g_extend_pdata->spk_pa_info) {
 		extend_codec_be_dailink(g_extend_pdata->spk_pa_info, dailink, size);
 	}
 
-	pr_info("%s: use_extern_dac %d\n", __func__, g_extend_pdata->use_extern_dac);
+	pr_debug("%s: use_extern_dac %d\n", __func__, g_extend_pdata->use_extern_dac);
 	if (g_extend_pdata->use_extern_dac && g_extend_pdata->hp_dac_info) {
 		extend_codec_be_dailink(g_extend_pdata->hp_dac_info, dailink, size);
 	}

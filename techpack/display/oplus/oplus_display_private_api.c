@@ -1889,9 +1889,9 @@ static ssize_t oplus_display_notify_fp_press(struct device *dev,
 	if (onscreenfp_status == oplus_onscreenfp_status)
 		return count;
 
-	pr_info("notify fingerpress %s\n", onscreenfp_status ? "on" : "off");
+	pr_debug("notify fingerpress %s\n", onscreenfp_status ? "on" : "off");
 	if ((oplus_get_panel_brightness() == 0) && onscreenfp_status) {
-		pr_info("notify fingerpress return as screen is off\n");
+		pr_debug("notify fingerpress return as screen is off\n");
 		return count;
 	}
 
@@ -2077,7 +2077,7 @@ static ssize_t oplus_display_set_dynamic_osc_clock(struct device *dev,
 		return -EFAULT;
 	}
 
-	pr_info("%s: osc clk param value: '%d'\n", __func__, osc_clk);
+	pr_debug("%s: osc clk param value: '%d'\n", __func__, osc_clk);
 	oplus_dsi_update_dynamic_osc_clock();
 
 	return count;

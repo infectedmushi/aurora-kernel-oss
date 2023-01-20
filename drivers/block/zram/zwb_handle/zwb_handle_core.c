@@ -218,7 +218,7 @@ static int clear_fn(void *p)
 			clear_proc[count] = tsk->pid;
 			count++;
 #if CLEAR_DEBUG
-			pr_info("clear_idle_flag processing %s (%d) \n", tsk->comm, tsk->pid);
+			pr_debug("clear_idle_flag processing %s (%d) \n", tsk->comm, tsk->pid);
 #endif
 
 			if (count == 2)
@@ -241,7 +241,7 @@ static int clear_fn(void *p)
 		}
 
 #if CLEAR_DEBUG
-		pr_info("clear_idle_flag finish");
+		pr_debug("clear_idle_flag finish");
 #endif
 		if (kthread_should_stop())
 			break;

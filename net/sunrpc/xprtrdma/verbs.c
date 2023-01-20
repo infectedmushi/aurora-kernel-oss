@@ -244,7 +244,7 @@ rpcrdma_conn_upcall(struct rdma_cm_id *id, struct rdma_cm_event *event)
 		break;
 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
 #if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
-		pr_info("rpcrdma: removing device %s for %s:%s\n",
+		pr_debug("rpcrdma: removing device %s for %s:%s\n",
 			ia->ri_device->name,
 			rpcrdma_addrstr(xprt), rpcrdma_portstr(xprt));
 #endif

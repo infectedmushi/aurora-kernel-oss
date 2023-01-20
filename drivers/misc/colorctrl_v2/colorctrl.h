@@ -30,12 +30,12 @@
 extern unsigned int ec_debug;
 
 #define COLOR_INFO(fmt, args...) \
-	pr_info("COLOR-CTRL: %s:" fmt "\n", __func__, ##args)
+	pr_debug("COLOR-CTRL: %s:" fmt "\n", __func__, ##args)
 
 #define COLOR_DEBUG(fmt, args...) \
 	do { \
 		if (LEVEL_DEBUG == ec_debug) \
-		pr_info("COLOR-CTRL: %s:" fmt "\n", __func__, ##args);\
+		pr_debug("COLOR-CTRL: %s:" fmt "\n", __func__, ##args);\
 	}while(0)
 
 typedef enum debug_level {

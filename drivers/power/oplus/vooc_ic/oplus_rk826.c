@@ -1199,7 +1199,7 @@ update_asic_fw:
 			rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 			pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 			if ((value_buf[0]==0x45)&&(value_buf[1]==0x4c)&&(value_buf[2]==0x44)&&(value_buf[3]==0x49)) {
-				pr_info("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
+				pr_debug("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
 				fw_check_err ++;
 				if (fw_check_err > 3)
 					goto update_fw_err;
@@ -1207,7 +1207,7 @@ update_asic_fw:
 				goto update_asic_fw;
 			} else {
 				pr_err("rk826 read register 0x52cc fail, rc = %d\n", rc);
-				pr_info("rk826 fw upgrade check ok.");
+				pr_debug("rk826 fw upgrade check ok.");
 			}
 		}
 update_fw_err:
@@ -1286,7 +1286,7 @@ update_asic_fw:
 			rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 			pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 			if ((value_buf[0]==0x45)&&(value_buf[1]==0x4c)&&(value_buf[2]==0x44)&&(value_buf[3]==0x49)) {
-				pr_info("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
+				pr_debug("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
 				fw_check_err ++;
 				if (fw_check_err > 3)
 					goto update_fw_err;
@@ -1294,7 +1294,7 @@ update_asic_fw:
 				goto update_asic_fw;
 			} else {
 				pr_err("rk826 read register 0x52cc fail, rc = %d\n", rc);
-				pr_info("rk826 fw upgrade check ok.");
+				pr_debug("rk826 fw upgrade check ok.");
 			}
 		}
 update_fw_err:
@@ -1327,7 +1327,7 @@ int rk826_asic_fw_status(struct oplus_vooc_chip *chip)
 	rc = oplus_i2c_dma_read(chip->client, 0x52cc, 4, value_buf);
 	pr_err("rk826 read register 0x52cc rc = %d\n", rc);
 	if ((value_buf[0]==0x45)&&(value_buf[1]==0x4c)&&(value_buf[2]==0x44)&&(value_buf[3]==0x49)) {
-		pr_info("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
+		pr_debug("read 0x52cc success 0x%x,0x%x,0x%x,0x%x", value_buf[0],value_buf[1],value_buf[2],value_buf[3]);
 		return 0;
 	} else {
 		pr_err("rk826 read register 0x52cc fail, rc = %d\n", rc);

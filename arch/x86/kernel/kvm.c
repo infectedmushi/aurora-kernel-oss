@@ -299,7 +299,7 @@ static void kvm_register_steal_time(void)
 		return;
 
 	wrmsrl(MSR_KVM_STEAL_TIME, (slow_virt_to_phys(st) | KVM_MSR_ENABLED));
-	pr_info("kvm-stealtime: cpu %d, msr %llx\n",
+	pr_debug("kvm-stealtime: cpu %d, msr %llx\n",
 		cpu, (unsigned long long) slow_virt_to_phys(st));
 }
 
@@ -537,7 +537,7 @@ static void kvm_setup_pv_ipi(void)
 	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
 	apic->send_IPI_allbutself = kvm_send_ipi_allbutself;
 	apic->send_IPI_all = kvm_send_ipi_all;
-	pr_info("KVM setup pv IPIs\n");
+	pr_debug("KVM setup pv IPIs\n");
 }
 
 static void __init kvm_smp_prepare_cpus(unsigned int max_cpus)
@@ -755,7 +755,7 @@ static __init int kvm_setup_pv_tlb_flush(void)
 			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
 				GFP_KERNEL, cpu_to_node(cpu));
 		}
-		pr_info("KVM setup pv remote TLB flush\n");
+		pr_debug("KVM setup pv remote TLB flush\n");
 	}
 
 	return 0;

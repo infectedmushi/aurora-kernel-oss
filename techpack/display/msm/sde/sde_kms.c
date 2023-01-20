@@ -3471,7 +3471,7 @@ static int _sde_kms_get_splash_data(struct sde_splash_data *data)
 	SDE_DEBUG("splash mem num_regions:%d\n", num_regions);
 	if (num_displays > num_regions) {
 		share_splash_mem = true;
-		pr_info(":%d displays share same splash buf\n", num_displays);
+		pr_debug(":%d displays share same splash buf\n", num_displays);
 	}
 
 	for (i = 0; i < num_displays; i++) {
@@ -3650,7 +3650,7 @@ static void _sde_kms_update_tcsr_glitch_mask(struct sde_kms *sde_kms)
 	write_val = read_val | BIT(2);
 	scm_io_write(TCSR_DISP_HF_SF_ARES_GLITCH_MASK, write_val);
 
-	pr_info("tcsr glitch programmed read_val:%x write_val:%x\n",
+	pr_debug("tcsr glitch programmed read_val:%x write_val:%x\n",
 						read_val, write_val);
 
 }
@@ -3669,7 +3669,7 @@ static int _sde_kms_hw_init_blocks(struct sde_kms *sde_kms,
 
 	_sde_kms_core_hw_rev_init(sde_kms);
 
-	pr_info("sde hardware revision:0x%x\n", sde_kms->core_rev);
+	pr_debug("sde hardware revision:0x%x\n", sde_kms->core_rev);
 
 	sde_kms->catalog = sde_hw_catalog_init(dev, sde_kms->core_rev);
 	if (IS_ERR_OR_NULL(sde_kms->catalog)) {

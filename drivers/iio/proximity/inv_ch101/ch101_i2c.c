@@ -123,21 +123,21 @@ static int read_reg(void *client, u16 i2c_addr, u8 reg, u16 length, u8 *data)
 	struct i2c_client *i2c_client = (struct i2c_client *)client;
 	struct i2c_adapter *i2c_adapter = i2c_client->adapter;
 
-//	pr_info(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
+//	pr_debug(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
 //		i2c_client->name, i2c_client->addr, i2c_client->flags);
-//	pr_info(TAG "%s: addr: %02x, reg: %02x, len: %d\n", __func__,
+//	pr_debug(TAG "%s: addr: %02x, reg: %02x, len: %d\n", __func__,
 //		i2c_addr, reg, length);
 
 	res = i2c_transfer(i2c_adapter, msg, 2);
 
-//	pr_info(TAG "%s: RES: %d\n", __func__, res);
+//	pr_debug(TAG "%s: RES: %d\n", __func__, res);
 
 //	{
 //	int i;
-//	pr_info(TAG "Read Values: ");
+//	pr_debug(TAG "Read Values: ");
 //	for (i = 0; i < (length < 3 ? length : 3); i++)
-//		pr_info(TAG " %02x ", *(u8 *)(data + i));
-//	pr_info(TAG "\n");
+//		pr_debug(TAG " %02x ", *(u8 *)(data + i));
+//	pr_debug(TAG "\n");
 //	}
 
 	if (res <= 0) {
@@ -161,9 +161,9 @@ static int write_reg(void *client, u16 i2c_addr, u8 reg, u16 length, u8 *data)
 	struct i2c_client *i2c_client = (struct i2c_client *)client;
 	struct i2c_adapter *i2c_adapter = i2c_client->adapter;
 
-//	pr_info(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
+//	pr_debug(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
 //		i2c_client->name, i2c_client->addr, i2c_client->flags);
-//	pr_info(TAG "%s: addr: %02x, reg: %02x, len: %d\n", __func__,
+//	pr_debug(TAG "%s: addr: %02x, reg: %02x, len: %d\n", __func__,
 //		i2c_addr, reg, length);
 
 	if (length > sizeof(buf))
@@ -175,15 +175,15 @@ static int write_reg(void *client, u16 i2c_addr, u8 reg, u16 length, u8 *data)
 
 //	{
 //	int i;
-//	pr_info(TAG "Write Values: ");
+//	pr_debug(TAG "Write Values: ");
 //	for (i = 0; i < sizeof(buf); i++)
-//		pr_info(TAG " %02x ", *(u8 *)(buf + i));
-//	pr_info(TAG "\n");
+//		pr_debug(TAG " %02x ", *(u8 *)(buf + i));
+//	pr_debug(TAG "\n");
 //	}
 
 	res = i2c_transfer(i2c_adapter, msg, 1);
 
-//	pr_info(TAG "%s: RES: %d\n", __func__, res);
+//	pr_debug(TAG "%s: RES: %d\n", __func__, res);
 
 	if (res <= 0) {
 		if (res == 0)
@@ -205,14 +205,14 @@ static int read_sync(void *client, u16 i2c_addr, u16 length, u8 *data)
 	struct i2c_client *i2c_client = (struct i2c_client *)client;
 	struct i2c_adapter *i2c_adapter = i2c_client->adapter;
 
-//	pr_info(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
+//	pr_debug(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
 //		i2c_client->name, i2c_client->addr, i2c_client->flags);
-//	pr_info(TAG "%s: addr: %02x, len: %d\n", __func__,
+//	pr_debug(TAG "%s: addr: %02x, len: %d\n", __func__,
 //		i2c_addr, length);
 
 	res = i2c_transfer(i2c_adapter, msg, 1);
 
-//	pr_info(TAG "%s: RES: %d\n", __func__, res);
+//	pr_debug(TAG "%s: RES: %d\n", __func__, res);
 
 	if (res <= 0) {
 		if (res == 0)
@@ -234,14 +234,14 @@ static int write_sync(void *client, u16 i2c_addr, u16 length, u8 *data)
 	struct i2c_client *i2c_client = (struct i2c_client *)client;
 	struct i2c_adapter *i2c_adapter = i2c_client->adapter;
 
-//	pr_info(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
+//	pr_debug(TAG "%s: name: %s, addr: %02x, flags: %x\n", __func__,
 //		i2c_client->name, i2c_client->addr, i2c_client->flags);
-//	pr_info(TAG "%s: addr: %02x, len: %d\n", __func__,
+//	pr_debug(TAG "%s: addr: %02x, len: %d\n", __func__,
 //		i2c_addr, length);
 
 	res = i2c_transfer(i2c_adapter, msg, 1);
 
-//	pr_info(TAG "%s: RES: %d\n", __func__, res);
+//	pr_debug(TAG "%s: RES: %d\n", __func__, res);
 
 	if (res <= 0) {
 		if (res == 0)
@@ -264,7 +264,7 @@ static struct gpio_chip *get_gpio_exp(void)
 	chip = gpiochip_find(SX1508_DEVICE_ID,
 				match_gpio_chip_by_label);
 
-//	pr_info(TAG "%s: name: %s gpio: %p\n", __func__,SX1508_DEVICE_ID,chip);
+//	pr_debug(TAG "%s: name: %s gpio: %p\n", __func__,SX1508_DEVICE_ID,chip);
 
 	return chip;
 }
@@ -276,7 +276,7 @@ static void set_pin_level(ioport_pin_t pin, int value)
 	if (!gpio)
 		return;
 
-//	pr_info(TAG "%s: pin: %d, value: %d\n", __func__, pin, value);
+//	pr_debug(TAG "%s: pin: %d, value: %d\n", __func__, pin, value);
 
 	gpio->set(gpio, pin, value);
 }
@@ -288,7 +288,7 @@ static void set_pin_dir(ioport_pin_t pin, enum ioport_direction dir)
 	if (!gpio)
 		return;
 
-//	pr_info(TAG "%s: pin: %d, dir: %d\n", __func__, pin, dir);
+//	pr_debug(TAG "%s: pin: %d, dir: %d\n", __func__, pin, dir);
 
 	if (dir == IOPORT_DIR_INPUT)
 		gpio->direction_input(gpio, pin);
@@ -352,8 +352,8 @@ static int ch101_i2c_probe(struct i2c_client *client,
 		return PTR_ERR(regmap);
 	}
 
-	pr_info(TAG "%s: client: %p\n", __func__, client);
-	pr_info(TAG "%s: adapter: %p\n", __func__, client->adapter);
+	pr_debug(TAG "%s: client: %p\n", __func__, client);
+	pr_debug(TAG "%s: adapter: %p\n", __func__, client->adapter);
 
 
 	ret = ch101_core_probe(client, regmap, cbk, id ? id->name : NULL);

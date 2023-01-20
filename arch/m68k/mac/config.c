@@ -845,7 +845,7 @@ static void __init mac_identify(void)
 	 */
 	iop_preinit();
 
-	pr_info("Detected Macintosh model: %d\n", model);
+	pr_debug("Detected Macintosh model: %d\n", model);
 
 	/*
 	 * Report booter data:
@@ -879,7 +879,7 @@ static void __init mac_identify(void)
 
 static void __init mac_report_hardware(void)
 {
-	pr_info("Apple Macintosh %s\n", macintosh_config->name);
+	pr_debug("Apple Macintosh %s\n", macintosh_config->name);
 }
 
 static void mac_get_model(char *str)

@@ -4219,12 +4219,12 @@ static int __init kvm_s390_init(void)
 	int i;
 
 	if (!sclp.has_sief2) {
-		pr_info("SIE not available\n");
+		pr_debug("SIE not available\n");
 		return -ENODEV;
 	}
 
 	if (nested && hpage) {
-		pr_info("nested (vSIE) and hpage (huge page backing) can currently not be activated concurrently");
+		pr_debug("nested (vSIE) and hpage (huge page backing) can currently not be activated concurrently");
 		return -EINVAL;
 	}
 

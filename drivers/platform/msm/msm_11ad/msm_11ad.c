@@ -785,7 +785,7 @@ out:
 static int msm_11ad_ssr_shutdown(const struct subsys_desc *subsys,
 				 bool force_stop)
 {
-	pr_info("%s(%pK,%d)\n", __func__, subsys, force_stop);
+	pr_debug("%s(%pK,%d)\n", __func__, subsys, force_stop);
 	/* nothing is done in shutdown. We do full recovery in powerup */
 	return 0;
 }
@@ -796,7 +796,7 @@ static int msm_11ad_ssr_powerup(const struct subsys_desc *subsys)
 	struct platform_device *pdev;
 	struct msm11ad_ctx *ctx;
 
-	pr_info("%s(%pK)\n", __func__, subsys);
+	pr_debug("%s(%pK)\n", __func__, subsys);
 
 	pdev = to_platform_device(subsys->dev);
 	ctx = platform_get_drvdata(pdev);

@@ -3973,7 +3973,7 @@ void __init tcp_init(void)
 	init_net.ipv4.sysctl_tcp_rmem[1] = 131072;
 	init_net.ipv4.sysctl_tcp_rmem[2] = max(131072, max_rshare);
 
-	pr_info("Hash tables configured (established %u bind %u)\n",
+	pr_debug("Hash tables configured (established %u bind %u)\n",
 		tcp_hashinfo.ehash_mask + 1, tcp_hashinfo.bhash_size);
 
 	tcp_v4_init();

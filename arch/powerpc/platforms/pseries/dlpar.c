@@ -535,7 +535,7 @@ static ssize_t dlpar_store(struct class *class, struct class_attribute *attr,
 	args = argbuf = kstrdup(buf, GFP_KERNEL);
 	hp_elog = kzalloc(sizeof(*hp_elog), GFP_KERNEL);
 	if (!hp_elog || !argbuf) {
-		pr_info("Could not allocate resources for DLPAR operation\n");
+		pr_debug("Could not allocate resources for DLPAR operation\n");
 		kfree(argbuf);
 		kfree(hp_elog);
 		return -ENOMEM;

@@ -173,7 +173,7 @@ void __init time_init(void)
 {
 	of_clk_init(NULL);
 #ifdef CONFIG_XTENSA_CALIBRATE_CCOUNT
-	pr_info("Calibrating CPU frequency ");
+	pr_debug("Calibrating CPU frequency ");
 	calibrate_ccount();
 	pr_cont("%d.%02d MHz\n",
 		(int)ccount_freq / 1000000,
@@ -212,7 +212,7 @@ irqreturn_t timer_interrupt(int irq, void *dev_id)
 void calibrate_delay(void)
 {
 	loops_per_jiffy = ccount_freq / HZ;
-	pr_info("Calibrating delay loop (skipped)... %lu.%02lu BogoMIPS preset\n",
+	pr_debug("Calibrating delay loop (skipped)... %lu.%02lu BogoMIPS preset\n",
 		loops_per_jiffy / (1000000 / HZ),
 		(loops_per_jiffy / (10000 / HZ)) % 100);
 }

@@ -246,7 +246,7 @@ static ssize_t perfmon_configure_store(struct device *dev,
 
 		port_ops = llcc_priv->port_ops[port_sel];
 		port_ops->event_config(llcc_priv, event_sel, &j, true);
-		pr_info("counter %2d configured for event %2ld from port %ld\n",
+		pr_debug("counter %2d configured for event %2ld from port %ld\n",
 				j++, event_sel, port_sel);
 		if (((llcc_priv->enables_port & (1 << port_sel)) == 0) &&
 				(port_ops->event_enable))
@@ -316,7 +316,7 @@ static ssize_t perfmon_remove_store(struct device *dev,
 		counter_map->event_sel = 0;
 		port_ops = llcc_priv->port_ops[port_sel];
 		port_ops->event_config(llcc_priv, event_sel, &j, false);
-		pr_info("removed counter %2d for event %2ld from port %2ld\n",
+		pr_debug("removed counter %2d for event %2ld from port %2ld\n",
 				j++, event_sel, port_sel);
 		if ((llcc_priv->enables_port & (1 << port_sel)) &&
 				(port_ops->event_enable))
@@ -1288,7 +1288,7 @@ static int llcc_perfmon_probe(struct platform_device *pdev)
 	hrtimer_init(&llcc_priv->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	llcc_priv->hrtimer.function = llcc_perfmon_timer_handler;
 	llcc_priv->expires = 0;
-	pr_info("Revision %d, has %d memory controllers connected with LLCC\n",
+	pr_debug("Revision %d, has %d memory controllers connected with LLCC\n",
 			llcc_priv->version, llcc_priv->num_mc);
 	return 0;
 }

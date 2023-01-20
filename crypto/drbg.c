@@ -1572,7 +1572,7 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
 			drbg->jent = NULL;
 			if (fips_enabled || ret != -ENOENT)
 				goto free_everything;
-			pr_info("DRBG: Continuing without Jitter RNG\n");
+			pr_debug("DRBG: Continuing without Jitter RNG\n");
 		}
 
 		reseed = false;
@@ -1652,7 +1652,7 @@ static int drbg_init_hash_kernel(struct drbg_state *drbg)
 
 	tfm = crypto_alloc_shash(drbg->core->backend_cra_name, 0, 0);
 	if (IS_ERR(tfm)) {
-		pr_info("DRBG: could not allocate digest TFM handle: %s\n",
+		pr_debug("DRBG: could not allocate digest TFM handle: %s\n",
 				drbg->core->backend_cra_name);
 		return PTR_ERR(tfm);
 	}
@@ -1736,7 +1736,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
 
 	tfm = crypto_alloc_cipher(drbg->core->backend_cra_name, 0, 0);
 	if (IS_ERR(tfm)) {
-		pr_info("DRBG: could not allocate cipher TFM handle: %s\n",
+		pr_debug("DRBG: could not allocate cipher TFM handle: %s\n",
 				drbg->core->backend_cra_name);
 		return PTR_ERR(tfm);
 	}
@@ -1750,7 +1750,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
 	}
 	sk_tfm = crypto_alloc_skcipher(ctr_name, 0, 0);
 	if (IS_ERR(sk_tfm)) {
-		pr_info("DRBG: could not allocate CTR cipher TFM handle: %s\n",
+		pr_debug("DRBG: could not allocate CTR cipher TFM handle: %s\n",
 				ctr_name);
 		drbg_fini_sym_kernel(drbg);
 		return PTR_ERR(sk_tfm);
@@ -1760,7 +1760,7 @@ static int drbg_init_sym_kernel(struct drbg_state *drbg)
 
 	req = skcipher_request_alloc(sk_tfm, GFP_KERNEL);
 	if (!req) {
-		pr_info("DRBG: could not allocate request queue\n");
+		pr_debug("DRBG: could not allocate request queue\n");
 		drbg_fini_sym_kernel(drbg);
 		return -ENOMEM;
 	}
@@ -2090,7 +2090,7 @@ static int __init drbg_init(void)
 		return ret;
 
 	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
-		pr_info("DRBG: Cannot register all DRBG types"
+		pr_debug("DRBG: Cannot register all DRBG types"
 			"(slots needed: %zu, slots available: %zu)\n",
 			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
 		return -EFAULT;

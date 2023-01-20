@@ -776,7 +776,7 @@ int cnss_suspend_pci_link(struct cnss_pci_data *pci_priv)
 		return -ENODEV;
 
 	if (pci_priv->pci_link_state == PCI_LINK_DOWN) {
-		cnss_pr_info("PCI link is already suspended\n");
+		cnss_pr_debug("PCI link is already suspended\n");
 		goto out;
 	}
 
@@ -815,7 +815,7 @@ int cnss_resume_pci_link(struct cnss_pci_data *pci_priv)
 		return -ENODEV;
 
 	if (pci_priv->pci_link_state == PCI_LINK_UP) {
-		cnss_pr_info("PCI link is already resumed\n");
+		cnss_pr_debug("PCI link is already resumed\n");
 		goto out;
 	}
 

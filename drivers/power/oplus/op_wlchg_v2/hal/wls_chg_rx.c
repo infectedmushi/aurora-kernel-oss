@@ -120,7 +120,7 @@ int oplus_chg_wls_get_cep_check_update(struct oplus_wls_chg_rx *wls_rx,
 		return rc;
 	}
 	if (cep_count == cep_count_temp) {
-		pr_info("cep not update\n");
+		pr_debug("cep not update\n");
 		return -EINVAL;
 	}
 	cep_count = cep_count_temp;
@@ -155,7 +155,7 @@ static void oplus_chg_wls_cep_check_work(struct work_struct *work)
 	int cep;
 
 	if (!wls_rx->wls_dev->wls_status.rx_online) {
-		pr_info("rx is offline, exit\n");
+		pr_debug("rx is offline, exit\n");
 		complete(&wls_rx->cep_ok_ack);
 		return;
 	}
@@ -163,7 +163,7 @@ static void oplus_chg_wls_cep_check_work(struct work_struct *work)
 	rc = oplus_chg_wls_get_cep_check_update(wls_rx, &cep);
 	if (rc < 0)
 		goto out;
-	pr_info("wkcs: cep=%d\n", cep);
+	pr_debug("wkcs: cep=%d\n", cep);
 	if (abs(cep) < 3) {
 		wls_rx->cep_is_ok = true;
 		complete(&wls_rx->cep_ok_ack);
@@ -572,7 +572,7 @@ int oplus_chg_wls_rx_send_msg(struct oplus_wls_chg_rx *wls_rx, unsigned char msg
 
 	rx_ic_ops = rx_ic->dev_ops;
 	rc = rx_ic_ops->rx_send_msg(rx_ic, buf, ARRAY_SIZE(buf));
-	pr_info("send msg, msg=0x%02x, data=0x%02x\n", msg, data);
+	pr_debug("send msg, msg=0x%02x, data=0x%02x\n", msg, data);
 
 	return rc;
 }

@@ -1623,7 +1623,7 @@ static ssize_t prime_store(struct device *dev,
 	while (hw_cread(CAP_ENDPTPRIME, BIT(n)))
 		cpu_relax();
 
-	pr_info("%s: prime:%08x stat:%08x ep#%d dir:%s\n", __func__,
+	pr_debug("%s: prime:%08x stat:%08x ep#%d dir:%s\n", __func__,
 			hw_cread(CAP_ENDPTPRIME, ~0),
 			hw_cread(CAP_ENDPTSTAT, ~0),
 			mEp->num, mEp->dir ? "IN" : "OUT");
@@ -1663,7 +1663,7 @@ static ssize_t dtds_store(struct device *dev,
 		mEp = &udc->ci13xxx_ep[ep_num];
 
 	n = hw_ep_bit(mEp->num, mEp->dir);
-	pr_info("%s: prime:%08x stat:%08x ep#%d dir:%s dTD_update_fail_count: %lu mEp->dTD_update_fail_count: %lu mEp->dTD_active_re_q_count: %lu mEp->prime_fail_count: %lu\n",
+	pr_debug("%s: prime:%08x stat:%08x ep#%d dir:%s dTD_update_fail_count: %lu mEp->dTD_update_fail_count: %lu mEp->dTD_active_re_q_count: %lu mEp->prime_fail_count: %lu\n",
 			__func__,
 			hw_cread(CAP_ENDPTPRIME, ~0),
 			hw_cread(CAP_ENDPTSTAT, ~0),
@@ -1673,14 +1673,14 @@ static ssize_t dtds_store(struct device *dev,
 			mEp->dTD_active_re_q_count,
 			mEp->prime_fail_count);
 
-	pr_info("QH: cap:%08x cur:%08x next:%08x token:%08x\n",
+	pr_debug("QH: cap:%08x cur:%08x next:%08x token:%08x\n",
 			mEp->qh.ptr->cap, mEp->qh.ptr->curr,
 			mEp->qh.ptr->td.next, mEp->qh.ptr->td.token);
 
 	list_for_each(ptr, &mEp->qh.queue) {
 		req = list_entry(ptr, struct ci13xxx_req, queue);
 
-		pr_info("\treq:%pKa next:%08x token:%08x page0:%08x status:%d\n",
+		pr_debug("\treq:%pKa next:%08x token:%08x page0:%08x status:%d\n",
 				&req->dma, req->ptr->next, req->ptr->token,
 				req->ptr->page[0], req->req.status);
 	}
@@ -1701,7 +1701,7 @@ static int ci13xxx_wakeup(struct usb_gadget *_gadget)
 	spin_lock_irqsave(udc->lock, flags);
 	if (!udc->gadget.remote_wakeup) {
 		ret = -EOPNOTSUPP;
-		pr_info("remote wakeup feature is not enabled\n");
+		pr_debug("remote wakeup feature is not enabled\n");
 		goto out;
 	}
 	spin_unlock_irqrestore(udc->lock, flags);
@@ -1717,7 +1717,7 @@ static int ci13xxx_wakeup(struct usb_gadget *_gadget)
 	spin_lock_irqsave(udc->lock, flags);
 	if (!hw_cread(CAP_PORTSC, PORTSC_SUSP)) {
 		ret = -EINVAL;
-		pr_info("port is not suspended\n");
+		pr_debug("port is not suspended\n");
 		pm_runtime_put(&_gadget->dev);
 		goto out;
 	}
@@ -1917,13 +1917,13 @@ static void ep_prime_timer_func(struct timer_list *t)
 	mep->prime_timer_count++;
 	if (mep->prime_timer_count == MAX_PRIME_CHECK_RETRY) {
 		mep->prime_timer_count = 0;
-		pr_info("ep%d dir:%s QH:cap:%08x cur:%08x next:%08x tkn:%08x\n",
+		pr_debug("ep%d dir:%s QH:cap:%08x cur:%08x next:%08x tkn:%08x\n",
 				mep->num, mep->dir ? "IN" : "OUT",
 				mep->qh.ptr->cap, mep->qh.ptr->curr,
 				mep->qh.ptr->td.next, mep->qh.ptr->td.token);
 		list_for_each(ptr, &mep->qh.queue) {
 			req = list_entry(ptr, struct ci13xxx_req, queue);
-			pr_info("\treq:%pKa:%08xtkn:%08xpage0:%08xsts:%d\n",
+			pr_debug("\treq:%pKa:%08xtkn:%08xpage0:%08xsts:%d\n",
 					&req->dma, req->ptr->next,
 					req->ptr->token, req->ptr->page[0],
 					req->req.status);
@@ -3708,7 +3708,7 @@ static int ci13xxx_start(struct usb_gadget *gadget,
 
 	spin_lock_irqsave(udc->lock, flags);
 
-	pr_info("hw_ep_max = %d\n", hw_ep_max);
+	pr_debug("hw_ep_max = %d\n", hw_ep_max);
 
 	udc->gadget.dev.driver = NULL;
 
@@ -3848,7 +3848,7 @@ static irqreturn_t udc_irq(void)
 		if (USBi_URI & intr) {
 			isr_statistics.uri++;
 			if (!hw_cread(CAP_PORTSC, PORTSC_PR))
-				pr_info("%s: USB reset interrupt is delayed\n",
+				pr_debug("%s: USB reset interrupt is delayed\n",
 								__func__);
 			isr_reset_handler(udc);
 		}

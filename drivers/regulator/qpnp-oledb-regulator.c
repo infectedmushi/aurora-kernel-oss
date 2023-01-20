@@ -272,7 +272,7 @@ static int qpnp_oledb_regulator_enable(struct regulator_dev *rdev)
 	u8 val = 0;
 
 	if (oledb->lab_sc_detected) {
-		pr_info("Short circuit detected: Disabled OLEDB rail\n");
+		pr_debug("Short circuit detected: Disabled OLEDB rail\n");
 		return 0;
 	}
 
@@ -1391,7 +1391,7 @@ static int qpnp_oledb_regulator_probe(struct platform_device *pdev)
 		pr_err("Failed to register regulator rc=%d\n", rc);
 		goto out;
 	}
-	pr_info("OLEDB registered successfully, ext_pin_en=%d mod_en=%d current_voltage=%d mV\n",
+	pr_debug("OLEDB registered successfully, ext_pin_en=%d mod_en=%d current_voltage=%d mV\n",
 			oledb->ext_pin_control, oledb->mod_enable,
 						oledb->current_voltage);
 	return 0;

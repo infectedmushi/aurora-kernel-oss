@@ -1671,7 +1671,7 @@ void rmnet_shs_init(struct net_device *dev, struct net_device *vnd)
 	rmnet_shs_freq_init();
 	rc = register_oom_notifier(&rmnet_oom_nb);
 	if (rc < 0) {
-		pr_info("Rmnet_shs_oom register failure");
+		pr_debug("Rmnet_shs_oom register failure");
 	}
 
 	rmnet_shs_cfg.rmnet_shs_init_complete = 1;

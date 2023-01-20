@@ -43,7 +43,7 @@ int wlchg_rx_set_vout(struct rx_chip *chip, int val)
 	union rx_chip_propval pval = {0,};
 	int rc;
 
-	pr_info("set rx chip vout to %d\n", val);
+	pr_debug("set rx chip vout to %d\n", val);
 	pval.intval = val;
 	rc = prop->set_prop(prop, RX_PROP_VOUT, &pval);
 	if (rc) {
@@ -145,7 +145,7 @@ int wlchg_rx_get_vrect_iout(struct rx_chip *chip)
 	}
 	chip->chg_data.iout = pval.intval;
 
-	pr_info("vout:%d, vrect=%d, iout=%d\n", chip->chg_data.vout,
+	pr_debug("vout:%d, vrect=%d, iout=%d\n", chip->chg_data.vout,
 		chip->chg_data.vrect, chip->chg_data.iout);
 
 	return 0;
@@ -243,7 +243,7 @@ int wlchg_rx_get_cep_flag(struct rx_chip *chip)
 		return rc;
 	}
 
-	pr_info("cep = %d\n", pval.intval);
+	pr_debug("cep = %d\n", pval.intval);
 	if (abs(pval.intval) <= 2)
 		return 0;
 
@@ -262,7 +262,7 @@ int wlchg_rx_get_cep_flag_skip_check_update(struct rx_chip *chip)
 		return rc;
 	}
 
-	pr_info("cep = %d\n", pval.intval);
+	pr_debug("cep = %d\n", pval.intval);
 	if (abs(pval.intval) <= 2)
 		return 0;
 
@@ -573,7 +573,7 @@ static int wlchg_rx_probe(struct i2c_client *client,
 	}
 
 	of_platform_populate(chip->dev->of_node, NULL, NULL, chip->dev);
-	pr_info("wlchg rx probe successful\n");
+	pr_debug("wlchg rx probe successful\n");
 	return rc;
 
 cleanup:

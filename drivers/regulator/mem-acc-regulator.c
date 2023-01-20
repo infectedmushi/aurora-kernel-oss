@@ -449,7 +449,7 @@ static int mem_acc_efuse_init(struct platform_device *pdev,
 	mem_acc_vreg->efuse_addr = res->start;
 	len = resource_size(res);
 
-	pr_info("efuse_addr = %pa (len=0x%x)\n", &res->start, len);
+	pr_debug("efuse_addr = %pa (len=0x%x)\n", &res->start, len);
 
 	mem_acc_vreg->efuse_base = devm_ioremap(&pdev->dev,
 						mem_acc_vreg->efuse_addr, len);
@@ -689,7 +689,7 @@ static int mem_acc_parse_override_fuse_version_map(
 	}
 
 	if (mem_acc_vreg->override_map_match != FUSE_MAP_NO_MATCH)
-		pr_info("override_fuse_val=%d, %s tuple match found: %d\n",
+		pr_debug("override_fuse_val=%d, %s tuple match found: %d\n",
 			mem_acc_vreg->override_fuse_value, prop_str,
 			mem_acc_vreg->override_map_match);
 	else
@@ -803,7 +803,7 @@ static int mem_acc_parse_override_fuse_version_range(
 				 j, fuse_val[j]);
 	buf[pos] = '\0';
 	if (mem_acc_vreg->override_map_match != FUSE_MAP_NO_MATCH)
-		pr_info("%s %s tuple match found: %d\n", buf, prop_str,
+		pr_debug("%s %s tuple match found: %d\n", buf, prop_str,
 			mem_acc_vreg->override_map_match);
 	else
 		pr_err("%s %s tuple match not found\n", buf, prop_str);

@@ -93,7 +93,7 @@ static int calc_hash(struct crypto_shash *alg, const unsigned char *data,
 
 	sdesc = init_sdesc(alg);
 	if (IS_ERR(sdesc)) {
-		pr_info("can't alloc sdesc\n");
+		pr_debug("can't alloc sdesc\n");
 		return PTR_ERR(sdesc);
 	}
 

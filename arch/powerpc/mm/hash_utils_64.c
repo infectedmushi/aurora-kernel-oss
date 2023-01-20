@@ -425,7 +425,7 @@ static int __init htab_dt_scan_page_sizes(unsigned long node,
 	if (!prop)
 		return 0;
 
-	pr_info("Page sizes from device-tree:\n");
+	pr_debug("Page sizes from device-tree:\n");
 	size /= 4;
 	cur_cpu_spec->mmu_features &= ~(MMU_FTR_16M_PAGE);
 	while(size > 0) {
@@ -477,7 +477,7 @@ static int __init htab_dt_scan_page_sizes(unsigned long node,
 				       "shift=%d\n", base_shift, shift);
 
 			def->penc[idx] = penc;
-			pr_info("base_shift=%d: shift=%d, sllp=0x%04lx,"
+			pr_debug("base_shift=%d: shift=%d, sllp=0x%04lx,"
 				" avpnm=0x%08lx, tlbiel=%d, penc=%d\n",
 				base_shift, shift, def->sllp,
 				def->avpnm, def->tlbiel, def->penc[idx]);
@@ -827,7 +827,7 @@ static void __init hash_init_partition_table(phys_addr_t hash_table,
 	 */
 	htab_size =  __ilog2(htab_size) - 18;
 	mmu_partition_table_set_entry(0, hash_table | htab_size, 0);
-	pr_info("Partition table %p\n", partition_tb);
+	pr_debug("Partition table %p\n", partition_tb);
 }
 
 static void __init htab_initialize(void)
@@ -887,7 +887,7 @@ static void __init htab_initialize(void)
 		 */
 		if (fdt_subnode_offset(initial_boot_params, 0, "axon") > 0) {
 			limit = 0x80000000;
-			pr_info("Hash table forced below 2G for Axon IOMMU\n");
+			pr_debug("Hash table forced below 2G for Axon IOMMU\n");
 		}
 #endif /* CONFIG_PPC_CELL */
 
@@ -1043,7 +1043,7 @@ void __init hash__early_init_mmu(void)
 	 */
 	htab_initialize();
 
-	pr_info("Initializing hash mmu with SLB\n");
+	pr_debug("Initializing hash mmu with SLB\n");
 	/* Initialize SLB management */
 	slb_initialize();
 
@@ -1194,9 +1194,9 @@ void hash_failure_debug(unsigned long ea, unsigned long access,
 {
 	if (!printk_ratelimit())
 		return;
-	pr_info("mm: Hashing failure ! EA=0x%lx access=0x%lx current=%s\n",
+	pr_debug("mm: Hashing failure ! EA=0x%lx access=0x%lx current=%s\n",
 		ea, access, current->comm);
-	pr_info("    trap=0x%lx vsid=0x%lx ssize=%d base psize=%d psize %d pte=0x%lx\n",
+	pr_debug("    trap=0x%lx vsid=0x%lx ssize=%d base psize=%d psize %d pte=0x%lx\n",
 		trap, vsid, ssize, psize, lpsize, pte);
 }
 

@@ -205,7 +205,7 @@ static ssize_t reset_store(struct device *dev,
 		goto out;
 	}
 
-	pr_info("reset\n");
+	pr_debug("reset\n");
 	ret = count;
 
 out:
@@ -458,17 +458,17 @@ static ssize_t trigger_request_store(struct device *dev,
 	if (!name)
 		return -ENOSPC;
 
-	pr_info("loading '%s'\n", name);
+	pr_debug("loading '%s'\n", name);
 
 	mutex_lock(&test_fw_mutex);
 	release_firmware(test_firmware);
 	test_firmware = NULL;
 	rc = request_firmware(&test_firmware, name, dev);
 	if (rc) {
-		pr_info("load of '%s' failed: %d\n", name, rc);
+		pr_debug("load of '%s' failed: %d\n", name, rc);
 		goto out;
 	}
-	pr_info("loaded: %zu\n", test_firmware->size);
+	pr_debug("loaded: %zu\n", test_firmware->size);
 	rc = count;
 
 out:
@@ -499,7 +499,7 @@ static ssize_t trigger_async_request_store(struct device *dev,
 	if (!name)
 		return -ENOSPC;
 
-	pr_info("loading '%s'\n", name);
+	pr_debug("loading '%s'\n", name);
 
 	mutex_lock(&test_fw_mutex);
 	release_firmware(test_firmware);
@@ -507,7 +507,7 @@ static ssize_t trigger_async_request_store(struct device *dev,
 	rc = request_firmware_nowait(THIS_MODULE, 1, name, dev, GFP_KERNEL,
 				     NULL, trigger_async_request_cb);
 	if (rc) {
-		pr_info("async load of '%s' failed: %d\n", name, rc);
+		pr_debug("async load of '%s' failed: %d\n", name, rc);
 		kfree(name);
 		goto out;
 	}
@@ -517,7 +517,7 @@ static ssize_t trigger_async_request_store(struct device *dev,
 	wait_for_completion(&async_fw_done);
 
 	if (test_firmware) {
-		pr_info("loaded: %zu\n", test_firmware->size);
+		pr_debug("loaded: %zu\n", test_firmware->size);
 		rc = count;
 	} else {
 		pr_err("failed to async load firmware\n");
@@ -542,7 +542,7 @@ static ssize_t trigger_custom_fallback_store(struct device *dev,
 	if (!name)
 		return -ENOSPC;
 
-	pr_info("loading '%s' using custom fallback mechanism\n", name);
+	pr_debug("loading '%s' using custom fallback mechanism\n", name);
 
 	mutex_lock(&test_fw_mutex);
 	release_firmware(test_firmware);
@@ -551,7 +551,7 @@ static ssize_t trigger_custom_fallback_store(struct device *dev,
 				     dev, GFP_KERNEL, NULL,
 				     trigger_async_request_cb);
 	if (rc) {
-		pr_info("async load of '%s' failed: %d\n", name, rc);
+		pr_debug("async load of '%s' failed: %d\n", name, rc);
 		kfree(name);
 		goto out;
 	}
@@ -561,7 +561,7 @@ static ssize_t trigger_custom_fallback_store(struct device *dev,
 	wait_for_completion(&async_fw_done);
 
 	if (test_firmware) {
-		pr_info("loaded: %zu\n", test_firmware->size);
+		pr_debug("loaded: %zu\n", test_firmware->size);
 		rc = count;
 	} else {
 		pr_err("failed to async load firmware\n");
@@ -586,13 +586,13 @@ static int test_fw_run_batch_request(void *data)
 
 	req->rc = test_fw_config->req_firmware(&req->fw, req->name, req->dev);
 	if (req->rc) {
-		pr_info("#%u: batched sync load failed: %d\n",
+		pr_debug("#%u: batched sync load failed: %d\n",
 			req->idx, req->rc);
 		if (!test_fw_config->test_result)
 			test_fw_config->test_result = req->rc;
 	} else if (req->fw) {
 		req->sent = true;
-		pr_info("#%u: batched sync loaded %zu\n",
+		pr_debug("#%u: batched sync loaded %zu\n",
 			req->idx, req->fw->size);
 	}
 	complete(&req->completion);
@@ -626,7 +626,7 @@ static ssize_t trigger_batched_requests_store(struct device *dev,
 		goto out_unlock;
 	}
 
-	pr_info("batched sync firmware loading '%s' %u times\n",
+	pr_debug("batched sync firmware loading '%s' %u times\n",
 		test_fw_config->name, test_fw_config->num_requests);
 
 	for (i = 0; i < test_fw_config->num_requests; i++) {
@@ -729,7 +729,7 @@ ssize_t trigger_batched_requests_async_store(struct device *dev,
 		goto out;
 	}
 
-	pr_info("batched loading '%s' custom fallback mechanism %u times\n",
+	pr_debug("batched loading '%s' custom fallback mechanism %u times\n",
 		test_fw_config->name, test_fw_config->num_requests);
 
 	send_uevent = test_fw_config->send_uevent ? FW_ACTION_HOTPLUG :
@@ -750,7 +750,7 @@ ssize_t trigger_batched_requests_async_store(struct device *dev,
 					     dev, GFP_KERNEL, req,
 					     trigger_batched_cb);
 		if (rc) {
-			pr_info("#%u: batched async load failed setup: %d\n",
+			pr_debug("#%u: batched async load failed setup: %d\n",
 				i, rc);
 			req->rc = rc;
 			goto out_bail;
@@ -832,7 +832,7 @@ static ssize_t read_firmware_show(struct device *dev,
 		goto out;
 	}
 
-	pr_info("#%u: loaded %zu\n", idx, req->fw->size);
+	pr_debug("#%u: loaded %zu\n", idx, req->fw->size);
 
 	if (req->fw->size > PAGE_SIZE) {
 		pr_err("Testing interface must use PAGE_SIZE firmware for now\n");

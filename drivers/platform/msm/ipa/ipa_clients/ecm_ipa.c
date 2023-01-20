@@ -52,7 +52,7 @@ static void *ipa_ecm_logbuf;
 
 #define ECM_IPA_INFO(fmt, args...) \
 	do { \
-		pr_info(DRIVER_NAME "@%s@%d@ctx:%s: "\
+		pr_debug(DRIVER_NAME "@%s@%d@ctx:%s: "\
 			fmt, __func__, __LINE__, current->comm, ## args);\
 		if (ipa_ecm_logbuf) { \
 			IPA_ECM_IPC_LOGGING(ipa_ecm_logbuf, \

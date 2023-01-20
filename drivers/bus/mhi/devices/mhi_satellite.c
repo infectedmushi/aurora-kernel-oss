@@ -28,7 +28,7 @@
 	if (!subsys) \
 		break; \
 	if (mhi_sat_driver.klog_lvl <= MHI_MSG_LVL_INFO) \
-		pr_info("[I][%s][%s] " fmt, __func__, subsys->name, \
+		pr_debug("[I][%s][%s] " fmt, __func__, subsys->name, \
 			##__VA_ARGS__);\
 	if (subsys->ipc_log && mhi_sat_driver.ipc_log_lvl <= \
 	    MHI_MSG_LVL_INFO) \
@@ -40,7 +40,7 @@
 	if (!subsys || !sat_cntrl) \
 		break; \
 	if (mhi_sat_driver.klog_lvl <= MHI_MSG_LVL_INFO) \
-		pr_info("[I][%s][%s][%x] " fmt, __func__, subsys->name, \
+		pr_debug("[I][%s][%s][%x] " fmt, __func__, subsys->name, \
 			sat_cntrl->dev_id, ##__VA_ARGS__);\
 	if (subsys->ipc_log && mhi_sat_driver.ipc_log_lvl <= \
 	    MHI_MSG_LVL_INFO) \

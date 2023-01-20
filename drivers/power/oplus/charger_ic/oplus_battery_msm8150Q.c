@@ -294,7 +294,7 @@ void __attribute__((weak)) switch_usb_state(int usb_state) {return;}
 #define smblib_dbg(chg, reason, fmt, ...)			\
 	do {							\
 		if (*chg->debug_mask & (reason))		\
-			pr_info("%s: %s: " fmt, chg->name,	\
+			pr_debug("%s: %s: " fmt, chg->name,	\
 				__func__, ##__VA_ARGS__);	\
 		else						\
 			pr_debug("%s: %s: " fmt, chg->name,	\
@@ -1677,7 +1677,7 @@ void smblib_suspend_on_debug_battery(struct smb_charger *chg)
 		vote(chg->usb_icl_votable, DEBUG_BOARD_VOTER, val.intval, 0);
 		vote(chg->dc_suspend_votable, DEBUG_BOARD_VOTER, val.intval, 0);
 		if (val.intval)
-			pr_info("Input suspended: Fake battery\n");
+			pr_debug("Input suspended: Fake battery\n");
 	} else {
 		vote(chg->chg_disable_votable, DEBUG_BOARD_VOTER,
 					val.intval, 0);
@@ -5744,7 +5744,7 @@ irqreturn_t usb_plugin_irq_handler(int irq, void *data)
 	struct oplus_chg_chip *chip = g_oplus_chip;
 		if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
 			&& chip->vbatt_num == 2 ) {
-			pr_info("%s:chg->typec_mode = sink return!\n", __func__);
+			pr_debug("%s:chg->typec_mode = sink return!\n", __func__);
 			return IRQ_HANDLED;
 		}
 #endif/*OPLUS_FEATURE_CHG_BASIC*/
@@ -5964,7 +5964,7 @@ irqreturn_t usb_source_change_irq_handler(int irq, void *data)
 
 	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
 		&& chip->vbatt_num == 2 ) {
-		pr_info("%s:chg->typec_mode = sink return!\n", __func__);
+		pr_debug("%s:chg->typec_mode = sink return!\n", __func__);
 		return IRQ_HANDLED;
 	}
 #endif/*OPLUS_FEATURE_CHG_BASIC*/
@@ -14754,7 +14754,7 @@ static int smb5_show_charger_status(struct smb5 *chip)
 	}
 	batt_charge_type = val.intval;
 
-	pr_info("SMB5 status - usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
+	pr_debug("SMB5 status - usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
 		usb_present, chg->real_charger_type,
 		batt_present, batt_health, batt_charge_type);
 	return rc;
@@ -15106,7 +15106,7 @@ static int smb5_probe(struct platform_device *pdev)
 
 	device_init_wakeup(chg->dev, true);
 
-	pr_info("QPNP SMB5 probed successfully\n");
+	pr_debug("QPNP SMB5 probed successfully\n");
 
 	return rc;
 

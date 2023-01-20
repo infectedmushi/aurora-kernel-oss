@@ -321,7 +321,7 @@ int upload_mm_fb_kevent_limit(enum OPLUS_MM_DIRVER_FB_EVENT_MODULE module,
 	}
 
 	if(is_relation_event_limit(event_id)) {
-		pr_info("%s: relation event has feedback before, not feedback %u\n", __func__, event_id);
+		pr_debug("%s: relation event has feedback before, not feedback %u\n", __func__, event_id);
 		return -EINVAL;
 	}
 	size = strlen(name) + sizeof(*kevent) + 1;
@@ -378,7 +378,7 @@ int upload_mm_fb_kevent_to_atlas_limit(unsigned int event_id,
 	}
 
 	if(is_relation_event_limit(event_id)) {
-		pr_info("%s: relation event has feedback before, not feedback %u\n", __func__, event_id);
+		pr_debug("%s: relation event has feedback before, not feedback %u\n", __func__, event_id);
 		return -EINVAL;
 	}
 
@@ -421,7 +421,7 @@ int upload_mm_fb_kevent_to_atlas_limit(unsigned int event_id,
 	user_msg_info->len = len + 1;
 	memcpy(user_msg_info->data, payload, len + 1);
 
-	pr_info("%s: mm_kevent: type %d, tag=%s, event_id=%s, len=%zu, payload=%s\n",
+	pr_debug("%s: mm_kevent: type %d, tag=%s, event_id=%s, len=%zu, payload=%s\n",
 		__func__,
 		user_msg_info->type, user_msg_info->tag, user_msg_info->event_id,
 		user_msg_info->len, user_msg_info->data);
@@ -577,7 +577,7 @@ int mm_fb_kevent_init(void)
 	}
 
 	mm_fb_init = true;
-	pr_info("%s: init success\n", __func__);
+	pr_debug("%s: init success\n", __func__);
 
 	return 0;
 
@@ -599,7 +599,7 @@ void mm_fb_kevent_deinit(void)
 
 	mm_fb_kevent_set_recv_user(NULL);
 	mm_fb_init = false;
-	pr_info("%s: deinit\n", __func__);
+	pr_debug("%s: deinit\n", __func__);
 }
 
 

@@ -4412,7 +4412,7 @@ static int diagchar_setup_cdev(dev_t devno)
 	err = cdev_add(driver->cdev, devno, 1);
 
 	if (err) {
-		pr_info("diagchar cdev registration failed !\n");
+		pr_debug("diagchar cdev registration failed !\n");
 		return err;
 	}
 
@@ -4615,7 +4615,7 @@ fail:
 
 static void diagchar_exit(void)
 {
-	pr_info("diagchar exiting...\n");
+	pr_debug("diagchar exiting...\n");
 	diag_mempool_exit();
 	diag_mux_exit();
 	diagfwd_peripheral_exit();
@@ -4627,7 +4627,7 @@ static void diagchar_exit(void)
 	diag_remote_exit();
 	diag_debugfs_cleanup();
 	diagchar_cleanup();
-	pr_info("done diagchar exit\n");
+	pr_debug("done diagchar exit\n");
 }
 
 module_init(diagchar_init);

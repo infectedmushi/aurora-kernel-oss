@@ -469,7 +469,7 @@ static int adsp_track_battery_chg_write(
 		bcdev->adsp_track_read_buffer.data_buffer,
 		bcdev->adsp_track_read_buffer.data_size);
 	mutex_unlock(&bcdev->adsp_track_read_buffer_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return rc;
 }
@@ -483,7 +483,7 @@ static int adsp_track_read_buffer(struct battery_chg_dev *bcdev)
 	req_msg.hdr.type = MSG_TYPE_REQ_RESP;
 	req_msg.hdr.opcode = TRACK_OPCODE_READ_BUFFER;
 
-	pr_info("start\n");
+	pr_debug("start\n");
 
 	return adsp_track_battery_chg_write(bcdev, &req_msg, sizeof(req_msg));
 }
@@ -1375,13 +1375,13 @@ void lcm_frequency_ctrl(void)
 			if (lcm_en_flag != LCM_EN_ENABLE) {
 				lcm_en_flag = LCM_EN_ENABLE;
 				smbchg_lcm_en(true);
-				pr_info("lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug("lcm_en_flag:%d\n", lcm_en_flag);
 			}
 		} else {
 			if (lcm_en_flag != LCM_EN_DISABLE) {
 				lcm_en_flag = LCM_EN_DISABLE;
 				smbchg_lcm_en(false);
-				pr_info(" lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug(" lcm_en_flag:%d\n", lcm_en_flag);
 			}
 		}
 
@@ -1391,7 +1391,7 @@ void lcm_frequency_ctrl(void)
 			if (lcm_en_flag != LCM_EN_ENABLE) {
 				lcm_en_flag = LCM_EN_ENABLE;
 				smbchg_lcm_en(true);
-				pr_info(" lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug(" lcm_en_flag:%d\n", lcm_en_flag);
 			}
 	}
 }
@@ -1993,7 +1993,7 @@ static void handle_notification(struct battery_chg_dev *bcdev, void *data,
 		schedule_delayed_work(&bcdev->otg_vbus_enable_work, 0);
 		break;
 	case BC_ADSP_NOTIFY_TRACK:
-		pr_info("!!!!!adsp track notify\n");
+		pr_debug("!!!!!adsp track notify\n");
 		schedule_delayed_work(&bcdev->adsp_track_notify_work, 0);
 		break;
 	case BC_VOOC_VBUS_ADC_ENABLE:
@@ -3325,7 +3325,7 @@ static int wireless_fw_update(struct battery_chg_dev *bcdev, bool force)
 		rc = 0;
 	}
 
-	pr_info("Wireless FW update done\n");
+	pr_debug("Wireless FW update done\n");
 
 release_fw:
 	bcdev->wls_fw_crc = 0;
@@ -5016,7 +5016,7 @@ static int oplus_chg_track_upload_usbtemp_info(
 			OPLUS_CHG_TRACK_CURX_INFO_LEN - index, "%s", chip->chg_power_info);
 
 	schedule_delayed_work(&chip->usbtemp_load_trigger_work, 0);
-	pr_info("%s\n", chip->usbtemp_load_trigger.crux_info);
+	pr_debug("%s\n", chip->usbtemp_load_trigger.crux_info);
 	mutex_unlock(&chip->track_upload_lock);
 
 	return 0;
@@ -7857,7 +7857,7 @@ int oplus_chg_wired_get_break_sub_crux_info(char *crux_info)
 	}
 	bcdev = chip->pmic_spmi.bcdev_chip;
 
-	pr_info("real_chg_type:%d\n", bcdev->real_chg_type);
+	pr_debug("real_chg_type:%d\n", bcdev->real_chg_type);
 	return bcdev->real_chg_type;
 }
 
@@ -10130,7 +10130,7 @@ static int smbchg_lcm_en(bool en)
 	if (rc < 0)
 		pr_err("set lcm to %u error, rc=%d\n", en, rc);
 	else
-		pr_info("set lcm to %d \n", en);
+		pr_debug("set lcm to %d \n", en);
 
 	return rc;
 }
@@ -10202,7 +10202,7 @@ static int smbchg_wls_set_icl(struct oplus_chg_ic_dev *ic_dev, int icl_ma)
 	if (rc < 0)
 		pr_err("set wls icl to %u error, rc=%d\n", icl_ma, rc);
 	else
-		pr_info("set icl to %d mA\n", icl_ma);
+		pr_debug("set icl to %d mA\n", icl_ma);
 
 	return rc;
 }
@@ -10238,7 +10238,7 @@ static int smbchg_wls_set_fcc(struct oplus_chg_ic_dev *ic_dev, int fcc_ma)
 	if (rc)
 		pr_err("set fcc to %d mA fail, rc=%d\n", fcc_ma, rc);
 	else
-		pr_info("set fcc to %d mA\n", fcc_ma);
+		pr_debug("set fcc to %d mA\n", fcc_ma);
 
 	return rc;
 }
@@ -10540,7 +10540,7 @@ static int oplus_chg_usb_event_notifier_call(struct notifier_block *nb,
 		}
 
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
-			pr_info("%s wls present\n", __func__);
+			pr_debug("%s wls present\n", __func__);
 			oplus_chg_wake_update_work();
 		}
 		break;
@@ -11069,7 +11069,7 @@ static void oplus_chg_track_dump_reg_info(char *dump_info, int len)
 			"0x%4x=0x%02x,",
 			bcdev->read_buffer_dump.data_buffer[i],
 			bcdev->read_buffer_dump.data_buffer[i + 1]);
-		pr_info("index:%d, size:%d\n", index, len - index);
+		pr_debug("index:%d, size:%d\n", index, len - index);
 	}
 }
 
@@ -11078,7 +11078,7 @@ static int oplus_chg_track_get_local_time_s(void)
 	int local_time_s;
 
 	local_time_s = local_clock() / TRACK_LOCAL_T_NS_TO_S_THD;
-	pr_info("local_time_s:%d\n", local_time_s);
+	pr_debug("local_time_s:%d\n", local_time_s);
 
 	return local_time_s;
 }
@@ -11115,7 +11115,7 @@ static int oplus_chg_track_upload_icl_err_info(
 
 	mutex_lock(&bcdev->track_icl_err_lock);
 	if (bcdev->icl_err_uploading) {
-		pr_info("icl_err_uploading, should return\n");
+		pr_debug("icl_err_uploading, should return\n");
 		mutex_unlock(&bcdev->track_icl_err_lock);
 		mutex_unlock(&bcdev->track_upload_lock);
 		return 0;
@@ -11163,7 +11163,7 @@ static int oplus_chg_track_upload_icl_err_info(
 			"$$reg_info@@%s", bcdev->dump_info);
 	schedule_delayed_work(&bcdev->icl_err_load_trigger_work, 0);
 	mutex_unlock(&bcdev->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -11206,7 +11206,7 @@ u32 oplus_chg_track_get_adsp_debug(void)
 		pr_err("get adsp debug fail, rc:%d\n", rc);
 		return 0;
 	}
-	pr_info("get adsp_debug[%d]\n", pst->prop[USB_ADSP_TRACK_DEBUG]);
+	pr_debug("get adsp_debug[%d]\n", pst->prop[USB_ADSP_TRACK_DEBUG]);
 
 	return pst->prop[USB_ADSP_TRACK_DEBUG];*/
 	return 0;
@@ -11232,7 +11232,7 @@ void oplus_chg_track_set_adsp_debug(u32 val)
 		return;
 	}*/
 
-	pr_info("set adsp_debug[%d]\n", val);
+	pr_debug("set adsp_debug[%d]\n", val);
 }
 
 static int oplus_chg_track_debugfs_init(struct battery_chg_dev *bcdev)
@@ -11299,7 +11299,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	int rc, i;
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
-	pr_info("battery_chg_probe start...\n");
+	pr_debug("battery_chg_probe start...\n");
 	if (oplus_gauge_check_chip_is_null()) {
 		gauge_chip = devm_kzalloc(&pdev->dev, sizeof(*gauge_chip), GFP_KERNEL);
 		if (!gauge_chip) {
@@ -11581,7 +11581,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	}
 	schedule_delayed_work(&bcdev->adsp_voocphy_enable_check_work,
 		round_jiffies_relative(msecs_to_jiffies(1500)));
-	pr_info("battery_chg_probe end...\n");
+	pr_debug("battery_chg_probe end...\n");
 #endif
 	return 0;
 

@@ -856,7 +856,7 @@ static int spss_parse_dt(struct device_node *node)
 
 	/* cmac buffer after spss firmware end */
 	cmac_mem_addr = pil_addr + pil_size;
-	pr_info("iar_buf_addr [0x%08x].\n", cmac_mem_addr);
+	pr_debug("iar_buf_addr [0x%08x].\n", cmac_mem_addr);
 
 	ret = of_property_read_u32(node, "qcom,spss-fuse3-addr",
 		&spss_fuse3_addr);
@@ -1202,7 +1202,7 @@ static int spss_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return ret;
 
-	pr_info("Initialization completed ok, firmware_name [%s].\n",
+	pr_debug("Initialization completed ok, firmware_name [%s].\n",
 		firmware_name);
 
 	iar_nb = kzalloc(sizeof(*iar_nb), GFP_KERNEL);

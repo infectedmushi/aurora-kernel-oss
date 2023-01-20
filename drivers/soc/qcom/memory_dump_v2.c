@@ -755,7 +755,7 @@ static int init_memory_dump(void *dump_vaddr, phys_addr_t phys_addr,
 
 	/* Ensure write to imem_base is complete before unmapping */
 	mb();
-	pr_info("MSM Memory Dump base table set up\n");
+	pr_debug("MSM Memory Dump base table set up\n");
 
 	iounmap(imem_base);
 	dump_vaddr +=  sizeof(*table);
@@ -769,7 +769,7 @@ static int init_memory_dump(void *dump_vaddr, phys_addr_t phys_addr,
 		pr_err("mem dump apps data table register failed\n");
 		return ret;
 	}
-	pr_info("MSM Memory Dump apps data table set up\n");
+	pr_debug("MSM Memory Dump apps data table set up\n");
 
 	return 0;
 }
@@ -785,7 +785,7 @@ static int __init init_debug_lar_unlock(void)
 	if (ret)
 		pr_err("Core Debug Lock unlock failed, ret: %d\n", ret);
 	else
-		pr_info("Core Debug Lock unlocked\n");
+		pr_debug("Core Debug Lock unlocked\n");
 
 	return ret;
 }

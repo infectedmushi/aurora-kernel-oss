@@ -193,7 +193,7 @@ static void *ion_secure_cma_map_kernel(struct ion_heap *heap,
 				       struct ion_buffer *buffer)
 {
 	if (!hlos_accessible_buffer(buffer)) {
-		pr_info("%s: Mapping non-HLOS accessible buffer disallowed\n",
+		pr_debug("%s: Mapping non-HLOS accessible buffer disallowed\n",
 			__func__);
 		return NULL;
 	}
@@ -205,7 +205,7 @@ static int ion_secure_cma_map_user(struct ion_heap *mapper,
 				   struct vm_area_struct *vma)
 {
 	if (!hlos_accessible_buffer(buffer)) {
-		pr_info("%s: Mapping non-HLOS accessible buffer disallowed\n",
+		pr_debug("%s: Mapping non-HLOS accessible buffer disallowed\n",
 			__func__);
 		return -EINVAL;
 	}

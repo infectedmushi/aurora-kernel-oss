@@ -125,7 +125,7 @@ static int __init fdleak_check_init(void)
 		pr_err(FDLEAK_CHECK_LOG_TAG "oplus_fdleak_check, register_kretprobe failed, return %d\n", ret);
 		return ret;
 	}
-	pr_info(FDLEAK_CHECK_LOG_TAG "oplus_fdleak_check, planted kretprobe at %p\n", g_krp.kp.addr);
+	pr_debug(FDLEAK_CHECK_LOG_TAG "oplus_fdleak_check, planted kretprobe at %p\n", g_krp.kp.addr);
 
 
 	return 0;
@@ -134,7 +134,7 @@ static int __init fdleak_check_init(void)
 static void __exit fdleak_chekc_exit(void)
 {
 	unregister_kretprobe(&g_krp);
-	pr_info("oplus_fdleak_check, kretprobe at %p unregistered\n", g_krp.kp.addr);
+	pr_debug("oplus_fdleak_check, kretprobe at %p unregistered\n", g_krp.kp.addr);
 }
 
 MODULE_DESCRIPTION("oplus fdleak check");

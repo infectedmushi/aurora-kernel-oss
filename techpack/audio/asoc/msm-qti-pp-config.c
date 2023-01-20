@@ -1280,11 +1280,11 @@ int msm_adsp_inform_mixer_ctl(struct snd_soc_pcm_runtime *rtd,
 
 	spin_lock_irqsave(&kctl_prtd->prtd_spin_lock, spin_flags);
 	while (kctl_prtd->event_count >= DSP_STREAM_CALLBACK_QUEUE_SIZE) {
-		pr_info("%s: queue of size %d is full. delete oldest one.\n",
+		pr_debug("%s: queue of size %d is full. delete oldest one.\n",
 			__func__, DSP_STREAM_CALLBACK_QUEUE_SIZE);
 		oldest_event = list_first_entry(&kctl_prtd->event_queue,
 				struct dsp_stream_callback_list, list);
-		pr_info("%s: event deleted: type %d length %d\n",
+		pr_debug("%s: event deleted: type %d length %d\n",
 			__func__, oldest_event->event.event_type,
 			oldest_event->event.payload_len);
 		list_del(&oldest_event->list);
@@ -1581,7 +1581,7 @@ static int mute_detect_result_get(struct snd_kcontrol *kcontrol,
 	ucontrol->value.integer.value[0] = ret;
 
 	if (g_auddet_ena_val == 0) {
-		pr_info("%s : disable auddet, return\n",__func__);
+		pr_debug("%s : disable auddet, return\n",__func__);
 		return ret;
 	}
 
@@ -1611,7 +1611,7 @@ static int mute_detect_voice_result_get(struct snd_kcontrol *kcontrol,
 	ucontrol->value.integer.value[0] = ret;
 
 	if (g_auddet_ena_val == 0) {
-		pr_info("%s : disable auddet, return\n",__func__);
+		pr_debug("%s : disable auddet, return\n",__func__);
 		return ret;
 	}
 
@@ -1632,7 +1632,7 @@ static int auddet_ena_set(struct snd_kcontrol *kcontrol,
 	struct msm_pcm_routing_bdai_data msm_bedai;
 
 	ena_val = ucontrol->value.integer.value[0];
-	pr_info("%s : enter: %d\n",__func__, ucontrol->value.integer.value[0]);
+	pr_debug("%s : enter: %d\n",__func__, ucontrol->value.integer.value[0]);
 
 	for (be_idx = 0; be_idx < MSM_BACKEND_DAI_MAX; be_idx++) {
 		msm_pcm_routing_get_bedai_info(be_idx, &msm_bedai);
@@ -1655,7 +1655,7 @@ static int auddet_ena_get(struct snd_kcontrol *kcontrol,
 						struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	pr_info("%s : enter: %d\n",__func__, g_auddet_ena_val);
+	pr_debug("%s : enter: %d\n",__func__, g_auddet_ena_val);
 
 	ucontrol->value.integer.value[0] = g_auddet_ena_val;
 	return ret;
@@ -1668,7 +1668,7 @@ static int auddet_voice_ena_set(struct snd_kcontrol *kcontrol,
 	u8 ena_val = 0;
 
 	ena_val = (u8)ucontrol->value.integer.value[0];
-	pr_info("%s : enter: %d\n",__func__, ena_val);
+	pr_debug("%s : enter: %d\n",__func__, ena_val);
 
 	ret = voice_set_cvp_auddet_param(ena_val);
 
@@ -1686,7 +1686,7 @@ static int auddet_voice_ena_get(struct snd_kcontrol *kcontrol,
 						struct snd_ctl_elem_value *ucontrol)
 {
 	int ret = 0;
-	pr_info("%s : enter: %d\n",__func__, g_auddet_ena_val);
+	pr_debug("%s : enter: %d\n",__func__, g_auddet_ena_val);
 
 	ucontrol->value.integer.value[0] = g_auddet_ena_val;
 	return ret;

@@ -38,7 +38,7 @@ void davinci_get_mac_addr(struct nvmem_device *nvmem, void *context)
 
 	/* Read MAC addr from EEPROM */
 	if (nvmem_device_read(nvmem, offset, ETH_ALEN, mac_addr) == ETH_ALEN)
-		pr_info("Read MAC addr from EEPROM: %pM\n", mac_addr);
+		pr_debug("Read MAC addr from EEPROM: %pM\n", mac_addr);
 }
 
 static int __init davinci_init_id(struct davinci_soc_info *soc_info)
@@ -66,7 +66,7 @@ static int __init davinci_init_id(struct davinci_soc_info *soc_info)
 		/* Don't care about the manufacturer right now */
 		if ((dip->part_no == part_no) && (dip->variant == variant)) {
 			soc_info->cpu_id = dip->cpu_id;
-			pr_info("DaVinci %s variant 0x%x\n", dip->name,
+			pr_debug("DaVinci %s variant 0x%x\n", dip->name,
 					dip->variant);
 			return 0;
 		}

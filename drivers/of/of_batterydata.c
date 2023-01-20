@@ -385,9 +385,9 @@ struct device_node *of_batterydata_get_best_profile(
 	rc = of_property_read_string(best_node, "qcom,battery-type",
 							&battery_type);
 	if (!rc)
-		pr_info("%s found\n", battery_type);
+		pr_debug("%s found\n", battery_type);
 	else
-		pr_info("%s found\n", best_node->name);
+		pr_debug("%s found\n", best_node->name);
 
 	return best_node;
 }
@@ -460,10 +460,10 @@ struct device_node *of_batterydata_get_best_aged_profile(
 	rc = of_property_read_string(best_node, "qcom,battery-type",
 							&battery_type);
 	if (!rc)
-		pr_info("%s age level %d found\n", battery_type,
+		pr_debug("%s age level %d found\n", battery_type,
 			*avail_age_level);
 	else
-		pr_info("%s age level %d found\n", best_node->name,
+		pr_debug("%s age level %d found\n", best_node->name,
 			*avail_age_level);
 
 	return best_node;
@@ -647,9 +647,9 @@ int of_batterydata_read_data(struct device_node *batterydata_container_node,
 	rc = of_property_read_string(best_node, "qcom,battery-type",
 							&battery_type);
 	if (!rc)
-		pr_info("%s loaded\n", battery_type);
+		pr_debug("%s loaded\n", battery_type);
 	else
-		pr_info("%s loaded\n", best_node->name);
+		pr_debug("%s loaded\n", best_node->name);
 
 	return of_batterydata_load_battery_data(best_node,
 					best_id_kohm, batt_data);

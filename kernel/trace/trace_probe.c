@@ -473,7 +473,7 @@ static int parse_probe_arg(char *arg, const struct fetch_type *t,
 		break;
 	}
 	if (!ret && !f->fn) {	/* Parsed, but do not find fetch method */
-		pr_info("%s type has no corresponding fetch method.\n", t->name);
+		pr_debug("%s type has no corresponding fetch method.\n", t->name);
 		ret = -EINVAL;
 	}
 
@@ -527,12 +527,12 @@ int traceprobe_parse_probe_arg(char *arg, ssize_t *size,
 	int ret;
 
 	if (strlen(arg) > MAX_ARGSTR_LEN) {
-		pr_info("Argument is too long.: %s\n",  arg);
+		pr_debug("Argument is too long.: %s\n",  arg);
 		return -ENOSPC;
 	}
 	parg->comm = kstrdup(arg, GFP_KERNEL);
 	if (!parg->comm) {
-		pr_info("Failed to allocate memory for command '%s'.\n", arg);
+		pr_debug("Failed to allocate memory for command '%s'.\n", arg);
 		return -ENOMEM;
 	}
 	t = strchr(parg->comm, ':');
@@ -548,7 +548,7 @@ int traceprobe_parse_probe_arg(char *arg, ssize_t *size,
 		t = "string";
 	parg->type = find_fetch_type(t, ftbl);
 	if (!parg->type) {
-		pr_info("Unsupported type: %s\n", t);
+		pr_debug("Unsupported type: %s\n", t);
 		return -EINVAL;
 	}
 	parg->offset = *size;

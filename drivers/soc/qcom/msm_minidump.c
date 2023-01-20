@@ -579,7 +579,7 @@ static int __init msm_minidump_init(void)
 	pendings = 0;
 	spin_unlock(&mdt_lock);
 
-	pr_info("Enabled with max number of regions %d\n",
+	pr_debug("Enabled with max number of regions %d\n",
 		CONFIG_MINIDUMP_MAX_ENTRIES);
 
 	return 0;

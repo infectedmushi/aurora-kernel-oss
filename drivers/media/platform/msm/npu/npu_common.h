@@ -67,7 +67,7 @@ enum npu_power_level {
 #define NPU_WARN(fmt, args...)                           \
 	pr_warn("NPU_WARN: %s: %d " fmt, __func__,  __LINE__, ##args)
 #define NPU_INFO(fmt, args...)                           \
-	pr_info("NPU_INFO: %s: %d " fmt, __func__,  __LINE__, ##args)
+	pr_debug("NPU_INFO: %s: %d " fmt, __func__,  __LINE__, ##args)
 #define NPU_DBG(fmt, args...)                           \
 	pr_debug("NPU_DBG: %s: %d " fmt, __func__,  __LINE__, ##args)
 

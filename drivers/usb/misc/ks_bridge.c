@@ -1061,7 +1061,7 @@ static int __init ksb_init(void)
 
 		ksb->name = kasprintf(GFP_KERNEL, "ks_usb_bridge.%i", i);
 		if (!ksb->name) {
-			pr_info("unable to allocate name\n");
+			pr_debug("unable to allocate name\n");
 			kfree(ksb);
 			ret = -ENOMEM;
 			goto dev_free;
@@ -1101,7 +1101,7 @@ static int __init ksb_init(void)
 		goto dev_free;
 	}
 
-	pr_info("init done\n");
+	pr_debug("init done\n");
 
 	return 0;
 

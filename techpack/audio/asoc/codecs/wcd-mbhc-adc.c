@@ -423,7 +423,7 @@ static int wcd_mbhc_adc_get_spl_hs_thres(struct wcd_mbhc *mbhc)
 			micbias_mv) / WCD_MBHC_ADC_MICBIAS_MV);
 	}
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: hs_threshold %d mv\n", __func__, hs_threshold);
+	pr_debug("%s: hs_threshold %d mv\n", __func__, hs_threshold);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
 	return hs_threshold;
@@ -445,7 +445,7 @@ static int wcd_mbhc_adc_get_hs_thres(struct wcd_mbhc *mbhc)
 			micbias_mv) / WCD_MBHC_ADC_MICBIAS_MV);
 	}
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: hs_threshold %d mv\n", __func__, hs_threshold);
+	pr_debug("%s: hs_threshold %d mv\n", __func__, hs_threshold);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
 	return hs_threshold;
@@ -467,7 +467,7 @@ static int wcd_mbhc_adc_get_hph_thres(struct wcd_mbhc *mbhc)
 			micbias_mv) / WCD_MBHC_ADC_MICBIAS_MV);
 	}
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: hph_threshold %d mv\n", __func__, hph_threshold);
+	pr_debug("%s: hph_threshold %d mv\n", __func__, hph_threshold);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
 	return hph_threshold;
@@ -669,7 +669,7 @@ static void wcd_mbhc_adc_detect_plug_type(struct wcd_mbhc *mbhc)
 		#ifdef OPLUS_ARCH_EXTENDS
 		if(mbhc->headset_bias_alwayon) {
 			mbhc->micbias_enable = true;
-			pr_info("%s: Mic Bias is set for  alwayon\n", __func__);
+			pr_debug("%s: Mic Bias is set for  alwayon\n", __func__);
 		}
 		#endif /* OPLUS_ARCH_EXTENDS */
 	} else {
@@ -692,7 +692,7 @@ static void wcd_mech_irq_dwork(struct work_struct *work)
 	dwork = to_delayed_work(work);
 	mbhc = container_of(dwork, struct wcd_mbhc, mech_irq_trigger_dwork);
 
-	pr_info("%s: enter, current_plug %d\n", __func__, mbhc->current_plug);
+	pr_debug("%s: enter, current_plug %d\n", __func__, mbhc->current_plug);
 	if (!wcd_swch_level_remove(mbhc) && (mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE)) {
 		WCD_MBHC_RSC_LOCK(mbhc);
 		wcd_mbhc_hs_elec_irq(mbhc, WCD_MBHC_ELEC_HS_INS, false);
@@ -700,7 +700,7 @@ static void wcd_mech_irq_dwork(struct work_struct *work)
 		wcd_mbhc_find_plug_and_report(mbhc, MBHC_PLUG_TYPE_HEADSET);
 		WCD_MBHC_RSC_UNLOCK(mbhc);
 	}
-	pr_info("%s: leave\n", __func__);
+	pr_debug("%s: leave\n", __func__);
 }
 #endif /* OPLUS_ARCH_EXTENDS */
 
@@ -731,7 +731,7 @@ static void wcd_mbhc_detect_plug_type_new(struct work_struct *work)
 		#ifdef OPLUS_ARCH_EXTENDS
 		if(mbhc->headset_bias_alwayon) {
 			mbhc->micbias_enable = true;
-			pr_info("%s: Mic Bias is set for  alwayon\n", __func__);
+			pr_debug("%s: Mic Bias is set for  alwayon\n", __func__);
 		}
 		#endif /* OPLUS_ARCH_EXTENDS */
 	} else {
@@ -774,7 +774,7 @@ static int wcd_mbhc_get_plug_from_adc(struct wcd_mbhc *mbhc, int adc_result)
 	u32 hph_thr = 0, hs_thr = 0;
 
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: adc_result %d mv\n", __func__, adc_result);
+	pr_debug("%s: adc_result %d mv\n", __func__, adc_result);
 	if (adc_result < 0) {
 		return plug_type;
 	}
@@ -864,7 +864,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 	/* Find plug type */
 	output_mv = wcd_measure_adc_continuous(mbhc);
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: output_mv %d\n", __func__, output_mv);
+	pr_debug("%s: output_mv %d\n", __func__, output_mv);
 	#endif /* OPLUS_ARCH_EXTENDS */
 	plug_type = wcd_mbhc_get_plug_from_adc(mbhc, output_mv);
 	#ifdef OPLUS_ARCH_EXTENDS
@@ -957,7 +957,7 @@ correct_plug_type:
 		output_mv = wcd_measure_adc_once(mbhc, MUX_CTL_IN2P);
 		#ifdef OPLUS_ARCH_EXTENDS
 		if (output_mv < 0) {
-			pr_info("%s: MUX_CTL_IN2P adc measurement failed!\n", __func__);
+			pr_debug("%s: MUX_CTL_IN2P adc measurement failed!\n", __func__);
 			continue;
 		}
 		#endif /* OPLUS_ARCH_EXTENDS */
@@ -984,7 +984,7 @@ correct_plug_type:
 
 		#ifdef OPLUS_ARCH_EXTENDS
 		if (output_mv < 0) {
-			pr_info("%s: invalid output_mv %d!\n", __func__, output_mv);
+			pr_debug("%s: invalid output_mv %d!\n", __func__, output_mv);
 			continue;
 		}
 		#endif /* OPLUS_ARCH_EXTENDS */
@@ -1077,9 +1077,9 @@ correct_plug_type:
 					headset_count++;
 				}
 
-				pr_info("%s: spl_hs_reported %d\n", __func__, spl_hs_reported);
-				pr_info("%s: headphone_count %d\n", __func__, headphone_count);
-				pr_info("%s: headset_count %d\n", __func__, headset_count);
+				pr_debug("%s: spl_hs_reported %d\n", __func__, spl_hs_reported);
+				pr_debug("%s: headphone_count %d\n", __func__, headphone_count);
+				pr_debug("%s: headset_count %d\n", __func__, headset_count);
 				#endif /* OPLUS_ARCH_EXTENDS */
 
 				if (!spl_hs_reported &&
@@ -1123,7 +1123,7 @@ correct_plug_type:
 				if ((mbhc->current_plug == MBHC_PLUG_TYPE_HEADSET)
 					&& (!wcd_swch_level_remove(mbhc))) {
 					if (headphone_count == 3 && !(mbhc->is_btn_press)) {
-						pr_info("%s: go to report 3pole\n", __func__);
+						pr_debug("%s: go to report 3pole\n", __func__);
 						goto report;
 					}
 				}
@@ -1178,13 +1178,13 @@ report:
 	WCD_MBHC_RSC_LOCK(mbhc);
 
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: mbhc current_plug %d\n", __func__, mbhc->current_plug);
+	pr_debug("%s: mbhc current_plug %d\n", __func__, mbhc->current_plug);
 	if (mbhc->current_plug != plug_type) {
 		//4pole -> 3pole
 		if ((mbhc->current_plug == MBHC_PLUG_TYPE_HEADSET)
 			&& (plug_type == MBHC_PLUG_TYPE_HEADPHONE)) {
 			if (!wcd_swch_level_remove(mbhc)) {
-				pr_info("%s: report remove SND_JACK_HEADSET\n", __func__);
+				pr_debug("%s: report remove SND_JACK_HEADSET\n", __func__);
 				wcd_mbhc_report_plug(mbhc, 0, SND_JACK_HEADSET);
 			}
 		}
@@ -1193,7 +1193,7 @@ report:
 		if ((mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE)
 			&& (plug_type == MBHC_PLUG_TYPE_HIGH_HPH)) {
 			if (!wcd_swch_level_remove(mbhc)) {
-				pr_info("%s: report remove SND_JACK_HEADPHONE\n", __func__);
+				pr_debug("%s: report remove SND_JACK_HEADPHONE\n", __func__);
 				wcd_mbhc_report_plug(mbhc, 0, SND_JACK_HEADPHONE);
 			}
 		}
@@ -1440,7 +1440,7 @@ static irqreturn_t wcd_mbhc_adc_hs_ins_irq(int irq, void *data)
 		#else /* OPLUS_ARCH_EXTENDS */
 		if (mbhc->irq_trigger_enable) {
 			WCD_MBHC_RSC_UNLOCK(mbhc);
-			pr_info("%s: schedule mech_irq_trigger_dwork.\n", __func__);
+			pr_debug("%s: schedule mech_irq_trigger_dwork.\n", __func__);
 			schedule_delayed_work(&mbhc->mech_irq_trigger_dwork, msecs_to_jiffies(200));
 			return IRQ_HANDLED;
 		} else {

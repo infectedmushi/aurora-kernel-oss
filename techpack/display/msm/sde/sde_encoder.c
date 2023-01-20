@@ -2034,7 +2034,7 @@ static void sde_encoder_wait_for_event_wakeup(struct drm_encoder *drm_enc, int c
 
 	sde_enc = to_sde_encoder_virt(drm_enc);
 	if (!sde_enc->cur_master || !curr_fps) {
-		pr_info("invalid args %d %d\n", curr_fps, sde_enc->cur_master);
+		pr_debug("invalid args %d %d\n", curr_fps, sde_enc->cur_master);
 		SDE_EVT32(0x1111);
 		return;
 	}
@@ -5414,7 +5414,7 @@ void sde_encoder_kickoff(struct drm_encoder *drm_enc, bool is_error)
 			if(rc) {
 				SDE_ERROR("fps120 failed to set cmd\n");
 			} else {
-				pr_info("fps120 success to set cmd, fps old_fps=%d\n", old_refresh_rate);
+				pr_debug("fps120 success to set cmd, fps old_fps=%d\n", old_refresh_rate);
 				old_refresh_rate = sde_enc->mode_info.frame_rate;
 			}
 		}

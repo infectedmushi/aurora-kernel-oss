@@ -76,7 +76,7 @@ static int __init crc_test_init(void)
 			goto free_32;
 		}
 
-		pr_info("crc-vpmsum_test begins, %lu iterations\n", iterations);
+		pr_debug("crc-vpmsum_test begins, %lu iterations\n", iterations);
 		for (i=0; i<iterations; i++) {
 			size_t len, offset;
 
@@ -111,7 +111,7 @@ static int __init crc_test_init(void)
 				break;
 			}
 		}
-		pr_info("crc-vpmsum_test done, completed %lu iterations\n", i);
+		pr_debug("crc-vpmsum_test done, completed %lu iterations\n", i);
 	} while (0);
 
 free_32:

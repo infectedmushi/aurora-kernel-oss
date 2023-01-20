@@ -105,7 +105,7 @@ struct pci_mmcfg_region *__init pci_mmconfig_add(int segment, int start,
 		list_add_sorted(new);
 		mutex_unlock(&pci_mmcfg_lock);
 
-		pr_info(PREFIX
+		pr_debug(PREFIX
 		       "MMCONFIG for domain %04x [bus %02x-%02x] at %pR "
 		       "(base %#lx)\n",
 		       segment, start, end, &new->res, (unsigned long)addr);
@@ -365,7 +365,7 @@ static int __init pci_mmcfg_check_hostbridge(void)
 			name = pci_mmcfg_probes[i].probe();
 
 		if (name)
-			pr_info(PREFIX "%s with MMCONFIG support\n", name);
+			pr_debug(PREFIX "%s with MMCONFIG support\n", name);
 	}
 
 	/* some end_bus_number is crazy, fix it */
@@ -466,7 +466,7 @@ static bool __ref is_mmconf_reserved(check_reserved_t is_reserved,
 		dev_info(dev, "MMCONFIG at %pR reserved in %s\n",
 			 &cfg->res, method);
 	else
-		pr_info(PREFIX "MMCONFIG at %pR reserved in %s\n",
+		pr_debug(PREFIX "MMCONFIG at %pR reserved in %s\n",
 		       &cfg->res, method);
 
 	if (old_size != size) {
@@ -485,7 +485,7 @@ static bool __ref is_mmconf_reserved(check_reserved_t is_reserved,
 				"at %pR (base %#lx) (size reduced!)\n",
 				&cfg->res, (unsigned long) cfg->address);
 		else
-			pr_info(PREFIX
+			pr_debug(PREFIX
 				"MMCONFIG for %04x [bus%02x-%02x] "
 				"at %pR (base %#lx) (size reduced!)\n",
 				cfg->segment, cfg->start_bus, cfg->end_bus,
@@ -508,7 +508,7 @@ pci_mmcfg_check_reserved(struct device *dev, struct pci_mmcfg_region *cfg, int e
 				 "ACPI motherboard resources\n",
 				 &cfg->res);
 		else
-			pr_info(FW_INFO PREFIX
+			pr_debug(FW_INFO PREFIX
 			       "MMCONFIG at %pR not reserved in "
 			       "ACPI motherboard resources\n",
 			       &cfg->res);
@@ -537,7 +537,7 @@ static void __init pci_mmcfg_reject_broken(int early)
 
 	list_for_each_entry(cfg, &pci_mmcfg_list, list) {
 		if (pci_mmcfg_check_reserved(NULL, cfg, early) == 0) {
-			pr_info(PREFIX "not using MMCONFIG\n");
+			pr_debug(PREFIX "not using MMCONFIG\n");
 			free_all_mmcfg();
 			return;
 		}

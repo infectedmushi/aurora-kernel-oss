@@ -212,7 +212,7 @@ static ssize_t shutdown_detect_trigger(struct file *filp, const char *ubuf, size
     }
 #ifdef OPLUS_BUG_STABILITY
     tsk = current->group_leader;
-    pr_info("%s:%d shutdown_detect, GroupLeader is %s:%d\n", current->comm, task_pid_nr(current), tsk->comm, task_pid_nr(tsk));
+    pr_debug("%s:%d shutdown_detect, GroupLeader is %s:%d\n", current->comm, task_pid_nr(current), tsk->comm, task_pid_nr(tsk));
 #endif /*OPLUS_BUG_STABILITY*/
     //val: 0x gtotaltimeout|gjavatimeout|gnativetimeout , gnativetimeout < F, gjavatimeout < F
     if (val > SHUTDOWN_RUS_MIN) {
@@ -220,7 +220,7 @@ static ssize_t shutdown_detect_trigger(struct file *filp, const char *ubuf, size
          gjavatimeout = ((val - gnativetimeout) % 256 ) / 16;
          temp = val / 256;
          gtotaltimeout = (temp < SHUTDOWN_TOTAL_TIME_MIN) ? SHUTDOWN_TOTAL_TIME_MIN : temp;// for safe
-         pr_info("shutdown_detect_trigger rus val %ld %d %d %d\n", val, gnativetimeout, gjavatimeout, gtotaltimeout);
+         pr_debug("shutdown_detect_trigger rus val %ld %d %d %d\n", val, gnativetimeout, gjavatimeout, gtotaltimeout);
          return cnt;
     }
 
@@ -237,7 +237,7 @@ static ssize_t shutdown_detect_trigger(struct file *filp, const char *ubuf, size
         break;
     case SHUTDOWN_STAGE_KERNEL:
         shutdown_kernel_start_time = current_boottime_time().tv_sec;
-        pr_info("shutdown_kernel_start_time %ld\n", shutdown_kernel_start_time);
+        pr_debug("shutdown_kernel_start_time %ld\n", shutdown_kernel_start_time);
         if((shutdown_kernel_start_time - shutdown_init_start_time) > gnativetimeout) {
             pr_err("shutdown_detect_timeout: timeout happened in reboot.cpp\n");
             shutdown_dump_kernel_log();
@@ -463,7 +463,7 @@ static int shutdown_timeout_flag_write_now(void *args)
         pr_err("sync returns %d\n", rc);
 
     filp_close(opfile,NULL);
-    pr_info("shutdown_timeout_flag_write_now done \n");
+    pr_debug("shutdown_timeout_flag_write_now done \n");
     complete(&shd_comp);
 
     return 0;

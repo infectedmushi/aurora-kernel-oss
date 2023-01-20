@@ -35,9 +35,9 @@
 #define HALL_IST8801_DOWN "oplus,hall-ist8801,down"
 #define TRI_KEY_TAG                  "[tri_state_key] "
 #define TRI_KEY_ERR(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 #define TRI_KEY_LOG(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 
 static struct ist8801_data_t *g_ist8801_data;
 

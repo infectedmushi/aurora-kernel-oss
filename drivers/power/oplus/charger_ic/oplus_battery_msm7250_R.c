@@ -343,7 +343,7 @@ static void oplus_set_otg_switch_status_default(bool value);
 #define smblib_dbg(chg, reason, fmt, ...)			\
 	do {							\
 		if (*chg->debug_mask & (reason))		\
-			pr_info("%s: %s: " fmt, chg->name,	\
+			pr_debug("%s: %s: " fmt, chg->name,	\
 				__func__, ##__VA_ARGS__);	\
 		else						\
 			pr_debug("%s: %s: " fmt, chg->name,	\
@@ -1530,11 +1530,11 @@ static const struct apsd_result *smblib_update_usb_type(struct smb_charger *chg)
 		}
 //#ifdef OPLUS_FEATURE_CHG_BASIC
 		else if (chg->real_charger_type == POWER_SUPPLY_TYPE_USB) {
-			pr_info("%s: work around usb charger type to dcp type\n", __func__);
+			pr_debug("%s: work around usb charger type to dcp type\n", __func__);
 			oplus_set_smb5_usb_props_type(apsd_result->pst);
 			if (apsd_result->pst == POWER_SUPPLY_TYPE_USB_DCP)
 			{
-				pr_info("%s: notify usb charger type to dcp type\n", __func__);
+				pr_debug("%s: notify usb charger type to dcp type\n", __func__);
 				power_supply_changed(chg->usb_psy);
 			}
 		}
@@ -1896,7 +1896,7 @@ void smblib_suspend_on_debug_battery(struct smb_charger *chg)
 		vote(chg->usb_icl_votable, DEBUG_BOARD_VOTER, val.intval, 0);
 		vote(chg->dc_suspend_votable, DEBUG_BOARD_VOTER, val.intval, 0);
 		if (val.intval)
-			pr_info("Input suspended: Fake battery\n");
+			pr_debug("Input suspended: Fake battery\n");
 	} else {
 		vote(chg->chg_disable_votable, DEBUG_BOARD_VOTER,
 					val.intval, 0);
@@ -6442,7 +6442,7 @@ irqreturn_t usb_plugin_irq_handler(int irq, void *data)
 
 	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
 			&& chip->vbatt_num == 2 ) {
-		pr_info("%s:chg->typec_mode = sink return!\n", __func__);
+		pr_debug("%s:chg->typec_mode = sink return!\n", __func__);
 			return IRQ_HANDLED;
 	}
 #endif/*OPLUS_FEATURE_CHG_BASIC*/
@@ -6658,7 +6658,7 @@ irqreturn_t usb_source_change_irq_handler(int irq, void *data)
 
 	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
 		&& chip->vbatt_num == 2 ) {
-		pr_info("%s:chg->typec_mode = sink return!\n", __func__);
+		pr_debug("%s:chg->typec_mode = sink return!\n", __func__);
 		return IRQ_HANDLED;
 	}
 	
@@ -7312,7 +7312,7 @@ irqreturn_t typec_state_change_irq_handler(int irq, void *data)
 #ifdef OPLUS_FEATURE_CHG_BASIC//Fanhong.Kong@ProDrv.CHG,add 2018/06/02 for SVOOC OTG
 	if (chg->typec_mode == POWER_SUPPLY_TYPEC_SINK
 		&& chip->vbatt_num == 2 ) {
-		pr_info("%s: chg->typec_mode = SINK,Disable APSD!\n", __func__);
+		pr_debug("%s: chg->typec_mode = SINK,Disable APSD!\n", __func__);
 		//vote(chg->apsd_disable_votable, SVOOC_OTG_VOTER, true, 0);
 		smblib_apsd_enable(chg,false);
 	}
@@ -15791,7 +15791,7 @@ static int smb5_show_charger_status(struct smb5 *chip)
 	}
 	batt_charge_type = val.intval;
 
-	pr_info("SMB5 status - usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
+	pr_debug("SMB5 status - usb:present=%d type=%d batt:present = %d health = %d charge = %d\n",
 		usb_present, chg->real_charger_type,
 		batt_present, batt_health, batt_charge_type);
 	return rc;
@@ -16229,7 +16229,7 @@ static int smb5_probe(struct platform_device *pdev)
 
 	device_init_wakeup(chg->dev, true);
 
-	pr_info("QPNP SMB5 probed successfully\n");
+	pr_debug("QPNP SMB5 probed successfully\n");
 
 	return rc;
 

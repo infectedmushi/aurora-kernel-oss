@@ -4883,15 +4883,15 @@ static bool oplus_pps_check_adapter_maxi(struct oplus_chg_chip *chip)
 	vdm_data.vdos[0] = PD_UVDM_HDR(OPLUS_SVID, OPLUS_UVDM_POWER_CMD);
 	vdm_data.vdos[1] = 0;
 	for (i = 0; i < vdm_data.cnt; i++)
-		pr_info("%s send uvdm_data1[%d] = 0x%08x\n",
+		pr_debug("%s send uvdm_data1[%d] = 0x%08x\n",
 				__func__, i, vdm_data.vdos[i]);
 	ret = tcpm_dpm_send_custom_vdm(tcpc_dev, &vdm_data, NULL);
 	if (ret == TCPM_SUCCESS) {
 		for (i = 0; i < vdm_data.cnt; i++)
-			pr_info("%s receive uvdm_data1[%d] = 0x%08x\n",__func__, i, vdm_data.vdos[i]);
+			pr_debug("%s receive uvdm_data1[%d] = 0x%08x\n",__func__, i, vdm_data.vdos[i]);
 		imax = (vdm_data.vdos[vdm_data.cnt - 1] & 0x00FF) * 50;
 		vmax = ((vdm_data.vdos[vdm_data.cnt - 1] & 0xFFFF0000) >> 16) * 10;
-		pr_info("%s imax[%d] ,vmax[%d],\n",__func__, imax, vmax);
+		pr_debug("%s imax[%d] ,vmax[%d],\n",__func__, imax, vmax);
 		if ((imax > OPLUS_EXTEND_IMIN) && (vmax >= OPLUS_EXTEND_VMIN )) {
 			oplus_pps_set_power(OPLUS_PPS_POWER_V2, imax, vmax);
 			return true;
@@ -4906,7 +4906,7 @@ static bool oplus_pps_check_adapter_maxi(struct oplus_chg_chip *chip)
 		}
 	} else {
 		/*oplus_chg_sc8571_error((1 << PPS_REPORT_ERROR_UVDM_POWER), NULL, ret);*/
-		pr_info("%s tcpm_dpm_send_custom_vdm fail(%d)\n", __func__, ret);
+		pr_debug("%s tcpm_dpm_send_custom_vdm fail(%d)\n", __func__, ret);
 		return false;
 	}
 }
@@ -4925,16 +4925,16 @@ static int oplus_pps_enable_extended_maxi(struct oplus_chg_chip *chip)
 	vdm_data.vdos[0] = PD_UVDM_HDR(OPLUS_SVID, OPLUS_UVDM_EXAPDO_CMD);
 	vdm_data.vdos[1] = 0;
 	for (i = 0; i < vdm_data.cnt; i++)
-		pr_info("%s send uvdm_data2[%d] = 0x%08x\n",
+		pr_debug("%s send uvdm_data2[%d] = 0x%08x\n",
 				__func__, i, vdm_data.vdos[i]);
 	ret = tcpm_dpm_send_custom_vdm(tcpc_dev, &vdm_data, NULL);
 	if (ret == TCPM_SUCCESS) {
 		for (i = 0; i < vdm_data.cnt; i++)
-			pr_info("%s receive uvdm_data2[%d] = 0x%08x\n",
+			pr_debug("%s receive uvdm_data2[%d] = 0x%08x\n",
 					__func__, i, vdm_data.vdos[i]);
 	} else {
 		/*oplus_chg_sc8571_error((1 << PPS_REPORT_ERROR_EXTEND_MAXI), NULL, ret);*/
-		pr_info("%s tcpm_dpm_send_custom_vdm fail(%d)\n", __func__, ret);
+		pr_debug("%s tcpm_dpm_send_custom_vdm fail(%d)\n", __func__, ret);
 		return ret;
 	}
 	extended_bit = (vdm_data.vdos[vdm_data.cnt - 1] & 0x1F000000) >> 24;

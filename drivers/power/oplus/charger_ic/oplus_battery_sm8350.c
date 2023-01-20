@@ -2157,7 +2157,7 @@ static void oplus_chg_wls_status_keep_clean_work(struct work_struct *work)
 		power_supply_changed(bcdev->psy_list[PSY_TYPE_BATTERY].psy);
 	}
 	if (bcdev->status_wake_lock_on) {
-		pr_info("release status_wake_lock\n");
+		pr_debug("release status_wake_lock\n");
 		__pm_relax(bcdev->status_wake_lock);
 		bcdev->status_wake_lock_on = false;
 	}
@@ -2194,7 +2194,7 @@ static int wls_psy_get_prop(struct power_supply *psy,
 		} else {
 			if (pre_wls_online && pval->intval == 0) {
 				if (!bcdev->status_wake_lock_on) {
-					pr_info("acquire status_wake_lock\n");
+					pr_debug("acquire status_wake_lock\n");
 					__pm_stay_awake(bcdev->status_wake_lock);
 					bcdev->status_wake_lock_on = true;
 				}
@@ -2476,7 +2476,7 @@ int oplus_chg_wired_get_break_sub_crux_info(char *crux_info)
 	}
 	bcdev = chip->pmic_spmi.bcdev_chip;
 
-	pr_info("real_chg_type:%d\n", bcdev->real_chg_type);
+	pr_debug("real_chg_type:%d\n", bcdev->real_chg_type);
 	return bcdev->real_chg_type;
 }
 
@@ -3328,7 +3328,7 @@ static int wireless_fw_update(struct battery_chg_dev *bcdev, bool force)
 		rc = 0;
 	}
 
-	pr_info("Wireless FW update done\n");
+	pr_debug("Wireless FW update done\n");
 
 release_fw:
 	release_firmware(fw);
@@ -4417,7 +4417,7 @@ static int oplus_chg_track_upload_usbtemp_info(
 			OPLUS_CHG_TRACK_CURX_INFO_LEN - index, "%s", chip->chg_power_info);
 
 	schedule_delayed_work(&chip->usbtemp_load_trigger_work, 0);
-	pr_info("%s\n", chip->usbtemp_load_trigger.crux_info);
+	pr_debug("%s\n", chip->usbtemp_load_trigger.crux_info);
 	mutex_unlock(&chip->track_upload_lock);
 
 	return 0;
@@ -9237,7 +9237,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	struct pmic_glink_client_data client_data = { };
 	int rc, i;
 #ifdef OPLUS_FEATURE_CHG_BASIC
-	pr_info("battery_chg_probe start...\n");
+	pr_debug("battery_chg_probe start...\n");
 	if (oplus_gauge_check_chip_is_null()) {
 		gauge_chip = devm_kzalloc(&pdev->dev, sizeof(*gauge_chip), GFP_KERNEL);
 		if (!gauge_chip) {
@@ -9471,7 +9471,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	init_debug_reg_proc(oplus_chip);
 	schedule_work(&bcdev->usb_type_work);
 	battery_probe_complete = true;
-	pr_info("battery_chg_probe end...\n");
+	pr_debug("battery_chg_probe end...\n");
 	start_usb_enum_check();
 #endif
 	return 0;

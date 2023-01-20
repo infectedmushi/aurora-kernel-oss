@@ -1112,7 +1112,7 @@ static int __init init_gladiator_erp(void)
 
 	ret = scm_is_secure_device();
 	if (ret == 0) {
-		pr_info("Gladiator Error Reporting not available\n");
+		pr_debug("Gladiator Error Reporting not available\n");
 		return -ENODEV;
 	}
 

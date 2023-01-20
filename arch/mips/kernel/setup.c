@@ -311,7 +311,7 @@ static void __init maybe_bswap_initrd(void)
 	    decompress_method((unsigned char *)(&buf), 8, NULL)) {
 		unsigned long i;
 
-		pr_info("Byteswapped initrd detected\n");
+		pr_debug("Byteswapped initrd detected\n");
 		for (i = initrd_start; i < ALIGN(initrd_end, 8); i += 8)
 			swab64s((u64 *)i);
 	}
@@ -336,7 +336,7 @@ static void __init finalize_initrd(void)
 	reserve_bootmem(__pa(initrd_start), size, BOOTMEM_DEFAULT);
 	initrd_below_start_ok = 1;
 
-	pr_info("Initial ramdisk at: 0x%lx (%lu bytes)\n",
+	pr_debug("Initial ramdisk at: 0x%lx (%lu bytes)\n",
 		initrd_start, size);
 	return;
 disable:
@@ -461,11 +461,11 @@ static void __init bootmem_init(void)
 				  BOOT_MEM_RESERVED);
 
 	if (min_low_pfn > ARCH_PFN_OFFSET) {
-		pr_info("Wasting %lu bytes for tracking %lu unused pages\n",
+		pr_debug("Wasting %lu bytes for tracking %lu unused pages\n",
 			(min_low_pfn - ARCH_PFN_OFFSET) * sizeof(struct page),
 			min_low_pfn - ARCH_PFN_OFFSET);
 	} else if (ARCH_PFN_OFFSET - min_low_pfn > 0UL) {
-		pr_info("%lu free pages won't be used\n",
+		pr_debug("%lu free pages won't be used\n",
 			ARCH_PFN_OFFSET - min_low_pfn);
 	}
 	min_low_pfn = ARCH_PFN_OFFSET;
@@ -820,7 +820,7 @@ static void __init request_crashkernel(struct resource *res)
 
 	ret = request_resource(res, &crashk_res);
 	if (!ret)
-		pr_info("Reserving %ldMB of memory at %ldMB for crashkernel\n",
+		pr_debug("Reserving %ldMB of memory at %ldMB for crashkernel\n",
 			(unsigned long)((crashk_res.end -
 					 crashk_res.start + 1) >> 20),
 			(unsigned long)(crashk_res.start  >> 20));
@@ -871,7 +871,7 @@ static void __init arch_mem_init(char **cmdline_p)
 			 PFN_DOWN(__pa_symbol(&__init_end)) << PAGE_SHIFT,
 			 BOOT_MEM_INIT_RAM);
 
-	pr_info("Determined physical RAM map:\n");
+	pr_debug("Determined physical RAM map:\n");
 	print_memory_map();
 
 #if defined(CONFIG_CMDLINE_BOOL) && defined(CONFIG_CMDLINE_OVERRIDE)
@@ -908,7 +908,7 @@ static void __init arch_mem_init(char **cmdline_p)
 	parse_early_param();
 
 	if (usermem) {
-		pr_info("User-defined physical RAM map:\n");
+		pr_debug("User-defined physical RAM map:\n");
 		print_memory_map();
 	}
 
@@ -1094,7 +1094,7 @@ int hw_coherentio = 0;	/* Actual hardware supported DMA coherency setting. */
 static int __init setcoherentio(char *str)
 {
 	coherentio = IO_COHERENCE_ENABLED;
-	pr_info("Hardware DMA cache coherency (command line)\n");
+	pr_debug("Hardware DMA cache coherency (command line)\n");
 	return 0;
 }
 early_param("coherentio", setcoherentio);
@@ -1102,7 +1102,7 @@ early_param("coherentio", setcoherentio);
 static int __init setnocoherentio(char *str)
 {
 	coherentio = IO_COHERENCE_DISABLED;
-	pr_info("Software DMA cache coherency (command line)\n");
+	pr_debug("Software DMA cache coherency (command line)\n");
 	return 0;
 }
 early_param("nocoherentio", setnocoherentio);

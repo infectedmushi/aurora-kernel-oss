@@ -332,7 +332,7 @@ int oplus_ramless_panel_set_aod_area(void *buf)
 		area->bitdepth = para->aod_area[i].bitdepth;
 		area->mono = para->aod_area[i].mono;
 		area->gray = para->aod_area[i].gray;
-		pr_info("%s aod_area[%d]: rect[%dx%d-%dx%d]-%d-%d-%d-%d\n", __func__, i,
+		pr_debug("%s aod_area[%d]: rect[%dx%d-%dx%d]-%d-%d-%d-%d\n", __func__, i,
 			area->x, area->y, area->w, area->h,
 			area->color, area->bitdepth, area->mono, area->gray);
 		area->enable = true;

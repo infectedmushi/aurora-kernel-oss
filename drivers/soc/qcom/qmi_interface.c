@@ -792,7 +792,7 @@ static ssize_t qmi_send_message(struct qmi_handle *qmi,
 	if (qmi->sock) {
 		ret = kernel_sendmsg(qmi->sock, &msghdr, &iv, 1, len);
 		if (ret < 0)
-			pr_info("failed to send QMI message %d\n", ret);
+			pr_debug("failed to send QMI message %d\n", ret);
 	} else {
 		ret = -EPIPE;
 	}

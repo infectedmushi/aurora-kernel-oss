@@ -910,7 +910,7 @@ static int ramoops_probe(struct platform_device *pdev)
 	ramoops_device_info_size = pdata->device_info_size;
 #endif /* OPLUS_FEATURE_DUMPDEVICE */
 
-	pr_info("attached 0x%lx@0x%llx, ecc: %d/%d\n",
+	pr_debug("attached 0x%lx@0x%llx, ecc: %d/%d\n",
 		cxt->size, (unsigned long long)cxt->phys_addr,
 		cxt->ecc_info.ecc_size, cxt->ecc_info.block_size);
 
@@ -986,11 +986,11 @@ static void __init ramoops_register_dummy(void)
 	if (!mem_size)
 		return;
 
-	pr_info("using module parameters\n");
+	pr_debug("using module parameters\n");
 
 	dummy_data = kzalloc(sizeof(*dummy_data), GFP_KERNEL);
 	if (!dummy_data) {
-		pr_info("could not allocate pdata\n");
+		pr_debug("could not allocate pdata\n");
 		return;
 	}
 
@@ -1016,7 +1016,7 @@ static void __init ramoops_register_dummy(void)
 	dummy = platform_device_register_data(NULL, "ramoops", -1,
 			dummy_data, sizeof(struct ramoops_platform_data));
 	if (IS_ERR(dummy)) {
-		pr_info("could not create platform device: %ld\n",
+		pr_debug("could not create platform device: %ld\n",
 			PTR_ERR(dummy));
 		dummy = NULL;
 		ramoops_unregister_dummy();

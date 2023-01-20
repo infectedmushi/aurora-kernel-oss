@@ -636,9 +636,9 @@ static void cpucc_clk_print_opp_table(int c0, int c1, bool is_sdm439)
 	oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c1),
 		apc_c1_fmin, true);
 
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
+	pr_debug("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmin, dev_pm_opp_get_voltage(oppfmin));
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
+	pr_debug("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmax, dev_pm_opp_get_voltage(oppfmax));
 
 	if (is_sdm439) {
@@ -652,9 +652,9 @@ static void cpucc_clk_print_opp_table(int c0, int c1, bool is_sdm439)
 		oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c0),
 			apc_c0_fmin, true);
 
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
+		pr_debug("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmin, dev_pm_opp_get_voltage(oppfmin));
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
+		pr_debug("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmax, dev_pm_opp_get_voltage(oppfmax));
 	}
 }

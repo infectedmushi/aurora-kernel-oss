@@ -994,7 +994,7 @@ init_befs_fs(void)
 {
 	int err;
 
-	pr_info("version: %s\n", BEFS_VERSION);
+	pr_debug("version: %s\n", BEFS_VERSION);
 
 	err = befs_init_inodecache();
 	if (err)

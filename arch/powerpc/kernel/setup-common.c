@@ -393,7 +393,7 @@ void __init check_for_initrd(void)
 		initrd_start = initrd_end = 0;
 
 	if (initrd_start)
-		pr_info("Found initrd at 0x%lx:0x%lx\n", initrd_start, initrd_end);
+		pr_debug("Found initrd at 0x%lx:0x%lx\n", initrd_start, initrd_end);
 
 	DBG(" <- check_for_initrd()\n");
 #endif /* CONFIG_BLK_DEV_INITRD */
@@ -785,7 +785,7 @@ arch_initcall(powerpc_debugfs_init);
 
 void ppc_printk_progress(char *s, unsigned short hex)
 {
-	pr_info("%s\n", s);
+	pr_debug("%s\n", s);
 }
 
 void arch_setup_pdev_archdata(struct platform_device *pdev)
@@ -797,51 +797,51 @@ void arch_setup_pdev_archdata(struct platform_device *pdev)
 
 static __init void print_system_info(void)
 {
-	pr_info("-----------------------------------------------------\n");
+	pr_debug("-----------------------------------------------------\n");
 #ifdef CONFIG_PPC_BOOK3S_64
-	pr_info("ppc64_pft_size    = 0x%llx\n", ppc64_pft_size);
+	pr_debug("ppc64_pft_size    = 0x%llx\n", ppc64_pft_size);
 #endif
 #ifdef CONFIG_PPC_STD_MMU_32
-	pr_info("Hash_size         = 0x%lx\n", Hash_size);
+	pr_debug("Hash_size         = 0x%lx\n", Hash_size);
 #endif
-	pr_info("phys_mem_size     = 0x%llx\n",
+	pr_debug("phys_mem_size     = 0x%llx\n",
 		(unsigned long long)memblock_phys_mem_size());
 
-	pr_info("dcache_bsize      = 0x%x\n", dcache_bsize);
-	pr_info("icache_bsize      = 0x%x\n", icache_bsize);
+	pr_debug("dcache_bsize      = 0x%x\n", dcache_bsize);
+	pr_debug("icache_bsize      = 0x%x\n", icache_bsize);
 	if (ucache_bsize != 0)
-		pr_info("ucache_bsize      = 0x%x\n", ucache_bsize);
+		pr_debug("ucache_bsize      = 0x%x\n", ucache_bsize);
 
-	pr_info("cpu_features      = 0x%016lx\n", cur_cpu_spec->cpu_features);
-	pr_info("  possible        = 0x%016lx\n",
+	pr_debug("cpu_features      = 0x%016lx\n", cur_cpu_spec->cpu_features);
+	pr_debug("  possible        = 0x%016lx\n",
 		(unsigned long)CPU_FTRS_POSSIBLE);
-	pr_info("  always          = 0x%016lx\n",
+	pr_debug("  always          = 0x%016lx\n",
 		(unsigned long)CPU_FTRS_ALWAYS);
-	pr_info("cpu_user_features = 0x%08x 0x%08x\n",
+	pr_debug("cpu_user_features = 0x%08x 0x%08x\n",
 		cur_cpu_spec->cpu_user_features,
 		cur_cpu_spec->cpu_user_features2);
-	pr_info("mmu_features      = 0x%08x\n", cur_cpu_spec->mmu_features);
+	pr_debug("mmu_features      = 0x%08x\n", cur_cpu_spec->mmu_features);
 #ifdef CONFIG_PPC64
-	pr_info("firmware_features = 0x%016lx\n", powerpc_firmware_features);
+	pr_debug("firmware_features = 0x%016lx\n", powerpc_firmware_features);
 #endif
 
 #ifdef CONFIG_PPC_BOOK3S_64
 	if (htab_address)
-		pr_info("htab_address      = 0x%p\n", htab_address);
+		pr_debug("htab_address      = 0x%p\n", htab_address);
 	if (htab_hash_mask)
-		pr_info("htab_hash_mask    = 0x%lx\n", htab_hash_mask);
+		pr_debug("htab_hash_mask    = 0x%lx\n", htab_hash_mask);
 #endif
 #ifdef CONFIG_PPC_STD_MMU_32
 	if (Hash)
-		pr_info("Hash              = 0x%p\n", Hash);
+		pr_debug("Hash              = 0x%p\n", Hash);
 	if (Hash_mask)
-		pr_info("Hash_mask         = 0x%lx\n", Hash_mask);
+		pr_debug("Hash_mask         = 0x%lx\n", Hash_mask);
 #endif
 
 	if (PHYSICAL_START > 0)
-		pr_info("physical_start    = 0x%llx\n",
+		pr_debug("physical_start    = 0x%llx\n",
 		       (unsigned long long)PHYSICAL_START);
-	pr_info("-----------------------------------------------------\n");
+	pr_debug("-----------------------------------------------------\n");
 }
 
 #ifdef CONFIG_SMP

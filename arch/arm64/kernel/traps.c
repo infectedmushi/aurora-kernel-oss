@@ -271,7 +271,7 @@ void arm64_force_sig_info(struct siginfo *info, const char *str,
 	if (!show_unhandled_signals_ratelimited())
 		goto send_sig;
 
-	pr_info("%s[%d]: unhandled exception: ", tsk->comm, task_pid_nr(tsk));
+	pr_debug("%s[%d]: unhandled exception: ", tsk->comm, task_pid_nr(tsk));
 	if (esr)
 		pr_cont("%s, ESR 0x%08x, ", esr_get_class_string(esr), esr);
 

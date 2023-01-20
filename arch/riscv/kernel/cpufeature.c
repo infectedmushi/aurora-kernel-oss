@@ -57,5 +57,5 @@ void riscv_fill_hwcap(void)
 	for (i = 0; i < strlen(isa); ++i)
 		elf_hwcap |= isa2hwcap[(unsigned char)(isa[i])];
 
-	pr_info("elf_hwcap is 0x%lx", elf_hwcap);
+	pr_debug("elf_hwcap is 0x%lx", elf_hwcap);
 }

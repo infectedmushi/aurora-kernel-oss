@@ -374,7 +374,7 @@ void mmc_check_hpi_support(struct mmc_card *card, u8 *ext_csd)
 		 */
 		card->ext_csd.out_of_int_time =
 			ext_csd[EXT_CSD_OUT_OF_INTERRUPT_TIME] * 10;
-		pr_info("%s: Out-of-interrupt timeout is %d[ms]\n",
+		pr_debug("%s: Out-of-interrupt timeout is %d[ms]\n",
 				mmc_hostname(card->host),
 				card->ext_csd.out_of_int_time);
 	}
@@ -682,7 +682,7 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
 		card->ext_csd.device_life_time_est_typ_b =
 			ext_csd[EXT_CSD_DEVICE_LIFE_TIME_EST_TYP_B];
 		card->ext_csd.fw_version = ext_csd[EXT_CSD_FIRMWARE_VERSION];
-		pr_info("%s: eMMC FW version: 0x%02x\n",
+		pr_debug("%s: eMMC FW version: 0x%02x\n",
 				mmc_hostname(card->host),
 				card->ext_csd.fw_version);
 	}
@@ -2291,7 +2291,7 @@ static int mmc_init_card(struct mmc_host *host, u32 ocr,
 				mmc_hostname(host), err);
 		} else {
 			host->cqe_enabled = true;
-			pr_info("%s: Command Queue Engine enabled\n",
+			pr_debug("%s: Command Queue Engine enabled\n",
 				mmc_hostname(host));
 		}
 	}

@@ -2297,7 +2297,7 @@ static int uvc_probe(struct usb_interface *intf,
 	/* sysfs file for dynamically setting urb configs */
 	ret = sysfs_create_file(&dev->intf->dev.kobj, &urb_config_attr.attr);
 	if (ret != 0)
-		pr_info("Unable to initialize urb configuration: %d\n", ret);
+		pr_debug("Unable to initialize urb configuration: %d\n", ret);
 
 	return 0;
 

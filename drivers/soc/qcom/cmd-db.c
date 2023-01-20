@@ -412,7 +412,7 @@ static int cmd_db_dev_probe(struct platform_device *pdev)
 	}
 
 	if (cmd_db_is_standalone() == 1)
-		pr_info("Command DB is initialized in standalone mode.\n");
+		pr_debug("Command DB is initialized in standalone mode.\n");
 
 	if (!debugfs_create_file("cmd_db", 0444, NULL, NULL, &cmd_db_fops))
 		pr_err("Couldn't create debugfs\n");

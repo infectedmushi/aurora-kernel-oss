@@ -36,7 +36,7 @@ static int panel_cabc_mode_config(int mode)
 	}
 
 	mutex_unlock(&oplus_cabc_lock);
-	pr_info("%s,cabc mode is %d, cabc_mode_backup is %d, cabc_lock_flag=%d\n",
+	pr_debug("%s,cabc mode is %d, cabc_mode_backup is %d, cabc_lock_flag=%d\n",
 		__func__, cabc_mode, cabc_mode_backup, cabc_lock_flag);
 	if (cabc_mode == cabc_mode_backup && cabc_lock_flag) {
 		pr_err("cabc is locked, nothing to do");
@@ -132,7 +132,7 @@ static int panel_cabc_cmd_config(struct dsi_display *display, int mode)
 int oplus_display_panel_get_cabc(void *data)
 {
 	uint32_t *temp = data;
-	pr_info("%s: cabc_mode=%d\n", __func__, cabc_mode);
+	pr_debug("%s: cabc_mode=%d\n", __func__, cabc_mode);
 
 	(*temp) = cabc_mode;
 	return 0;
@@ -154,7 +154,7 @@ int oplus_display_panel_set_cabc(void *data)
 		return -EINVAL;
 	}
 
-	pr_info("%s: to set cabc_mode=%d\n", __func__, *temp_save);
+	pr_debug("%s: to set cabc_mode=%d\n", __func__, *temp_save);
 	rc = panel_cabc_mode_config(*temp_save);
 	if (rc) {
 		pr_err("%s: Not to config cabc_mode=%d", __func__, *temp_save);

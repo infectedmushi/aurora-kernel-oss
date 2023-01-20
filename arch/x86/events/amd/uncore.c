@@ -564,7 +564,7 @@ static int __init amd_uncore_init(void)
 		if (ret)
 			goto fail_nb;
 
-		pr_info("AMD NB counters detected\n");
+		pr_debug("AMD NB counters detected\n");
 		ret = 0;
 	}
 
@@ -578,7 +578,7 @@ static int __init amd_uncore_init(void)
 		if (ret)
 			goto fail_llc;
 
-		pr_info("AMD LLC counters detected\n");
+		pr_debug("AMD LLC counters detected\n");
 		ret = 0;
 	}
 

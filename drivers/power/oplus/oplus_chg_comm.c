@@ -457,11 +457,11 @@ static void oplus_chg_config_update_work(struct work_struct *work)
 
 	if (!force_update && (is_usb_charger_online(comm_dev) || is_wls_charger_online(comm_dev))) {
 		comm_dev->config_update_pending = true;
-		pr_info("usb or wireless charging, postpone update\n");
+		pr_debug("usb or wireless charging, postpone update\n");
 		return;
 	}
 	if (comm_dev->config_buf == NULL) {
-		pr_info("config buf is NULL\n");
+		pr_debug("config buf is NULL\n");
 		return;
 	}
 
@@ -470,7 +470,7 @@ static void oplus_chg_config_update_work(struct work_struct *work)
 	if (rc < 0)
 		pr_err("update charge params error, rc=%d\n", rc);
 	else
-		pr_info("update charge params success\n");
+		pr_debug("update charge params success\n");
 	if (comm_dev->config_buf != NULL)
 		kfree(comm_dev->config_buf);
 	comm_dev->config_buf = NULL;
@@ -527,7 +527,7 @@ start:
 			pr_err("cfg data header verification succeeded, cfg_size=%d\n", cfg_size);
 			memcpy(cfg_buf, buf, count);
 			cfg_index = count;
-			pr_info("Receiving cfg data, cfg_size=%d, cfg_index=%d\n", cfg_size, cfg_index);
+			pr_debug("Receiving cfg data, cfg_size=%d, cfg_index=%d\n", cfg_size, cfg_index);
 			if (cfg_index >= cfg_size) {
 				receive_step = RECEIVE_END;
 				goto start;
@@ -542,7 +542,7 @@ start:
 	case RECEIVE_FW:
 		memcpy(cfg_buf + cfg_index, buf, count);
 		cfg_index += count;
-		pr_info("Receiving cfg data, cfg_size=%d, cfg_index=%d\n", cfg_size, cfg_index);
+		pr_debug("Receiving cfg data, cfg_size=%d, cfg_index=%d\n", cfg_size, cfg_index);
 		if (cfg_index >= cfg_size) {
 			receive_step = RECEIVE_END;
 			goto start;
@@ -558,7 +558,7 @@ start:
 			return rc;
 		}
 		if (!force_update && (is_usb_charger_online(comm_dev) || is_wls_charger_online(comm_dev))) {
-			pr_info("usb or wireless charging, postpone update\n");
+			pr_debug("usb or wireless charging, postpone update\n");
 			mutex_lock(&comm_dev->config_lock);
 			comm_dev->config_update_pending = true;
 			comm_dev->config_buf = cfg_buf;
@@ -576,7 +576,7 @@ start:
 				receive_step = RECEIVE_START;
 				return rc;
 			}
-			pr_info("update charge params success\n");
+			pr_debug("update charge params success\n");
 			kfree(cfg_buf);
 		}
 		cfg_buf = NULL;
@@ -751,7 +751,7 @@ static int oplus_chg_comm_event_notifier_call(struct notifier_block *nb,
 			return NOTIFY_BAD;
 		}
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
-			pr_info("wls online\n");
+			pr_debug("wls online\n");
 			comm_dev->wls_chging_keep = true;
 			schedule_delayed_work(&comm_dev->heartbeat_work,
 				round_jiffies_relative(msecs_to_jiffies
@@ -767,7 +767,7 @@ static int oplus_chg_comm_event_notifier_call(struct notifier_block *nb,
 			return NOTIFY_BAD;
 		}
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
-			pr_info("wls offline\n");
+			pr_debug("wls offline\n");
 			cancel_delayed_work(&comm_dev->heartbeat_work);
 		}
 #ifdef CONFIG_OPLUS_CHG_DYNAMIC_CONFIG
@@ -1001,7 +1001,7 @@ static int oplus_chg_comm_parse_dt(struct oplus_chg_comm *comm_dev)
 		for (i = 0; i < BATT_TEMP_INVALID - 1; i++)
 			comm_cfg->batt_temp_thr[i] = default_chg.batt_temp_thr[i];
 	}
-	pr_info("wkcs: temp thr = %d, %d, %d, %d, %d, %d, %d, %d\n",
+	pr_debug("wkcs: temp thr = %d, %d, %d, %d, %d, %d, %d, %d\n",
 		comm_cfg->batt_temp_thr[0], comm_cfg->batt_temp_thr[1],
 		comm_cfg->batt_temp_thr[2], comm_cfg->batt_temp_thr[3],
 		comm_cfg->batt_temp_thr[4], comm_cfg->batt_temp_thr[5],
@@ -1292,7 +1292,7 @@ static int oplus_chg_comm_check_batt_temp(struct oplus_chg_comm *comm_dev)
 
 	if (comm_dev->is_power_changed) {
 		comm_dev->is_power_changed = false;
-		pr_info("charge status changed, temp region is %d\n",
+		pr_debug("charge status changed, temp region is %d\n",
 			comm_dev->temp_region);
 		if (is_wls_fv_votable_available(comm_dev))
 			oplus_vote(comm_dev->wls_fv_votable, USER_VOTER, true,
@@ -1517,7 +1517,7 @@ int oplus_chg_comm_check_ffc(struct oplus_chg_mod *comm_ocm)
 		if (comm_dev->ffc_fv_count > 5) {
 			comm_dev->ffc_step++;
 			comm_dev->ffc_fv_count = 0;
-			pr_info("vbat_mv(=%d) > fv_max_mv(=%d), switch to next step(=%d)\n",
+			pr_debug("vbat_mv(=%d) > fv_max_mv(=%d), switch to next step(=%d)\n",
 				vbat_mv, fv_max_mv, comm_dev->ffc_step);
 		}
 		if (abs(ibat_ma) < cutoff_ma)
@@ -1527,11 +1527,11 @@ int oplus_chg_comm_check_ffc(struct oplus_chg_mod *comm_ocm)
 		if (comm_dev->ffc_fcc_count > 3) {
 			comm_dev->ffc_step++;
 			comm_dev->ffc_fv_count = 0;
-			pr_info("ibat_ma(=%d) > cutoff_ma(=%d), switch to next step(=%d)\n",
+			pr_debug("ibat_ma(=%d) > cutoff_ma(=%d), switch to next step(=%d)\n",
 				ibat_ma, cutoff_ma, comm_dev->ffc_step);
 		}
 		if (comm_dev->ffc_step >= step_max) {
-			pr_info("ffc charge done\n");
+			pr_debug("ffc charge done\n");
 			if (usb_online) {
 				pr_err("not support usb ffc\n");
 				rc = -EINVAL;
@@ -1706,7 +1706,7 @@ bool oplus_chg_comm_check_batt_full_by_sw(struct oplus_chg_mod *comm_ocm)
 			if (vbat_counts_sw > FULL_COUNTS_SW * 2) {
 				vbat_counts_sw = 0;
 				ret_sw = true;
-				pr_info("[BATTERY] Battery full by sw when icharging>=0!!\n");
+				pr_debug("[BATTERY] Battery full by sw when icharging>=0!!\n");
 			}
 		} else {
 			vbat_counts_sw = 0;
@@ -1730,7 +1730,7 @@ bool oplus_chg_comm_check_batt_full_by_sw(struct oplus_chg_mod *comm_ocm)
 	}
 
 	if (ret_sw == true || ret_hw == true) {
-		pr_info("[BATTERY] Battery full by sw[%s] !!\n",
+		pr_debug("[BATTERY] Battery full by sw[%s] !!\n",
 			(ret_sw == true) ? "S" : "H");
 		ret_sw = ret_hw = false;
 		return true;
@@ -1772,7 +1772,7 @@ void oplus_chg_comm_check_term_current(struct oplus_chg_mod *comm_ocm)
 		(void)oplus_chg_get_vbat(comm_dev, &vbat_mv);
 		(void)oplus_chg_get_ibat(comm_dev, &ibat_ma);
 		temp = oplus_chg_get_batt_temp(comm_dev);
-		pr_info("chg_done:SOC=%d, REAL_SOC=%d, VBAT=%d,IBAT=%d, BAT_TEMP=%d\n",
+		pr_debug("chg_done:SOC=%d, REAL_SOC=%d, VBAT=%d,IBAT=%d, BAT_TEMP=%d\n",
 			soc, real_soc, vbat_mv, ibat_ma, temp);
 	}
 }
@@ -2003,7 +2003,7 @@ static void oplus_chg_check_charger_uovp(struct oplus_chg_comm *comm_dev, int vc
 
 			pr_err("uovp=%d, pre_uovp=%d, over_volt_count=%d\n",
 				comm_dev->vbus_uovp, pre_uovp, over_volt_count);
-			pr_info("vchg_max=%d, vchg_min=%d\n", comm_dev->vchg_max_mv, comm_dev->vchg_min_mv);
+			pr_debug("vchg_max=%d, vchg_min=%d\n", comm_dev->vchg_max_mv, comm_dev->vchg_min_mv);
 			if (detect_time <= over_volt_count) {
 				/* vchg continuous higher than 5.8v */
 				pr_err("charger is over voltage, stop charging\n");
@@ -2122,7 +2122,7 @@ static void oplus_chg_heartbeat_work(struct work_struct *work)
 	oplus_chg_check_charge_timeout(comm_dev);
 
 	(void)oplus_chg_wls_charger_vol(comm_dev, &vchg_mv);
-	pr_info("charger vol=%d\n", vchg_mv);
+	pr_debug("charger vol=%d\n", vchg_mv);
 	oplus_chg_check_charger_uovp(comm_dev, vchg_mv);
 	oplus_chg_check_battery_uovp(comm_dev);
 
@@ -2257,14 +2257,14 @@ ssize_t oplus_chg_comm_send_mutual_cmd(
 		return rc;
 	if (!chip->cmd_data_ok)
 		pr_err("oplus chg false wakeup, rc=%d\n", rc);
-	pr_info("send\n");
+	pr_debug("send\n");
 	mutex_lock(&chip->cmd_data_lock);
 	chip->cmd_data_ok = false;
 	memcpy(&cmd, &chip->cmd, sizeof(struct oplus_chg_cmd));
 	mutex_unlock(&chip->cmd_data_lock);
 	memcpy(buf, &cmd, sizeof(struct oplus_chg_cmd));
 	pcmd = (struct oplus_chg_cmd *)buf;
-	pr_info("success to copy to user space cmd:%d, size:%d\n",
+	pr_debug("success to copy to user space cmd:%d, size:%d\n",
 		pcmd->cmd, pcmd->data_size);
 
 	return sizeof(struct oplus_chg_cmd);
@@ -2289,7 +2289,7 @@ ssize_t oplus_chg_comm_response_mutual_cmd(
 		pr_err("!!!size of buf is not matched\n");
 		return -EINVAL;
 	}
-	pr_info("!!!cmd[%d]\n", p_cmd->cmd);
+	pr_debug("!!!cmd[%d]\n", p_cmd->cmd);
 
 	oplus_chg_comm_mutual_event((void *)buf);
 	complete(&chip->cmd_ack);
@@ -2324,7 +2324,7 @@ int oplus_chg_common_set_mutual_cmd(
 		return CMD_ERROR_HIDL_NOT_READY;
 	}
 
-	pr_info("start\n");
+	pr_debug("start\n");
 	mutex_lock(&chip->cmd_ack_lock);
 	mutex_lock(&chip->cmd_data_lock);
 	memset(&chip->cmd, 0, sizeof(struct oplus_chg_cmd));
@@ -2344,7 +2344,7 @@ int oplus_chg_common_set_mutual_cmd(
 		return CMD_ERROR_TIME_OUT;
 	}
 	rc = CMD_ACK_OK;
-	pr_info("success\n");
+	pr_debug("success\n");
 	mutex_unlock(&chip->cmd_ack_lock);
 
 	return rc;
@@ -2401,7 +2401,7 @@ static int oplus_chg_comm_driver_probe(struct platform_device *pdev)
 	mutex_init(&comm_dev->config_lock);
 #endif
 
-	pr_info("probe done\n");
+	pr_debug("probe done\n");
 
 	return 0;
 

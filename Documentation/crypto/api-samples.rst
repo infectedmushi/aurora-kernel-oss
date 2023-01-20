@@ -27,7 +27,7 @@ Code Example For Symmetric Key Cipher Operation
             rc = crypto_wait_req(crypto_skcipher_decrypt(sk->req), &sk->wait);
 
 	if (rc)
-		pr_info("skcipher encrypt returned with result %d\n", rc);
+		pr_debug("skcipher encrypt returned with result %d\n", rc);
 
         return rc;
     }
@@ -45,13 +45,13 @@ Code Example For Symmetric Key Cipher Operation
 
         skcipher = crypto_alloc_skcipher("cbc-aes-aesni", 0, 0);
         if (IS_ERR(skcipher)) {
-            pr_info("could not allocate skcipher handle\n");
+            pr_debug("could not allocate skcipher handle\n");
             return PTR_ERR(skcipher);
         }
 
         req = skcipher_request_alloc(skcipher, GFP_KERNEL);
         if (!req) {
-            pr_info("could not allocate skcipher request\n");
+            pr_debug("could not allocate skcipher request\n");
             ret = -ENOMEM;
             goto out;
         }
@@ -63,7 +63,7 @@ Code Example For Symmetric Key Cipher Operation
         /* AES 256 with random key */
         get_random_bytes(&key, 32);
         if (crypto_skcipher_setkey(skcipher, key, 32)) {
-            pr_info("key could not be set\n");
+            pr_debug("key could not be set\n");
             ret = -EAGAIN;
             goto out;
         }
@@ -71,7 +71,7 @@ Code Example For Symmetric Key Cipher Operation
         /* IV will be random */
         ivdata = kmalloc(16, GFP_KERNEL);
         if (!ivdata) {
-            pr_info("could not allocate ivdata\n");
+            pr_debug("could not allocate ivdata\n");
             goto out;
         }
         get_random_bytes(ivdata, 16);
@@ -79,7 +79,7 @@ Code Example For Symmetric Key Cipher Operation
         /* Input data will be random */
         scratchpad = kmalloc(16, GFP_KERNEL);
         if (!scratchpad) {
-            pr_info("could not allocate scratchpad\n");
+            pr_debug("could not allocate scratchpad\n");
             goto out;
         }
         get_random_bytes(scratchpad, 16);
@@ -97,7 +97,7 @@ Code Example For Symmetric Key Cipher Operation
         if (ret)
             goto out;
 
-        pr_info("Encryption triggered successfully\n");
+        pr_debug("Encryption triggered successfully\n");
 
     out:
         if (skcipher)
@@ -146,7 +146,7 @@ Code Example For Use of Operational State Memory With SHASH
 
         sdesc = init_sdesc(alg);
         if (IS_ERR(sdesc)) {
-            pr_info("can't alloc sdesc\n");
+            pr_debug("can't alloc sdesc\n");
             return PTR_ERR(sdesc);
         }
 
@@ -164,7 +164,7 @@ Code Example For Use of Operational State Memory With SHASH
 
         alg = crypto_alloc_shash(hash_alg_name, 0, 0);
         if (IS_ERR(alg)) {
-                pr_info("can't alloc alg %s\n", hash_alg_name);
+                pr_debug("can't alloc alg %s\n", hash_alg_name);
                 return PTR_ERR(alg);
         }
         ret = calc_hash(alg, data, datalen, digest);

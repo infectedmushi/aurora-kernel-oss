@@ -776,7 +776,7 @@ void iris_i3c_status_set(bool enable)
 {
 	iris_i3c_status = enable;
 
-	pr_info("%s: %d\n", __func__, enable);
+	pr_debug("%s: %d\n", __func__, enable);
 }
 
 bool iris_i3c_status_get(void)

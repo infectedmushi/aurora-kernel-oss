@@ -2002,16 +2002,16 @@ static void print_bug_type(void)
 	case FTRACE_BUG_UNKNOWN:
 		break;
 	case FTRACE_BUG_INIT:
-		pr_info("Initializing ftrace call sites\n");
+		pr_debug("Initializing ftrace call sites\n");
 		break;
 	case FTRACE_BUG_NOP:
-		pr_info("Setting ftrace call site to NOP\n");
+		pr_debug("Setting ftrace call site to NOP\n");
 		break;
 	case FTRACE_BUG_CALL:
-		pr_info("Setting ftrace call site to call ftrace function\n");
+		pr_debug("Setting ftrace call site to call ftrace function\n");
 		break;
 	case FTRACE_BUG_UPDATE:
-		pr_info("Updating ftrace call site to call a different ftrace function\n");
+		pr_debug("Updating ftrace call site to call a different ftrace function\n");
 		break;
 	}
 }
@@ -2035,12 +2035,12 @@ void ftrace_bug(int failed, struct dyn_ftrace *rec)
 	switch (failed) {
 	case -EFAULT:
 		FTRACE_WARN_ON_ONCE(1);
-		pr_info("ftrace faulted on modifying ");
+		pr_debug("ftrace faulted on modifying ");
 		print_ip_sym(ip);
 		break;
 	case -EINVAL:
 		FTRACE_WARN_ON_ONCE(1);
-		pr_info("ftrace failed to modify ");
+		pr_debug("ftrace failed to modify ");
 		print_ip_sym(ip);
 		print_ip_ins(" actual:   ", (unsigned char *)ip);
 		pr_cont("\n");
@@ -2051,19 +2051,19 @@ void ftrace_bug(int failed, struct dyn_ftrace *rec)
 		break;
 	case -EPERM:
 		FTRACE_WARN_ON_ONCE(1);
-		pr_info("ftrace faulted on writing ");
+		pr_debug("ftrace faulted on writing ");
 		print_ip_sym(ip);
 		break;
 	default:
 		FTRACE_WARN_ON_ONCE(1);
-		pr_info("ftrace faulted on unknown error ");
+		pr_debug("ftrace faulted on unknown error ");
 		print_ip_sym(ip);
 	}
 	print_bug_type();
 	if (rec) {
 		struct ftrace_ops *ops = NULL;
 
-		pr_info("ftrace record flags: %lx\n", rec->flags);
+		pr_debug("ftrace record flags: %lx\n", rec->flags);
 		pr_cont(" (%ld)%s", ftrace_rec_count(rec),
 			rec->flags & FTRACE_FL_REGS ? " R" : "  ");
 		if (rec->flags & FTRACE_FL_TRAMP_EN) {
@@ -3095,7 +3095,7 @@ ftrace_allocate_pages(unsigned long num_to_init)
 		kfree(pg);
 		pg = start_pg;
 	}
-	pr_info("ftrace: FAILED to allocate memory for functions\n");
+	pr_debug("ftrace: FAILED to allocate memory for functions\n");
 	return NULL;
 }
 
@@ -6226,11 +6226,11 @@ void __init ftrace_init(void)
 
 	count = __stop_mcount_loc - __start_mcount_loc;
 	if (!count) {
-		pr_info("ftrace: No functions to be traced?\n");
+		pr_debug("ftrace: No functions to be traced?\n");
 		goto failed;
 	}
 
-	pr_info("ftrace: allocating %ld entries in %ld pages\n",
+	pr_debug("ftrace: allocating %ld entries in %ld pages\n",
 		count, DIV_ROUND_UP(count, ENTRIES_PER_PAGE));
 
 	last_ftrace_enabled = ftrace_enabled = 1;
@@ -6979,7 +6979,7 @@ static int start_graph_tracing(void)
 	if (!ret) {
 		ret = register_trace_sched_switch(ftrace_graph_probe_sched_switch, NULL);
 		if (ret)
-			pr_info("ftrace_graph: Couldn't activate tracepoint"
+			pr_debug("ftrace_graph: Couldn't activate tracepoint"
 				" probe to kernel_sched_switch\n");
 	}
 

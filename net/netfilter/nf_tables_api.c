@@ -2042,7 +2042,7 @@ static const struct nla_policy nft_expr_policy[NFTA_EXPR_MAX + 1] = {
 	[NFTA_EXPR_DATA]	= { .type = NLA_NESTED },
 };
 
-static int nf_tables_fill_expr_info(struct sk_buff *skb,
+static int nf_tables_fill_expr_debug(struct sk_buff *skb,
 				    const struct nft_expr *expr)
 {
 	if (nla_put_string(skb, NFTA_EXPR_NAME, expr->ops->type->name))
@@ -2071,7 +2071,7 @@ int nft_expr_dump(struct sk_buff *skb, unsigned int attr,
 	nest = nla_nest_start(skb, attr);
 	if (!nest)
 		goto nla_put_failure;
-	if (nf_tables_fill_expr_info(skb, expr) < 0)
+	if (nf_tables_fill_expr_debug(skb, expr) < 0)
 		goto nla_put_failure;
 	nla_nest_end(skb, nest);
 	return 0;

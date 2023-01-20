@@ -35,7 +35,7 @@ int dbg_unw;
 #define unw_debug(fmt, ...)			\
 do {						\
 	if (dbg_unw)				\
-		pr_info(fmt, ##__VA_ARGS__);	\
+		pr_debug(fmt, ##__VA_ARGS__);	\
 } while (0);
 #else
 #define unw_debug(fmt, ...)

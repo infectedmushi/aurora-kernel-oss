@@ -397,7 +397,7 @@ static int nu1619_track_get_local_time_s(void)
 	int local_time_s;
 
 	local_time_s = local_clock() / TRACK_LOCAL_T_NS_TO_S_THD;
-	pr_info("local_time_s:%d\n", local_time_s);
+	pr_debug("local_time_s:%d\n", local_time_s);
 
 	return local_time_s;
 }
@@ -430,7 +430,7 @@ static int nu1619_track_upload_i2c_err_info(
 
 	mutex_lock(&chip->track_i2c_err_lock);
 	if (chip->i2c_err_uploading) {
-		pr_info("i2c_err_uploading, should return\n");
+		pr_debug("i2c_err_uploading, should return\n");
 		mutex_unlock(&chip->track_i2c_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -477,7 +477,7 @@ static int nu1619_track_upload_i2c_err_info(
 			"$$access_reg@@0x%x", reg);
 	schedule_delayed_work(&chip->i2c_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -511,7 +511,7 @@ static int nu1619_track_upload_wls_rx_err_info(
 	if (!chip)
 		return -EINVAL;
 
-	pr_info("start\n");
+	pr_debug("start\n");
 	mutex_lock(&chip->track_upload_lock);
 	memset(chip->chg_power_info, 0, sizeof(chip->chg_power_info));
 	memset(chip->err_reason, 0, sizeof(chip->err_reason));
@@ -532,7 +532,7 @@ static int nu1619_track_upload_wls_rx_err_info(
 
 	mutex_lock(&chip->track_rx_err_lock);
 	if (chip->rx_err_uploading) {
-		pr_info("rx_err_uploading, should return\n");
+		pr_debug("rx_err_uploading, should return\n");
 		mutex_unlock(&chip->track_rx_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -581,7 +581,7 @@ static int nu1619_track_upload_wls_rx_err_info(
 			"%s", chip->wls_crux_info);
 	schedule_delayed_work(&chip->rx_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -635,7 +635,7 @@ static int nu1619_track_upload_wls_tx_err_info(
 
 	mutex_lock(&chip->track_tx_err_lock);
 	if (chip->tx_err_uploading) {
-		pr_info("tx_err_uploading, should return\n");
+		pr_debug("tx_err_uploading, should return\n");
 		mutex_unlock(&chip->track_tx_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -684,7 +684,7 @@ static int nu1619_track_upload_wls_tx_err_info(
 			"%s", chip->wls_crux_info);
 	schedule_delayed_work(&chip->tx_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -737,7 +737,7 @@ static int nu1619_track_upload_wls_update_err_info(
 
 	mutex_lock(&chip->track_update_err_lock);
 	if (chip->update_err_uploading) {
-		pr_info("update_err_uploading, should return\n");
+		pr_debug("update_err_uploading, should return\n");
 		mutex_unlock(&chip->track_update_err_lock);
 		mutex_unlock(&chip->track_upload_lock);
 		return 0;
@@ -781,7 +781,7 @@ static int nu1619_track_upload_wls_update_err_info(
 			OPLUS_CHG_TRACK_CURX_INFO_LEN - index, "%s", chip->chg_power_info);
 	schedule_delayed_work(&chip->update_err_load_trigger_work, 0);
 	mutex_unlock(&chip->track_upload_lock);
-	pr_info("success\n");
+	pr_debug("success\n");
 
 	return 0;
 }
@@ -960,7 +960,7 @@ static int nu1619_set_rx_enable(struct oplus_chg_ic_dev *dev, bool en)
 	if (rc < 0)
 		pr_err("can't %s rx\n", en ? "enable" : "disable");
 	else
-		pr_info("set rx %s\n", en ? "enable" : "disable");
+		pr_debug("set rx %s\n", en ? "enable" : "disable");
 
 	pr_err("vt_sleep: set value:%d, gpio_val:%d\n", !en, gpio_get_value(chip->rx_en_gpio));
 
@@ -2751,7 +2751,7 @@ static void nu1619_event_process(struct oplus_nu1619 *chip)
 	}
 
 	if (!nu1619_rx_is_enable(chip->ic_dev) && nu1619_is_in_tx_mode(chip) == false) {
-		pr_info("RX is sleep or TX is disable, Ignore events\n");
+		pr_debug("RX is sleep or TX is disable, Ignore events\n");
 		return;
 	}
 
@@ -2937,7 +2937,7 @@ static struct oplus_chg_ic_rx_ops nu1619_dev_ops = {
 
 	od2_state = nu1619_get_rx_event_gpio_val(chip);
 
-	pr_info("od2_state = %s", od2_state ? "true" : "false");
+	pr_debug("od2_state = %s", od2_state ? "true" : "false");
 	if (od2_state == false) {
 		msleep(50);
 		od2_state = nu1619_get_rx_event_gpio_val(chip);
@@ -2956,7 +2956,7 @@ static void nu1619_check_ldo_on_work(struct work_struct *work)
 		container_of(dwork, struct oplus_nu1619, check_ldo_on_work);
 	int iout = 0;
 
-	pr_info("connected_ldo_on = %s\n", chip->connected_ldo_on ? "true" : "false");
+	pr_debug("connected_ldo_on = %s\n", chip->connected_ldo_on ? "true" : "false");
 	if ((!chip->connected_ldo_on) && nu1619_rx_is_connected(chip->ic_dev)) {
 		pr_err("Connect but no ldo on event irq, check again.\n");
 		nu1619_get_iout(chip->ic_dev, &iout);

@@ -367,7 +367,7 @@ static int ufs_hisi_get_pwr_dev_param(
 
 	agreed_pwr->hs_rate = hisi_param->hs_rate;
 
-	pr_info("ufs final power mode: gear = %d, lane = %d, pwr = %d, rate = %d\n",
+	pr_debug("ufs final power mode: gear = %d, lane = %d, pwr = %d, rate = %d\n",
 		agreed_pwr->gear_rx, agreed_pwr->lane_rx, agreed_pwr->pwr_rx,
 		agreed_pwr->hs_rate);
 	return 0;
@@ -392,7 +392,7 @@ static void ufs_hisi_set_dev_cap(struct ufs_hisi_dev_params *hisi_param)
 static void ufs_hisi_pwr_change_pre_change(struct ufs_hba *hba)
 {
 	if (hba->dev_quirks & UFS_DEVICE_QUIRK_HOST_VS_DEBUGSAVECONFIGTIME) {
-		pr_info("ufs flash device must set VS_DebugSaveConfigTime 0x10\n");
+		pr_debug("ufs flash device must set VS_DebugSaveConfigTime 0x10\n");
 		/* VS_DebugSaveConfigTime */
 		ufshcd_dme_set(hba, UIC_ARG_MIB(0xD0A0), 0x10);
 		/* sync length */

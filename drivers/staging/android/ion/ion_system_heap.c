@@ -362,7 +362,7 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 
 	if (ion_heap_is_system_heap_type(buffer->heap->type) &&
 	    is_secure_vmid_valid(vmid)) {
-		pr_info("%s: System heap doesn't support secure allocations\n",
+		pr_debug("%s: System heap doesn't support secure allocations\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -411,7 +411,7 @@ static int ion_system_heap_allocate(struct ion_heap *heap,
 		boost_pool_dec_high(boost_pool, alloc_sz >> PAGE_SHIFT);
 #ifdef BOOSTPOOL_DEBUG
 		if (size_remaining != 0) {
-			pr_info("boostpool %s alloc failed. alloc_sz: %d size: %d orders(%d, %d, %d) %d ms\n",
+			pr_debug("boostpool %s alloc failed. alloc_sz: %d size: %d orders(%d, %d, %d) %d ms\n",
 				boost_pool->name, alloc_sz, (int) size,
 				boostpool_order[0], boostpool_order[1],
 				boostpool_order[2],
@@ -751,12 +751,12 @@ static int ion_system_heap_debug_show(struct ion_heap *heap, struct seq_file *s,
 			   uncached_total + cached_total + secure_total);
 		seq_puts(s, "--------------------------------------------\n");
 	} else {
-		pr_info("-------------------------------------------------\n");
-		pr_info("uncached pool = %lu cached pool = %lu secure pool = %lu\n",
+		pr_debug("-------------------------------------------------\n");
+		pr_debug("uncached pool = %lu cached pool = %lu secure pool = %lu\n",
 			uncached_total, cached_total, secure_total);
-		pr_info("pool total (uncached + cached + secure) = %lu\n",
+		pr_debug("pool total (uncached + cached + secure) = %lu\n",
 			uncached_total + cached_total + secure_total);
-		pr_info("-------------------------------------------------\n");
+		pr_debug("-------------------------------------------------\n");
 	}
 
 	return 0;
@@ -885,7 +885,7 @@ static int fill_pool_kworkthread(void *p)
 	struct ion_system_heap * sh;
 	sh = (struct ion_system_heap *) p;
 
-	pr_info("boot time ION pool filling started\n");
+	pr_debug("boot time ION pool filling started\n");
 
 	for (i = 0; i < NUM_ORDERS; i++) {
 		while (global_zone_page_state(NR_IONCACHE_PAGES) <
@@ -903,7 +903,7 @@ static int fill_pool_kworkthread(void *p)
 		}
 	}
 
-	pr_info("boot time ION pool filling ended\n");
+	pr_debug("boot time ION pool filling ended\n");
 	return 0;
 }
 #endif

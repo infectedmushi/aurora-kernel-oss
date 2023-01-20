@@ -83,7 +83,7 @@ static int mm_fb_kevent_send_module(struct sk_buff *skb,
 	struct nlattr *na = NULL;
 	char *pmesg = NULL;
 
-	pr_info("mm_kevent: mm_fb_kevent_send_module enter\n");
+	pr_debug("mm_kevent: mm_fb_kevent_send_module enter\n");
 
 	if (!mm_kevent_init_flag) {
 		pr_err("%s: mm_kevent: not init error\n", __func__);
@@ -103,7 +103,7 @@ static int mm_fb_kevent_send_module(struct sk_buff *skb,
 		if (pmesg) {
 			memcpy(pmesg, nla_data(na), nla_len(na));
 			pmesg[nla_len(na)] = 0x0;
-			pr_info("mm_kevent: nla_len(na) %d, pid %d, module: %s\n",
+			pr_debug("mm_kevent: nla_len(na) %d, pid %d, module: %s\n",
 					nla_len(na), nlh->nlmsg_pid, pmesg);
 			mm_fb_kevent_add_module(nlh->nlmsg_pid, pmesg);
 		}
@@ -132,7 +132,7 @@ static int mm_fb_kevent_test_upload(struct sk_buff *skb,
 	struct nlattr *na = NULL;
 	char *pmesg = NULL;
 
-	pr_info("mm_kevent: mm_fb_kevent_test_upload enter\n");
+	pr_debug("mm_kevent: mm_fb_kevent_test_upload enter\n");
 
 	if (!mm_kevent_init_flag) {
 		pr_err("%s: mm_kevent: not init error\n", __func__);
@@ -147,7 +147,7 @@ static int mm_fb_kevent_test_upload(struct sk_buff *skb,
 
 	if (info->attrs[MM_FB_CMD_ATTR_MSG]) {
 		na = info->attrs[MM_FB_CMD_ATTR_MSG];
-		pr_info("mm_kevent: nla_len(na) is %d, data= %s\n", nla_len(na), (char *)nla_data(na));
+		pr_debug("mm_kevent: nla_len(na) is %d, data= %s\n", nla_len(na), (char *)nla_data(na));
 
 		if (nla_len(na) > OPLUS_MM_MSG_TO_KERNEL_BUF_LEN) {
 			pr_err("mm_kevent: message len %d too long error\n", nla_len(na));
@@ -294,21 +294,21 @@ int __init mm_fb_kevent_module_init(void) {
 		pr_err("mm_kevent: genl_register_family:%s error,ret = %d\n", MM_FB_FAMILY, ret);
 		return ret;
 	} else {
-		pr_info("mm_kevent: genl_register_family complete, id = %d!\n", mm_fb_genl_family.id);
+		pr_debug("mm_kevent: genl_register_family complete, id = %d!\n", mm_fb_genl_family.id);
 	}
 
 	spin_lock_init(&mm_slock);
 	memset(mm_modules, 0x0, sizeof(mm_modules));
 	mm_kevent_init_flag = true;
 
-	pr_info("mm_kevent: init ok\n");
+	pr_debug("mm_kevent: init ok\n");
 	return MM_KEVENT_NO_ERROR;
 }
 
 void __exit mm_fb_kevent_module_exit(void) {
 	genl_unregister_family(&mm_fb_genl_family);
 	mm_kevent_init_flag = false;
-	pr_info("mm_kevent: exit\n");
+	pr_debug("mm_kevent: exit\n");
 }
 
 module_init(mm_fb_kevent_module_init);

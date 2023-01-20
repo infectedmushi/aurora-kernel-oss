@@ -1357,7 +1357,7 @@ static int __init mbochs_dev_init(void)
 	}
 	cdev_init(&mbochs_cdev, &vd_fops);
 	cdev_add(&mbochs_cdev, mbochs_devt, MINORMASK);
-	pr_info("%s: major %d\n", __func__, MAJOR(mbochs_devt));
+	pr_debug("%s: major %d\n", __func__, MAJOR(mbochs_devt));
 
 	mbochs_class = class_create(THIS_MODULE, MBOCHS_CLASS_NAME);
 	if (IS_ERR(mbochs_class)) {

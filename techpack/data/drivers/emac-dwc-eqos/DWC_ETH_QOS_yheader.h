@@ -2097,7 +2097,7 @@ do {\
 #define EMACDBG(fmt, args...) \
 	pr_debug(DRV_NAME " %s:%d " fmt, __func__, __LINE__, ## args)
 #define EMACINFO(fmt, args...) \
-	pr_info(DRV_NAME " %s:%d " fmt, __func__, __LINE__, ## args)
+	pr_debug(DRV_NAME " %s:%d " fmt, __func__, __LINE__, ## args)
 #define EMACERR(fmt, args...) \
 do {\
 	pr_err(DRV_NAME " %s:%d " fmt, __func__, __LINE__, ## args);\

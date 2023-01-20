@@ -3602,7 +3602,7 @@ do {							\
 	else if (c)					\
 		pr_cont(fmt, ##__VA_ARGS__);		\
 	else						\
-		pr_info(fmt, ##__VA_ARGS__);		\
+		pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)
 
 static int clock_debug_print_clock(struct clk_core *c, struct seq_file *s)
@@ -4426,7 +4426,7 @@ do {							\
 	else if (c)					\
 		pr_cont(fmt, ##__VA_ARGS__);		\
 	else						\
-		pr_info(fmt, ##__VA_ARGS__);		\
+		pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)
 
 static int clock_debug_print_clock(struct clk_core *c, struct seq_file *s)
@@ -5517,7 +5517,7 @@ static int clk_add_and_print_opp(struct clk_hw *hw,
 
 		if (n == 0 || n == core->num_rate_max - 1 ||
 					rate == clk_hw_round_rate(hw, INT_MAX))
-			pr_info("%s: set OPP pair(%lu Hz: %u uV) on %s\n",
+			pr_debug("%s: set OPP pair(%lu Hz: %u uV) on %s\n",
 						core->name, rate, uv,
 						dev_name(device_list[j]));
 	}

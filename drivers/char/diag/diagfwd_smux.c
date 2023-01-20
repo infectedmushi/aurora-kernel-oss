@@ -44,24 +44,24 @@ static void diag_smux_event(void *priv, int event_type, const void *metadata)
 
 	switch (event_type) {
 	case SMUX_CONNECTED:
-		pr_info("diag: SMUX_CONNECTED received, ch: %d\n", ch->id);
+		pr_debug("diag: SMUX_CONNECTED received, ch: %d\n", ch->id);
 		ch->opened = 1;
 		ch->in_busy = 0;
 		break;
 	case SMUX_DISCONNECTED:
 		ch->opened = 0;
 		msm_smux_close(ch->lcid);
-		pr_info("diag: SMUX_DISCONNECTED received, ch: %d\n", ch->id);
+		pr_debug("diag: SMUX_DISCONNECTED received, ch: %d\n", ch->id);
 		break;
 	case SMUX_WRITE_DONE:
 		pr_debug("diag: SMUX Write done, ch: %d\n", ch->id);
 		diag_remote_dev_write_done(ch->dev_id, rx_buf, len, ch->id);
 		break;
 	case SMUX_WRITE_FAIL:
-		pr_info("diag: SMUX Write Failed, ch: %d\n", ch->id);
+		pr_debug("diag: SMUX Write Failed, ch: %d\n", ch->id);
 		break;
 	case SMUX_READ_FAIL:
-		pr_info("diag: SMUX Read Failed, ch: %d\n", ch->id);
+		pr_debug("diag: SMUX Read Failed, ch: %d\n", ch->id);
 		break;
 	case SMUX_READ_DONE:
 		ch->read_buf = rx_buf;
@@ -151,7 +151,7 @@ static int smux_open(int id)
 	}
 	msm_smux_tiocm_set(ch->lcid, TIOCM_DTR, 0);
 	ch->opened = 1;
-	pr_info("diag: SMUX ch %d is connected\n", ch->id);
+	pr_debug("diag: SMUX ch %d is connected\n", ch->id);
 	return 0;
 }
 

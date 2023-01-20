@@ -396,20 +396,20 @@ module_param_named(debug_enable, cpr_debug_enable, int, 0644);
 #define cpr_debug(cpr_vreg, message, ...) \
 	do { \
 		if (cpr_debug_enable & CPR_DEBUG_MASK_API) \
-			pr_info("%s: " message, (cpr_vreg)->rdesc.name, \
+			pr_debug("%s: " message, (cpr_vreg)->rdesc.name, \
 				##__VA_ARGS__); \
 	} while (0)
 #define cpr_debug_irq(cpr_vreg, message, ...) \
 	do { \
 		if (cpr_debug_enable & CPR_DEBUG_MASK_IRQ) \
-			pr_info("%s: " message, (cpr_vreg)->rdesc.name, \
+			pr_debug("%s: " message, (cpr_vreg)->rdesc.name, \
 				##__VA_ARGS__); \
 		else \
 			pr_debug("%s: " message, (cpr_vreg)->rdesc.name, \
 				##__VA_ARGS__); \
 	} while (0)
-#define cpr_info(cpr_vreg, message, ...) \
-	pr_info("%s: " message, (cpr_vreg)->rdesc.name, ##__VA_ARGS__)
+#define cpr_debug(cpr_vreg, message, ...) \
+	pr_debug("%s: " message, (cpr_vreg)->rdesc.name, ##__VA_ARGS__)
 #define cpr_err(cpr_vreg, message, ...) \
 	pr_err("%s: " message, (cpr_vreg)->rdesc.name, ##__VA_ARGS__)
 
@@ -1456,7 +1456,7 @@ static int cpr_calculate_de_aging_margin(struct cpr_regulator *cpr_vreg)
 		if (!aging_info->cpr_aging_error)
 			for (i = CPR_FUSE_CORNER_MIN;
 					i <= cpr_vreg->num_fuse_corners; i++)
-				cpr_info(cpr_vreg, "Corner[%d]: age adjusted target quot = %d\n",
+				cpr_debug(cpr_vreg, "Corner[%d]: age adjusted target quot = %d\n",
 					i, cpr_vreg->cpr_fuse_target_quot[i]);
 	}
 
@@ -1711,7 +1711,7 @@ static int cpr_config(struct cpr_regulator *cpr_vreg, struct device *dev)
 	/* Program the delay count for the timer */
 	val = (cpr_vreg->ref_clk_khz * cpr_vreg->timer_delay_us) / 1000;
 	cpr_write(cpr_vreg, REG_RBCPR_TIMER_INTERVAL, val);
-	cpr_info(cpr_vreg, "Timer count: 0x%0x (for %d us)\n", val,
+	cpr_debug(cpr_vreg, "Timer count: 0x%0x (for %d us)\n", val,
 		cpr_vreg->timer_delay_us);
 
 	/* Program Consecutive Up & Down */
@@ -1762,7 +1762,7 @@ static int cpr_fuse_is_setting_expected(struct cpr_regulator *cpr_vreg,
 	else
 		ret = 0;
 
-	cpr_info(cpr_vreg, "[row:%d] = 0x%llx @%d:%d == %d ?: %s\n",
+	cpr_debug(cpr_vreg, "[row:%d] = 0x%llx @%d:%d == %d ?: %s\n",
 			sel_array[0], fuse_bits,
 			sel_array[1], sel_array[2],
 			sel_array[3],
@@ -1849,7 +1849,7 @@ static int cpr_adjust_init_voltages(struct device_node *of_node,
 
 		if (volt_adjust) {
 			cpr_vreg->pvs_corner_v[i] += volt_adjust;
-			cpr_info(cpr_vreg, "adjusted initial voltage[%d]: %d -> %d uV\n",
+			cpr_debug(cpr_vreg, "adjusted initial voltage[%d]: %d -> %d uV\n",
 				i, cpr_vreg->pvs_corner_v[i] - volt_adjust,
 				cpr_vreg->pvs_corner_v[i]);
 		}
@@ -1951,14 +1951,14 @@ static int cpr_pvs_per_corner_init(struct device_node *of_node,
 	for (i = CPR_FUSE_CORNER_MIN; i <= cpr_vreg->num_fuse_corners; i++) {
 		if (cpr_vreg->pvs_corner_v[i]
 		    > cpr_vreg->fuse_ceiling_volt[i]) {
-			cpr_info(cpr_vreg, "Warning: initial voltage[%d] %d above ceiling %d\n",
+			cpr_debug(cpr_vreg, "Warning: initial voltage[%d] %d above ceiling %d\n",
 				i, cpr_vreg->pvs_corner_v[i],
 				cpr_vreg->fuse_ceiling_volt[i]);
 			cpr_vreg->pvs_corner_v[i]
 				= cpr_vreg->fuse_ceiling_volt[i];
 		} else if (cpr_vreg->pvs_corner_v[i] <
 				cpr_vreg->fuse_floor_volt[i]) {
-			cpr_info(cpr_vreg, "Warning: initial voltage[%d] %d below floor %d\n",
+			cpr_debug(cpr_vreg, "Warning: initial voltage[%d] %d below floor %d\n",
 				i, cpr_vreg->pvs_corner_v[i],
 				cpr_vreg->fuse_floor_volt[i]);
 			cpr_vreg->pvs_corner_v[i]
@@ -2217,19 +2217,19 @@ static int cpr_pvs_init(struct platform_device *pdev,
 		pos += scnprintf(buf + pos, buflen - pos, "%u%s",
 				cpr_vreg->pvs_corner_v[i],
 				i < highest_fuse_corner ? " " : "");
-	cpr_info(cpr_vreg, "pvs voltage: [%s] uV\n", buf);
+	cpr_debug(cpr_vreg, "pvs voltage: [%s] uV\n", buf);
 
 	for (i = CPR_FUSE_CORNER_MIN, pos = 0; i <= highest_fuse_corner; i++)
 		pos += scnprintf(buf + pos, buflen - pos, "%d%s",
 				cpr_vreg->fuse_ceiling_volt[i],
 				i < highest_fuse_corner ? " " : "");
-	cpr_info(cpr_vreg, "ceiling voltage: [%s] uV\n", buf);
+	cpr_debug(cpr_vreg, "ceiling voltage: [%s] uV\n", buf);
 
 	for (i = CPR_FUSE_CORNER_MIN, pos = 0; i <= highest_fuse_corner; i++)
 		pos += scnprintf(buf + pos, buflen - pos, "%d%s",
 				cpr_vreg->fuse_floor_volt[i],
 				i < highest_fuse_corner ? " " : "");
-	cpr_info(cpr_vreg, "floor voltage: [%s] uV\n", buf);
+	cpr_debug(cpr_vreg, "floor voltage: [%s] uV\n", buf);
 
 	kfree(buf);
 	return 0;
@@ -2325,7 +2325,7 @@ static void cpr_parse_pvs_version_fuse(struct cpr_regulator *cpr_vreg,
 				fuse_sel[0], fuse_sel[3]);
 		cpr_vreg->pvs_version = (fuse_bits >> fuse_sel[1]) &
 			((1 << fuse_sel[2]) - 1);
-		cpr_info(cpr_vreg, "[row: %d]: 0x%llx, pvs_version = %d\n",
+		cpr_debug(cpr_vreg, "[row: %d]: 0x%llx, pvs_version = %d\n",
 				fuse_sel[0], fuse_bits, cpr_vreg->pvs_version);
 	} else {
 		cpr_vreg->pvs_version = 0;
@@ -2557,7 +2557,7 @@ static int cpr_adjust_target_quot_offsets(struct platform_device *pdev,
 
 		if (quot_offset_adjust) {
 			cpr_vreg->fuse_quot_offset[i] += quot_offset_adjust;
-			cpr_info(cpr_vreg, "Corner[%d]: adjusted target quot = %d\n",
+			cpr_debug(cpr_vreg, "Corner[%d]: adjusted target quot = %d\n",
 				i, cpr_vreg->fuse_quot_offset[i]);
 		}
 	}
@@ -2707,7 +2707,7 @@ static int cpr_virtual_corner_voltage_adjust(struct cpr_regulator *cpr_vreg,
 
 		if (voltage_adjust) {
 			cpr_vreg->open_loop_volt[i] += (int)voltage_adjust;
-			cpr_info(cpr_vreg, "corner=%d adjusted open-loop voltage=%d\n",
+			cpr_debug(cpr_vreg, "corner=%d adjusted open-loop voltage=%d\n",
 				i, cpr_vreg->open_loop_volt[i]);
 		}
 	}
@@ -2763,7 +2763,7 @@ static int cpr_virtual_corner_quot_adjust(struct cpr_regulator *cpr_vreg,
 
 		if (quot_adjust) {
 			cpr_vreg->quot_adjust[i] -= (int)quot_adjust;
-			cpr_info(cpr_vreg, "corner=%d adjusted quotient=%d\n",
+			cpr_debug(cpr_vreg, "corner=%d adjusted quotient=%d\n",
 					i,
 			cpr_vreg->cpr_fuse_target_quot[cpr_vreg->corner_map[i]]
 						- cpr_vreg->quot_adjust[i]);
@@ -3062,7 +3062,7 @@ static int cpr_get_corner_quot_adjustment(struct cpr_regulator *cpr_vreg,
 				scaling[i] = 0;
 		}
 		scaling[i] = min(scaling[i], max_factor[i]);
-		cpr_info(cpr_vreg, "fuse corner %d quotient adjustment scaling factor: %d.%03d\n",
+		cpr_debug(cpr_vreg, "fuse corner %d quotient adjustment scaling factor: %d.%03d\n",
 			i, scaling[i] / 1000, scaling[i] % 1000);
 	}
 
@@ -3093,7 +3093,7 @@ static int cpr_get_corner_quot_adjustment(struct cpr_regulator *cpr_vreg,
 	}
 
 	for (i = CPR_CORNER_MIN; i <= cpr_vreg->num_corners; i++)
-		cpr_info(cpr_vreg, "adjusted quotient[%d] = %d\n", i,
+		cpr_debug(cpr_vreg, "adjusted quotient[%d] = %d\n", i,
 			cpr_vreg->cpr_fuse_target_quot[cpr_vreg->corner_map[i]]
 			- cpr_vreg->quot_adjust[i]);
 
@@ -3152,7 +3152,7 @@ static int cpr_check_redundant(struct platform_device *pdev,
 	}
 
 	if (cpr_vreg->cpr_fuse_redundant)
-		cpr_info(cpr_vreg, "using redundant fuse parameters\n");
+		cpr_debug(cpr_vreg, "using redundant fuse parameters\n");
 
 	return 0;
 }
@@ -3175,7 +3175,7 @@ static int cpr_read_fuse_revision(struct platform_device *pdev,
 		cpr_vreg->cpr_fuse_revision
 			= cpr_read_efuse_param(cpr_vreg, fuse_sel[0],
 					fuse_sel[1], fuse_sel[2], fuse_sel[3]);
-		cpr_info(cpr_vreg, "fuse revision = %d\n",
+		cpr_debug(cpr_vreg, "fuse revision = %d\n",
 			cpr_vreg->cpr_fuse_revision);
 	} else {
 		cpr_vreg->cpr_fuse_revision = FUSE_REVISION_UNKNOWN;
@@ -3377,7 +3377,7 @@ static int cpr_minimum_quot_difference_adjustment(struct platform_device *pdev,
 			cpr_vreg->cpr_fuse_target_quot[i]
 				= cpr_vreg->cpr_fuse_target_quot[i - 1]
 					+ adjust_quot;
-			cpr_info(cpr_vreg, "Corner[%d]: revised adjusted quotient = %d\n",
+			cpr_debug(cpr_vreg, "Corner[%d]: revised adjusted quotient = %d\n",
 					i, cpr_vreg->cpr_fuse_target_quot[i]);
 		}
 	}
@@ -3433,7 +3433,7 @@ static int cpr_adjust_target_quots(struct platform_device *pdev,
 
 		if (quot_adjust) {
 			cpr_vreg->cpr_fuse_target_quot[i] += quot_adjust;
-			cpr_info(cpr_vreg, "Corner[%d]: adjusted target quot = %d\n",
+			cpr_debug(cpr_vreg, "Corner[%d]: adjusted target quot = %d\n",
 				i, cpr_vreg->cpr_fuse_target_quot[i]);
 		}
 	}
@@ -3490,7 +3490,7 @@ static int cpr_check_allowed(struct platform_device *pdev,
 	else
 		cpr_vreg->cpr_fuse_disable = true;
 
-	cpr_info(cpr_vreg, "CPR closed loop is %s for fuse revision %d\n",
+	cpr_debug(cpr_vreg, "CPR closed loop is %s for fuse revision %d\n",
 		cpr_vreg->cpr_fuse_disable ? "disabled" : "enabled",
 		cpr_vreg->cpr_fuse_revision);
 
@@ -3537,7 +3537,7 @@ static int cpr_check_de_aging_allowed(struct cpr_regulator *cpr_vreg,
 		return rc;
 	}
 
-	cpr_info(cpr_vreg, "CPR de-aging is %s for fuse revision %d\n",
+	cpr_debug(cpr_vreg, "CPR de-aging is %s for fuse revision %d\n",
 			allow_status ? "allowed" : "not allowed",
 			cpr_vreg->cpr_fuse_revision);
 
@@ -3756,7 +3756,7 @@ static int cpr_aging_init(struct platform_device *pdev,
 				(aging_info->cpr_ro_kv[ro_sel]
 				* aging_info->max_aging_margin) / 1000000;
 		aging_info->voltage_adjust[i] = aging_info->max_aging_margin;
-		cpr_info(cpr_vreg, "Corner[%d]: age margin adjusted quotient = %d\n",
+		cpr_debug(cpr_vreg, "Corner[%d]: age margin adjusted quotient = %d\n",
 			i, cpr_vreg->cpr_fuse_target_quot[i]);
 	}
 
@@ -3907,7 +3907,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 	/* Read the control bits of eFuse */
 	fuse_bits = cpr_read_efuse_row(cpr_vreg, cpr_fuse_row[0],
 					cpr_fuse_row[1]);
-	cpr_info(cpr_vreg, "[row:%d] = 0x%llx\n", cpr_fuse_row[0], fuse_bits);
+	cpr_debug(cpr_vreg, "[row:%d] = 0x%llx\n", cpr_fuse_row[0], fuse_bits);
 
 	if (cpr_vreg->cpr_fuse_redundant) {
 		if (of_find_property(of_node,
@@ -3954,7 +3954,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 
 			fuse_bits_2 = cpr_read_efuse_row(cpr_vreg, temp_row[0],
 							temp_row[1]);
-			cpr_info(cpr_vreg, "[original row:%d] = 0x%llx\n",
+			cpr_debug(cpr_vreg, "[original row:%d] = 0x%llx\n",
 				temp_row[0], fuse_bits_2);
 		}
 	} else {
@@ -3978,7 +3978,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 	if (disable_fuse_valid) {
 		cpr_vreg->cpr_fuse_disable =
 					(fuse_bits_2 >> bp_cpr_disable) & 0x01;
-		cpr_info(cpr_vreg, "CPR disable fuse = %d\n",
+		cpr_debug(cpr_vreg, "CPR disable fuse = %d\n",
 			cpr_vreg->cpr_fuse_disable);
 	} else {
 		cpr_vreg->cpr_fuse_disable = false;
@@ -3986,7 +3986,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 
 	if (scheme_fuse_valid) {
 		cpr_vreg->cpr_fuse_local = (fuse_bits_2 >> bp_scheme) & 0x01;
-		cpr_info(cpr_vreg, "local = %d\n", cpr_vreg->cpr_fuse_local);
+		cpr_debug(cpr_vreg, "local = %d\n", cpr_vreg->cpr_fuse_local);
 	} else {
 		cpr_vreg->cpr_fuse_local = true;
 	}
@@ -3999,7 +3999,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 		/* Unpack the target quotient by scaling. */
 		cpr_vreg->cpr_fuse_target_quot[i] *= quot_scale[i].multiplier;
 		cpr_vreg->cpr_fuse_target_quot[i] += quot_scale[i].offset;
-		cpr_info(cpr_vreg,
+		cpr_debug(cpr_vreg,
 			"Corner[%d]: ro_sel = %d, target quot = %d\n", i,
 			cpr_vreg->cpr_fuse_ro_sel[i],
 			cpr_vreg->cpr_fuse_target_quot[i]);
@@ -4036,7 +4036,7 @@ static int cpr_init_cpr_efuse(struct platform_device *pdev,
 		cpr_voltage_uplift_wa_inc_quot(cpr_vreg, of_node);
 		for (i = CPR_FUSE_CORNER_MIN; i <= cpr_vreg->num_fuse_corners;
 		     i++) {
-			cpr_info(cpr_vreg,
+			cpr_debug(cpr_vreg,
 				"Corner[%d]: uplifted target quot = %d\n",
 				i, cpr_vreg->cpr_fuse_target_quot[i]);
 		}
@@ -4190,7 +4190,7 @@ static int cpr_fill_override_voltage(struct cpr_regulator *cpr_vreg,
 	for (i = CPR_CORNER_MIN, pos = 0; i <= cpr_vreg->num_corners; i++)
 		pos += scnprintf(buf + pos, buflen - pos, "%d%s",
 			virtual_limit[i], i < cpr_vreg->num_corners ? " " : "");
-	cpr_info(cpr_vreg, "%s override voltage: [%s] uV\n", label, buf);
+	cpr_debug(cpr_vreg, "%s override voltage: [%s] uV\n", label, buf);
 	kfree(buf);
 
 	return rc;
@@ -4335,7 +4335,7 @@ static int cpr_init_floor_to_ceiling_range(
 		pos += scnprintf(buf + pos, buflen - pos, "%d%s",
 			cpr_vreg->floor_volt[i],
 			i < cpr_vreg->num_corners ? " " : "");
-	cpr_info(cpr_vreg, "Final floor override voltages: [%s] uV\n", buf);
+	cpr_debug(cpr_vreg, "Final floor override voltages: [%s] uV\n", buf);
 	kfree(buf);
 
 	return 0;
@@ -4433,7 +4433,7 @@ static int cpr_init_cpr_parameters(struct platform_device *pdev,
 			  &cpr_vreg->down_threshold, rc);
 	if (rc)
 		return rc;
-	cpr_info(cpr_vreg, "up threshold = %u, down threshold = %u\n",
+	cpr_debug(cpr_vreg, "up threshold = %u, down threshold = %u\n",
 		cpr_vreg->up_threshold, cpr_vreg->down_threshold);
 
 	CPR_PROP_READ_U32(cpr_vreg, of_node, "cpr-idle-clocks",
@@ -4467,7 +4467,7 @@ static int cpr_init_cpr_parameters(struct platform_device *pdev,
 
 	/* Init module parameter with the DT value */
 	cpr_vreg->enable = of_property_read_bool(of_node, "qcom,cpr-enable");
-	cpr_info(cpr_vreg, "CPR is %s by default.\n",
+	cpr_debug(cpr_vreg, "CPR is %s by default.\n",
 		cpr_vreg->enable ? "enabled" : "disabled");
 
 	return 0;
@@ -4893,7 +4893,7 @@ static int cpr_efuse_init(struct platform_device *pdev,
 	cpr_vreg->efuse_addr = res->start;
 	len = resource_size(res);
 
-	cpr_info(cpr_vreg, "efuse_addr = %pa (len=0x%x)\n", &res->start, len);
+	cpr_debug(cpr_vreg, "efuse_addr = %pa (len=0x%x)\n", &res->start, len);
 
 	cpr_vreg->efuse_base = ioremap(cpr_vreg->efuse_addr, len);
 	if (!cpr_vreg->efuse_base) {
@@ -4945,7 +4945,7 @@ static void cpr_parse_speed_bin_fuse(struct cpr_regulator *cpr_vreg,
 				fuse_sel[0], fuse_sel[3]);
 		speed_bits = (fuse_bits >> fuse_sel[1]) &
 			((1 << fuse_sel[2]) - 1);
-		cpr_info(cpr_vreg, "[row: %d]: 0x%llx, speed_bits = %d\n",
+		cpr_debug(cpr_vreg, "[row: %d]: 0x%llx, speed_bits = %d\n",
 				fuse_sel[0], fuse_bits, speed_bits);
 		cpr_vreg->speed_bin = speed_bits;
 	} else {
@@ -5144,7 +5144,7 @@ static int cpr_enable_set(void *data, u64 val)
 		goto _exit;
 
 	if (cpr_vreg->enable && cpr_vreg->cpr_fuse_disable) {
-		cpr_info(cpr_vreg,
+		cpr_debug(cpr_vreg,
 			"CPR permanently disabled due to fuse values\n");
 		cpr_vreg->enable = false;
 		goto _exit;

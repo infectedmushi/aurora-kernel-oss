@@ -10,7 +10,7 @@
 #include <linux/thermal.h>
 
 #define COLOR_INFO(fmt, args...) \
-    pr_info("COLOR-CTRL: %s:" fmt "\n", __func__, ##args)
+    pr_debug("COLOR-CTRL: %s:" fmt "\n", __func__, ##args)
 
 #define GPIO_HIGH (1)
 #define GPIO_LOW  (0)

@@ -19,13 +19,13 @@
 #define tpp_logv(fmt...) \
 	do { \
 		if (tpp_log_lv < 1) \
-			pr_info(TPP_TAG fmt); \
+			pr_debug(TPP_TAG fmt); \
 	} while (0)
 
 #define tpp_logi(fmt...) \
 	do { \
 		if (tpp_log_lv < 2) \
-			pr_info(TPP_TAG fmt); \
+			pr_debug(TPP_TAG fmt); \
 	} while (0)
 
 #define tpp_logw(fmt...) \

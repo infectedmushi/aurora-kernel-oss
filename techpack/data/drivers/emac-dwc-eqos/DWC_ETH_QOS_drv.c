@@ -7745,7 +7745,7 @@ void print_pkt(struct sk_buff *skb, int len, bool tx_rx, int desc_idx)
 
 	pr_debug("\nPay Load : %d bytes\n", (len - 14));
 	for (i = 14, j = 1; i < len; i++, j++) {
-		pr_info("%#.2x%s", buf[i], (((i == (len - 1)) ? "" : ":")));
+		pr_debug("%#.2x%s", buf[i], (((i == (len - 1)) ? "" : ":")));
 		if ((j % 16) == 0)
 			pr_debug(" ");
 	}

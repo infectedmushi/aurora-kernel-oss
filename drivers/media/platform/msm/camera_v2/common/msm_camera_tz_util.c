@@ -62,7 +62,7 @@
 #undef CDBG
 #ifdef MSM_CAMERA_TZ_UTIL_VERBOSE
 	#define CDBG(fmt, args...) \
-		pr_info("%s:%d -\n"fmt, __func__, __LINE__, ##args)
+		pr_debug("%s:%d -\n"fmt, __func__, __LINE__, ##args)
 #else /* MSM_CAMERA_TZ_UTIL_VERBOSE */
 	#define CDBG(fmt, args...) \
 		pr_debug("%s:%d -\n"fmt,  __func__, __LINE__, ##args)

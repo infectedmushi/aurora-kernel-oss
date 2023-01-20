@@ -1601,12 +1601,12 @@ static void oplus_vooc_fastchg_func(struct work_struct *work)
 				&& chip->fast_chg_type == CHARGER_SUBTYPE_FASTCHG_VOOC)
 				&& oplus_chg_get_cool_down_status() >= 1)) {
 				ret_info = oplus_vooc_get_cool_down_valid();
-				pr_info("%s:origin cool_down ret_info=%d\n", __func__, ret_info);
+				pr_debug("%s:origin cool_down ret_info=%d\n", __func__, ret_info);
 				ret_info = (chip->vooc_multistep_adjust_current_support
 				&& (!(chip->support_vooc_by_normal_charger_path
 				&& chip->fast_chg_type == CHARGER_SUBTYPE_FASTCHG_VOOC)))
 				? ret_info : 0x01;
-				pr_info("%s:recheck cool_down ret_info=%d\n", __func__, ret_info);
+				pr_debug("%s:recheck cool_down ret_info=%d\n", __func__, ret_info);
 				vooc_xlog_printk(CHG_LOG_CRTI, "ret_info:%d\n", ret_info);
 		} else {
 			if ((chip->vooc_multistep_adjust_current_support

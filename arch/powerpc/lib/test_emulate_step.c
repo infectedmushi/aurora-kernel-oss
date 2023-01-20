@@ -74,7 +74,7 @@ static void __init init_pt_regs(struct pt_regs *regs)
 
 static void __init show_result(char *ins, char *result)
 {
-	pr_info("%-14s : %s\n", ins, result);
+	pr_debug("%-14s : %s\n", ins, result);
 }
 
 static void __init test_ld(void)

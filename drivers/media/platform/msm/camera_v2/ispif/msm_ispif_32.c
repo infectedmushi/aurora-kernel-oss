@@ -895,7 +895,7 @@ static int msm_ispif_restart_frame_boundary(struct ispif_device *ispif,
 		}
 	}
 
-	pr_info("%s: ISPIF reset hw done\n", __func__);
+	pr_debug("%s: ISPIF reset hw done\n", __func__);
 
 	if (ispif->clk_idx == 1) {
 		rc = msm_cam_clk_enable(&ispif->pdev->dev,

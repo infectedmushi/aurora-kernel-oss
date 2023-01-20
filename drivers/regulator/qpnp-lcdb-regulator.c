@@ -2363,7 +2363,7 @@ static int qpnp_lcdb_regulator_probe(struct platform_device *pdev)
 	if (rc < 0)
 		pr_err("Failed to initialize LCDB module rc=%d\n", rc);
 	else
-		pr_info("LCDB module successfully registered! lcdb_en=%d ldo_voltage=%dmV ncp_voltage=%dmV bst_voltage=%dmV\n",
+		pr_debug("LCDB module successfully registered! lcdb_en=%d ldo_voltage=%dmV ncp_voltage=%dmV bst_voltage=%dmV\n",
 			lcdb->lcdb_enabled, lcdb->ldo.voltage_mv,
 			lcdb->ncp.voltage_mv, lcdb->bst.voltage_mv);
 

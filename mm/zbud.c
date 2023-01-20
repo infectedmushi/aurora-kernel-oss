@@ -610,7 +610,7 @@ static int __init init_zbud(void)
 {
 	/* Make sure the zbud header will fit in one chunk */
 	BUILD_BUG_ON(sizeof(struct zbud_header) > ZHDR_SIZE_ALIGNED);
-	pr_info("loaded\n");
+	pr_debug("loaded\n");
 
 #ifdef CONFIG_ZPOOL
 	zpool_register_driver(&zbud_zpool_driver);
@@ -625,7 +625,7 @@ static void __exit exit_zbud(void)
 	zpool_unregister_driver(&zbud_zpool_driver);
 #endif
 
-	pr_info("unloaded\n");
+	pr_debug("unloaded\n");
 }
 
 module_init(init_zbud);

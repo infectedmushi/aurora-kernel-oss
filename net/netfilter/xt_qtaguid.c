@@ -456,7 +456,7 @@ static struct tag_ref *new_tag_ref(tag_t new_tag,
 	int res;
 
 	if (utd_entry->num_active_tags + 1 > max_sock_tags) {
-		pr_info("qtaguid: new_tag_ref(0x%llx): "
+		pr_debug("qtaguid: new_tag_ref(0x%llx): "
 			"tag ref alloc quota exceeded. max=%d\n",
 			new_tag, max_sock_tags);
 		res = -EMFILE;
@@ -644,7 +644,7 @@ static struct iface_stat *get_iface_entry(const char *ifname)
 
 	/* Find the entry for tracking the specified tag within the interface */
 	if (ifname == NULL) {
-		pr_info("qtaguid: iface_stat: get() NULL device name\n");
+		pr_debug("qtaguid: iface_stat: get() NULL device name\n");
 		return NULL;
 	}
 
@@ -1995,7 +1995,7 @@ static int ctrl_cmd_delete(const char *input)
 		goto err;
 	}
 	if (!valid_atag(acct_tag)) {
-		pr_info("qtaguid: ctrl_delete(%s): invalid tag\n", input);
+		pr_debug("qtaguid: ctrl_delete(%s): invalid tag\n", input);
 		res = -EINVAL;
 		goto err;
 	}
@@ -2003,7 +2003,7 @@ static int ctrl_cmd_delete(const char *input)
 		uid = current_fsuid();
 		uid_int = from_kuid(&init_user_ns, uid);
 	} else if (!can_impersonate_uid(uid)) {
-		pr_info("qtaguid: ctrl_delete(%s): "
+		pr_debug("qtaguid: ctrl_delete(%s): "
 			"insufficient priv from pid=%u tgid=%u uid=%u\n",
 			input, current->pid, current->tgid, from_kuid(&init_user_ns, current_fsuid()));
 		res = -EPERM;
@@ -2150,13 +2150,13 @@ static int ctrl_cmd_counter_set(const char *input)
 		goto err;
 	}
 	if (counter_set < 0 || counter_set >= IFS_MAX_COUNTER_SETS) {
-		pr_info("qtaguid: ctrl_counterset(%s): invalid counter_set range\n",
+		pr_debug("qtaguid: ctrl_counterset(%s): invalid counter_set range\n",
 			input);
 		res = -EINVAL;
 		goto err;
 	}
 	if (!can_manipulate_uids()) {
-		pr_info("qtaguid: ctrl_counterset(%s): "
+		pr_debug("qtaguid: ctrl_counterset(%s): "
 			"insufficient priv from pid=%u tgid=%u uid=%u\n",
 			input, current->pid, current->tgid, from_kuid(&init_user_ns, current_fsuid()));
 		res = -EPERM;
@@ -2218,7 +2218,7 @@ static int ctrl_cmd_tag(const char *input)
 	}
 	el_socket = sockfd_lookup(sock_fd, &res);  /* This locks the file */
 	if (!el_socket) {
-		pr_info("qtaguid: ctrl_tag(%s): failed to lookup"
+		pr_debug("qtaguid: ctrl_tag(%s): failed to lookup"
 			" sock_fd=%d err=%d pid=%u tgid=%u uid=%u\n",
 			input, sock_fd, res, current->pid, current->tgid,
 			from_kuid(&init_user_ns, current_fsuid()));
@@ -2230,7 +2230,7 @@ static int ctrl_cmd_tag(const char *input)
 	if (argc < 3) {
 		acct_tag = make_atag_from_value(0);
 	} else if (!valid_atag(acct_tag)) {
-		pr_info("qtaguid: ctrl_tag(%s): invalid tag\n", input);
+		pr_debug("qtaguid: ctrl_tag(%s): invalid tag\n", input);
 		res = -EINVAL;
 		goto err_put;
 	}
@@ -2248,7 +2248,7 @@ static int ctrl_cmd_tag(const char *input)
 		uid = current_fsuid();
 		uid_int = from_kuid(&init_user_ns, uid);
 	} else if (!can_impersonate_uid(uid)) {
-		pr_info("qtaguid: ctrl_tag(%s): "
+		pr_debug("qtaguid: ctrl_tag(%s): "
 			"insufficient priv from pid=%u tgid=%u uid=%u\n",
 			input, current->pid, current->tgid, from_kuid(&init_user_ns, current_fsuid()));
 		res = -EPERM;
@@ -2364,7 +2364,7 @@ static int ctrl_cmd_untag(const char *input)
 	}
 	el_socket = sockfd_lookup(sock_fd, &res);  /* This locks the file */
 	if (!el_socket) {
-		pr_info("qtaguid: ctrl_untag(%s): failed to lookup"
+		pr_debug("qtaguid: ctrl_untag(%s): failed to lookup"
 			" sock_fd=%d err=%d pid=%u tgid=%u uid=%u\n",
 			input, sock_fd, res, current->pid, current->tgid,
 			from_kuid(&init_user_ns, current_fsuid()));
@@ -2691,7 +2691,7 @@ static void *qtaguid_stats_proc_start(struct seq_file *m, loff_t *pos)
 		ts_entry = tag_stat_tree_search(
 				&ppi->iface_entry->tag_stat_tree, ppi->tag);
 		if (!ts_entry) {
-			pr_info("qtaguid: %s(): tag_stat.tag 0x%llx not found. Abort.\n",
+			pr_debug("qtaguid: %s(): tag_stat.tag 0x%llx not found. Abort.\n",
 				__func__, ppi->tag);
 			return NULL;
 		}

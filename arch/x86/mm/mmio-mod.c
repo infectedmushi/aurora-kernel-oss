@@ -106,7 +106,7 @@ static void print_pte(unsigned long address)
 			 address);
 		BUG();
 	}
-	pr_info("pte for 0x%lx: 0x%llx 0x%llx\n",
+	pr_debug("pte for 0x%lx: 0x%llx 0x%llx\n",
 		address,
 		(unsigned long long)pte_val(*pte),
 		(unsigned long long)pte_val(*pte) & _PAGE_PRESENT);
@@ -400,7 +400,7 @@ static void enter_uniprocessor(void)
 	for_each_cpu(cpu, downed_cpus) {
 		err = cpu_down(cpu);
 		if (!err)
-			pr_info("CPU%d is down.\n", cpu);
+			pr_debug("CPU%d is down.\n", cpu);
 		else
 			pr_err("Error taking CPU%d down: %d\n", cpu, err);
 	}
@@ -420,7 +420,7 @@ static void leave_uniprocessor(void)
 	for_each_cpu(cpu, downed_cpus) {
 		err = cpu_up(cpu);
 		if (!err)
-			pr_info("enabled CPU%d.\n", cpu);
+			pr_debug("enabled CPU%d.\n", cpu);
 		else
 			pr_err("cannot re-enable CPU%d: %d\n", cpu, err);
 	}
@@ -446,13 +446,13 @@ void enable_mmiotrace(void)
 		goto out;
 
 	if (nommiotrace)
-		pr_info("MMIO tracing disabled.\n");
+		pr_debug("MMIO tracing disabled.\n");
 	kmmio_init();
 	enter_uniprocessor();
 	spin_lock_irq(&trace_lock);
 	atomic_inc(&mmiotrace_enabled);
 	spin_unlock_irq(&trace_lock);
-	pr_info("enabled.\n");
+	pr_debug("enabled.\n");
 out:
 	mutex_unlock(&mmiotrace_mutex);
 }
@@ -471,7 +471,7 @@ void disable_mmiotrace(void)
 	clear_trace_list(); /* guarantees: no more kmmio callbacks */
 	leave_uniprocessor();
 	kmmio_cleanup();
-	pr_info("disabled.\n");
+	pr_debug("disabled.\n");
 out:
 	mutex_unlock(&mmiotrace_mutex);
 }

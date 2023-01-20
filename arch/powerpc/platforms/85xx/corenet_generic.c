@@ -78,7 +78,7 @@ void __init corenet_gen_setup_arch(void)
 	limit_zone_pfn(ZONE_DMA32, 1UL << (31 - PAGE_SHIFT));
 #endif
 
-	pr_info("%s board\n", ppc_md.name);
+	pr_debug("%s board\n", ppc_md.name);
 
 	mpc85xx_qe_init();
 }

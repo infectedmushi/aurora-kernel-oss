@@ -29,7 +29,7 @@
 			DRM_INFO("[msm-dp-info][%-4d]"fmt, current->pid,    \
 					##__VA_ARGS__);                      \
 		else                                                         \
-			pr_info("[drm:%s][msm-dp-info][%-4d]"fmt, __func__, \
+			pr_debug("[drm:%s][msm-dp-info][%-4d]"fmt, __func__, \
 				       current->pid, ##__VA_ARGS__);         \
 	} while (0)
 

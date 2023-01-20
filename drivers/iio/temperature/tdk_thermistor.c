@@ -114,13 +114,13 @@ static enum hrtimer_restart tdk_thermistor_hrtimer_handler(struct hrtimer *t)
 	if (!data)
 		return HRTIMER_NORESTART;
 
-	pr_info(TAG "%s: t: %lld\n",
+	pr_debug(TAG "%s: t: %lld\n",
 		__func__, ktime_get_boot_ns());
 
 	if (data->trig != NULL)
 		iio_trigger_poll(data->trig);
 	else
-		pr_info(TAG "%s: Trigger is NULL\n", __func__);
+		pr_debug(TAG "%s: Trigger is NULL\n", __func__);
 
 	hrtimer_forward_now(t, data->period);
 
@@ -139,16 +139,16 @@ static int test_thread_fn(void *input_data)
 	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 
 	if (indio_dev == NULL || dev == NULL)
-		pr_info(TAG "%s: indio_dev or dev NULL\n", __func__);
+		pr_debug(TAG "%s: indio_dev or dev NULL\n", __func__);
 
-	pr_info(TAG "%s: Starting test thread\n", __func__);
-	pr_info(TAG "%s: input data: %p spidev: %p\n",
+	pr_debug(TAG "%s: Starting test thread\n", __func__);
+	pr_debug(TAG "%s: input data: %p spidev: %p\n",
 		__func__, input_data, data->spi);
 
 
 	msleep(10000);
 
-	pr_info(TAG "%s: Triggered calibration of TDK thermistor\n", __func__);
+	pr_debug(TAG "%s: Triggered calibration of TDK thermistor\n", __func__);
 	tdk_thermistor_calibrate(data);
 	msleep(500);
 
@@ -160,16 +160,16 @@ static int test_thread_fn(void *input_data)
 
 		cycle_cnt++;
 		msleep(1000);
-		pr_info(TAG "%s: Reading TDK thermistor\n", __func__);
+		pr_debug(TAG "%s: Reading TDK thermistor\n", __func__);
 		tdk_thermistor_read(data, NULL, &temp_data);
-		pr_info(TAG "%s: Read TDK thermistor: %i\n",
+		pr_debug(TAG "%s: Read TDK thermistor: %i\n",
 			__func__, temp_data);
 
 		/* multiply by 100*/
 		temp_voltage = ((temp_data) * 330) / 16368;
 		temp_resistance = (3300000 / temp_voltage) - 10000;
 
-		pr_info(
+		pr_debug(
 		TAG "%s: Read TDK thermistor voltage %i resistance: %i\n",
 			 __func__, temp_voltage, temp_resistance);
 	}
@@ -186,7 +186,7 @@ static int tdk_thermistor_read(struct tdk_thermistor_data *data,
 	u8 raw_data[3];
 	int ret;
 
-	pr_info(TAG "%s: Reading thermistor\n", __func__);
+	pr_debug(TAG "%s: Reading thermistor\n", __func__);
 
 	/* Requires 18 clock cycles to get ADC data.  First falling edge
 	 * is zero, then 14 bits of data, followed by 3 additional zeroes.
@@ -195,11 +195,11 @@ static int tdk_thermistor_read(struct tdk_thermistor_data *data,
 	ret = spi_read(data->spi, (void *)raw_data, 3);
 
 	if (ret) {
-		pr_info(TAG "%s: Failed SPI read: %i\n", __func__, ret);
+		pr_debug(TAG "%s: Failed SPI read: %i\n", __func__, ret);
 		return ret;
 	}
 
-	pr_info(TAG "%s: Read SPI: 0x%x 0x%x 0x%x\n", __func__,
+	pr_debug(TAG "%s: Read SPI: 0x%x 0x%x 0x%x\n", __func__,
 		raw_data[0], raw_data[1], raw_data[2]);
 
 	/* check to be sure this is a valid reading */
@@ -208,7 +208,7 @@ static int tdk_thermistor_read(struct tdk_thermistor_data *data,
 
 	*val = ((raw_data[0] & 0x7F) << 7) | (raw_data[1] >> 1);
 
-	pr_info(TAG "%s: Read temp: %i\n", __func__, *val);
+	pr_debug(TAG "%s: Read temp: %i\n", __func__, *val);
 
 	return 0;
 }
@@ -220,7 +220,7 @@ static int tdk_thermistor_read_raw(struct iio_dev *indio_dev,
 	struct tdk_thermistor_data *data = iio_priv(indio_dev);
 	int ret = -EINVAL;
 
-	pr_info(TAG "%s: Read raw TDK thermistor, mask: %li\n", __func__, mask);
+	pr_debug(TAG "%s: Read raw TDK thermistor, mask: %li\n", __func__, mask);
 
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
@@ -236,7 +236,7 @@ static int tdk_thermistor_read_raw(struct iio_dev *indio_dev,
 
 		break;
 	case IIO_CHAN_INFO_SCALE:
-		pr_info(TAG "%s: Read TDK thermistor scale chan: val: %i %i\n",
+		pr_debug(TAG "%s: Read TDK thermistor scale chan: val: %i %i\n",
 			 __func__, *val, chan->channel2);
 		switch (chan->channel2) {
 		case IIO_MOD_TEMP_AMBIENT:
@@ -264,7 +264,7 @@ static irqreturn_t tdk_thermistor_store_time(int irq, void *p)
 	struct iio_poll_func *pf = p;
 
 	pf->timestamp = ktime_get_boot_ns();
-	pr_info(TAG "%s: t: %llx\n", __func__, pf->timestamp);
+	pr_debug(TAG "%s: t: %llx\n", __func__, pf->timestamp);
 
 	return IRQ_WAKE_THREAD;
 }
@@ -278,24 +278,24 @@ static irqreturn_t tdk_thermistor_trigger_handler(int irq, void *private)
 	struct tdk_thermistor_data *data = iio_priv(indio_dev);
 	int ret;
 
-	pr_info(TAG "%s: Triggered read TDK thermistor\n", __func__);
+	pr_debug(TAG "%s: Triggered read TDK thermistor\n", __func__);
 
 	ret = spi_read(data->spi, data->buffer, 3);
 	if (!ret) {
 		iio_push_to_buffers_with_timestamp(indio_dev, data->buffer,
 						   iio_get_time_ns(indio_dev));
 	}
-	pr_info(TAG "%s: Read SPI: 0x%x 0x%x 0x%x\n", __func__,
+	pr_debug(TAG "%s: Read SPI: 0x%x 0x%x 0x%x\n", __func__,
 			data->buffer[0], data->buffer[1], data->buffer[2]);
 #ifdef TEST_DRIVER
 	/* check to be sure this is a valid reading */
 	if (data->buffer[0] == 0 && data->buffer[1] == 0 &&
 		data->buffer[2] == 0)
-		pr_info(TAG "%s: Invalid reading\n", __func__);//return -EINVAL;
+		pr_debug(TAG "%s: Invalid reading\n", __func__);//return -EINVAL;
 
 	val = ((data->buffer[0] & 0x7F) << 7) | (data->buffer[1] >> 1);
 
-	pr_info(TAG "%s: Read temp: %i\n", __func__, val);
+	pr_debug(TAG "%s: Read temp: %i\n", __func__, val);
 #endif
 	iio_trigger_notify_done(indio_dev->trig);
 
@@ -313,20 +313,20 @@ static int tdk_thermistor_probe(struct spi_device *spi)
 	struct iio_buffer *buffer;
 	int ret = 0;
 
-	pr_info(TAG "%s: Probing call for TDK thermistor\n", __func__);
-	pr_info(TAG "%s: SPI Device detected: %s offset: %lu\n",
+	pr_debug(TAG "%s: Probing call for TDK thermistor\n", __func__);
+	pr_debug(TAG "%s: SPI Device detected: %s offset: %lu\n",
 	__func__, id->name, id->driver_data);
 
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*data));
 	if (!indio_dev) {
-		pr_info(
+		pr_debug(
 		TAG "%s: Failed to alloc memory TDK thermistor\n", __func__);
 		return -ENOMEM;
 	}
 
 	buffer = devm_iio_kfifo_allocate(&spi->dev);
 	if (!buffer) {
-		pr_info(
+		pr_debug(
 		TAG "%s: Failed to alloc memory TDK thermistor\n", __func__);
 		return -ENOMEM;
 	}
@@ -385,7 +385,7 @@ static int tdk_thermistor_probe(struct spi_device *spi)
 	data->timer.function = tdk_thermistor_hrtimer_handler;
 
 #ifdef TEST_DRIVER
-	pr_info(
+	pr_debug(
 TAG  "%s: Creating test thread for thermistor with data: %p spidev: %p\n",
 		__func__, data, data->spi);
 
@@ -393,9 +393,9 @@ TAG  "%s: Creating test thread for thermistor with data: %p spidev: %p\n",
 		"TDK Thermistor Test Thread");
 
 	if (thread_st)
-		pr_info(TAG  "%s: Thread Created successfully\n", __func__);
+		pr_debug(TAG  "%s: Thread Created successfully\n", __func__);
 	else
-		pr_info(TAG  "%s: Thread creation failed\n", __func__);
+		pr_debug(TAG  "%s: Thread creation failed\n", __func__);
 #endif
 	return 0;
 

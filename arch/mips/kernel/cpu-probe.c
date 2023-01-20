@@ -397,7 +397,7 @@ static int __init ftlb_disable(char *s)
 	 * noftlb is mainly used for debug purposes so print
 	 * an informative message instead of using pr_debug()
 	 */
-	pr_info("FTLB has been disabled\n");
+	pr_debug("FTLB has been disabled\n");
 
 	/*
 	 * Some of these bits are duplicated in the decode_config4.
@@ -1962,7 +1962,7 @@ static inline void cpu_probe_netlogic(struct cpuinfo_mips *c, int cpu)
 		break;
 
 	default:
-		pr_info("Unknown Netlogic chip id [%02x]!\n",
+		pr_debug("Unknown Netlogic chip id [%02x]!\n",
 		       c->processor_id);
 		c->cputype = CPU_XLR;
 		break;
@@ -2153,12 +2153,12 @@ void cpu_report(void)
 {
 	struct cpuinfo_mips *c = &current_cpu_data;
 
-	pr_info("CPU%d revision is: %08x (%s)\n",
+	pr_debug("CPU%d revision is: %08x (%s)\n",
 		smp_processor_id(), c->processor_id, cpu_name_string());
 	if (c->options & MIPS_CPU_FPU)
 		printk(KERN_INFO "FPU revision is: %08x\n", c->fpu_id);
 	if (cpu_has_msa)
-		pr_info("MSA revision is: %08x\n", c->msa_id);
+		pr_debug("MSA revision is: %08x\n", c->msa_id);
 }
 
 void cpu_set_cluster(struct cpuinfo_mips *cpuinfo, unsigned int cluster)

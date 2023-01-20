@@ -401,7 +401,7 @@ int panel_release(struct inode *inode, struct file *filp)
 {
 	--panel_ref;
 	module_put(THIS_MODULE);
-	pr_info("%s\n", __func__);
+	pr_debug("%s\n", __func__);
 
 	return 0;
 }
@@ -474,7 +474,7 @@ err_class_create:
 
 static void __exit oplus_display_panel_exit(void)
 {
-	pr_info("%s\n", __func__);
+	pr_debug("%s\n", __func__);
 
 	cdev_del(&panel_cdev);
 	device_destroy(panel_class, dev_num);

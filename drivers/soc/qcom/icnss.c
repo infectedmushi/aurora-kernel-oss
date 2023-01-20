@@ -1005,7 +1005,7 @@ static int icnss_get_battery_level(struct icnss_priv *priv)
 		battery_percentage = psp.intval;
 	}
 
-	icnss_pr_info("Battery Percentage: %d\n", battery_percentage);
+	icnss_pr_debug("Battery Percentage: %d\n", battery_percentage);
 out:
 	return battery_percentage;
 }
@@ -1160,7 +1160,7 @@ static int icnss_driver_event_server_exit(void *data)
 	if (!penv)
 		return -ENODEV;
 
-	icnss_pr_info("WLAN FW Service Disconnected: 0x%lx\n", penv->state);
+	icnss_pr_debug("WLAN FW Service Disconnected: 0x%lx\n", penv->state);
 
 	icnss_clear_server(penv);
 
@@ -1300,7 +1300,7 @@ static int icnss_driver_event_fw_ready_ind(void *data)
 	set_bit(ICNSS_FW_READY, &penv->state);
 	clear_bit(ICNSS_MODE_ON, &penv->state);
 
-	icnss_pr_info("WLAN FW is ready: 0x%lx\n", penv->state);
+	icnss_pr_debug("WLAN FW is ready: 0x%lx\n", penv->state);
 
 	icnss_hw_power_off(penv);
 
@@ -1707,7 +1707,7 @@ static int icnss_modem_notifier_nb(struct notifier_block *nb,
 		ret = icnss_assign_msa_perm_all(priv,
 						ICNSS_MSA_PERM_HLOS_ALL);
 		if (!ret) {
-			icnss_pr_info("Collecting msa0 segment dump\n");
+			icnss_pr_debug("Collecting msa0 segment dump\n");
 			icnss_msa0_ramdump(priv);
 			icnss_assign_msa_perm_all(priv,
 						  ICNSS_MSA_PERM_WLAN_HW_RW);
@@ -1738,7 +1738,7 @@ static int icnss_modem_notifier_nb(struct notifier_block *nb,
 		goto out;
 	}
 
-	icnss_pr_info("Modem went down, state: 0x%lx, crashed: %d\n",
+	icnss_pr_debug("Modem went down, state: 0x%lx, crashed: %d\n",
 		      priv->state, notif->crashed);
 
 	set_bit(ICNSS_FW_DOWN, &priv->state);
@@ -1875,7 +1875,7 @@ static int icnss_service_notifier_notify(struct notifier_block *nb,
 		priv->stats.recovery.root_pd_crash++;
 		break;
 	}
-	icnss_pr_info("PD service down, pd_state: %d, state: 0x%lx: cause: %s\n",
+	icnss_pr_debug("PD service down, pd_state: %d, state: 0x%lx: cause: %s\n",
 		      *state, priv->state, icnss_pdr_cause[cause]);
 event_post:
 	if (!test_bit(ICNSS_FW_DOWN, &priv->state)) {
@@ -2892,7 +2892,7 @@ static void icnss_allow_recursive_recovery(struct device *dev)
 
 	priv->allow_recursive_recovery = true;
 
-	icnss_pr_info("Recursive recovery allowed for WLAN\n");
+	icnss_pr_debug("Recursive recovery allowed for WLAN\n");
 }
 
 static void icnss_disallow_recursive_recovery(struct device *dev)
@@ -2901,7 +2901,7 @@ static void icnss_disallow_recursive_recovery(struct device *dev)
 
 	priv->allow_recursive_recovery = false;
 
-	icnss_pr_info("Recursive recovery disallowed for WLAN\n");
+	icnss_pr_debug("Recursive recovery disallowed for WLAN\n");
 }
 
 static ssize_t icnss_fw_debug_write(struct file *fp,
@@ -3897,7 +3897,7 @@ static int icnss_probe(struct platform_device *pdev)
 
 	init_completion(&priv->unblock_shutdown);
 
-	icnss_pr_info("Platform driver probed successfully\n");
+	icnss_pr_debug("Platform driver probed successfully\n");
 
 	return 0;
 
@@ -3913,7 +3913,7 @@ out:
 
 static int icnss_remove(struct platform_device *pdev)
 {
-	icnss_pr_info("Removing driver: state: 0x%lx\n", penv->state);
+	icnss_pr_debug("Removing driver: state: 0x%lx\n", penv->state);
 
 	device_init_wakeup(&penv->pdev->dev, false);
 

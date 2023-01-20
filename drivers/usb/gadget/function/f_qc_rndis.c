@@ -451,7 +451,7 @@ static void rndis_qc_response_available(void *_rndis)
 	status = usb_ep_queue(rndis->notify, req, GFP_ATOMIC);
 	if (status) {
 		atomic_dec(&rndis->notify_count);
-		pr_info("notify/0 --> %d\n", status);
+		pr_debug("notify/0 --> %d\n", status);
 	}
 }
 
@@ -489,7 +489,7 @@ static void rndis_qc_response_complete(struct usb_ep *ep,
 		atomic_set(&rndis->notify_count, 0);
 		goto out;
 	default:
-		pr_info("RNDIS %s response error %d, %d/%d\n",
+		pr_debug("RNDIS %s response error %d, %d/%d\n",
 			ep->name, status,
 			req->actual, req->length);
 		/* FALLTHROUGH */
@@ -797,7 +797,7 @@ static void rndis_qc_suspend(struct usb_function *f)
 	else
 		remote_wakeup_allowed = f->config->cdev->gadget->remote_wakeup;
 
-	pr_info("%s(): start rndis suspend: remote_wakeup_allowed:%d\n",
+	pr_debug("%s(): start rndis suspend: remote_wakeup_allowed:%d\n",
 					__func__, remote_wakeup_allowed);
 
 	if (!remote_wakeup_allowed) {
@@ -1255,7 +1255,7 @@ static int rndis_qc_open_dev(struct inode *ip, struct file *fp)
 	int ret = 0;
 	unsigned long flags;
 
-	pr_info("Open rndis QC driver\n");
+	pr_debug("Open rndis QC driver\n");
 
 	spin_lock_irqsave(&rndis_lock, flags);
 	if (!_rndis_qc) {
@@ -1275,7 +1275,7 @@ fail:
 	spin_unlock_irqrestore(&rndis_lock, flags);
 
 	if (!ret)
-		pr_info("rndis QC file opened\n");
+		pr_debug("rndis QC file opened\n");
 
 	return ret;
 }
@@ -1284,7 +1284,7 @@ static int rndis_qc_release_dev(struct inode *ip, struct file *fp)
 {
 	unsigned long flags;
 
-	pr_info("Close rndis QC file\n");
+	pr_debug("Close rndis QC file\n");
 
 	spin_lock_irqsave(&rndis_lock, flags);
 
@@ -1322,7 +1322,7 @@ static long rndis_qc_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
 	spin_unlock_irqrestore(&rndis_lock, flags);
 
-	pr_info("Received command %d\n", cmd);
+	pr_debug("Received command %d\n", cmd);
 
 	switch (cmd) {
 	case RNDIS_QC_GET_MAX_PKT_PER_XFER:
@@ -1333,7 +1333,7 @@ static long rndis_qc_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 			pr_err("copying to user space failed\n");
 			ret = -EFAULT;
 		}
-		pr_info("Sent UL max packets per xfer %d\n",
+		pr_debug("Sent UL max packets per xfer %d\n",
 				qc_max_pkt_per_xfer);
 		break;
 	case RNDIS_QC_GET_MAX_PKT_SIZE:

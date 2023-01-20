@@ -123,7 +123,7 @@ static int __init pcibios_init(void)
 	struct pci_bus *bus;
 	int next_busno = 0, ret;
 
-	pr_info("PCI: Probing PCI hardware\n");
+	pr_debug("PCI: Probing PCI hardware\n");
 
 	/* Scan all of the recorded PCI controllers.  */
 	for (pci_ctrl = pci_ctrl_head; pci_ctrl; pci_ctrl = pci_ctrl->next) {

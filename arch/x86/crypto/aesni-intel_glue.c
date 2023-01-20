@@ -1445,20 +1445,20 @@ static int __init aesni_init(void)
 #ifdef CONFIG_X86_64
 #ifdef CONFIG_AS_AVX2
 	if (boot_cpu_has(X86_FEATURE_AVX2)) {
-		pr_info("AVX2 version of gcm_enc/dec engaged.\n");
+		pr_debug("AVX2 version of gcm_enc/dec engaged.\n");
 		aesni_gcm_enc_tfm = aesni_gcm_enc_avx2;
 		aesni_gcm_dec_tfm = aesni_gcm_dec_avx2;
 	} else
 #endif
 #ifdef CONFIG_AS_AVX
 	if (boot_cpu_has(X86_FEATURE_AVX)) {
-		pr_info("AVX version of gcm_enc/dec engaged.\n");
+		pr_debug("AVX version of gcm_enc/dec engaged.\n");
 		aesni_gcm_enc_tfm = aesni_gcm_enc_avx;
 		aesni_gcm_dec_tfm = aesni_gcm_dec_avx;
 	} else
 #endif
 	{
-		pr_info("SSE version of gcm_enc/dec engaged.\n");
+		pr_debug("SSE version of gcm_enc/dec engaged.\n");
 		aesni_gcm_enc_tfm = aesni_gcm_enc;
 		aesni_gcm_dec_tfm = aesni_gcm_dec;
 	}
@@ -1467,7 +1467,7 @@ static int __init aesni_init(void)
 	if (boot_cpu_has(X86_FEATURE_AVX)) {
 		/* optimize performance of ctr mode encryption transform */
 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
-		pr_info("AES CTR mode by8 optimization enabled\n");
+		pr_debug("AES CTR mode by8 optimization enabled\n");
 	}
 #endif
 #endif

@@ -463,7 +463,7 @@ int cnss_wlfw_tgt_cap_send_sync(struct cnss_plat_data *plat_priv)
 		plat_priv->cpr_info.voltage = resp->voltage_mv;
 		cnss_pr_dbg("Voltage for CPR: %dmV\n",
 			    plat_priv->cpr_info.voltage);
-		cnss_update_cpr_info(plat_priv);
+		cnss_update_cpr_debug(plat_priv);
 	}
 	if (resp->time_freq_hz_valid) {
 		plat_priv->device_freq_hz = resp->time_freq_hz;
@@ -2397,7 +2397,7 @@ static int cnss_wlfw_connect_to_server(struct cnss_plat_data *plat_priv,
 
 	set_bit(CNSS_QMI_WLFW_CONNECTED, &plat_priv->driver_state);
 
-	cnss_pr_info("QMI WLFW service connected, state: 0x%lx\n",
+	cnss_pr_debug("QMI WLFW service connected, state: 0x%lx\n",
 		     plat_priv->driver_state);
 
 	kfree(data);
@@ -2458,7 +2458,7 @@ int cnss_wlfw_server_exit(struct cnss_plat_data *plat_priv)
 
 	clear_bit(CNSS_QMI_WLFW_CONNECTED, &plat_priv->driver_state);
 
-	cnss_pr_info("QMI WLFW service disconnected, state: 0x%lx\n",
+	cnss_pr_debug("QMI WLFW service disconnected, state: 0x%lx\n",
 		     plat_priv->driver_state);
 
 	cnss_qmi_deinit(plat_priv);
@@ -2482,7 +2482,7 @@ static int wlfw_new_server(struct qmi_handle *qmi_wlfw,
 
 	if (plat_priv && test_bit(CNSS_QMI_DEL_SERVER,
 				  &plat_priv->driver_state)) {
-		cnss_pr_info("WLFW server delete in progress, Ignore server arrive, state: 0x%lx\n",
+		cnss_pr_debug("WLFW server delete in progress, Ignore server arrive, state: 0x%lx\n",
 			     plat_priv->driver_state);
 		return 0;
 	}
@@ -2511,7 +2511,7 @@ static void wlfw_del_server(struct qmi_handle *qmi_wlfw,
 
 	if (plat_priv && test_bit(CNSS_QMI_DEL_SERVER,
 				  &plat_priv->driver_state)) {
-		cnss_pr_info("WLFW server delete in progress, Ignore server delete, state: 0x%lx\n",
+		cnss_pr_debug("WLFW server delete in progress, Ignore server delete, state: 0x%lx\n",
 			     plat_priv->driver_state);
 		return;
 	}

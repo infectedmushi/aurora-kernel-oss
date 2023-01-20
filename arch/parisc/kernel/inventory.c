@@ -85,7 +85,7 @@ void __init setup_pdc(void)
 		pr_cont("64 bit PAT.\n");
 		parisc_cell_num = cell_info.cell_num;
 		parisc_cell_loc = cell_info.cell_loc;
-		pr_info("PAT: Running on cell %lu and location %lu.\n",
+		pr_debug("PAT: Running on cell %lu and location %lu.\n",
 			parisc_cell_num, parisc_cell_loc);
 		return;
 	}

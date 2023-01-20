@@ -50,13 +50,13 @@
 #define TRI_KEY_DEVICE "oplus,hall_tri_state_key"
 #define TRI_KEY_TAG                  "[tri_state_key] "
 #define TRI_KEY_ERR(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 #define TRI_KEY_LOG(fmt, args...)\
-	pr_info(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
+	pr_debug(TRI_KEY_TAG" %s : "fmt, __func__, ##args)
 #define TRI_KEY_DEBUG(fmt, args...)\
 	do {\
 		if (tri_key_debug == LEVEL_DEBUG)\
-			pr_info(TRI_KEY_TAG " %s: " fmt, __func__, ##args);\
+			pr_debug(TRI_KEY_TAG " %s: " fmt, __func__, ##args);\
 	} while (0)
 enum {
 	MODE_UNKNOWN,

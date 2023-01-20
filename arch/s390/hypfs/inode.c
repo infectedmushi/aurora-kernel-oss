@@ -305,7 +305,7 @@ static int hypfs_fill_super(struct super_block *sb, void *data, int silent)
 		return PTR_ERR(update_file);
 	sbi->update_file = update_file;
 	hypfs_update_update(sb);
-	pr_info("Hypervisor filesystem mounted\n");
+	pr_debug("Hypervisor filesystem mounted\n");
 	return 0;
 }
 

@@ -584,7 +584,7 @@ static int hyp_core_ctl_init_reserve_cpus(struct hyp_core_ctl_data *hcd)
 	}
 
 	cpumask_copy(&hcd->final_reserved_cpus, &hcd->reserve_cpus);
-	pr_info("reserve_cpus=%*pbl ret=%d\n",
+	pr_debug("reserve_cpus=%*pbl ret=%d\n",
 		 cpumask_pr_args(&hcd->reserve_cpus), ret);
 
 	return ret;

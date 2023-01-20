@@ -276,7 +276,7 @@ static void bad_math_dump(unsigned long len, int total_overlap,
 		struct ion_cma_alloc_chunk *chunk =
 			container_of(entry,
 				     struct ion_cma_alloc_chunk, entry);
-		pr_info("---   pa %pa len %lx\n",
+		pr_debug("---   pa %pa len %lx\n",
 			&chunk->handle, chunk->chunk_size);
 	}
 	WARN(1, "mismatch in the sizes of secure cma chunks\n");
@@ -751,7 +751,7 @@ static int ion_secure_cma_mmap(struct ion_heap *mapper,
 			       struct ion_buffer *buffer,
 			       struct vm_area_struct *vma)
 {
-	pr_info("%s: mmaping from secure heap %s disallowed\n",
+	pr_debug("%s: mmaping from secure heap %s disallowed\n",
 		__func__, mapper->name);
 	return -EINVAL;
 }
@@ -759,7 +759,7 @@ static int ion_secure_cma_mmap(struct ion_heap *mapper,
 static void *ion_secure_cma_map_kernel(struct ion_heap *heap,
 				       struct ion_buffer *buffer)
 {
-	pr_info("%s: kernel mapping from secure heap %s disallowed\n",
+	pr_debug("%s: kernel mapping from secure heap %s disallowed\n",
 		__func__, heap->name);
 	return ERR_PTR(-EINVAL);
 }

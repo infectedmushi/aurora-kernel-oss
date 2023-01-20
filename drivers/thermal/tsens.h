@@ -64,14 +64,14 @@ struct tsens_device;
 	} while (0)
 #define TSENS_DUMP(dev, msg, args...) do {				\
 		TSENS_IPC(2, dev, msg, args); \
-		pr_info(msg, ##args);	\
+		pr_debug(msg, ##args);	\
 	} while (0)
 #define TSENS_ERR(dev, msg, args...) do {				\
 		pr_err(msg, ##args);	\
 		TSENS_IPC(1, dev, msg, args); \
 	} while (0)
 #define TSENS_INFO(dev, msg, args...) do {				\
-		pr_info(msg, ##args);	\
+		pr_debug(msg, ##args);	\
 		TSENS_IPC(1, dev, msg, args); \
 	} while (0)
 #define TSENS_DBG(dev, msg, args...) do {				\
@@ -89,9 +89,9 @@ struct tsens_device;
 #else
 #define	TSENS_DBG1(dev, msg, x...)		pr_debug(msg, ##x)
 #define	TSENS_DBG(dev, msg, x...)		pr_debug(msg, ##x)
-#define	TSENS_INFO(dev, msg, x...)		pr_info(msg, ##x)
+#define	TSENS_INFO(dev, msg, x...)		pr_debug(msg, ##x)
 #define	TSENS_ERR(dev, msg, x...)		pr_err(msg, ##x)
-#define	TSENS_DUMP(dev, msg, x...)		pr_info(msg, ##x)
+#define	TSENS_DUMP(dev, msg, x...)		pr_debug(msg, ##x)
 #endif
 
 #if defined(CONFIG_THERMAL_TSENS)

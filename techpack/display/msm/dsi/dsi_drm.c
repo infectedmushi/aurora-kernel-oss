@@ -259,7 +259,7 @@ static void dsi_bridge_enable(struct drm_bridge *bridge)
 				if (rc) {
 					DSI_ERR("fps60 [%s] failed to set cmd\n", c_bridge->display->name);
 				} else {
-					pr_info("fps60 [%s] success to set cmd,fps old_fps=%d\n", c_bridge->display->name, old_refresh_rate);
+					pr_debug("fps60 [%s] success to set cmd,fps old_fps=%d\n", c_bridge->display->name, old_refresh_rate);
 					old_refresh_rate = c_bridge->display->panel->cur_mode->timing.refresh_rate;
 				}
 			}

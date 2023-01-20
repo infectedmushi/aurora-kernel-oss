@@ -919,7 +919,7 @@ static int oplus_mms_gauge_set_err_code(struct oplus_mms_gauge *chip,
 		return 0;
 
 	chip->err_code = err_code;
-	pr_info("set err_code=%08x\n", err_code);
+	pr_debug("set err_code=%08x\n", err_code);
 
 	msg = oplus_mms_alloc_msg(MSG_TYPE_ITEM, MSG_PRIO_HIGH,
 				  GAUGE_ITEM_ERR_CODE);

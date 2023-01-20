@@ -443,7 +443,7 @@ static int msm_hsphy_init(struct usb_phy *uphy)
 #ifdef OPLUS_FEATURE_CHG_BASIC
         if((phy->phy.flags & PHY_HOST_MODE)&&(phy->param_override_seq_host)) {
 	/* set parameter ovrride  if needed */
-		pr_info("%s: override phy host mode\n");
+		pr_debug("%s: override phy host mode\n");
 #else
         if (phy->param_override_seq)
 			hsusb_phy_write_seq(phy->base, phy->param_override_seq,
@@ -456,7 +456,7 @@ static int msm_hsphy_init(struct usb_phy *uphy)
         }
         else{
 		    if (phy->param_override_seq) {
-				pr_info("%s: override phy device mode\n");
+				pr_debug("%s: override phy device mode\n");
 				hsusb_phy_write_seq(phy->base, phy->param_override_seq,
 					phy->param_override_seq_cnt, 0);
 			}

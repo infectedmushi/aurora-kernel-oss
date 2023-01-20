@@ -97,7 +97,7 @@ noinline void lkdtm_CORRUPT_STACK(void)
 	/* Use default char array length that triggers stack protection. */
 	char data[8] __aligned(sizeof(void *));
 
-	pr_info("Corrupting stack containing char array ...\n");
+	pr_debug("Corrupting stack containing char array ...\n");
 	__lkdtm_CORRUPT_STACK((void *)&data);
 }
 
@@ -109,7 +109,7 @@ noinline void lkdtm_CORRUPT_STACK_STRONG(void)
 		unsigned long *ptr;
 	} data __aligned(sizeof(void *));
 
-	pr_info("Corrupting stack containing union ...\n");
+	pr_debug("Corrupting stack containing union ...\n");
 	__lkdtm_CORRUPT_STACK((void *)&data);
 }
 
@@ -165,7 +165,7 @@ void lkdtm_CORRUPT_LIST_ADD(void)
 	void *target[2] = { };
 	void *redirection = &target;
 
-	pr_info("attempting good list addition\n");
+	pr_debug("attempting good list addition\n");
 
 	/*
 	 * Adding to the list performs these actions:
@@ -176,7 +176,7 @@ void lkdtm_CORRUPT_LIST_ADD(void)
 	 */
 	list_add(&good.node, &test_head);
 
-	pr_info("attempting corrupted list addition\n");
+	pr_debug("attempting corrupted list addition\n");
 	/*
 	 * In simulating this "write what where" primitive, the "what" is
 	 * the address of &bad.node, and the "where" is the address held
@@ -200,10 +200,10 @@ void lkdtm_CORRUPT_LIST_DEL(void)
 
 	list_add(&item.node, &test_head);
 
-	pr_info("attempting good list removal\n");
+	pr_debug("attempting good list removal\n");
 	list_del(&item.node);
 
-	pr_info("attempting corrupted list removal\n");
+	pr_debug("attempting corrupted list removal\n");
 	list_add(&item.node, &test_head);
 
 	/* As with the list_add() test above, this corrupts "next". */
@@ -219,7 +219,7 @@ void lkdtm_CORRUPT_LIST_DEL(void)
 /* Test if unbalanced set_fs(KERNEL_DS)/set_fs(USER_DS) check exists. */
 void lkdtm_CORRUPT_USER_DS(void)
 {
-	pr_info("setting bad task size limit\n");
+	pr_debug("setting bad task size limit\n");
 	set_fs(KERNEL_DS);
 
 	/* Make sure we do not keep running with a KERNEL_DS! */
@@ -233,7 +233,7 @@ void lkdtm_STACK_GUARD_PAGE_LEADING(void)
 	const unsigned char *ptr = stack - 1;
 	volatile unsigned char byte;
 
-	pr_info("attempting bad read from page below current stack\n");
+	pr_debug("attempting bad read from page below current stack\n");
 
 	byte = *ptr;
 
@@ -247,7 +247,7 @@ void lkdtm_STACK_GUARD_PAGE_TRAILING(void)
 	const unsigned char *ptr = stack + THREAD_SIZE;
 	volatile unsigned char byte;
 
-	pr_info("attempting bad read from page above current stack\n");
+	pr_debug("attempting bad read from page above current stack\n");
 
 	byte = *ptr;
 

@@ -82,8 +82,8 @@
 	spcom_ipc_log_string("%s" pr_fmt(_fmt), "", ##__VA_ARGS__);	\
 	} while (0)
 
-#define spcom_pr_info(_fmt, ...) do {					\
-	pr_info(_fmt, ##__VA_ARGS__);					\
+#define spcom_pr_debug(_fmt, ...) do {					\
+	pr_debug(_fmt, ##__VA_ARGS__);					\
 	spcom_ipc_log_string("%s" pr_fmt(_fmt), "", ##__VA_ARGS__);	\
 	} while (0)
 
@@ -1241,7 +1241,7 @@ static int spcom_handle_enable_ssr_command(void)
 	}
 
 	desc_p->powerup = desc_powerup;
-	spcom_pr_info("SSR is enabled after FOTA\n");
+	spcom_pr_debug("SSR is enabled after FOTA\n");
 
 	return 0;
 }
@@ -1918,7 +1918,7 @@ static inline int handle_poll(struct file *file,
 	}
 	spcom_pr_dbg("name=%s, retval=%d\n", name, op->retval);
 	if (ready < 0) { /* wait was interrupted */
-		spcom_pr_info("interrupted wait retval=%d\n", op->retval);
+		spcom_pr_debug("interrupted wait retval=%d\n", op->retval);
 		ret = -EINTR;
 	}
 	return ret;
@@ -2391,7 +2391,7 @@ static int spcom_rpdev_probe(struct rpmsg_device *rpdev)
 	/* used to evaluate underlying transport link up/down */
 	atomic_inc(&spcom_dev->rpmsg_dev_count);
 	if (atomic_read(&spcom_dev->rpmsg_dev_count) == 1) {
-		spcom_pr_info("Signal link up\n");
+		spcom_pr_debug("Signal link up\n");
 		complete_all(&spcom_dev->rpmsg_state_change);
 	}
 

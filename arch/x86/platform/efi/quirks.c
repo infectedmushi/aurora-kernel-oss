@@ -529,7 +529,7 @@ void __init efi_apply_memmap_quirks(void)
 	 * services.
 	 */
 	if (!efi_runtime_supported()) {
-		pr_info("Setup done, disabling due to 32/64-bit mismatch\n");
+		pr_debug("Setup done, disabling due to 32/64-bit mismatch\n");
 		efi_memmap_unmap();
 	}
 

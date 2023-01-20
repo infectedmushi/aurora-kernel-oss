@@ -643,8 +643,8 @@ void gdsc_debug_print_regs(struct regulator *regulator)
 		return;
 	}
 
-	pr_info("Dumping %s Registers:\n", sc->rdesc.name);
-	pr_info("GDSCR: 0x%.8x CFG: 0x%.8x CFG2: 0x%.8x\n",
+	pr_debug("Dumping %s Registers:\n", sc->rdesc.name);
+	pr_debug("GDSCR: 0x%.8x CFG: 0x%.8x CFG2: 0x%.8x\n",
 			regvals[0], regvals[1], regvals[2]);
 }
 EXPORT_SYMBOL(gdsc_debug_print_regs);

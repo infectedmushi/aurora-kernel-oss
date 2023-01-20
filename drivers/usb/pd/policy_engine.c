@@ -1518,10 +1518,10 @@ static void handle_vdm_resp_ack(struct usbpd *pd, u32 *vdos, u8 num_vdos,
 		}
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
-		pr_info("handle_vdm_resp_ack num_vdos:%d\n",num_vdos);
+		pr_debug("handle_vdm_resp_ack num_vdos:%d\n",num_vdos);
 		if (num_vdos == 3){
 			oplus_svid = vdos[0] & 0xffff;
-			pr_info("handle_vdm_resp_ack oplus_svid:%d\n",oplus_svid);
+			pr_debug("handle_vdm_resp_ack oplus_svid:%d\n",oplus_svid);
 			if(oplus_svid == OPLUS_SVID){
 				handler = find_svid_handler(pd, oplus_svid);
 				if (handler) {

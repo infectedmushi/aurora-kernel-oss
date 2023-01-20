@@ -560,7 +560,7 @@ static int qcom_ice_get_device_tree_data(struct platform_device *pdev,
 			goto err_dev;
 		}
 		ice_dev->irq = irq;
-		pr_info("ICE IRQ = %d\n", ice_dev->irq);
+		pr_debug("ICE IRQ = %d\n", ice_dev->irq);
 	} else {
 		dev_dbg(dev, "IRQ resource not available\n");
 	}
@@ -1382,7 +1382,7 @@ struct platform_device *qcom_ice_get_pdevice(struct device_node *node)
 
 	list_for_each_entry(ice_dev, &ice_devices, list) {
 		if (ice_dev->pdev->of_node == node) {
-			pr_info("%s: found ice device %pK\n", __func__,
+			pr_debug("%s: found ice device %pK\n", __func__,
 			ice_dev);
 			ice_pdev = to_platform_device(ice_dev->pdev);
 			break;
@@ -1390,7 +1390,7 @@ struct platform_device *qcom_ice_get_pdevice(struct device_node *node)
 	}
 
 	if (ice_pdev)
-		pr_info("%s: matching platform device %pK\n", __func__,
+		pr_debug("%s: matching platform device %pK\n", __func__,
 			ice_pdev);
 out:
 	return ice_pdev;

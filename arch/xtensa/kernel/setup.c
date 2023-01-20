@@ -180,7 +180,7 @@ static int __init parse_bootparam(const bp_tag_t* tag)
 #else
 static int __init parse_bootparam(const bp_tag_t *tag)
 {
-	pr_info("Ignoring boot parameters at %p\n", tag);
+	pr_debug("Ignoring boot parameters at %p\n", tag);
 	return 0;
 }
 #endif
@@ -318,11 +318,11 @@ static inline int __init_memblock mem_reserve(unsigned long start,
 
 void __init setup_arch(char **cmdline_p)
 {
-	pr_info("config ID: %08x:%08x\n",
+	pr_debug("config ID: %08x:%08x\n",
 		get_sr(SREG_EPC), get_sr(SREG_EXCSAVE));
 	if (get_sr(SREG_EPC) != XCHAL_HW_CONFIGID0 ||
 	    get_sr(SREG_EXCSAVE) != XCHAL_HW_CONFIGID1)
-		pr_info("built for config ID: %08x:%08x\n",
+		pr_debug("built for config ID: %08x:%08x\n",
 			XCHAL_HW_CONFIGID0, XCHAL_HW_CONFIGID1);
 
 	*cmdline_p = command_line;

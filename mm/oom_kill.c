@@ -754,7 +754,7 @@ static bool oom_reap_task_mm(struct task_struct *tsk, struct mm_struct *mm)
 	if (!ret)
 		goto out_finish;
 
-	pr_info("oom_reaper: reaped process %d (%s), now anon-rss:%lukB, file-rss:%lukB, shmem-rss:%lukB\n",
+	pr_debug("oom_reaper: reaped process %d (%s), now anon-rss:%lukB, file-rss:%lukB, shmem-rss:%lukB\n",
 			task_pid_nr(tsk), tsk->comm,
 			K(get_mm_counter(mm, MM_ANONPAGES)),
 			K(get_mm_counter(mm, MM_FILEPAGES)),
@@ -781,7 +781,7 @@ static void oom_reap_task(struct task_struct *tsk)
 	    test_bit(MMF_OOM_SKIP, &mm->flags))
 		goto done;
 
-	pr_info("oom_reaper: unable to reap pid:%d (%s)\n",
+	pr_debug("oom_reaper: unable to reap pid:%d (%s)\n",
 		task_pid_nr(tsk), tsk->comm);
 	debug_show_all_locks();
 
@@ -912,7 +912,7 @@ void exit_oom_victim(void)
 void oom_killer_enable(void)
 {
 	oom_killer_disabled = false;
-	pr_info("OOM killer enabled.\n");
+	pr_debug("OOM killer enabled.\n");
 }
 
 /**
@@ -949,7 +949,7 @@ bool oom_killer_disable(signed long timeout)
 		oom_killer_enable();
 		return false;
 	}
-	pr_info("OOM killer disabled.\n");
+	pr_debug("OOM killer disabled.\n");
 
 	return true;
 }
@@ -1086,7 +1086,7 @@ static void __oom_kill_process(struct task_struct *victim)
 		if (is_global_init(p)) {
 			can_oom_reap = false;
 			set_bit(MMF_OOM_SKIP, &mm->flags);
-			pr_info("oom killer %d (%s) has mm pinned by %d (%s)\n",
+			pr_debug("oom killer %d (%s) has mm pinned by %d (%s)\n",
 					task_pid_nr(victim), victim->comm,
 					task_pid_nr(p), p->comm);
 			continue;

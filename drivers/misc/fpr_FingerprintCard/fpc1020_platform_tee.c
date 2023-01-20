@@ -439,7 +439,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 {
 	struct fpc1020_data *fpc1020 = handle;
 
-	pr_info("fpc1020 irq handler: %s\n", __func__);
+	pr_debug("fpc1020 irq handler: %s\n", __func__);
 	mutex_lock(&fpc1020->lock);
 	if (atomic_read(&fpc1020->wakeup_enabled)) {
 		fpc1020->nbr_irqs_received++;

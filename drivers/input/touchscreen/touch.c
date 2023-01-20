@@ -147,7 +147,7 @@ int tp_util_get_vendor(struct hw_resource *hw_res, struct panel_info *panel_data
 			snprintf(panel_data->test_limit_name, MAX_LIMIT_DATA_LENGTH,
 				"tp/20669/LIMIT_%s_%s.img", panel_data->chip_name, vendor);
 		}
-		pr_info("panel_data->tp_type = %d\n", panel_data->tp_type);
+		pr_debug("panel_data->tp_type = %d\n", panel_data->tp_type);
 		if (panel_data->tp_type == TP_JDI) {
 			memcpy(panel_data->manufacture_info.version, "AA869_DS_NT_", 12);
 			panel_data->firmware_headfile.firmware_data = FW_17951_NT36672C_JDI;
@@ -187,7 +187,7 @@ int tp_util_get_vendor(struct hw_resource *hw_res, struct panel_info *panel_data
 		panel_data->manufacture_info.fw_path = panel_data->fw_name;
 	}
 
-	pr_info("[TP]vendor:%s fw:%s limit:%s\n",
+	pr_debug("[TP]vendor:%s fw:%s limit:%s\n",
 		vendor,
 		panel_data->fw_name,
 		panel_data->test_limit_name == NULL?"NO Limit":panel_data->test_limit_name);

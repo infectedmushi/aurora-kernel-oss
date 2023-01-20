@@ -2094,7 +2094,7 @@ static ssize_t cpuset_write_resmask_assist(struct kernfs_open_file *of,
 					   struct cs_target tgt, size_t nbytes,
 					   loff_t off)
 {
-	pr_info("cpuset_assist: setting %s to %s\n", tgt.name, tgt.cpus);
+	pr_debug("cpuset_assist: setting %s to %s\n", tgt.name, tgt.cpus);
 	return cpuset_write_resmask(of, tgt.cpus, nbytes, off);
 }
 
@@ -3095,7 +3095,7 @@ void cpuset_print_current_mems_allowed(void)
 	rcu_read_lock();
 
 	cgrp = task_cs(current)->css.cgroup;
-	pr_info("%s cpuset=", current->comm);
+	pr_debug("%s cpuset=", current->comm);
 	pr_cont_cgroup_name(cgrp);
 	pr_cont(" mems_allowed=%*pbl\n",
 		nodemask_pr_args(&current->mems_allowed));

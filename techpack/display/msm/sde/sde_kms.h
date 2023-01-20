@@ -61,7 +61,7 @@
 		if (unlikely(drm_debug & DRM_UT_KMS))                      \
 			DRM_INFO(fmt, ##__VA_ARGS__); \
 		else                                                       \
-			pr_info(fmt, ##__VA_ARGS__);                      \
+			pr_debug(fmt, ##__VA_ARGS__);                      \
 	} while (0)
 
 /**

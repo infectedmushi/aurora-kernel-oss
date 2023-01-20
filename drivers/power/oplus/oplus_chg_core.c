@@ -568,14 +568,14 @@ static int __init oplus_chg_class_init(void)
 		pr_err("oplus chg module not found, please check oplus_chg_module.lds\n");
 		goto end;
 	} else {
-		pr_info("find %d oplus chg module\n", module_num);
+		pr_debug("find %d oplus chg module\n", module_num);
 	}
 	first_module = oplus_chg_find_first_module();
 	for (i = 0; i < module_num; i++) {
 		oplus_module = &first_module[i];
 		if ((oplus_module->magic == OPLUS_CHG_MODEL_MAGIC) &&
 		    (oplus_module->chg_module_init != NULL)) {
-			pr_info("%s init\n", oplus_module->name);
+			pr_debug("%s init\n", oplus_module->name);
 			rc = oplus_module->chg_module_init();
 			if (rc < 0) {
 				pr_err("%s init error, rc=%d\n", oplus_module->name, rc);

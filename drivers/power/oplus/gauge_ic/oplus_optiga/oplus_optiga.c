@@ -498,13 +498,13 @@ static bool oplus_optia_check_auth_msg(void) {
 		return false;
 	}
 
-	pr_info("oplus_chg_check_auth_msg: %s\n", str);
+	pr_debug("oplus_chg_check_auth_msg: %s\n", str);
 	if (0 == memcmp(str, OPLUS_OPTIGA_AUTH_SUCCESS, sizeof(OPLUS_OPTIGA_AUTH_SUCCESS))) {
 		ret = true;
-		pr_info("oplus_chg_check_auth_msg: %s\n", OPLUS_OPTIGA_AUTH_SUCCESS);
+		pr_debug("oplus_chg_check_auth_msg: %s\n", OPLUS_OPTIGA_AUTH_SUCCESS);
 	} else {
 		ret = false;
-		pr_info("oplus_chg_check_auth_msg: %s\n", OPLUS_OPTIGA_AUTH_FAILED);
+		pr_debug("oplus_chg_check_auth_msg: %s\n", OPLUS_OPTIGA_AUTH_FAILED);
 	}
 #else
 	/* QCom not realize now. */

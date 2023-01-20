@@ -7291,11 +7291,11 @@ static __init int selinux_init(void)
 	}
 
 	if (!selinux_enabled) {
-		pr_info("SELinux:  Disabled at boot.\n");
+		pr_debug("SELinux:  Disabled at boot.\n");
 		return 0;
 	}
 
-	pr_info("SELinux:  Initializing.\n");
+	pr_debug("SELinux:  Initializing.\n");
 
 	memset(&selinux_state, 0, sizeof(selinux_state));
 	enforcing_set(&selinux_state, selinux_enforcing_boot);
@@ -7473,7 +7473,7 @@ int selinux_disable(struct selinux_state *state)
 
 	state->disabled = 1;
 
-	pr_info("SELinux:  Disabled at runtime.\n");
+	pr_debug("SELinux:  Disabled at runtime.\n");
 
 	selinux_enabled = 0;
 

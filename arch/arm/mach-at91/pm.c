@@ -735,11 +735,11 @@ static void __init at91_pm_init(void (*pm_idle)(void))
 
 	if (at91_suspend_sram_fn) {
 		suspend_set_ops(&at91_pm_ops);
-		pr_info("AT91: PM: standby: %s, suspend: %s\n",
+		pr_debug("AT91: PM: standby: %s, suspend: %s\n",
 			pm_modes[pm_data.standby_mode].pattern,
 			pm_modes[pm_data.suspend_mode].pattern);
 	} else {
-		pr_info("AT91: PM not supported, due to no SRAM allocated\n");
+		pr_debug("AT91: PM not supported, due to no SRAM allocated\n");
 	}
 }
 

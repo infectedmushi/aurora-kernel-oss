@@ -1110,7 +1110,7 @@ static int l2_cache_pmu_probe_cluster(struct device *parent,
 		goto err_put_dev;
 	}
 
-	pr_info(L2_COUNTERS_BUG
+	pr_debug(L2_COUNTERS_BUG
 		"Registered L2 cache PMU cluster %ld\n", fw_cluster_id);
 
 	spin_lock_init(&cluster->pmu_lock);

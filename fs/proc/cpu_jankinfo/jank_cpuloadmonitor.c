@@ -164,7 +164,7 @@ struct pid_stat_mgr g_pid_stat_mgt[HIGH_LOAD_MAX_TYPE] = { 0 };
 
 void cpuset_bg_cpumask(unsigned long bits)
 {
-	pr_info("cpuload:bg cpumask bits:0x%x", bits);
+	pr_debug("cpuload:bg cpumask bits:0x%x", bits);
 	cpumask_bg = bits;
 }
 
@@ -252,7 +252,7 @@ static int pidstat_init(void)
 			sizeof(g_pid_stat_mgt[i].data));
 	}
 
-	pr_info("cpuload: pidstat init ok!");
+	pr_debug("cpuload: pidstat init ok!");
 	return 0;
 }
 
@@ -555,7 +555,7 @@ void highload_report(void)
 
 #ifdef JANK_DEBUG
 	for (j = 0; j < i; j++) {
-		pr_info("cpuload: [highload_report:%d] data[%d]=%d\n", i, j, data[j]);
+		pr_debug("cpuload: [highload_report:%d] data[%d]=%d\n", i, j, data[j]);
 	}
 #endif
 
@@ -633,7 +633,7 @@ static void cpus_procstatic_low(void)
 		if (action_ctl_bits.bits_high & (1 << type))
 			continue;
 
-		pr_info("cpuload: delete size:%d type:%u",
+		pr_debug("cpuload: delete size:%d type:%u",
 			threhold_pid_size[type], type);
 
 		/* 
@@ -663,7 +663,7 @@ static void cpus_proc_static_high(u32 type)
 		i < g_pid_stat_mgt[type].index_curr;
 		i++, curr++) {
 		if (curr->count > get_threhold_bytype(type)) {
-			pr_info("cpuload: key_pid:%d,count:%d,type:%u",
+			pr_debug("cpuload: key_pid:%d,count:%d,type:%u",
 				curr->key_pid, curr->count, type);
 
 			if (threhold_pid_size[type] < PID_LIST_MAX) {
@@ -679,7 +679,7 @@ static void cpus_proc_static_high(u32 type)
 		}
 	}
 
-	pr_info("cpuload: threhold_pid_size:%d,type:%u", threhold_pid_size[type], type);
+	pr_debug("cpuload: threhold_pid_size:%d,type:%u", threhold_pid_size[type], type);
 	if (threhold_pid_size[type])
 		send_to_user_high(type, threhold_pid_size[type], (int *)threhold_pid_list[type]);
 	pid_stat_reset(type);
@@ -736,13 +736,13 @@ bool high_load_tick(void)
 			send_to_user_with_usage(HIGH_LOAD, usage_per, CPU_NUMS);
 			last_report_reason = HIGH_LOAD;
 			ret = true;
-			pr_info("cpuload: cpuload HIGH_LOAD!");
+			pr_debug("cpuload: cpuload HIGH_LOAD!");
 		} else if (high_load_cnt[CPUSET_ALL] == CPU_LOW_LOAD_THRESHOLD
 			&& last_report_reason != LOW_LOAD) {
 			send_to_user_netlink(LOW_LOAD);
 			last_report_reason = LOW_LOAD;
 			ret = true;
-			pr_info("cpuload: cpuload LOW_LOAD!");
+			pr_debug("cpuload: cpuload LOW_LOAD!");
 		}
 	}
 
@@ -765,7 +765,7 @@ static bool cycle_big_highcycle(u32 type)
 	if (last_status[type] == HIGH_LOAD) {
 		if (cycle_big_high_cnt[type] >
 			(CPU_LOAD_BIG_HIGHCYCLE * CPU_HIGH_LOAD_THRESHOLD)) {
-			pr_info("cpuload: type=%d, cycle big HIGH_LOAD!", type);
+			pr_debug("cpuload: type=%d, cycle big HIGH_LOAD!", type);
 			set_action_ctl(type, true);
 			ret = true;
 		}
@@ -780,7 +780,7 @@ static bool cycle_big_lowcycle(u32 type)
 	if (last_status[type] == HIGH_LOAD) {
 		if (cycle_big_normal_cnt[type] >
 			(CPU_LOAD_BIG_LOWCYCLE * CPU_HIGH_LOAD_THRESHOLD)) {
-			pr_info("cpuload: type=%d, cycle big LOW_LOAD!", type);
+			pr_debug("cpuload: type=%d, cycle big LOW_LOAD!", type);
 			last_status[type] = LOW_LOAD;
 			set_action_ctl(type, false);
 			cycle_big_count_reset(type);
@@ -828,7 +828,7 @@ bool high_load_tick_mask(unsigned long bits, u32 type,
 
 	if (high_load_cnt[type] >= CPU_HIGH_LOAD_THRESHOLD &&
 		last_status[type] != HIGH_LOAD) {
-		pr_info("cpuload: cpuload mask HIGH_LOAD\n");
+		pr_debug("cpuload: cpuload mask HIGH_LOAD\n");
 		last_status[type] = HIGH_LOAD;
 		set_action_ctl(type, true);
 		cycle_big_count_reset(type);
@@ -888,7 +888,7 @@ static void high_freqs_load_tick(void)
 	}
 
 	if (delta_freqs_time > (delta_time * fg_freqs_threshold)) {
-		pr_info("cpuload: high freqs load");
+		pr_debug("cpuload: high freqs load");
 		set_action_ctl(CLUSTER_BIG, true);
 		last_status[CLUSTER_BIG] = HIGH_LOAD;
 	} else if (last_status[CLUSTER_BIG] != LOW_LOAD) {
@@ -917,13 +917,13 @@ static void get_current_task_mask(u32 type)
 
 		rq_cur = cpu_rq(cpu);
 		if (!rq_cur) {
-			pr_info("cpuload: cpu:%u rq_cur is NULL!", cpu);
+			pr_debug("cpuload: cpu:%u rq_cur is NULL!", cpu);
 			continue;
 		}
 
 		p = rq_cur->curr;
 		if (!p) {
-			pr_info("cpuload: cpu:%u p is NULL!", cpu);
+			pr_debug("cpuload: cpu:%u p is NULL!", cpu);
 			continue;
 		}
 
@@ -932,7 +932,7 @@ static void get_current_task_mask(u32 type)
 		uid = task_uid(p).val;
 		tgid = p->tgid;
 		put_task_struct(p);
-		pr_info("cpuload: pid=%d, uid=%d, tgid=%d\n", curr_pid, uid, tgid);
+		pr_debug("cpuload: pid=%d, uid=%d, tgid=%d\n", curr_pid, uid, tgid);
 
 		if (curr_pid == 0 || curr_pid == local_pid)
 			continue;
@@ -960,14 +960,14 @@ static void get_current_thread_mask(u32 type)
 
 		rq_cur = cpu_rq(cpu);
 		if (!rq_cur) {
-			pr_info("cpuload: cpu:%u rq_cur is NULL!", cpu);
+			pr_debug("cpuload: cpu:%u rq_cur is NULL!", cpu);
 			continue;
 		}
 
 		p = rq_cur->curr;
 
 		if (!p) {
-			pr_info("cpuload: cpu:%u p is NULL!", cpu);
+			pr_debug("cpuload: cpu:%u p is NULL!", cpu);
 			continue;
 		}
 
@@ -976,7 +976,7 @@ static void get_current_thread_mask(u32 type)
 		uid = task_uid(p).val;
 		tgid = p->tgid;
 		put_task_struct(p);
-		pr_info("cpuload: pid=%d, uid=%d, tgid=%d\n", curr_pid, uid, tgid);
+		pr_debug("cpuload: pid=%d, uid=%d, tgid=%d\n", curr_pid, uid, tgid);
 
 		if (curr_pid == 0 || curr_pid == local_pid)
 			continue;
@@ -1007,7 +1007,7 @@ static void cpus_proc_static_tickfn(struct work_struct *work)
 			continue;
 
 #ifdef JANK_DEBUG
-		pr_info("cpuload: [cpus_proc_static_tickfn: type=%d]\n", type);
+		pr_debug("cpuload: [cpus_proc_static_tickfn: type=%d]\n", type);
 #endif
 
 		/* Samples were taken every 400ms */
@@ -1110,7 +1110,7 @@ void jank_calcload_init(void)
 	check_proc_static = 0;
 
 	if (pidstat_init() != 0) {
-		pr_info("cpuloadmonitor init failed!\n");
+		pr_debug("cpuloadmonitor init failed!\n");
 		return;
 	}
 

@@ -676,7 +676,7 @@ static void record_system_cpu_state(void)
 	do { \
 		int ret = _register(_cb, NULL); \
 		if (!ret) { \
-			pr_info("%s: %pF register succesful\n",tag, _cb); \
+			pr_debug("%s: %pF register succesful\n",tag, _cb); \
 		} else { \
 			pr_warn("%s: %pF register failed, ret %d\n",tag, _cb, ret); \
 			goto failed; \

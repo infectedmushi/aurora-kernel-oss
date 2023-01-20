@@ -276,8 +276,8 @@ int oplus_subsystem_sleeptime(char *name, u64 *sleeptime)
 		}
 		record = (struct msm_rpmh_master_stats *) qcom_smem_get(rpmh_masters[i].pid, rpmh_masters[i].smem_id, &size);
 		if (!IS_ERR_OR_NULL(record)) {
-			pr_info("%s : %s:0x%x\n", __func__, rpmh_masters[i].master_name, record->counts);
-			pr_info("%s found: %s:0x%x\n", __func__, rpmh_masters[i].master_name, record->counts);
+			pr_debug("%s : %s:0x%x\n", __func__, rpmh_masters[i].master_name, record->counts);
+			pr_debug("%s found: %s:0x%x\n", __func__, rpmh_masters[i].master_name, record->counts);
 			found = 1;
 			*sleeptime = oplus_rpmh_master_get_sleeptime(record);
 			goto finish;

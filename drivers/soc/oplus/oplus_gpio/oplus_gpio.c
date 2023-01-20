@@ -35,13 +35,13 @@
 
 static int oplus_gpio_probe(struct platform_device *pdev)
 {
-	pr_info(TAG "oplus_gpio_probe call %d %s\n",get_PCB_Version(),pdev->name);
+	pr_debug(TAG "oplus_gpio_probe call %d %s\n",get_PCB_Version(),pdev->name);
 	return 0;
 }
 
 static int oplus_gpio_remove(struct platform_device *pdev)
 {
-	pr_info(TAG "oplus_gpio_remove call \n");
+	pr_debug(TAG "oplus_gpio_remove call \n");
 	return 0;
 }
 
@@ -51,7 +51,7 @@ OPLUS_GPIO_DRIVER(gpio_pvt);
 
 static int __init oplus_gpio_init(void)
 {
-	pr_info(TAG "oplus_gpio_init call \n");
+	pr_debug(TAG "oplus_gpio_init call \n");
 
 	GPIO_DO_DRIVER_INIT(gpio_evt);
 	GPIO_DO_DRIVER_INIT(gpio_dvt);

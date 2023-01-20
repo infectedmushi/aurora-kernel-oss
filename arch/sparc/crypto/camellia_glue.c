@@ -305,10 +305,10 @@ static int __init camellia_sparc64_mod_init(void)
 		INIT_LIST_HEAD(&algs[i].cra_list);
 
 	if (sparc64_has_camellia_opcode()) {
-		pr_info("Using sparc64 camellia opcodes optimized CAMELLIA implementation\n");
+		pr_debug("Using sparc64 camellia opcodes optimized CAMELLIA implementation\n");
 		return crypto_register_algs(algs, ARRAY_SIZE(algs));
 	}
-	pr_info("sparc64 camellia opcodes not available.\n");
+	pr_debug("sparc64 camellia opcodes not available.\n");
 	return -ENODEV;
 }
 

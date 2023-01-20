@@ -949,7 +949,7 @@ static int gfs2_lm_mount(struct gfs2_sbd *sdp, int silent)
 		lm = &gfs2_dlm_ops;
 #endif
 	} else {
-		pr_info("can't find protocol %s\n", proto);
+		pr_debug("can't find protocol %s\n", proto);
 		return -ENOENT;
 	}
 

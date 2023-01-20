@@ -1075,7 +1075,7 @@ static int sgm7220_suspend(struct device *dev)
 {
 	struct sgm7220_info *info = dev_get_drvdata(dev);
 
-	pr_info("%s enter\n", __func__);
+	pr_debug("%s enter\n", __func__);
 
 	if (gchip) {
 		atomic_set(&gchip->suspended, 1);
@@ -1094,7 +1094,7 @@ static int sgm7220_resume(struct device *dev)
 {
 	struct sgm7220_info *info = dev_get_drvdata(dev);
 
-	pr_info("%s enter\n", __func__);
+	pr_debug("%s enter\n", __func__);
 
 	if (info->en_gpio[EN_CC_MUX])
 		gpio_direction_output(info->en_gpio[EN_CC_MUX], 1);

@@ -713,7 +713,7 @@ cpp 手册对宏的讲解很详细。gcc internals 手册也详细讲解了 RTL�
 <linux/device.h> 里有一些驱动模型诊断宏，你应该使用它们，以确保信息对应于正确
 的设备和驱动，并且被标记了正确的消息级别。这些宏有：dev_err(), dev_warn(),
 dev_info() 等等。对于那些不和某个特定设备相关连的信息，<linux/printk.h> 定义
-了 pr_notice(), pr_info(), pr_warn(), pr_err() 和其他。
+了 pr_notice(), pr_debug(), pr_warn(), pr_err() 和其他。
 
 写出好的调试信息可以是一个很大的挑战；一旦你写出后，这些信息在远程除错时能提
 供极大的帮助。然而打印调试信息的处理方式同打印非调试信息不同。其他 pr_XXX()

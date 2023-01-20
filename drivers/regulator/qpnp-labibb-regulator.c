@@ -4238,7 +4238,7 @@ static int qpnp_labibb_check_ttw_supported(struct qpnp_labibb *labibb)
 		/* TTW supported for all revisions */
 		break;
 	default:
-		pr_info("TTW mode not supported for PMIC-subtype = %d\n",
+		pr_debug("TTW mode not supported for PMIC-subtype = %d\n",
 			labibb->pmic_rev_id->pmic_subtype);
 		labibb->ttw_en = false;
 		break;
@@ -4492,7 +4492,7 @@ static int qpnp_labibb_regulator_probe(struct platform_device *pdev)
 		return rc;
 	}
 
-	pr_info("LAB/IBB registered successfully, lab_vreg enable=%d ibb_vreg enable=%d swire_control=%d\n",
+	pr_debug("LAB/IBB registered successfully, lab_vreg enable=%d ibb_vreg enable=%d swire_control=%d\n",
 		labibb->lab_vreg.vreg_enabled, labibb->ibb_vreg.vreg_enabled,
 		labibb->swire_control);
 

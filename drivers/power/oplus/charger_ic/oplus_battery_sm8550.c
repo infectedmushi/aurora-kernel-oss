@@ -1148,13 +1148,13 @@ void lcm_frequency_ctrl(void)
 			if (lcm_en_flag != LCM_EN_ENABLE) {
 				lcm_en_flag = LCM_EN_ENABLE;
 				smbchg_lcm_en(true);
-				pr_info("lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug("lcm_en_flag:%d\n", lcm_en_flag);
 			}
 		} else {
 			if (lcm_en_flag != LCM_EN_DISABLE) {
 				lcm_en_flag = LCM_EN_DISABLE;
 				smbchg_lcm_en(false);
-				pr_info(" lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug(" lcm_en_flag:%d\n", lcm_en_flag);
 			}
 		}
 
@@ -1164,7 +1164,7 @@ void lcm_frequency_ctrl(void)
 			if (lcm_en_flag != LCM_EN_ENABLE) {
 				lcm_en_flag = LCM_EN_ENABLE;
 				smbchg_lcm_en(true);
-				pr_info(" lcm_en_flag:%d\n", lcm_en_flag);
+				pr_debug(" lcm_en_flag:%d\n", lcm_en_flag);
 			}
 	}
 }
@@ -2982,7 +2982,7 @@ static int wireless_fw_update(struct battery_chg_dev *bcdev, bool force)
 		rc = 0;
 	}
 
-	pr_info("Wireless FW update done\n");
+	pr_debug("Wireless FW update done\n");
 
 release_fw:
 	bcdev->wls_fw_crc = 0;
@@ -4534,7 +4534,7 @@ static int oplus_chg_track_upload_usbtemp_info(
 			OPLUS_CHG_TRACK_CURX_INFO_LEN - index, "%s", power_info);
 
 	schedule_delayed_work(&chip->usbtemp_load_trigger_work, 0);
-	pr_info("%s\n", chip->usbtemp_load_trigger.crux_info);
+	pr_debug("%s\n", chip->usbtemp_load_trigger.crux_info);
 
 	return 0;
 }
@@ -7163,7 +7163,7 @@ int oplus_chg_wired_get_break_sub_crux_info(char *crux_info)
 	}
 	bcdev = chip->pmic_spmi.bcdev_chip;
 
-	pr_info("real_chg_type:%d\n", bcdev->real_chg_type);
+	pr_debug("real_chg_type:%d\n", bcdev->real_chg_type);
 	return bcdev->real_chg_type;
 }
 
@@ -9220,7 +9220,7 @@ static int smbchg_lcm_en(bool en)
 	if (rc < 0)
 		pr_err("set lcm to %u error, rc=%d\n", en, rc);
 	else
-		pr_info("set lcm to %d \n", en);
+		pr_debug("set lcm to %d \n", en);
 
 	return rc;
 }
@@ -9292,7 +9292,7 @@ static int smbchg_wls_set_icl(struct oplus_chg_ic_dev *ic_dev, int icl_ma)
 	if (rc < 0)
 		pr_err("set wls icl to %u error, rc=%d\n", icl_ma, rc);
 	else
-		pr_info("set icl to %d mA\n", icl_ma);
+		pr_debug("set icl to %d mA\n", icl_ma);
 
 	return rc;
 }
@@ -9328,7 +9328,7 @@ static int smbchg_wls_set_fcc(struct oplus_chg_ic_dev *ic_dev, int fcc_ma)
 	if (rc)
 		pr_err("set fcc to %d mA fail, rc=%d\n", fcc_ma, rc);
 	else
-		pr_info("set fcc to %d mA\n", fcc_ma);
+		pr_debug("set fcc to %d mA\n", fcc_ma);
 
 	return rc;
 }
@@ -9640,7 +9640,7 @@ static int oplus_chg_usb_event_notifier_call(struct notifier_block *nb,
 		}
 
 		if (!strcmp(owner_ocm->desc->name, "wireless")) {
-			pr_info("%s wls present\n", __func__);
+			pr_debug("%s wls present\n", __func__);
 			oplus_chg_wake_update_work();
 		}
 		break;
@@ -10139,7 +10139,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	int rc, i;
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
-	pr_info("battery_chg_probe start...\n");
+	pr_debug("battery_chg_probe start...\n");
 	gauge_chip = devm_kzalloc(&pdev->dev, sizeof(*gauge_chip), GFP_KERNEL);
 	if (!gauge_chip) {
 		pr_err("oplus_gauge_chip devm_kzalloc failed.\n");
@@ -10400,7 +10400,7 @@ static int battery_chg_probe(struct platform_device *pdev)
 	}
 	schedule_delayed_work(&bcdev->adsp_voocphy_enable_check_work,
 		round_jiffies_relative(msecs_to_jiffies(1500)));
-	pr_info("battery_chg_probe end...\n");
+	pr_debug("battery_chg_probe end...\n");
 #endif
 	return 0;
 

@@ -595,7 +595,7 @@ static void __init reserve_crashkernel(void)
 		return;
 
 	if (memblock.memory.regions[0].size < crash_size) {
-		pr_info("crashkernel reservation failed: %s\n",
+		pr_debug("crashkernel reservation failed: %s\n",
 			"first memory chunk must be at least crashkernel size");
 		return;
 	}
@@ -611,7 +611,7 @@ static void __init reserve_crashkernel(void)
 		high = crash_base ? crash_base + crash_size : ULONG_MAX;
 
 		if (crash_base && crash_base < low) {
-			pr_info("crashkernel reservation failed: %s\n",
+			pr_debug("crashkernel reservation failed: %s\n",
 				"crash_base too low");
 			return;
 		}
@@ -621,7 +621,7 @@ static void __init reserve_crashkernel(void)
 	}
 
 	if (!crash_base) {
-		pr_info("crashkernel reservation failed: %s\n",
+		pr_debug("crashkernel reservation failed: %s\n",
 			"no suitable area found");
 		return;
 	}
@@ -634,7 +634,7 @@ static void __init reserve_crashkernel(void)
 	crashk_res.start = crash_base;
 	crashk_res.end = crash_base + crash_size - 1;
 	memblock_remove(crash_base, crash_size);
-	pr_info("Reserving %lluMB of memory at %lluMB "
+	pr_debug("Reserving %lluMB of memory at %lluMB "
 		"for crashkernel (System RAM: %luMB)\n",
 		crash_size >> 20, crash_base >> 20,
 		(unsigned long)memblock.memory.total_size >> 20);
@@ -885,14 +885,14 @@ void __init setup_arch(char **cmdline_p)
          * print what head.S has found out about the machine
          */
 	if (MACHINE_IS_VM)
-		pr_info("Linux is running as a z/VM "
+		pr_debug("Linux is running as a z/VM "
 			"guest operating system in 64-bit mode\n");
 	else if (MACHINE_IS_KVM)
-		pr_info("Linux is running under KVM in 64-bit mode\n");
+		pr_debug("Linux is running under KVM in 64-bit mode\n");
 	else if (MACHINE_IS_LPAR)
-		pr_info("Linux is running natively in 64-bit mode\n");
+		pr_debug("Linux is running natively in 64-bit mode\n");
 	else
-		pr_info("Linux is running as a guest in 64-bit mode\n");
+		pr_debug("Linux is running as a guest in 64-bit mode\n");
 
 	/* Have one command line that is parsed and saved in /proc/cmdline */
 	/* boot_command_line has been already set up in early.c */

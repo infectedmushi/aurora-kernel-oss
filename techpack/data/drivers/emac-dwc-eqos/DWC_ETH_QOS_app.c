@@ -35,7 +35,7 @@ static int __init DWC_ETH_QOS_app_init (void)
 	}
 	rtnl_unlock();
 
-	pr_info("Call DWC_ETH_QOS_open function for test purpose\r\n");
+	pr_debug("Call DWC_ETH_QOS_open function for test purpose\r\n");
 	return 0;
 }
 

@@ -33,9 +33,9 @@ void __init imr_self_test_result(int res, const char *fmt, ...)
 
 	/* Print pass/fail. */
 	if (res)
-		pr_info(SELFTEST "pass ");
+		pr_debug(SELFTEST "pass ");
 	else
-		pr_info(SELFTEST "fail ");
+		pr_debug(SELFTEST "fail ");
 
 	/* Print variable string. */
 	va_start(vlist, fmt);

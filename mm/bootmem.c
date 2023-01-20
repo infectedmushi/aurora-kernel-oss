@@ -95,7 +95,7 @@ early_param("bootmem_debug", bootmem_debug_setup);
 
 #define bdebug(fmt, args...) ({				\
 	if (unlikely(bootmem_debug))			\
-		pr_info("bootmem::%s " fmt,		\
+		pr_debug("bootmem::%s " fmt,		\
 			__func__, ## args);		\
 })
 

@@ -13,7 +13,7 @@
 #define  OLC_PROC_ENTRY(name, entry, mode)\
     ({if (!proc_create(#name, S_IFREG | mode, aed_proc_dir, \
         &proc_##entry##_fops)) \
-        pr_info("proc_create %s failed\n", #name); })
+        pr_debug("proc_create %s failed\n", #name); })
 
 
 static struct proc_dir_entry *olc_proc_dir;
@@ -137,13 +137,13 @@ int olc_proc_debug_init(void)
     olc_proc_dir = proc_mkdir("olc", NULL);
     if (!olc_proc_dir)
     {
-        pr_info("olc proc_mkdir failed\n");
+        pr_debug("olc proc_mkdir failed\n");
         return -ENOMEM;
     }
 
     if (!proc_create("generate-exception", S_IFREG | 0600, olc_proc_dir, &proc_generate_exception_fops))
     {
-         pr_info("proc_create generate-exception failed\n");
+         pr_debug("proc_create generate-exception failed\n");
     }
 
     return 0;

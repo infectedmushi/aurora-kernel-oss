@@ -1114,7 +1114,7 @@ static int bob_regulator_mode_switch_get(struct snd_kcontrol *kcontrol,
 		break;
 	}
 
-	pr_info("%s: get g_bob_mode = 0x%x\n", __func__, g_bob_mode);
+	pr_debug("%s: get g_bob_mode = 0x%x\n", __func__, g_bob_mode);
 	return 0;
 }
 
@@ -1137,7 +1137,7 @@ static int bob_regulator_mode_switch_set(struct snd_kcontrol *kcontrol,
 		new_bob_mode = REGULATOR_MODE_STANDBY;
 		break;
 	default:
-		pr_info("%s: set g_bob_mode to default.\n", __func__);
+		pr_debug("%s: set g_bob_mode to default.\n", __func__);
 		new_bob_mode = REGULATOR_MODE_NORMAL;
 		break;
 	}
@@ -1145,10 +1145,10 @@ static int bob_regulator_mode_switch_set(struct snd_kcontrol *kcontrol,
 	if (g_bob_mode != new_bob_mode) {
 		g_bob_mode = new_bob_mode;
 
-		pr_info("%s: set g_bob_mode = 0x%x\n", __func__, g_bob_mode);
+		pr_debug("%s: set g_bob_mode = 0x%x\n", __func__, g_bob_mode);
 		kona_bob_regulator_set_mode(g_bob_mode);
 	} else {
-		pr_info("%s: already in mode 0x%x\n", __func__, g_bob_mode);
+		pr_debug("%s: already in mode 0x%x\n", __func__, g_bob_mode);
 	}
 
 	return 0;

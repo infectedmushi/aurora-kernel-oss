@@ -116,7 +116,7 @@ static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
 			return BLK_EH_RESET_TIMER;
 		}
 
-		pr_info("%s: %s: Timeout even before req reaching LDD, completing the req. Active reqs: %d Req: %p Tag: %d\n",
+		pr_debug("%s: %s: Timeout even before req reaching LDD, completing the req. Active reqs: %d Req: %p Tag: %d\n",
 				mmc_hostname(host), __func__,
 				mmc_cqe_qcnt(mq), req, req->tag);
 		mmc_log_string(host,

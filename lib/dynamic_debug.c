@@ -103,10 +103,10 @@ static char *ddebug_describe_flags(unsigned int flags, struct flagsbuf *fb)
 	return fb->buf;
 }
 
-#define vpr_info(fmt, ...)					\
+#define vpr_debug(fmt, ...)					\
 do {								\
 	if (verbose)						\
-		pr_info(fmt, ##__VA_ARGS__);			\
+		pr_debug(fmt, ##__VA_ARGS__);			\
 } while (0)
 
 static void vpr_info_dq(const struct ddebug_query *query, const char *msg)
@@ -120,7 +120,7 @@ static void vpr_info_dq(const struct ddebug_query *query, const char *msg)
 			fmtlen--;
 	}
 
-	vpr_info("%s: func=\"%s\" file=\"%s\" module=\"%s\" format=\"%.*s\" lineno=%u-%u\n",
+	vpr_debug("%s: func=\"%s\" file=\"%s\" module=\"%s\" format=\"%.*s\" lineno=%u-%u\n",
 		 msg,
 		 query->function ? query->function : "",
 		 query->filename ? query->filename : "",
@@ -196,7 +196,7 @@ static int ddebug_change(const struct ddebug_query *query,
 				static_branch_enable(&dp->key.dd_key_true);
 #endif
 			dp->flags = newflags;
-			vpr_info("changed %s:%d [%s]%s =%s\n",
+			vpr_debug("changed %s:%d [%s]%s =%s\n",
 				 trim_prefix(dp->filename), dp->lineno,
 				 dt->mod_name, dp->function,
 				 ddebug_describe_flags(dp->flags, &fbuf));
@@ -205,7 +205,7 @@ static int ddebug_change(const struct ddebug_query *query,
 	mutex_unlock(&ddebug_lock);
 
 	if (!nfound && verbose)
-		pr_info("no matches for query\n");
+		pr_debug("no matches for query\n");
 
 	return nfound;
 }
@@ -258,7 +258,7 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
 
 	if (verbose) {
 		int i;
-		pr_info("split into words:");
+		pr_debug("split into words:");
 		for (i = 0; i < nwords; i++)
 			pr_cont(" \"%s\"", words[i]);
 		pr_cont("\n");
@@ -408,7 +408,7 @@ static int ddebug_parse_flags(const char *str, unsigned int *flagsp,
 		pr_err("bad flag-op %c, at start of %s\n", *str, str);
 		return -EINVAL;
 	}
-	vpr_info("op='%c'\n", op);
+	vpr_debug("op='%c'\n", op);
 
 	for (; *str ; ++str) {
 		for (i = ARRAY_SIZE(opt_array) - 1; i >= 0; i--) {
@@ -422,7 +422,7 @@ static int ddebug_parse_flags(const char *str, unsigned int *flagsp,
 			return -EINVAL;
 		}
 	}
-	vpr_info("flags=0x%x\n", flags);
+	vpr_debug("flags=0x%x\n", flags);
 
 	/* calculate final *flagsp, *maskp according to mask and op */
 	switch (op) {
@@ -439,7 +439,7 @@ static int ddebug_parse_flags(const char *str, unsigned int *flagsp,
 		*flagsp = 0;
 		break;
 	}
-	vpr_info("*flagsp=0x%x *maskp=0x%x\n", *flagsp, *maskp);
+	vpr_debug("*flagsp=0x%x *maskp=0x%x\n", *flagsp, *maskp);
 	return 0;
 }
 
@@ -490,7 +490,7 @@ static int ddebug_exec_queries(char *query, const char *modname)
 		if (!query || !*query || *query == '#')
 			continue;
 
-		vpr_info("query %d: \"%s\"\n", i, query);
+		vpr_debug("query %d: \"%s\"\n", i, query);
 
 		rc = ddebug_exec_query(query, modname);
 		if (rc < 0) {
@@ -501,7 +501,7 @@ static int ddebug_exec_queries(char *query, const char *modname)
 		}
 		i++;
 	}
-	vpr_info("processed %d queries, with %d matches, %d errs\n",
+	vpr_debug("processed %d queries, with %d matches, %d errs\n",
 		 i, nfound, errs);
 
 	if (exitcode)
@@ -673,7 +673,7 @@ static ssize_t ddebug_proc_write(struct file *file, const char __user *ubuf,
 	tmpbuf = memdup_user_nul(ubuf, len);
 	if (IS_ERR(tmpbuf))
 		return PTR_ERR(tmpbuf);
-	vpr_info("read %d bytes from userspace\n", (int)len);
+	vpr_debug("read %d bytes from userspace\n", (int)len);
 
 	ret = ddebug_exec_queries(tmpbuf, NULL);
 	kfree(tmpbuf);
@@ -736,7 +736,7 @@ static void *ddebug_proc_start(struct seq_file *m, loff_t *pos)
 	struct _ddebug *dp;
 	int n = *pos;
 
-	vpr_info("called m=%p *pos=%lld\n", m, (unsigned long long)*pos);
+	vpr_debug("called m=%p *pos=%lld\n", m, (unsigned long long)*pos);
 
 	mutex_lock(&ddebug_lock);
 
@@ -760,7 +760,7 @@ static void *ddebug_proc_next(struct seq_file *m, void *p, loff_t *pos)
 	struct ddebug_iter *iter = m->private;
 	struct _ddebug *dp;
 
-	vpr_info("called m=%p p=%p *pos=%lld\n",
+	vpr_debug("called m=%p p=%p *pos=%lld\n",
 		 m, p, (unsigned long long)*pos);
 
 	if (p == SEQ_START_TOKEN)
@@ -783,7 +783,7 @@ static int ddebug_proc_show(struct seq_file *m, void *p)
 	struct _ddebug *dp = p;
 	struct flagsbuf flags;
 
-	vpr_info("called m=%p p=%p\n", m, p);
+	vpr_debug("called m=%p p=%p\n", m, p);
 
 	if (p == SEQ_START_TOKEN) {
 		seq_puts(m,
@@ -807,7 +807,7 @@ static int ddebug_proc_show(struct seq_file *m, void *p)
  */
 static void ddebug_proc_stop(struct seq_file *m, void *p)
 {
-	vpr_info("called m=%p p=%p\n", m, p);
+	vpr_debug("called m=%p p=%p\n", m, p);
 	mutex_unlock(&ddebug_lock);
 }
 
@@ -827,7 +827,7 @@ static const struct seq_operations ddebug_proc_seqops = {
  */
 static int ddebug_proc_open(struct inode *inode, struct file *file)
 {
-	vpr_info("called\n");
+	vpr_debug("called\n");
 	return seq_open_private(file, &ddebug_proc_seqops,
 				sizeof(struct ddebug_iter));
 }
@@ -867,7 +867,7 @@ int ddebug_add_module(struct _ddebug *tab, unsigned int n,
 	list_add_tail(&dt->link, &ddebug_tables);
 	mutex_unlock(&ddebug_lock);
 
-	vpr_info("%u debug prints in module %s\n", n, dt->mod_name);
+	vpr_debug("%u debug prints in module %s\n", n, dt->mod_name);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(ddebug_add_module);
@@ -897,7 +897,7 @@ static int ddebug_dyndbg_param_cb(char *param, char *val,
 static int ddebug_dyndbg_boot_param_cb(char *param, char *val,
 				const char *unused, void *arg)
 {
-	vpr_info("%s=\"%s\"\n", param, val);
+	vpr_debug("%s=\"%s\"\n", param, val);
 	return ddebug_dyndbg_param_cb(param, val, NULL, 0);
 }
 
@@ -908,7 +908,7 @@ static int ddebug_dyndbg_boot_param_cb(char *param, char *val,
  */
 int ddebug_dyndbg_module_param_cb(char *param, char *val, const char *module)
 {
-	vpr_info("module: %s %s=\"%s\"\n", module, param, val);
+	vpr_debug("module: %s %s=\"%s\"\n", module, param, val);
 	return ddebug_dyndbg_param_cb(param, val, module, -ENOENT);
 }
 
@@ -928,7 +928,7 @@ int ddebug_remove_module(const char *mod_name)
 	struct ddebug_table *dt, *nextdt;
 	int ret = -ENOENT;
 
-	vpr_info("removing module \"%s\"\n", mod_name);
+	vpr_debug("removing module \"%s\"\n", mod_name);
 
 	mutex_lock(&ddebug_lock);
 	list_for_each_entry_safe(dt, nextdt, &ddebug_tables, link) {
@@ -1016,7 +1016,7 @@ static int __init dynamic_debug_init(void)
 		goto out_err;
 
 	ddebug_init_success = 1;
-	vpr_info("%d modules, %d entries and %d bytes in ddebug tables, %d bytes in (readonly) verbose section\n",
+	vpr_debug("%d modules, %d entries and %d bytes in ddebug tables, %d bytes in (readonly) verbose section\n",
 		 modct, entries, (int)(modct * sizeof(struct ddebug_table)),
 		 verbose_bytes + (int)(__stop___verbose - __start___verbose));
 
@@ -1028,7 +1028,7 @@ static int __init dynamic_debug_init(void)
 			pr_warn("Invalid ddebug boot param %s\n",
 				ddebug_setup_string);
 		else
-			pr_info("%d changes by ddebug_query\n", ret);
+			pr_debug("%d changes by ddebug_query\n", ret);
 	}
 	/* now that ddebug tables are loaded, process all boot args
 	 * again to find and activate queries given in dyndbg params.

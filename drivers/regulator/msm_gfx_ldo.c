@@ -927,7 +927,7 @@ static int msm_gfx_ldo_adjust_init_voltage(struct msm_gfx_ldo *ldo_vreg)
 	for (i = 0; i < ldo_vreg->num_corners; i++) {
 		if (volt_adjust[i]) {
 			ldo_vreg->open_loop_volt[i] += volt_adjust[i];
-			pr_info("adjusted the open-loop voltage[%d] %d -> %d\n",
+			pr_debug("adjusted the open-loop voltage[%d] %d -> %d\n",
 				i + MIN_CORNER_OFFSET,
 				ldo_vreg->open_loop_volt[i] - volt_adjust[i],
 				ldo_vreg->open_loop_volt[i]);
@@ -986,7 +986,7 @@ static int msm_gfx_ldo_voltage_init(struct msm_gfx_ldo *ldo_vreg)
 					GFX_LDO_FUSE_STEP_VOLT,
 					efuse_bits,
 					GFX_LDO_FUSE_SIZE);
-		pr_info("LDO corner %d: target-volt = %d uV\n",
+		pr_debug("LDO corner %d: target-volt = %d uV\n",
 			i + MIN_CORNER_OFFSET, ldo_vreg->open_loop_volt[i]);
 	}
 
@@ -998,14 +998,14 @@ static int msm_gfx_ldo_voltage_init(struct msm_gfx_ldo *ldo_vreg)
 
 	for (i = 0; i < ldo_vreg->num_ldo_corners; i++) {
 		if (ldo_vreg->open_loop_volt[i] > ldo_vreg->ceiling_volt[i]) {
-			pr_info("Warning: initial voltage[%d] %d above ceiling %d\n",
+			pr_debug("Warning: initial voltage[%d] %d above ceiling %d\n",
 				i + MIN_CORNER_OFFSET,
 				ldo_vreg->open_loop_volt[i],
 				ldo_vreg->ceiling_volt[i]);
 			ldo_vreg->open_loop_volt[i] = ldo_vreg->ceiling_volt[i];
 		} else if (ldo_vreg->open_loop_volt[i] <
 				ldo_vreg->floor_volt[i]) {
-			pr_info("Warning: initial voltage[%d] %d below floor %d\n",
+			pr_debug("Warning: initial voltage[%d] %d below floor %d\n",
 				i + MIN_CORNER_OFFSET,
 				ldo_vreg->open_loop_volt[i],
 				ldo_vreg->floor_volt[i]);
@@ -1021,7 +1021,7 @@ static int msm_gfx_ldo_voltage_init(struct msm_gfx_ldo *ldo_vreg)
 		return rc;
 	}
 	ldo_vreg->ldo_fuse_enable = !!efuse_bits;
-	pr_info("LDO-mode fuse %s by default\n", ldo_vreg->ldo_fuse_enable ?
+	pr_debug("LDO-mode fuse %s by default\n", ldo_vreg->ldo_fuse_enable ?
 					"enabled" : "disabled");
 
 	return rc;

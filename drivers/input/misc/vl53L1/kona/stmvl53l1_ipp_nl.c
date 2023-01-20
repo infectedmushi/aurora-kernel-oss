@@ -85,7 +85,7 @@ static int next_xfer_id;
 		__func__, __LINE__, ##__VA_ARGS__)
 
 #if 0
-#	define ipp_dbg(fmt, ...) pr_info("IPP %s %d " fmt "\n",\
+#	define ipp_dbg(fmt, ...) pr_debug("IPP %s %d " fmt "\n",\
 		__func__, __LINE__, ##__VA_ARGS__)
 #else
 #	define ipp_dbg(...) (void)0

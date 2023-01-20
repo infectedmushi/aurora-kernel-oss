@@ -1292,7 +1292,7 @@ static ssize_t show_mask_and_match(struct device *dev,
 	if (!host)
 		return -EINVAL;
 
-	pr_info("%s: M&M show func\n", mmc_hostname(host->mmc));
+	pr_debug("%s: M&M show func\n", mmc_hostname(host->mmc));
 
 	return 0;
 }
@@ -1326,7 +1326,7 @@ static ssize_t store_mask_and_match(struct device *dev,
 		i++;
 	}
 
-	pr_info("%s: M&M parameter passed are: %d %d %d %d\n",
+	pr_debug("%s: M&M parameter passed are: %d %d %d %d\n",
 		mmc_hostname(host->mmc), mask, match, bit_shift, testbus);
 	pm_runtime_get_sync(dev);
 	sdhci_msm_mm_dbg_configure(host, mask, match, bit_shift, testbus);
@@ -3026,7 +3026,7 @@ static irqreturn_t sdhci_msm_testbus_trigger_irq(int irq, void *data)
 {
 	struct sdhci_host *host = (struct sdhci_host *)data;
 
-	pr_info("%s: match happened against mask\n",
+	pr_debug("%s: match happened against mask\n",
 				mmc_hostname(host->mmc));
 
 	return IRQ_HANDLED;
@@ -4352,7 +4352,7 @@ void sdhci_msm_dump_vendor_regs(struct sdhci_host *host)
 	u32 debug_reg[MAX_TEST_BUS] = {0};
 
 	sdhci_msm_cache_debug_data(host);
-	pr_info("----------- VENDOR REGISTER DUMP -----------\n");
+	pr_debug("----------- VENDOR REGISTER DUMP -----------\n");
 	if (msm_host->cq_host)
 		sdhci_msm_cqe_dump_debug_ram(host);
 
@@ -4361,35 +4361,35 @@ void sdhci_msm_dump_vendor_regs(struct sdhci_host *host)
 			msm_host_offset->CORE_MCI_DATA_CNT),
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_MCI_FIFO_CNT));
-	pr_info("Data cnt: 0x%08x | Fifo cnt: 0x%08x | Int sts: 0x%08x\n",
+	pr_debug("Data cnt: 0x%08x | Fifo cnt: 0x%08x | Int sts: 0x%08x\n",
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_MCI_DATA_CNT),
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_MCI_FIFO_CNT),
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_MCI_STATUS));
-	pr_info("DLL sts: 0x%08x | DLL cfg:  0x%08x | DLL cfg2: 0x%08x\n",
+	pr_debug("DLL sts: 0x%08x | DLL cfg:  0x%08x | DLL cfg2: 0x%08x\n",
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_DLL_STATUS),
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_DLL_CONFIG),
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_DLL_CONFIG_2));
-	pr_info("DLL cfg3: 0x%08x | DLL usr ctl:  0x%08x | DDR cfg: 0x%08x\n",
+	pr_debug("DLL cfg3: 0x%08x | DLL usr ctl:  0x%08x | DDR cfg: 0x%08x\n",
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_DLL_CONFIG_3),
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_DLL_USR_CTL),
 		sdhci_msm_readl_relaxed(host,
 			msm_host_offset->CORE_DDR_CONFIG));
-	pr_info("SDCC ver: 0x%08x | Vndr adma err : addr0: 0x%08x addr1: 0x%08x\n",
+	pr_debug("SDCC ver: 0x%08x | Vndr adma err : addr0: 0x%08x addr1: 0x%08x\n",
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_MCI_VERSION),
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_VENDOR_SPEC_ADMA_ERR_ADDR0),
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_VENDOR_SPEC_ADMA_ERR_ADDR1));
-	pr_info("Vndr func: 0x%08x | Vndr func2 : 0x%08x Vndr func3: 0x%08x\n",
+	pr_debug("Vndr func: 0x%08x | Vndr func2 : 0x%08x Vndr func3: 0x%08x\n",
 		readl_relaxed(host->ioaddr +
 			msm_host_offset->CORE_VENDOR_SPEC),
 		readl_relaxed(host->ioaddr +
@@ -4427,7 +4427,7 @@ void sdhci_msm_dump_vendor_regs(struct sdhci_host *host)
 		}
 	}
 	for (i = 0; i < MAX_TEST_BUS; i = i + 4)
-		pr_info(" Test bus[%d to %d]: 0x%08x 0x%08x 0x%08x 0x%08x\n",
+		pr_debug(" Test bus[%d to %d]: 0x%08x 0x%08x 0x%08x 0x%08x\n",
 				i, i + 3, debug_reg[i], debug_reg[i+1],
 				debug_reg[i+2], debug_reg[i+3]);
 }
@@ -4479,7 +4479,7 @@ void sdhci_msm_reset_workaround(struct sdhci_host *host, u32 enable)
 		while (readl_relaxed(host->ioaddr +
 		msm_host_offset->CORE_VENDOR_SPEC_FUNC2) & HC_SW_RST_REQ) {
 			if (timeout == 0) {
-				pr_info("%s: Applying wait idle disable workaround\n",
+				pr_debug("%s: Applying wait idle disable workaround\n",
 					mmc_hostname(host->mmc));
 				/*
 				 * Apply the reset workaround to not wait for
@@ -4499,7 +4499,7 @@ void sdhci_msm_reset_workaround(struct sdhci_host *host, u32 enable)
 			timeout--;
 			udelay(10);
 		}
-		pr_info("%s: waiting for SW_RST_REQ is successful\n",
+		pr_debug("%s: waiting for SW_RST_REQ is successful\n",
 				mmc_hostname(host->mmc));
 	} else {
 		writel_relaxed(vendor_func2 & ~HC_SW_RST_WAIT_IDLE_DIS,
@@ -4913,7 +4913,7 @@ void sdhci_msm_pm_qos_cpu_init(struct sdhci_host *host,
 		group->latency = PM_QOS_DEFAULT_VALUE;
 		pm_qos_add_request(&group->req, PM_QOS_CPU_DMA_LATENCY,
 			group->latency);
-		pr_info("%s (): voted for group #%d (mask=0x%lx) latency=%d\n",
+		pr_debug("%s (): voted for group #%d (mask=0x%lx) latency=%d\n",
 			__func__, i,
 			group->req.cpus_affine.bits[0],
 			group->latency);
@@ -5311,7 +5311,7 @@ static void sdhci_msm_select_bus_mode(struct sdhci_host *host)
 			msm_host->mmc->clk_scaling.lower_bus_speed_mode &=
 				~(MMC_SCALING_LOWER_DDR52_MODE);
 		}
-		pr_info("%s: %s: bus_mode=%d set using kernel command line\n",
+		pr_debug("%s: %s: bus_mode=%d set using kernel command line\n",
 			mmc_hostname(host->mmc), __func__, bus_mode);
 	}
 }

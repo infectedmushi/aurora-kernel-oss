@@ -76,7 +76,7 @@ static int ion_system_secure_heap_allocate(struct ion_heap *heap,
 
 	if (!ion_heap_is_system_secure_heap_type(secure_heap->heap.type) ||
 	    !is_cp_flag_present(flags)) {
-		pr_info("%s: Incorrect heap type or incorrect flags\n",
+		pr_debug("%s: Incorrect heap type or incorrect flags\n",
 			__func__);
 		return -EINVAL;
 	}
@@ -84,7 +84,7 @@ static int ion_system_secure_heap_allocate(struct ion_heap *heap,
 	ret = secure_heap->sys_heap->ops->allocate(secure_heap->sys_heap,
 						buffer, size, flags);
 	if (ret) {
-		pr_info("%s: Failed to get allocation for %s, ret = %d\n",
+		pr_debug("%s: Failed to get allocation for %s, ret = %d\n",
 			__func__, heap->name, ret);
 		return ret;
 	}
@@ -311,7 +311,7 @@ int ion_system_secure_heap_drain(struct ion_heap *heap, void *ptr)
 static void *ion_system_secure_heap_map_kernel(struct ion_heap *heap,
 					       struct ion_buffer *buffer)
 {
-	pr_info("%s: Kernel mapping from secure heap %s disallowed\n",
+	pr_debug("%s: Kernel mapping from secure heap %s disallowed\n",
 		__func__, heap->name);
 	return ERR_PTR(-EINVAL);
 }
@@ -325,7 +325,7 @@ static int ion_system_secure_heap_map_user(struct ion_heap *mapper,
 					   struct ion_buffer *buffer,
 					   struct vm_area_struct *vma)
 {
-	pr_info("%s: Mapping from secure heap %s disallowed\n",
+	pr_debug("%s: Mapping from secure heap %s disallowed\n",
 		__func__, mapper->name);
 	return -EINVAL;
 }

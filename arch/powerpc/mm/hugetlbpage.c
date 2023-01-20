@@ -667,7 +667,7 @@ static int __init hugetlbpage_init(void)
 	int psize;
 
 	if (hugetlb_disabled) {
-		pr_info("HugeTLB support is disabled!\n");
+		pr_debug("HugeTLB support is disabled!\n");
 		return 0;
 	}
 

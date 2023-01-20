@@ -5,7 +5,7 @@
 /* Bus-Access-Manager (BAM) Hardware manager. */
 
 #include <linux/types.h>	/* u32 */
-#include <linux/kernel.h>	/* pr_info() */
+#include <linux/kernel.h>	/* pr_debug() */
 #include <linux/io.h>		/* ioread32() */
 #include <linux/bitops.h>	/* find_first_bit() */
 #include <linux/errno.h>	/* ENODEV */

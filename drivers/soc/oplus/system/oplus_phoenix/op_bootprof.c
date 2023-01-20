@@ -117,7 +117,7 @@ static void op_bootprof_switch(int on)
 	if (op_bootprof_enabled ^ on) {
 		unsigned long long ts = sched_clock();
 
-		pr_info("BOOTPROF:%10Ld.%06ld: %s\n",
+		pr_debug("BOOTPROF:%10Ld.%06ld: %s\n",
 		       nsec_high(ts), nsec_low(ts), on ? "ON" : "OFF");
 
 		if (on) {

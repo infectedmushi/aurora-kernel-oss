@@ -378,7 +378,7 @@ static int create_trace_uprobe(int argc, char **argv)
 	else if (argv[0][0] == 'r')
 		is_return = true;
 	else if (argv[0][0] != 'p') {
-		pr_info("Probe definition must be started with 'p', 'r' or '-'.\n");
+		pr_debug("Probe definition must be started with 'p', 'r' or '-'.\n");
 		return -EINVAL;
 	}
 
@@ -392,12 +392,12 @@ static int create_trace_uprobe(int argc, char **argv)
 			event[-1] = '\0';
 
 			if (strlen(group) == 0) {
-				pr_info("Group name is not specified\n");
+				pr_debug("Group name is not specified\n");
 				return -EINVAL;
 			}
 		}
 		if (strlen(event) == 0) {
-			pr_info("Event name is not specified\n");
+			pr_debug("Event name is not specified\n");
 			return -EINVAL;
 		}
 	}
@@ -408,7 +408,7 @@ static int create_trace_uprobe(int argc, char **argv)
 		int ret;
 
 		if (!event) {
-			pr_info("Delete command needs an event name.\n");
+			pr_debug("Delete command needs an event name.\n");
 			return -EINVAL;
 		}
 		mutex_lock(&uprobe_lock);
@@ -416,7 +416,7 @@ static int create_trace_uprobe(int argc, char **argv)
 
 		if (!tu) {
 			mutex_unlock(&uprobe_lock);
-			pr_info("Event %s/%s doesn't exist.\n", group, event);
+			pr_debug("Event %s/%s doesn't exist.\n", group, event);
 			return -ENOENT;
 		}
 		/* delete an event */
@@ -426,7 +426,7 @@ static int create_trace_uprobe(int argc, char **argv)
 	}
 
 	if (argc < 2) {
-		pr_info("Probe point is not specified.\n");
+		pr_debug("Probe point is not specified.\n");
 		return -EINVAL;
 	}
 	/* Find the last occurrence, in case the path contains ':' too. */
@@ -474,7 +474,7 @@ static int create_trace_uprobe(int argc, char **argv)
 
 	tu = alloc_trace_uprobe(group, event, argc, is_return);
 	if (IS_ERR(tu)) {
-		pr_info("Failed to allocate trace_uprobe.(%d)\n", (int)PTR_ERR(tu));
+		pr_debug("Failed to allocate trace_uprobe.(%d)\n", (int)PTR_ERR(tu));
 		ret = PTR_ERR(tu);
 		goto fail_address_parse;
 	}
@@ -483,7 +483,7 @@ static int create_trace_uprobe(int argc, char **argv)
 	tu->filename = kstrdup(filename, GFP_KERNEL);
 
 	if (!tu->filename) {
-		pr_info("Failed to allocate filename.\n");
+		pr_debug("Failed to allocate filename.\n");
 		ret = -ENOMEM;
 		goto error;
 	}
@@ -509,19 +509,19 @@ static int create_trace_uprobe(int argc, char **argv)
 		}
 
 		if (!parg->name) {
-			pr_info("Failed to allocate argument[%d] name.\n", i);
+			pr_debug("Failed to allocate argument[%d] name.\n", i);
 			ret = -ENOMEM;
 			goto error;
 		}
 
 		if (!is_good_name(parg->name)) {
-			pr_info("Invalid argument[%d] name: %s\n", i, parg->name);
+			pr_debug("Invalid argument[%d] name: %s\n", i, parg->name);
 			ret = -EINVAL;
 			goto error;
 		}
 
 		if (traceprobe_conflict_field_name(parg->name, tu->tp.args, i)) {
-			pr_info("Argument[%d] name '%s' conflicts with "
+			pr_debug("Argument[%d] name '%s' conflicts with "
 				"another field.\n", i, argv[i]);
 			ret = -EINVAL;
 			goto error;
@@ -532,7 +532,7 @@ static int create_trace_uprobe(int argc, char **argv)
 						 is_return, false,
 						 uprobes_fetch_type_table);
 		if (ret) {
-			pr_info("Parse error at argument[%d]. (%d)\n", i, ret);
+			pr_debug("Parse error at argument[%d]. (%d)\n", i, ret);
 			goto error;
 		}
 	}
@@ -549,7 +549,7 @@ error:
 fail_address_parse:
 	path_put(&path);
 
-	pr_info("Failed to parse address or file.\n");
+	pr_debug("Failed to parse address or file.\n");
 
 	return ret;
 }
@@ -1323,7 +1323,7 @@ static int register_uprobe_event(struct trace_uprobe *tu)
 	ret = trace_add_event_call(call);
 
 	if (ret) {
-		pr_info("Failed to register uprobe event: %s\n",
+		pr_debug("Failed to register uprobe event: %s\n",
 			trace_event_name(call));
 		kfree(call->print_fmt);
 		unregister_trace_event(&call->event);
@@ -1371,7 +1371,7 @@ create_local_trace_uprobe(char *name, unsigned long offs, bool is_return)
 				is_return);
 
 	if (IS_ERR(tu)) {
-		pr_info("Failed to allocate trace_uprobe.(%d)\n",
+		pr_debug("Failed to allocate trace_uprobe.(%d)\n",
 			(int)PTR_ERR(tu));
 		path_put(&path);
 		return ERR_CAST(tu);

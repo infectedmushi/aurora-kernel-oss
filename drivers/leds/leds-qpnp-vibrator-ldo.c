@@ -339,7 +339,7 @@ static ssize_t qpnp_vib_store_activate(struct device *dev,
 	hrtimer_cancel(&chip->stop_timer);
 	chip->state = val;
 #ifdef OPLUS_FEATURE_CHG_BASIC
-	pr_info("state = %d, time = %llums\n", chip->state, chip->vib_play_ms);
+	pr_debug("state = %d, time = %llums\n", chip->state, chip->vib_play_ms);
 #endif
 	mutex_unlock(&chip->lock);
 #ifdef OPLUS_FEATURE_CHG_BASIC
@@ -519,7 +519,7 @@ static int qpnp_vibrator_ldo_probe(struct platform_device *pdev)
 		}
 	}
 
-	pr_info("Vibrator LDO successfully registered: uV = %d, overdrive = %s\n",
+	pr_debug("Vibrator LDO successfully registered: uV = %d, overdrive = %s\n",
 		chip->vmax_uV,
 		chip->disable_overdrive ? "disabled" : "enabled");
 	return 0;

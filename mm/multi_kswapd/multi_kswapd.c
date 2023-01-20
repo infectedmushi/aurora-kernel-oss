@@ -83,7 +83,7 @@ void update_kswapd_threads(void)
 	for_each_node_state(nid, N_MEMORY)
 		update_kswapd_threads_node(nid);
 
-	pr_info("kswapd_thread count changed, old:%d new:%d\n",
+	pr_debug("kswapd_thread count changed, old:%d new:%d\n",
 		kswapd_threads_current, kswapd_threads);
 	kswapd_threads_current = kswapd_threads;
 	mem_hotplug_done();

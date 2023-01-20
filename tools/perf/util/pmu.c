@@ -678,7 +678,7 @@ int strcmp_cpuid_str(const char *mapcpuid, const char *cpuid)
 
 	if (regcomp(&re, mapcpuid, REG_EXTENDED) != 0) {
 		/* Warn unable to generate match particular string. */
-		pr_info("Invalid regular expression %s\n", mapcpuid);
+		pr_debug("Invalid regular expression %s\n", mapcpuid);
 		return 1;
 	}
 
@@ -1072,7 +1072,7 @@ static int pmu_config_term(struct list_head *formats,
 	} else if (term->type_val == PARSE_EVENTS__TERM_TYPE_STR) {
 		if (strcmp(term->val.str, "?")) {
 			if (verbose > 0) {
-				pr_info("Invalid sysfs entry %s=%s\n",
+				pr_debug("Invalid sysfs entry %s=%s\n",
 						term->config, term->val.str);
 			}
 			if (err) {

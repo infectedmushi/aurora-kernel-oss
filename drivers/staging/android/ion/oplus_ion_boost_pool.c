@@ -92,7 +92,7 @@ void boost_pool_dump(struct ion_boost_pool *pool)
 {
 	int i;
 
-	pr_info("Name:%s: %dMib, low: %dMib, high:%dMib\n",
+	pr_debug("Name:%s: %dMib, low: %dMib, high:%dMib\n",
 		pool->name,
 		M(boost_pool_nr_pages(pool)),
 		M(pool->low),
@@ -101,10 +101,10 @@ void boost_pool_dump(struct ion_boost_pool *pool)
 	for (i = 0; i < NUM_ORDERS; i++) {
 		struct ion_page_pool *page_pool = pool->pools[i];
 
-		pr_info("%d order %u highmem pages in boost pool = %lu total\n",
+		pr_debug("%d order %u highmem pages in boost pool = %lu total\n",
 			page_pool->high_count, page_pool->order,
 			(PAGE_SIZE << page_pool->order) * page_pool->high_count);
-		pr_info("%d order %u lowmem pages in boost pool = %lu total\n",
+		pr_debug("%d order %u lowmem pages in boost pool = %lu total\n",
 			page_pool->low_count, page_pool->order,
 			(PAGE_SIZE << page_pool->order) * page_pool->low_count);
 	}
@@ -176,7 +176,7 @@ static int boost_prefill_kworkthread(void *p)
 #ifdef BOOSTPOOL_DEBUG
 		begin = jiffies;
 
-		pr_info("prefill start >>>>> nr_page: %dMib high: %dMib.\n",
+		pr_debug("prefill start >>>>> nr_page: %dMib high: %dMib.\n",
 			M(boost_pool_nr_pages(pool)), M(pool->high));
 #endif /* BOOSTPOOL_DEBUG */
 
@@ -196,7 +196,7 @@ static int boost_prefill_kworkthread(void *p)
 		}
 
 #ifdef BOOSTPOOL_DEBUG
-		pr_info("prefill end <<<<< nr_page: %dMib high:%dMib use %dms\n",
+		pr_debug("prefill end <<<<< nr_page: %dMib high:%dMib use %dms\n",
 			M(boost_pool_nr_pages(pool)), M(pool->high),
 			jiffies_to_msecs(jiffies - begin));
 #endif /* BOOSTPOOL_DEBUG */
@@ -408,14 +408,14 @@ static ssize_t boost_pool_proc_write(struct file *file,
 		return err;
 
 	if (nr_pages == 0) {
-		pr_info("%s: reset flag.\n", current->comm);
+		pr_debug("%s: reset flag.\n", current->comm);
 		boost_pool->high = boost_pool->low = boost_pool->origin;
 		boost_pool->force_stop = false;
 		return count;
 	}
 
 	if (nr_pages == -1) {
-		pr_info("%s: force stop.\n", current->comm);
+		pr_debug("%s: force stop.\n", current->comm);
 		boost_pool->force_stop = true;
 		return count;
 	}
@@ -427,7 +427,7 @@ static ssize_t boost_pool_proc_write(struct file *file,
 	if (mutex_trylock(&boost_pool->prefill_mutex)) {
 		long mem_avail = si_mem_available();
 
-		pr_info("%s: set high wm => %dMib. current avail => %dMib\n",
+		pr_debug("%s: set high wm => %dMib. current avail => %dMib\n",
 			current->comm, M(nr_pages), M(mem_avail));
 
 		boost_pool->prefill = true;
@@ -547,7 +547,7 @@ static int set_tsk_affinity(struct task_struct *tsk, int end_cpu)
 		cpumask_set_cpu(i, &mask);
 	/* TODO FIX this */
 	ret = sched_setaffinity(tsk->pid, &mask);
-	pr_info("bind %s on cpu[0-%d].\n", tsk->comm, end_cpu);
+	pr_debug("bind %s on cpu[0-%d].\n", tsk->comm, end_cpu);
 
 	return ret;
 }
@@ -590,11 +590,11 @@ struct ion_boost_pool *boost_pool_create(struct ion_system_heap *heap,
 						 &boost_pool_proc_ops,
 						 boost_pool);
 	if (IS_ERR_OR_NULL(boost_pool->proc_info)) {
-		pr_info("Unable to initialise /proc/boost_pool/%s\n",
+		pr_debug("Unable to initialise /proc/boost_pool/%s\n",
 			name);
 		goto destroy_pools;
 	} else {
-		pr_info("procfs entry /proc/boost_pool/%s allocated.\n", name);
+		pr_debug("procfs entry /proc/boost_pool/%s allocated.\n", name);
 	}
 	snprintf(buf, 128, "%s_low", name);
 	boost_pool->proc_low_info = proc_create_data(buf, 0666,
@@ -602,11 +602,11 @@ struct ion_boost_pool *boost_pool_create(struct ion_system_heap *heap,
 						 &boost_pool_low_proc_ops,
 						 boost_pool);
 	if (IS_ERR_OR_NULL(boost_pool->proc_low_info)) {
-		pr_info("Unable to initialise /proc/boost_pool/%s_low\n",
+		pr_debug("Unable to initialise /proc/boost_pool/%s_low\n",
 			name);
 		goto destroy_proc_info;
 	} else {
-		pr_info("procfs entry /proc/boost_pool/%s_low allocated.\n",
+		pr_debug("procfs entry /proc/boost_pool/%s_low allocated.\n",
 			name);
 	}
 
@@ -616,11 +616,11 @@ struct ion_boost_pool *boost_pool_create(struct ion_system_heap *heap,
 						 &boost_pool_stat_proc_ops,
 						 boost_pool);
 	if (IS_ERR_OR_NULL(boost_pool->proc_stat)) {
-		pr_info("Unable to initialise /proc/boost_pool/%s_stat\n",
+		pr_debug("Unable to initialise /proc/boost_pool/%s_stat\n",
 			name);
 		goto destroy_proc_low_info;
 	} else {
-		pr_info("procfs entry /proc/boost_pool/%s_stat allocated.\n",
+		pr_debug("procfs entry /proc/boost_pool/%s_stat allocated.\n",
 			name);
 	}
 

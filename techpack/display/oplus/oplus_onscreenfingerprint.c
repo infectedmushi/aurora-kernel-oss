@@ -366,11 +366,11 @@ static int dsi_panel_parse_oplus_backlight_remapping_config(struct dsi_panel *pa
 
 	panel->oplus_priv.bl_interpolate_remap_nosub = utils->read_bool(utils->data,
 			"oplus,bl_interpolate_remapping_nosub");
-	pr_info("support bl_interpolate_remap_nosub: %s\n", panel->oplus_priv.bl_interpolate_remap_nosub ? "true" : "false");
+	pr_debug("support bl_interpolate_remap_nosub: %s\n", panel->oplus_priv.bl_interpolate_remap_nosub ? "true" : "false");
 
 	panel->oplus_priv.bl_interpolate_alpha_dc_nosub = utils->read_bool(utils->data,
 			"oplus,bl_interpolate_alpha_dc_nosub");
-	pr_info("support bl_interpolate_alpha_dc_nosub: %s\n", panel->oplus_priv.bl_interpolate_alpha_dc_nosub ? "true" : "false");
+	pr_debug("support bl_interpolate_alpha_dc_nosub: %s\n", panel->oplus_priv.bl_interpolate_alpha_dc_nosub ? "true" : "false");
 
 	arr = utils->get_property(utils->data, "oplus,dsi-brightness-remapping", &length);
 	if (!arr) {
@@ -474,7 +474,7 @@ int dsi_panel_parse_oplus_config(struct dsi_panel *panel)
 #endif /* OPLUS_FEATURE_AOD_RAMLESS */
 
 	panel->oplus_priv.is_osc_support = utils->read_bool(utils->data, "oplus,osc-support");
-	pr_info("[%s]osc mode support: %s", __func__, panel->oplus_priv.is_osc_support ? "Yes" : "Not");
+	pr_debug("[%s]osc mode support: %s", __func__, panel->oplus_priv.is_osc_support ? "Yes" : "Not");
 	if (panel->oplus_priv.is_osc_support) {
 		ret = utils->read_u32(utils->data, "oplus,mdss-dsi-osc-clk-mode0-rate",
 					&panel->oplus_priv.osc_clk_mode0_rate);
@@ -493,7 +493,7 @@ int dsi_panel_parse_oplus_config(struct dsi_panel *panel)
 		}
 
 		panel->oplus_priv.is_osc_rewrite_support = utils->read_bool(utils->data, "oplus,osc-rewrite-support");
-		pr_info("[%s]osc rewrite clk rate support: %s", __func__, panel->oplus_priv.is_osc_rewrite_support ? "Yes" : "Not");
+		pr_debug("[%s]osc rewrite clk rate support: %s", __func__, panel->oplus_priv.is_osc_rewrite_support ? "Yes" : "Not");
 		if (panel->oplus_priv.is_osc_rewrite_support) {
 			ret = utils->read_u32(utils->data, "oplus,mdss-dsi-osc-rewrite-rate",
 							&panel->oplus_priv.osc_rewrite_clk_rate);
@@ -508,7 +508,7 @@ int dsi_panel_parse_oplus_config(struct dsi_panel *panel)
 	DSI_INFO("apollo_backlight_enable: %s", apollo_backlight_enable ? "true" : "false");
 
 	panel->oplus_priv.is_raw_backlight = utils->read_bool(utils->data, "oplus,raw-backlight");
-	pr_info("[%s]is_raw_backlight: %s", __func__, panel->oplus_priv.is_raw_backlight? "Yes" : "Not");
+	pr_debug("[%s]is_raw_backlight: %s", __func__, panel->oplus_priv.is_raw_backlight? "Yes" : "Not");
 
 #ifdef OPLUS_FEATURE_ADFR
 	if (oplus_adfr_is_support()) {
@@ -914,7 +914,7 @@ int oplus_display_panel_notify_fp_press(void *data)
 	if (onscreenfp_status == oplus_onscreenfp_status)
 		return 0;
 
-	pr_info("hidl notify fingerpress %s\n", onscreenfp_status ? "on" : "off");
+	pr_debug("hidl notify fingerpress %s\n", onscreenfp_status ? "on" : "off");
 
 	vblank_get = drm_crtc_vblank_get(dsi_connector->state->crtc);
 	if (vblank_get) {

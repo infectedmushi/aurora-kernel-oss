@@ -158,14 +158,14 @@ static void dump_kswapd_debug_info(void)
 	struct kswapd_debug_entry *entry;
 
 	for_each_online_pgdat(pgdat) {
-		pr_info("Node %d kswapd has run %lu ms %lu times:\n",
+		pr_debug("Node %d kswapd has run %lu ms %lu times:\n",
 				pgdat->node_id,
 				div_u64(atomic_long_read(&pgdat->kswapd_running_ns), NS_PER_MS),
 				atomic_long_read(&pgdat->kswapd_running_times));
 
 		entry = pgdat->kswapd_debug;
 		for (order=0; order<=MAX_ORDER; order++)
-			pr_info("order %4d %12lu %12lu ms\n", order,
+			pr_debug("order %4d %12lu %12lu ms\n", order,
 					atomic_long_read(&entry[order].cnt),
 					div_u64(atomic_long_read(&entry[order].runtime_ns), NS_PER_MS));
 	}
@@ -397,7 +397,7 @@ static void oplus_show_mem(void)
 	unaccounted = total - free - slab_rec - slab_unrec - vmalloc -anon -
 		file - pagetbl - kernel_stack - ion_used - ion_cache - gpu;
 
-	pr_info("%s:%lukB %s:%lukB %s:%lukB %s:%lukB %s:%lukB "
+	pr_debug("%s:%lukB %s:%lukB %s:%lukB %s:%lukB %s:%lukB "
 		"%s:%lukB %s:%lukB %s:%lukB %s:%lukB %s:%lukB "
 		"%s:%lukB %s:%lukB %s:%lukB Unaccounted:%lukB",
 		mem_type_text[MEM_TOTAL], K(total),
@@ -429,7 +429,7 @@ static int dump_tasks_info(bool verbose)
 	u64 wm_task_rss = SZ_256M >> PAGE_SHIFT;
 	char cmdline[MAX_OOM_DUMP_TASK_CMDLINE];
 
-	pr_info("[ pid ]   uid  tgid total_vm      rss    nptes     swap    sheme   adj s name\n");
+	pr_debug("[ pid ]   uid  tgid total_vm      rss    nptes     swap    sheme   adj s name\n");
 
 	rcu_read_lock();
 	for_each_process(p) {
@@ -463,7 +463,7 @@ static int dump_tasks_info(bool verbose)
 		/* check whether we have freezed a task. */
 		frozen_mark = frozen(tsk) ? '*' : ' ';
 
-		pr_info("[%5d] %5d %5d %8lu %8lu %8lu %8lu %8lu %5hd %c %s%c\n",
+		pr_debug("[%5d] %5d %5d %8lu %8lu %8lu %8lu %8lu %5hd %c %s%c\n",
 			tsk->pid,
 			from_kuid(&init_user_ns, task_uid(tsk)),
 			tsk->tgid, tsk->mm->total_vm,
@@ -480,7 +480,7 @@ static int dump_tasks_info(bool verbose)
 		if (strstr(tsk->comm, "vendor.qti") != NULL) {
 			memset(cmdline, 0, MAX_OOM_DUMP_TASK_CMDLINE);
 			get_cmdline(tsk, cmdline, MAX_OOM_DUMP_TASK_CMDLINE-1);
-			pr_info("[%5d] %s\n", tsk->pid, cmdline);
+			pr_debug("[%5d] %s\n", tsk->pid, cmdline);
 		}
 	}
 	rcu_read_unlock();
@@ -519,7 +519,7 @@ static int dump_ion(bool verbose)
 			mutex_unlock(&client->lock);
 			continue;
 		}
-		pr_info("[%-5d] %-8d %-16s %-16s\n",
+		pr_debug("[%-5d] %-8d %-16s %-16s\n",
 			client->pid,
 			buffer_size / SZ_1K,
 			client->task ? task_comm : "from_kernel",
@@ -528,14 +528,14 @@ static int dump_ion(bool verbose)
 		mutex_unlock(&client->lock);
 	}
 
-	pr_info("orphaned allocation (info is from last known client):\n");
+	pr_debug("orphaned allocation (info is from last known client):\n");
 	mutex_lock(&dev->buffer_lock);
 	for (n = rb_first(&dev->buffers); n; n = rb_next(n)) {
 		struct ion_buffer *buffer = rb_entry(n, struct ion_buffer,
 						     node);
 		total_size += buffer->size;
 		if (!buffer->handle_count) {
-			pr_info("[%-5d] %-8d %-16s 0x%p %d %d\n",
+			pr_debug("[%-5d] %-8d %-16s 0x%p %d %d\n",
 				buffer->pid,
 				buffer->size / SZ_1K,
 				buffer->task_comm,
@@ -546,7 +546,7 @@ static int dump_ion(bool verbose)
 		}
 	}
 	mutex_unlock(&dev->buffer_lock);
-	pr_info("orphaned: %zu total: %zu\n",
+	pr_debug("orphaned: %zu total: %zu\n",
 		total_orphaned_size, total_size);
 
 	up_read(&dev->lock);
@@ -571,7 +571,7 @@ static int acct_dma_dize(const void *data, struct file *file,
 
 	dbuf = file->private_data;
 	if (dbuf->size && dmainfo->verbose) {
-		pr_info("%s:%ldkB\n",
+		pr_debug("%s:%ldkB\n",
 			dbuf->name,
 			dbuf->size / SZ_1K);
 	}
@@ -614,7 +614,7 @@ static int dump_ion(bool verbose)
 			continue;
 		}
 
-		pr_info("%s (PID:%d) size:%lukB\n",
+		pr_debug("%s (PID:%d) size:%lukB\n",
 			task->comm, task->pid, dmainfo.sz / SZ_1K);
 	}
 	rcu_read_unlock();
@@ -648,7 +648,7 @@ static int dump_slab(bool verbose)
 		}
 
 		if (max_cachep || prev_max_cachep) {
-			pr_info("name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab> : tunables <limit> <batchcount> <sharedfactor> : slabdata <active_slabs> <num_slabs> <sharedavail>");
+			pr_debug("name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab> : tunables <limit> <batchcount> <sharedfactor> : slabdata <active_slabs> <num_slabs> <sharedavail>");
 		}
 
 		if (max_cachep) {
@@ -659,7 +659,7 @@ static int dump_slab(bool verbose)
 			 * better performance */
 			get_slabinfo(max_cachep, &sinfo);
 
-			pr_info("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
+			pr_debug("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
 				max_cachep->name, sinfo.active_objs,
 				sinfo.num_objs, max_cachep->size,
 				sinfo.objects_per_slab,
@@ -677,7 +677,7 @@ static int dump_slab(bool verbose)
 			 * better performance */
 			get_slabinfo(prev_max_cachep, &sinfo);
 
-			pr_info("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
+			pr_debug("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
 				prev_max_cachep->name, sinfo.active_objs,
 				sinfo.num_objs, prev_max_cachep->size,
 				sinfo.objects_per_slab,
@@ -691,7 +691,7 @@ static int dump_slab(bool verbose)
 	} else {
 		struct kmem_cache *cachep = NULL;
 
-		pr_info("# name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab> : tunables <limit> <batchcount> <sharedfactor> : slabdata <active_slabs> <num_slabs> <sharedavail>");
+		pr_debug("# name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab> : tunables <limit> <batchcount> <sharedfactor> : slabdata <active_slabs> <num_slabs> <sharedavail>");
 
 		mutex_lock(&slab_mutex);
 		list_for_each_entry(cachep, &slab_caches, list) {
@@ -700,7 +700,7 @@ static int dump_slab(bool verbose)
 			memset(&sinfo, 0, sizeof(sinfo));
 			get_slabinfo(cachep, &sinfo);
 
-			pr_info("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
+			pr_debug("%-17s %6lu %6lu %6u %4u %4d : tunables %4u %4u %4u : slabdata %6lu %6lu %6lu\n",
 				cachep->name, sinfo.active_objs,
 				sinfo.num_objs, cachep->size,
 				sinfo.objects_per_slab,
@@ -723,7 +723,7 @@ static void lowmem_dbg_dump(struct work_struct *work)
 	struct lowmem_dbg_cfg *pcfg = &dbg_cfg;
 
 	mutex_lock(&lowmem_dump_mutex);
-	pr_info("dump start avail:%lukB critical:%d\n",
+	pr_debug("dump start avail:%lukB critical:%d\n",
 		K(get_mem_usage_pages(MEM_AVAILABLE)), critical);
 	oplus_show_mem();
 	for (i = MEM_ANON; i < MEM_TOTAL; i++) {
@@ -733,15 +733,15 @@ static void lowmem_dbg_dump(struct work_struct *work)
 			pr_warn("not suport %s stats", text);
 			continue;
 		}
-		pr_info("dump [%s] usage:%lukB above_watermark:%d\n",
+		pr_debug("dump [%s] usage:%lukB above_watermark:%d\n",
 			text, K(usage), pcfg->wms[i] < usage);
 		dump_mem_detail(i, critical ? true : pcfg->wms[i] < usage);
-		pr_info("dump [%s] end.\n", text);
+		pr_debug("dump [%s] end.\n", text);
 	}
 #ifdef CONFIG_KSWAPD_DEBUG_STATISTICS
 	dump_kswapd_debug_info();
 #endif
-	pr_info("dump end\n");
+	pr_debug("dump end\n");
 	mutex_unlock(&lowmem_dump_mutex);
 }
 
@@ -818,7 +818,7 @@ static __init int oplus_lowmem_dbg_init(void)
 	pcfg->wm_critical = pcfg->wm_low / 2;
 	ret = register_shrinker(&lowmem_shrinker);
 
-	pr_info("init watermark %s:%lukB %s:%lukB %s:%lukB %s:%lukB "
+	pr_debug("init watermark %s:%lukB %s:%lukB %s:%lukB %s:%lukB "
 		"Low %lukB Critical %lukB",
 		mem_type_text[MEM_ANON], K(pcfg->wms[MEM_ANON]),
 		mem_type_text[MEM_SLAB_UNRECLAIMABLE],

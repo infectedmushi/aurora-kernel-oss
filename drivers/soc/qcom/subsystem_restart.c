@@ -311,7 +311,7 @@ static ssize_t restart_level_store(struct device *dev,
 				subsys->desc->name, i);
                         //#ifdef OPLUS_BUG_STABILITY
 			if(PREVERSION == get_eng_version()){
-				pr_info("preversion \n");
+				pr_debug("preversion \n");
 				subsys->restart_level = RESET_SUBSYS_COUPLED;
 			} else {
 				subsys->restart_level = i;
@@ -343,7 +343,7 @@ static ssize_t firmware_name_store(struct device *dev,
 	if (p)
 		count = p - buf;
 
-	pr_info("Changing subsys fw_name to %s\n", buf);
+	pr_debug("Changing subsys fw_name to %s\n", buf);
 	mutex_lock(&track->lock);
 	strlcpy(subsys->desc->fw_name, buf,
 			min(count + 1, sizeof(subsys->desc->fw_name)));
@@ -812,7 +812,7 @@ static int subsystem_shutdown(struct subsys_device *dev, void *data)
 	const char *name = dev->desc->name;
 	int ret;
 
-	pr_info("[%s:%d]: Shutting down %s\n",
+	pr_debug("[%s:%d]: Shutting down %s\n",
 			current->comm, current->pid, name);
 	ret = dev->desc->shutdown(dev->desc, true);
 	if (ret < 0) {
@@ -855,7 +855,7 @@ static int subsystem_powerup(struct subsys_device *dev, void *data)
 	const char *name = dev->desc->name;
 	int ret;
 
-	pr_info("[%s:%d]: Powering up %s\n", current->comm, current->pid, name);
+	pr_debug("[%s:%d]: Powering up %s\n", current->comm, current->pid, name);
 	reinit_completion(&dev->err_ready);
 
 	enable_all_irqs(dev);
@@ -1075,7 +1075,7 @@ void *__subsystem_get(const char *name, const char *fw_name)
 	mutex_lock(&track->lock);
 	if (!subsys->count) {
 		if (fw_name) {
-			pr_info("Changing subsys fw_name to %s\n", fw_name);
+			pr_debug("Changing subsys fw_name to %s\n", fw_name);
 			strlcpy(subsys->desc->fw_name, fw_name,
 				sizeof(subsys->desc->fw_name));
 		}
@@ -1250,7 +1250,7 @@ static void subsystem_restart_wq_func(struct work_struct *work)
 		goto err;
 	notify_each_subsys_device(list, count, SUBSYS_AFTER_POWERUP, NULL);
 
-	pr_info("[%s:%d]: Restart sequence for %s completed.\n",
+	pr_debug("[%s:%d]: Restart sequence for %s completed.\n",
 			current->comm, current->pid, desc->name);
 
 err:
@@ -1350,7 +1350,7 @@ void __subsystem_send_uevent(struct device *dev, char *reason)
 	hashid = getBKDRHash(reason, strlen(reason));
 	snprintf(modem_hashreason, sizeof(modem_hashreason), "MODEM_HASH_REASON=fid:%u;cause:%s", hashid, reason);
 	modem_hashreason[MAX_REASON_LEN - 1] = 0;
-	pr_info("__subsystem_send_uevent: modem_hashreason: %s\n", modem_hashreason);
+	pr_debug("__subsystem_send_uevent: modem_hashreason: %s\n", modem_hashreason);
 	envp[2] = (char *)&modem_hashreason;
 
 	envp[3] = 0;
@@ -1358,9 +1358,9 @@ void __subsystem_send_uevent(struct device *dev, char *reason)
 	if(dev){
 		ret_val = kobject_uevent_env(&(dev->kobj), KOBJ_CHANGE, envp);
 		if(!ret_val){
-			pr_info("modem crash:kobject_uevent_env success!\n");
+			pr_debug("modem crash:kobject_uevent_env success!\n");
 		}else{
-			pr_info("modem crash:kobject_uevent_env fail,error=%d!\n", ret_val);
+			pr_debug("modem crash:kobject_uevent_env fail,error=%d!\n", ret_val);
 		}
     }
 }
@@ -1408,9 +1408,9 @@ void __wlan_subsystem_send_uevent(struct device *dev, char *reason, const char *
 	if (dev) {
 		ret_val = kobject_uevent_env(&(dev->kobj), KOBJ_CHANGE, envp);
 		if (!ret_val) {
-			pr_info("wlan crash:kobject_uevent_env success!\n");
+			pr_debug("wlan crash:kobject_uevent_env success!\n");
 		} else {
-			pr_info("wlan crash:kobject_uevent_env fail,error=%d!\n", ret_val);
+			pr_debug("wlan crash:kobject_uevent_env fail,error=%d!\n", ret_val);
 		}
 	}
 }
@@ -1450,7 +1450,7 @@ int subsystem_restart_dev(struct subsys_device *dev)
 #endif
 #ifdef OPLUS_FEATURE_WIFI_DCS_SWITCH
 	if (subsys_get_crash_status(dev) == CRASH_STATUS_ERR_FATAL) {
-		pr_info("subsystem_restart_dev wlan send uevent");
+		pr_debug("subsystem_restart_dev wlan send uevent");
 		__wlan_subsystem_send_uevent(&(dev->dev), "", dev->desc->name);
 	}
 #endif /* OPLUS_FEATURE_WIFI_DCS_SWITCH */
@@ -1467,7 +1467,7 @@ int subsystem_restart_dev(struct subsys_device *dev)
 		return -EBUSY;
 	}
 
-	pr_info("Restart sequence requested for %s, restart_level = %s.\n",
+	pr_debug("Restart sequence requested for %s, restart_level = %s.\n",
 		name, restart_levels[dev->restart_level]);
 
 	if (disable_restart_work == DISABLE_SSR) {
@@ -1783,7 +1783,7 @@ static struct subsys_soc_restart_order *ssr_parse_restart_orders(struct
 		if (!ssr_node)
 			return ERR_PTR(-ENXIO);
 		of_node_put(ssr_node);
-		pr_info("%s device has been added to %s's restart group\n",
+		pr_debug("%s device has been added to %s's restart group\n",
 						ssr_node->name, desc->name);
 		order->device_ptrs[i] = ssr_node;
 	}
@@ -2250,7 +2250,7 @@ static ssize_t force_rst_write(struct file *file,
 		return count;
 	}
 
-	pr_info("%s: %s\n", __func__, read_buf);
+	pr_debug("%s: %s\n", __func__, read_buf);
 
 	if (!strncmp(read_buf, "2", 1)) {
 		panic("force esoc crash");

@@ -108,7 +108,7 @@ extern unsigned int fp_debugprint;
 
 #define dprint(bit, fmt, ...) ({			\
 	if (fp_debugprint & (1 << (bit)))		\
-		pr_info(fmt, ##__VA_ARGS__);		\
+		pr_debug(fmt, ##__VA_ARGS__);		\
 })
 #else
 #define dprint(bit, fmt, ...)	no_printk(fmt, ##__VA_ARGS__)

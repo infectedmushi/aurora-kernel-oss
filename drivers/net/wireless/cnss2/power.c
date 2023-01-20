@@ -75,7 +75,7 @@ static int cnss_get_vreg_single(struct cnss_plat_data *plat_priv,
 		if (ret == -ENODEV)
 			return ret;
 		else if (ret == -EPROBE_DEFER)
-			cnss_pr_info("EPROBE_DEFER for regulator: %s\n",
+			cnss_pr_debug("EPROBE_DEFER for regulator: %s\n",
 				     vreg->cfg.name);
 		else
 			cnss_pr_err("Failed to get regulator %s, err = %d\n",
@@ -935,7 +935,7 @@ void cnss_set_pin_connect_status(struct cnss_plat_data *plat_priv)
 	plat_priv->pin_result.host_pin_result = pin_status;
 }
 
-int cnss_get_cpr_info(struct cnss_plat_data *plat_priv)
+int cnss_get_cpr_debug(struct cnss_plat_data *plat_priv)
 {
 	struct platform_device *plat_dev = plat_priv->plat_dev;
 	struct cnss_cpr_info *cpr_info = &plat_priv->cpr_info;
@@ -998,7 +998,7 @@ out:
 	return ret;
 }
 
-int cnss_update_cpr_info(struct cnss_plat_data *plat_priv)
+int cnss_update_cpr_debug(struct cnss_plat_data *plat_priv)
 {
 	struct cnss_cpr_info *cpr_info = &plat_priv->cpr_info;
 	u32 pmic_addr, voltage = 0, voltage_tmp, offset;

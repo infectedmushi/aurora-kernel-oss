@@ -254,7 +254,7 @@ int adm_set_auddet_enable_param(int port_id, uint8_t val)
 	int idx;
 	int port_idx = adm_validate_and_get_port_index(port_id);
 
-	pr_info("%s, portid %d, enable %d\n", __func__, port_id, val);
+	pr_debug("%s, portid %d, enable %d\n", __func__, port_id, val);
 
 	memset(&param_hdr, 0, sizeof(param_hdr));
 	param_hdr.module_id = MUTE_DETECT_MODULE_ID;
@@ -266,7 +266,7 @@ int adm_set_auddet_enable_param(int port_id, uint8_t val)
 
 	for (idx = 0; idx < MAX_COPPS_PER_PORT; idx++) {
 		if (atomic_read(&this_adm.copp.id[port_idx][idx]) != RESET_COPP_ID) {
-			pr_info("%s : active copp_idx:0x%x for port_id \n",__func__, idx);
+			pr_debug("%s : active copp_idx:0x%x for port_id \n",__func__, idx);
 
 			if (atomic_read(&this_adm.copp.session_type[port_idx][idx]) == SESSION_TYPE_TX) {
 				param_hdr.instance_id = 0x8000;
@@ -303,7 +303,7 @@ int adm_get_all_mute_pp_param_from_port(int port_id)
 		pr_err("%s: Invalid port id: 0x%x", __func__, port_id);
 		return -EINVAL;
 	}
-	pr_info("%s: port_idx:%d\n", __func__, port_idx);
+	pr_debug("%s: port_idx:%d\n", __func__, port_idx);
 
 	param_value = kzalloc(param_size, GFP_KERNEL);
 	if (!param_value)
@@ -316,7 +316,7 @@ int adm_get_all_mute_pp_param_from_port(int port_id)
 
 	for (idx = 0; idx < MAX_COPPS_PER_PORT; idx++) {
 		if (atomic_read(&this_adm.copp.id[port_idx][idx]) != RESET_COPP_ID) {
-			pr_info("%s : active copp_idx:0x%x for port_id \n",__func__, idx);
+			pr_debug("%s : active copp_idx:0x%x for port_id \n",__func__, idx);
 
 			if (atomic_read(&this_adm.copp.session_type[port_idx][idx]) == SESSION_TYPE_TX) {
 				param_hdr.instance_id = 0x8000;
@@ -329,33 +329,33 @@ int adm_get_all_mute_pp_param_from_port(int port_id)
 			ret = adm_get_pp_params(port_id, idx,
 						ADM_CLIENT_ID_DEFAULT, NULL, &param_hdr,
 						param_value);
-			pr_info("%s : mute_detect return param, ret: %d, mutedet = %d, zd = %d, pop = %d, clip = %d\n",__func__, ret, *(uint32_t *)param_value, *((uint32_t *)param_value + 1), *((uint32_t *)param_value + 2), *((uint32_t *)param_value + 3));
-			pr_info("%s : COPP: 0x%x\n",__func__, this_adm.copp.app_type[port_idx][idx]);
+			pr_debug("%s : mute_detect return param, ret: %d, mutedet = %d, zd = %d, pop = %d, clip = %d\n",__func__, ret, *(uint32_t *)param_value, *((uint32_t *)param_value + 1), *((uint32_t *)param_value + 2), *((uint32_t *)param_value + 3));
+			pr_debug("%s : COPP: 0x%x\n",__func__, this_adm.copp.app_type[port_idx][idx]);
 			switch (atomic_read(&this_adm.copp.app_type[port_idx][idx])) {
 				case 0x11130:
-					pr_info("%s : update playback detection result\n",__func__);
+					pr_debug("%s : update playback detection result\n",__func__);
 					general_playback_muted_cnt = *(uint32_t *)param_value;
 					general_playback_zd_cnt = *((uint32_t *)param_value + 1);
 					general_playback_pop_cnt = *((uint32_t *)param_value + 2);
 					general_playback_clip_cnt = *((uint32_t *)param_value + 3);
 					break;
 				case 0x11132:
-					pr_info("%s : update recording detection result\n",__func__);
+					pr_debug("%s : update recording detection result\n",__func__);
 					general_record_muted_cnt = *(uint32_t *)param_value;
 					general_record_zd_cnt = *((uint32_t *)param_value + 1);
 					general_record_pop_cnt = *((uint32_t *)param_value + 2);
 					general_record_clip_cnt = *((uint32_t *)param_value + 3);
 					break;
 				case 0x1113a:
-					pr_info("%s : update VOIP detection result\n",__func__);
+					pr_debug("%s : update VOIP detection result\n",__func__);
 					if (atomic_read(&this_adm.copp.session_type[port_idx][idx]) == SESSION_TYPE_RX) {
-						pr_info("%s : VOIP RX result\n",__func__);
+						pr_debug("%s : VOIP RX result\n",__func__);
 						voip_rx_muted_cnt = *(uint32_t *)param_value;
 						voip_rx_zd_cnt = *((uint32_t *)param_value + 1);
 						voip_rx_pop_cnt = *((uint32_t *)param_value + 2);
 						voip_rx_clip_cnt = *((uint32_t *)param_value + 3);
 					} else if (atomic_read(&this_adm.copp.session_type[port_idx][idx]) == SESSION_TYPE_TX) {
-						pr_info("%s : VOIP TX result\n",__func__);
+						pr_debug("%s : VOIP TX result\n",__func__);
 						voip_tx_muted_cnt = *(uint32_t *)param_value;
 						voip_tx_zd_cnt = *((uint32_t *)param_value + 1);
 						voip_tx_pop_cnt = *((uint32_t *)param_value + 2);
@@ -3292,7 +3292,7 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 #ifdef OPLUS_FEATURE_KTV
 	if ((topology == AUDIO_TOPOLOGY_KTV)
 			&& (rate != ADM_CMD_COPP_OPEN_SAMPLE_RATE_48K)) {
-			pr_info("%s: Change rate %d to 48K for copp 0x%x",
+			pr_debug("%s: Change rate %d to 48K for copp 0x%x",
 					__func__, rate, topology);
 			rate = 48000;
 	}

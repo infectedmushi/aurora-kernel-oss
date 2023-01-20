@@ -1181,10 +1181,10 @@ void __init smp_cpus_done(unsigned int max_cpus)
 	 * use the deeper topology that is aware of this sharing.
 	 */
 	if (shared_caches) {
-		pr_info("Using shared cache scheduler topology\n");
+		pr_debug("Using shared cache scheduler topology\n");
 		set_sched_topology(power9_topology);
 	} else {
-		pr_info("Using standard scheduler topology\n");
+		pr_debug("Using standard scheduler topology\n");
 		set_sched_topology(powerpc_topology);
 	}
 }

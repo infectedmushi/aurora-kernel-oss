@@ -1604,7 +1604,7 @@ static int clk_osm_resolve_crossover_corners(struct clk_osm *c,
 				  "qcom,apm-threshold-voltage",
 				  &apm_threshold);
 	if (rc) {
-		pr_info("qcom,apm-threshold-voltage property not specified\n");
+		pr_debug("qcom,apm-threshold-voltage property not specified\n");
 		return rc;
 	}
 
@@ -2347,7 +2347,7 @@ static irqreturn_t clk_osm_debug_irq_cb(int irq, void *data)
 
 	val = clk_osm_read_reg(c, DCVS_PERF_STATE_DEVIATION_INTR_STAT);
 	if (val & BIT(0)) {
-		pr_info("OS DCVS performance state deviated\n");
+		pr_debug("OS DCVS performance state deviated\n");
 		clk_osm_write_reg(c, BIT(0),
 				  DCVS_PERF_STATE_DEVIATION_INTR_CLEAR);
 	}
@@ -2355,14 +2355,14 @@ static irqreturn_t clk_osm_debug_irq_cb(int irq, void *data)
 	val = clk_osm_read_reg(c,
 			       DCVS_PERF_STATE_DEVIATION_CORRECTED_INTR_STAT);
 	if (val & BIT(0)) {
-		pr_info("OS DCVS performance state corrected\n");
+		pr_debug("OS DCVS performance state corrected\n");
 		clk_osm_write_reg(c, BIT(0),
 			  DCVS_PERF_STATE_DEVIATION_CORRECTED_INTR_CLEAR);
 	}
 
 	val = clk_osm_read_reg(c, DCVS_PERF_STATE_MET_INTR_STAT);
 	if (val & BIT(0)) {
-		pr_info("OS DCVS performance state desired reached\n");
+		pr_debug("OS DCVS performance state desired reached\n");
 		clk_osm_write_reg(c, BIT(0), DCVS_PERF_STATE_MET_INTR_CLR);
 	}
 
@@ -2378,7 +2378,7 @@ static irqreturn_t clk_osm_debug_irq_cb(int irq, void *data)
 		total_delta = total_delta + ((second - first) / factor);
 	}
 
-	pr_info("cluster=%d, L_VAL (estimated)=%lu\n",
+	pr_debug("cluster=%d, L_VAL (estimated)=%lu\n",
 		c->cluster_num, total_delta / c->cycle_counter_factor);
 
 	return IRQ_HANDLED;
@@ -2451,11 +2451,11 @@ static int add_opp(struct clk_osm *c, struct device *dev)
 		 * scheduler.
 		 */
 		if (rate == min_rate)
-			pr_info("Set OPP pair (%lu Hz, %d uv) on %s\n",
+			pr_debug("Set OPP pair (%lu Hz, %d uv) on %s\n",
 				rate, uv, dev_name(dev));
 
 		if (rate == max_rate && max_rate != min_rate) {
-			pr_info("Set OPP pair (%lu Hz, %d uv) on %s\n",
+			pr_debug("Set OPP pair (%lu Hz, %d uv) on %s\n",
 				rate, uv, dev_name(dev));
 			break;
 		}
@@ -3414,7 +3414,7 @@ static int clk_cpu_osm_driver_probe(struct platform_device *pdev)
 
 	register_cpu_cycle_counter_cb(&cb);
 
-	pr_info("OSM driver initialize\n");
+	pr_debug("OSM driver initialize\n");
 	put_online_cpus();
 
 	return 0;

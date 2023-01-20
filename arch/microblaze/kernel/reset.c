@@ -25,14 +25,14 @@ static int of_platform_reset_gpio_probe(void)
 				   "hard-reset-gpios", 0);
 
 	if (!gpio_is_valid(handle)) {
-		pr_info("Skipping unavailable RESET gpio %d (%s)\n",
+		pr_debug("Skipping unavailable RESET gpio %d (%s)\n",
 				handle, "reset");
 		return -ENODEV;
 	}
 
 	ret = gpio_request(handle, "reset");
 	if (ret < 0) {
-		pr_info("GPIO pin is already allocated\n");
+		pr_debug("GPIO pin is already allocated\n");
 		return ret;
 	}
 
@@ -49,7 +49,7 @@ static int of_platform_reset_gpio_probe(void)
 	/* Setup output direction */
 	gpio_set_value(handle, 0);
 
-	pr_info("RESET: Registered gpio device: %d, current val: %d\n",
+	pr_debug("RESET: Registered gpio device: %d, current val: %d\n",
 							handle, reset_val);
 	return 0;
 err:

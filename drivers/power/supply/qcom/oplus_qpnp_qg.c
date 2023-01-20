@@ -134,9 +134,9 @@ int qg_read(struct qpnp_qg *chip, u32 addr, u8 *val, int len)
 	}
 
 	if (*chip->debug_mask & QG_DEBUG_BUS_READ) {
-		pr_info("length %d addr=%04x\n", len, addr);
+		pr_debug("length %d addr=%04x\n", len, addr);
 		for (i = 0; i < len; i++)
-			pr_info("val[%d]: %02x\n", i, val[i]);
+			pr_debug("val[%d]: %02x\n", i, val[i]);
 	}
 
 	return 0;
@@ -160,9 +160,9 @@ int qg_write(struct qpnp_qg *chip, u32 addr, u8 *val, int len)
 	}
 
 	if (*chip->debug_mask & QG_DEBUG_BUS_WRITE) {
-		pr_info("length %d addr=%04x\n", len, addr);
+		pr_debug("length %d addr=%04x\n", len, addr);
 		for (i = 0; i < len; i++)
-			pr_info("val[%d]: %02x\n", i, val[i]);
+			pr_debug("val[%d]: %02x\n", i, val[i]);
 	}
 out:
 	mutex_unlock(&chip->bus_lock);
@@ -183,7 +183,7 @@ int qg_masked_write(struct qpnp_qg *chip, int addr, u32 mask, u32 val)
 	}
 
 	if (*chip->debug_mask & QG_DEBUG_BUS_WRITE)
-		pr_info("addr=%04x mask: %02x val: %02x\n", addr, mask, val);
+		pr_debug("addr=%04x mask: %02x val: %02x\n", addr, mask, val);
 
 out:
 	mutex_unlock(&chip->bus_lock);
@@ -458,7 +458,7 @@ int qg_get_parallel_current_now(struct qpnp_qg *chip, int *parallel_val)
 		pr_err("Failed reading PARALLEL_SENSE over ADC rc=%d\n", rc);
 		return rc;
 	}
-	pr_info("parallel_isense = %d\n", *parallel_val);
+	pr_debug("parallel_isense = %d\n", *parallel_val);
 	return 0;
 }
 #endif
@@ -1322,13 +1322,13 @@ static int qg_vbat_low_wa(struct qpnp_qg *chip)
 			if ((chip->kdata.fifo[i].v > (vbat_low_uv +
 					VBAT_LOW_HYST_UV)) && chip->vbat_low) {
 				chip->vbat_low = false;
-				pr_info("Exit VBAT_LOW vbat_avg=%duV vbat_low=%duV\n",
+				pr_debug("Exit VBAT_LOW vbat_avg=%duV vbat_low=%duV\n",
 					chip->kdata.fifo[i].v, vbat_low_uv);
 				break;
 			} else if ((chip->kdata.fifo[i].v < vbat_low_uv) &&
 							!chip->vbat_low) {
 				chip->vbat_low = true;
-				pr_info("Enter VBAT_LOW vbat_avg=%duV vbat_low=%duV\n",
+				pr_debug("Enter VBAT_LOW vbat_avg=%duV vbat_low=%duV\n",
 					chip->kdata.fifo[i].v, vbat_low_uv);
 				break;
 			}
@@ -3245,7 +3245,7 @@ static int qg_battery_status_update(struct qpnp_qg *chip)
 		if (rc < 0)
 			pr_err("Failed in battery-removal rc=%d\n", rc);
 	}
-	pr_info("qg_battery_status_update battery_missing = %d prop.intval = %d is_batt_id_valid = %d\n",chip->battery_missing, prop.intval,is_batt_id_valid(chip));
+	pr_debug("qg_battery_status_update battery_missing = %d prop.intval = %d is_batt_id_valid = %d\n",chip->battery_missing, prop.intval,is_batt_id_valid(chip));
 
 	chip->battery_missing = !prop.intval;
 
@@ -3925,7 +3925,7 @@ static int qg_setup_battery(struct qpnp_qg *chip)
 			} else {
 				chip->batt_id_kohm = chip->batt_id_ohm / 1000;
 			};
-			pr_info("Battery id in ohm is %d, in kohm is %d\n", chip->batt_id_ohm, chip->batt_id_kohm);
+			pr_debug("Battery id in ohm is %d, in kohm is %d\n", chip->batt_id_ohm, chip->batt_id_kohm);
 			//chip->batt_id_kohm = 100;
 			//chip->batt_id_ohm = 100000;
 #endif
@@ -4145,7 +4145,7 @@ done:
 	if (rc < 0)
 		pr_err("Failed to update sdam params rc=%d\n", rc);
 
-	pr_info("using %s @ PON ocv_uv=%duV soc=%d\n",
+	pr_debug("using %s @ PON ocv_uv=%duV soc=%d\n",
 			ocv_type, ocv_uv, chip->msoc);
 
 	/* SOC reporting is now ready */
@@ -5934,7 +5934,7 @@ static int qpnp_qg_probe(struct platform_device *pdev)
 
 	qg_get_battery_capacity(chip, &soc);
 
-	pr_info("QG initialized! battery_profile=%s SOC=%d QG_subtype=%d QG_version=%s QG_mode=%s\n",
+	pr_debug("QG initialized! battery_profile=%s SOC=%d QG_subtype=%d QG_version=%s QG_mode=%s\n",
 			qg_get_battery_type(chip), soc, chip->qg_subtype,
 			(chip->qg_version == QG_LITE) ? "QG_LITE" : "QG_PMIC5",
 			(chip->qg_mode == QG_V_I_MODE) ? "QG_V_I" : "QG_V");
@@ -5952,7 +5952,7 @@ static int qpnp_qg_probe(struct platform_device *pdev)
 		oplus_chip->gauge_ops = &qonp_gauge_ops;
 		oplus_gauge_init(oplus_chip);
 	//}else{
-		//pr_info("qpnp_qg_probe oplus_gauge is not enable\n");
+		//pr_debug("qpnp_qg_probe oplus_gauge is not enable\n");
 	//}
 #endif
 	return rc;

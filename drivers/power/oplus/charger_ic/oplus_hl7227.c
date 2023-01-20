@@ -231,7 +231,7 @@ static int hl7227_hardware_init(struct oplus_hl7227 *chip)
 		pr_err("can't read chip version, rc=%d", rc);
 		return rc;
 	}
-	pr_info("hl7227 version is 0x%02x\n", version);
+	pr_debug("hl7227 version is 0x%02x\n", version);
 
 	if (version == 0xa0) {
 		rc = hl7227_write_byte(chip, 0xA7, 0xF9);  //# Passwd

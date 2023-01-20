@@ -166,10 +166,10 @@ static void sc8547_slave_update_data(struct oplus_voocphy_manager *chip)
 		sc8547_slave_i2c_error(false);
 	}
 	for (i=0; i<2; i++) {
-		pr_info("data_block[%d] = %u\n", i, data_block[i]);
+		pr_debug("data_block[%d] = %u\n", i, data_block[i]);
 	}
 	chip->slave_cp_ichg = ((data_block[0] << 8) | data_block[1])*1875 / 1000;
-	pr_info("slave cp_ichg = %d int_flag = %d", chip->slave_cp_ichg, int_flag);
+	pr_debug("slave cp_ichg = %d int_flag = %d", chip->slave_cp_ichg, int_flag);
 }
 /*********************************************************************/
 int sc8547_slave_get_ichg(struct oplus_voocphy_manager *chip)
@@ -409,23 +409,23 @@ static int sc8547_slave_hw_setting(struct oplus_voocphy_manager *chip, int reaso
 	case SETTING_REASON_PROBE:
 	case SETTING_REASON_RESET:
 		sc8547_slave_init_device(chip);
-		pr_info("SETTING_REASON_RESET OR PROBE\n");
+		pr_debug("SETTING_REASON_RESET OR PROBE\n");
 		break;
 	case SETTING_REASON_SVOOC:
 		sc8547_slave_svooc_hw_setting(chip);
-		pr_info("SETTING_REASON_SVOOC\n");
+		pr_debug("SETTING_REASON_SVOOC\n");
 		break;
 	case SETTING_REASON_VOOC:
 		sc8547_slave_vooc_hw_setting(chip);
-		pr_info("SETTING_REASON_VOOC\n");
+		pr_debug("SETTING_REASON_VOOC\n");
 		break;
 	case SETTING_REASON_5V2A:
 		sc8547_slave_5v2a_hw_setting(chip);
-		pr_info("SETTING_REASON_5V2A\n");
+		pr_debug("SETTING_REASON_5V2A\n");
 		break;
 	case SETTING_REASON_PDQC:
 		sc8547_slave_pdqc_hw_setting(chip);
-		pr_info("SETTING_REASON_PDQC\n");
+		pr_debug("SETTING_REASON_PDQC\n");
 		break;
 	default:
 		pr_err("do nothing\n");

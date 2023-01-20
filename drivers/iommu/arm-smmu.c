@@ -633,7 +633,7 @@ static irqreturn_t arm_smmu_cf_selftest(int irq, void *cb_base)
 	irq_count++;
 	if (irq_data)
 		hwirq = irq_data->hwirq;
-	pr_info("Interrupt (irq:%d hwirq:%ld) received, fsr:0x%x\n",
+	pr_debug("Interrupt (irq:%d hwirq:%ld) received, fsr:0x%x\n",
 				irq, hwirq, fsr);
 
 	writel_relaxed(fsr, cb_base + ARM_SMMU_CB_FSR);

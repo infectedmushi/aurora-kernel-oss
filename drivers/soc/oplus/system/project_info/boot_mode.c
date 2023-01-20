@@ -120,7 +120,7 @@ static int __init start_reason_init(void)
 		pr_err("startup_mode from cmdline : %s\n", startup_mode);
 		strcpy(pwron_event, startup_mode);
 		pwron_event[strlen(startup_mode)] = '\0';
-		pr_info("parse poweron reason %s i = %d\n", pwron_event, strlen(startup_mode));
+		pr_debug("parse poweron reason %s i = %d\n", pwron_event, strlen(startup_mode));
 	}
 #else
 	int i;
@@ -134,7 +134,7 @@ static int __init start_reason_init(void)
 	}
 
 	pwron_event[i] = '\0';
-	pr_info("parse poweron reason %s i = %d\n", pwron_event, i);
+	pr_debug("parse poweron reason %s i = %d\n", pwron_event, i);
 #endif
 
 	return 0;
@@ -197,7 +197,7 @@ static int __init oplus_charger_reboot(void)
 		}
 		charger_reboot[i] = '\0';
 #endif
-		pr_info("%s: parse charger_reboot %s\n", __func__, charger_reboot);
+		pr_debug("%s: parse charger_reboot %s\n", __func__, charger_reboot);
 	}
 
 	return 0;
@@ -238,7 +238,7 @@ EXPORT_SYMBOL(get_hw_board_version);
 static int __init oplus_hw_version_init(char *str)
 {
 	hw_version = simple_strtol(str, NULL, 0);
-	pr_info("kernel get_hw_version %d\n", hw_version);
+	pr_debug("kernel get_hw_version %d\n", hw_version);
 	return 0;
 }
 
@@ -249,7 +249,7 @@ static int __init boot_mode_init(void)
 {
 	int rc = 0;
 
-	pr_info("%s: parse boot_mode\n", __func__);
+	pr_debug("%s: parse boot_mode\n", __func__);
 
 	board_boot_mode_init();
 	board_ftm_mode_init();

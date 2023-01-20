@@ -547,7 +547,7 @@ u64 dma_fence_context_alloc(unsigned num);
 	do {								\
 		struct dma_fence *__ff = (f);				\
 		if (IS_ENABLED(CONFIG_DMA_FENCE_TRACE))			\
-			pr_info("f %llu#%u: " fmt,			\
+			pr_debug("f %llu#%u: " fmt,			\
 				__ff->context, __ff->seqno, ##args);	\
 	} while (0)
 

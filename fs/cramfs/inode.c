@@ -575,7 +575,7 @@ static int cramfs_read_super(struct super_block *sb,
 	sbi->magic = super->magic;
 	sbi->flags = super->flags;
 	if (root_offset == 0)
-		pr_info("empty filesystem");
+		pr_debug("empty filesystem");
 	else if (!(super->flags & CRAMFS_FLAG_SHIFTED_ROOT_OFFSET) &&
 		 ((root_offset != sizeof(struct cramfs_super)) &&
 		  (root_offset != 512 + sizeof(struct cramfs_super))))
@@ -647,14 +647,14 @@ static int cramfs_mtd_fill_super(struct super_block *sb, void *data,
 		return err ? : -ENODATA;
 	}
 
-	pr_info("checking physical address %pap for linear cramfs image\n",
+	pr_debug("checking physical address %pap for linear cramfs image\n",
 		&sbi->linear_phys_addr);
 	err = cramfs_read_super(sb, &super, silent);
 	if (err)
 		return err;
 
 	/* Remap the whole filesystem now */
-	pr_info("linear cramfs image on mtd:%s appears to be %lu KB in size\n",
+	pr_debug("linear cramfs image on mtd:%s appears to be %lu KB in size\n",
 		sb->s_mtd->name, sbi->size/1024);
 	mtd_unpoint(sb->s_mtd, 0, PAGE_SIZE);
 	err = mtd_point(sb->s_mtd, 0, sbi->size, &sbi->mtd_point_size,

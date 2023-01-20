@@ -107,7 +107,7 @@ static void * __init pcpu_alloc_bootmem(unsigned int cpu, unsigned long size,
 
 	if (!node_online(node) || !NODE_DATA(node)) {
 		ptr = __alloc_bootmem_nopanic(size, align, goal);
-		pr_info("cpu %d has no node %d or node-local memory\n",
+		pr_debug("cpu %d has no node %d or node-local memory\n",
 			cpu, node);
 		pr_debug("per cpu data for cpu%d %lu bytes at %016lx\n",
 			 cpu, size, __pa(ptr));
@@ -169,7 +169,7 @@ void __init setup_per_cpu_areas(void)
 	unsigned long delta;
 	int rc;
 
-	pr_info("NR_CPUS:%d nr_cpumask_bits:%d nr_cpu_ids:%u nr_node_ids:%d\n",
+	pr_debug("NR_CPUS:%d nr_cpumask_bits:%d nr_cpu_ids:%u nr_node_ids:%d\n",
 		NR_CPUS, nr_cpumask_bits, nr_cpu_ids, nr_node_ids);
 
 	/*

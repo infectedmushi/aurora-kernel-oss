@@ -175,7 +175,7 @@ static int __init x86_mpx_setup(char *s)
 		return 1;
 
 	setup_clear_cpu_cap(X86_FEATURE_MPX);
-	pr_info("nompx: Intel Memory Protection Extensions (MPX) disabled\n");
+	pr_debug("nompx: Intel Memory Protection Extensions (MPX) disabled\n");
 	return 1;
 }
 __setup("nompx", x86_mpx_setup);
@@ -192,7 +192,7 @@ static int __init x86_nopcid_setup(char *s)
 		return 0;
 
 	setup_clear_cpu_cap(X86_FEATURE_PCID);
-	pr_info("nopcid: PCID feature disabled\n");
+	pr_debug("nopcid: PCID feature disabled\n");
 	return 0;
 }
 early_param("nopcid", x86_nopcid_setup);
@@ -209,7 +209,7 @@ static int __init x86_noinvpcid_setup(char *s)
 		return 0;
 
 	setup_clear_cpu_cap(X86_FEATURE_INVPCID);
-	pr_info("noinvpcid: INVPCID feature disabled\n");
+	pr_debug("noinvpcid: INVPCID feature disabled\n");
 	return 0;
 }
 early_param("noinvpcid", x86_noinvpcid_setup);
@@ -353,7 +353,7 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
 
 	cr4_set_bits(X86_CR4_UMIP);
 
-	pr_info("x86/cpu: Activated the Intel User Mode Instruction Prevention (UMIP) CPU feature\n");
+	pr_debug("x86/cpu: Activated the Intel User Mode Instruction Prevention (UMIP) CPU feature\n");
 
 	return;
 
@@ -404,7 +404,7 @@ static __init int setup_disable_pku(char *arg)
 	 * This happens to be exactly how a system would look
 	 * if we disabled the config option.
 	 */
-	pr_info("x86: 'nopku' specified, disabling Memory Protection Keys\n");
+	pr_debug("x86: 'nopku' specified, disabling Memory Protection Keys\n");
 	pku_disabled = true;
 	return 1;
 }
@@ -652,11 +652,11 @@ static void cpu_detect_tlb(struct cpuinfo_x86 *c)
 	if (this_cpu->c_detect_tlb)
 		this_cpu->c_detect_tlb(c);
 
-	pr_info("Last level iTLB entries: 4KB %d, 2MB %d, 4MB %d\n",
+	pr_debug("Last level iTLB entries: 4KB %d, 2MB %d, 4MB %d\n",
 		tlb_lli_4k[ENTRIES], tlb_lli_2m[ENTRIES],
 		tlb_lli_4m[ENTRIES]);
 
-	pr_info("Last level dTLB entries: 4KB %d, 2MB %d, 4MB %d, 1GB %d\n",
+	pr_debug("Last level dTLB entries: 4KB %d, 2MB %d, 4MB %d, 1GB %d\n",
 		tlb_lld_4k[ENTRIES], tlb_lld_2m[ENTRIES],
 		tlb_lld_4m[ENTRIES], tlb_lld_1g[ENTRIES]);
 }
@@ -1305,7 +1305,7 @@ void __init early_cpu_init(void)
 	int count = 0;
 
 #ifdef CONFIG_PROCESSOR_SELECT
-	pr_info("KERNEL supported cpus:\n");
+	pr_debug("KERNEL supported cpus:\n");
 #endif
 
 	for (cdev = __x86_cpu_dev_start; cdev < __x86_cpu_dev_end; cdev++) {
@@ -1323,7 +1323,7 @@ void __init early_cpu_init(void)
 			for (j = 0; j < 2; j++) {
 				if (!cpudev->c_ident[j])
 					continue;
-				pr_info("  %s %s\n", cpudev->c_vendor,
+				pr_debug("  %s %s\n", cpudev->c_vendor,
 					cpudev->c_ident[j]);
 			}
 		}
@@ -2028,7 +2028,7 @@ void cpu_init(void)
 
 	show_ucode_info_early();
 
-	pr_info("Initializing CPU#%d\n", cpu);
+	pr_debug("Initializing CPU#%d\n", cpu);
 
 	if (cpu_feature_enabled(X86_FEATURE_VME) ||
 	    boot_cpu_has(X86_FEATURE_TSC) ||

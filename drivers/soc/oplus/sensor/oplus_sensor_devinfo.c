@@ -36,7 +36,7 @@ static char* als_rear_feature[] = {
 
 __attribute__((weak)) void oplus_device_dir_redirect(struct sensor_info * chip)
 {
-	pr_info("%s oplus_device_dir_redirect \n", __func__);
+	pr_debug("%s oplus_device_dir_redirect \n", __func__);
 };
 
 __attribute__((weak)) unsigned int get_serialID(void)
@@ -58,7 +58,7 @@ static void is_need_close_pd(struct sensor_hw* hw, struct device_node *ch_node)
 			hw->feature.feature[2] = CLOSE_PD;
 		} else if (CLOSE_PD_CONDITION == value) {
 			sn_size = of_property_count_elems_of_size(ch_node, "sn_number", sizeof(uint32_t));
-			pr_info("sn size %d\n", sn_size);
+			pr_debug("sn size %d\n", sn_size);
 			specific_sn = (uint32_t *)kzalloc(sizeof(uint32_t) * sn_size, GFP_KERNEL);
 
 			if (!specific_sn) {
@@ -165,7 +165,7 @@ static void parse_magnetic_sensor_dts(struct sensor_hw* hw, struct device_node *
 						}
 						return;
 					} else {
-						pr_info("parse soft magnetic parameter failed!\n");
+						pr_debug("parse soft magnetic parameter failed!\n");
 					}
 				}
 				else
@@ -173,7 +173,7 @@ static void parse_magnetic_sensor_dts(struct sensor_hw* hw, struct device_node *
 			}
 		}
 	} else {
-		pr_info("parse soft magnetic parameter failed!\n");
+		pr_debug("parse soft magnetic parameter failed!\n");
 	}
 }
 
@@ -249,7 +249,7 @@ static void parse_proximity_sensor_dts(struct sensor_hw* hw, struct device_node 
 				hw->feature.reg[2 * di + 2]);
 		}
 	} else {
-		pr_info("parse alsps sensor reg failed\n");
+		pr_debug("parse alsps sensor reg failed\n");
 	}
 
 	SENSOR_DEVINFO_DEBUG("ps-type:%d ps_saturation:%d is_need_close_pd:%d\n",
@@ -320,7 +320,7 @@ static void parse_light_sensor_dts(struct sensor_hw* hw, struct device_node *ch_
 		} else if (0 == strncmp(als_feature[di], "als_ratio_type", strlen("als_ratio_type"))) {
 			hw->feature.feature[di] = 0; /*set defaut zero*/
 		} else {
-			pr_info("parse %s failed!", als_feature[di]);
+			pr_debug("parse %s failed!", als_feature[di]);
 		}
 
 		SENSOR_DEVINFO_DEBUG("light feature[%s] : %d\n", als_feature[di], hw->feature.feature[di]);
@@ -335,7 +335,7 @@ static void parse_light_sensor_dts(struct sensor_hw* hw, struct device_node *ch_
 			hw->feature.parameter[di] = 1001; /*set defaut value 1001*/
 		} else {
 			hw->feature.parameter[di] = 0; /*set defaut param*/
-			pr_info("parse %s failed!", light_para[di]);
+			pr_debug("parse %s failed!", light_para[di]);
 		}
 		SENSOR_DEVINFO_DEBUG("light_para[%s] : %d\n", light_para[di], hw->feature.parameter[di]);
 	}
@@ -352,7 +352,7 @@ static void parse_light_rear_sensor_dts(struct sensor_hw* hw, struct device_node
 		if (!rc) {
 			hw->feature.feature[di] = value;
 		} else {
-			pr_info("parse %s failed!", als_rear_feature[di]);
+			pr_debug("parse %s failed!", als_rear_feature[di]);
 		}
 
 		SENSOR_DEVINFO_DEBUG("parse_light_rear_sensor_dts-feature[%d] : %d\n", di, hw->feature.feature[di]);
@@ -374,7 +374,7 @@ static void parse_sar_sensor_dts(struct sensor_hw* hw, struct device_node *ch_no
 				hw->feature.parameter[2 * di + 1]);
 		}
 	} else {
-			pr_info("parse sar sensor reg failed\n");
+			pr_debug("parse sar sensor reg failed\n");
 	}
 	/*channel-num*/
 	rc = of_property_read_u32(ch_node, "channel-num", &value);
@@ -382,7 +382,7 @@ static void parse_sar_sensor_dts(struct sensor_hw* hw, struct device_node *ch_no
 		hw->feature.feature[di] = value;
 		SENSOR_DEVINFO_DEBUG("sar channel-num: %d\n", value);
 	} else {
-		pr_info("parse sar sensor channel-num failed, rc %d, value %d", rc, value);
+		pr_debug("parse sar sensor channel-num failed, rc %d, value %d", rc, value);
 	}
 	/*reg->dc_offset*/
 	rc = of_property_read_u32(ch_node, "is-dc-offset", &value);
@@ -398,7 +398,7 @@ static void parse_sar_sensor_dts(struct sensor_hw* hw, struct device_node *ch_no
 				di, hw->feature.reg[di], di + SAR_MAX_CH_NUM, hw->feature.reg[di + SAR_MAX_CH_NUM]);
 		}
 	} else {
-			pr_info("parse sar sensor dc_offset failed, rc %d, value %d", rc, value);
+			pr_debug("parse sar sensor dc_offset failed, rc %d, value %d", rc, value);
 	}
 
 }
@@ -420,7 +420,7 @@ static void parse_down_sar_sensor_dts(struct sensor_hw* hw, struct device_node *
 		}
 
 	} else {
-		pr_info("parse down-sar sensor reg failed\n");
+		pr_debug("parse down-sar sensor reg failed\n");
 	}
 
 }
@@ -703,7 +703,7 @@ static void oplus_sensor_parse_dts(struct platform_device *pdev)
 	int sensor_index = 0;
 	struct sensor_hw *hw = NULL;
 	struct sensor_algorithm *algo = NULL;
-	pr_info("start \n");
+	pr_debug("start \n");
 
 	for_each_child_of_node(node, ch_node) {
 		is_virtual_sensor = false;
@@ -716,7 +716,7 @@ static void oplus_sensor_parse_dts(struct platform_device *pdev)
 
 		if (rc || (is_virtual_sensor && value >= SENSOR_ALGO_NUM)
 			|| value >= SENSORS_NUM) {
-			pr_info("parse sensor type failed!\n");
+			pr_debug("parse sensor type failed!\n");
 			continue;
 		} else {
 			sensor_type = value;
@@ -727,7 +727,7 @@ static void oplus_sensor_parse_dts(struct platform_device *pdev)
 			rc = of_property_read_u32(ch_node, "sensor-index", &value);
 
 			if (rc || value >= SOURCE_NUM) {
-				pr_info("parse sensor index failed!\n");
+				pr_debug("parse sensor index failed!\n");
 				continue;
 			} else {
 				sensor_index = value;
@@ -1361,7 +1361,7 @@ static int oplus_als_cali_data_init(void)
 	int rc = 0;
 	struct proc_dir_entry *pentry;
 
-	pr_info("%s call\n", __func__);
+	pr_debug("%s call\n", __func__);
 
 	if (gdata->proc_oplus_als) {
 		printk("proc_oplus_als has alread inited\n");
@@ -1496,7 +1496,7 @@ static int oplus_devinfo_probe(struct platform_device *pdev)
 	int rc = 0;
 	struct oplus_als_cali_data *data = NULL;
 
-	pr_info("%s call\n", __func__);
+	pr_debug("%s call\n", __func__);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0))
 		smem_size = ALIGN4(struct sensor_info);
@@ -1543,7 +1543,7 @@ static int oplus_devinfo_probe(struct platform_device *pdev)
 
 	g_chip = chip;
 
-	pr_info("%s success\n", __func__);
+	pr_debug("%s success\n", __func__);
 
 	sensor_proc_dir = proc_mkdir("sensor", NULL);
 	if (!sensor_proc_dir) {
@@ -1593,7 +1593,7 @@ static struct platform_driver _driver = {
 
 static int __init oplus_devinfo_init(void)
 {
-	pr_info("oplus_devinfo_init call\n");
+	pr_debug("oplus_devinfo_init call\n");
 
 	platform_driver_register(&_driver);
 	return 0;

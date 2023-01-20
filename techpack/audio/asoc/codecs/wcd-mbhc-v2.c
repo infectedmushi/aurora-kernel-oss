@@ -306,7 +306,7 @@ out_micb_en:
 			wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_CS);
 			#else /* OPLUS_ARCH_EXTENDS */
 			{
-				pr_info("%s: current_plug %d\n", __func__, mbhc->current_plug);
+				pr_debug("%s: current_plug %d\n", __func__, mbhc->current_plug);
 				if (mbhc->current_plug == MBHC_PLUG_TYPE_HEADSET) {
 					wcd_enable_curr_micbias(mbhc, WCD_MBHC_EN_MB);
 				} else {
@@ -598,7 +598,7 @@ void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 			wcd_mbhc_jack_report(mbhc, &mbhc->button_jack, 0,
 					    mbhc->buttons_pressed);
 			#else /* OPLUS_ARCH_EXTENDS */
-			pr_info("%s: release of button press%d\n",
+			pr_debug("%s: release of button press%d\n",
 				 __func__, jack_type);
 			if (mbhc->buttons_pressed & (SND_JACK_BTN_2 | SND_JACK_BTN_3)) {
 				wcd_mbhc_jack_report(mbhc, &mbhc->button_jack, 0,
@@ -631,7 +631,7 @@ void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 		pr_debug("%s: Reporting removal %d(%x)\n", __func__,
 			 jack_type, mbhc->hph_status);
 		#else /* OPLUS_ARCH_EXTENDS */
-		pr_info("%s: Reporting removal %d(%x)\n", __func__,
+		pr_debug("%s: Reporting removal %d(%x)\n", __func__,
 			 jack_type, mbhc->hph_status);
 		#endif /* OPLUS_ARCH_EXTENDS */
 
@@ -790,8 +790,8 @@ void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 				    (mbhc->hph_status | SND_JACK_MECHANICAL),
 				    WCD_MBHC_JACK_MASK);
 		#else /* OPLUS_ARCH_EXTENDS */
-		pr_info("%s: [1:headphone 3:headset 4:lineout]\n", __func__);
-		pr_info("%s: Reporting insertion jack_type=%d, (hph_status=0x%x)\n",
+		pr_debug("%s: [1:headphone 3:headset 4:lineout]\n", __func__);
+		pr_debug("%s: Reporting insertion jack_type=%d, (hph_status=0x%x)\n",
 			__func__, jack_type, mbhc->hph_status);
 		if (jack_type != SND_JACK_LINEOUT) {
 			wcd_mbhc_jack_report(mbhc, &mbhc->headset_jack,
@@ -820,7 +820,7 @@ void wcd_mbhc_elec_hs_report_unplug(struct wcd_mbhc *mbhc)
 		mbhc->mbhc_fn->wcd_cancel_hs_detect_plug(mbhc,
 						&mbhc->correct_plug_swch);
 	else
-		pr_info("%s: hs_detect_plug work not cancelled\n", __func__);
+		pr_debug("%s: hs_detect_plug work not cancelled\n", __func__);
 
 	pr_debug("%s: Report extension cable\n", __func__);
 	wcd_mbhc_report_plug(mbhc, 1, SND_JACK_LINEOUT);
@@ -856,7 +856,7 @@ void wcd_mbhc_find_plug_and_report(struct wcd_mbhc *mbhc,
 	enum snd_jack_types jack_type;
 
 	if (mbhc->deinit_in_progress) {
-		pr_info("%s: mbhc deinit in progess: ignore report\n", __func__);
+		pr_debug("%s: mbhc deinit in progess: ignore report\n", __func__);
 		return;
 	}
 
@@ -864,7 +864,7 @@ void wcd_mbhc_find_plug_and_report(struct wcd_mbhc *mbhc,
 	pr_debug("%s: enter current_plug(%d) new_plug(%d)\n",
 		 __func__, mbhc->current_plug, plug_type);
 	#else /* OPLUS_ARCH_EXTENDS */
-	pr_info("%s: enter current_plug(%d) new_plug(%d)\n",
+	pr_debug("%s: enter current_plug(%d) new_plug(%d)\n",
 		 __func__, mbhc->current_plug, plug_type);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
@@ -943,7 +943,7 @@ exit:
 	#ifndef OPLUS_ARCH_EXTENDS
 	pr_debug("%s: leave\n", __func__);
 	#else /* OPLUS_ARCH_EXTENDS */
-	pr_info("%s: leave\n", __func__);
+	pr_debug("%s: leave\n", __func__);
 	#endif /* OPLUS_ARCH_EXTENDS */
 }
 EXPORT_SYMBOL(wcd_mbhc_find_plug_and_report);
@@ -1000,13 +1000,13 @@ static void wcd_mbhc_usbc_analog_plug_detect_handler(struct wcd_mbhc *mbhc, bool
 	if (wcd_cancel_btn_work(mbhc))
 		pr_debug("%s: button press is canceled\n", __func__);
 
-	pr_info("%s: mbhc->current_plug: %d detection_type: %d\n", __func__,
+	pr_debug("%s: mbhc->current_plug: %d detection_type: %d\n", __func__,
 			mbhc->current_plug, detection_type);
 	if (mbhc->mbhc_fn->wcd_cancel_hs_detect_plug)
 		mbhc->mbhc_fn->wcd_cancel_hs_detect_plug(mbhc,
 						&mbhc->correct_plug_swch);
 	else
-		pr_info("%s: hs_detect_plug work not cancelled\n", __func__);
+		pr_debug("%s: hs_detect_plug work not cancelled\n", __func__);
 
 	/* Enable micbias ramp */
 	if (mbhc->mbhc_cb->mbhc_micb_ramp_control)
@@ -1095,7 +1095,7 @@ static void wcd_mbhc_usbc_analog_plug_detect_handler(struct wcd_mbhc *mbhc, bool
 			jack_type = SND_JACK_ANC_HEADPHONE;
 			break;
 		default:
-			pr_info("%s: Invalid current plug: %d\n",
+			pr_debug("%s: Invalid current plug: %d\n",
 				__func__, mbhc->current_plug);
 			jack_type = SND_JACK_UNSUPPORTED;
 			break;
@@ -1171,7 +1171,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 	#endif /* OPLUS_ARCH_EXTENDS */
 	#ifdef OPLUS_ARCH_EXTENDS
 	if (mbhc->irq_trigger_enable) {
-		pr_info("%s: cancel mech_irq_trigger_dwork\n", __func__);
+		pr_debug("%s: cancel mech_irq_trigger_dwork\n", __func__);
 		cancel_delayed_work_sync(&mbhc->mech_irq_trigger_dwork);
 	}
 	#endif /* OPLUS_ARCH_EXTENDS */
@@ -1199,7 +1199,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 
 	#ifdef OPLUS_ARCH_EXTENDS
 	if (mbhc->use_usbc_detect) {
-		pr_info("%s: mbhc->usbc_analog_status: %d detection_type: %d\n", __func__,
+		pr_debug("%s: mbhc->usbc_analog_status: %d detection_type: %d\n", __func__,
 				mbhc->usbc_analog_status, detection_type);
 		goto done;
 	}
@@ -1211,7 +1211,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 		mbhc->mbhc_fn->wcd_cancel_hs_detect_plug(mbhc,
 						&mbhc->correct_plug_swch);
 	else
-		pr_info("%s: hs_detect_plug work not cancelled\n", __func__);
+		pr_debug("%s: hs_detect_plug work not cancelled\n", __func__);
 
 	/* Enable micbias ramp */
 	if (mbhc->mbhc_cb->mbhc_micb_ramp_control)
@@ -1263,7 +1263,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 		if (!micbias2 && mbhc->is_hs_recording) {
 			if (mbhc->mbhc_cb->mbhc_micbias_control) {
 				//for wcd93xx codec
-				pr_info("%s: force micbias2 enable.\n", __func__);
+				pr_debug("%s: force micbias2 enable.\n", __func__);
 				WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 1);
 			}
 		}
@@ -1324,7 +1324,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 			jack_type = SND_JACK_ANC_HEADPHONE;
 			break;
 		default:
-			pr_info("%s: Invalid current plug: %d\n",
+			pr_debug("%s: Invalid current plug: %d\n",
 				__func__, mbhc->current_plug);
 			jack_type = SND_JACK_UNSUPPORTED;
 			break;
@@ -1344,7 +1344,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 		if (micbias2) {
 			if (mbhc->mbhc_cb->mbhc_micbias_control) {
 				//for wcd93xx codec
-				pr_info("%s: force micbias2 disable.\n", __func__);
+				pr_debug("%s: force micbias2 disable.\n", __func__);
 				WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 0);
 			}
 		}
@@ -1370,7 +1370,7 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 	} else if (!detection_type) {
 		#ifdef OPLUS_ARCH_EXTENDS
 		if (mbhc->micbias_enable) {
-			pr_info("%s: Need to disable MIC_BIAS_2\n", __func__);
+			pr_debug("%s: Need to disable MIC_BIAS_2\n", __func__);
 			if (mbhc->mbhc_cb->mbhc_micbias_control)
 				mbhc->mbhc_cb->mbhc_micbias_control(
 						component, MIC_BIAS_2,
@@ -1438,7 +1438,7 @@ int wcd_mbhc_get_button_mask(struct wcd_mbhc *mbhc)
 	btn = mbhc->mbhc_cb->map_btn_code_to_num(mbhc->component);
 
 	#ifdef OPLUS_ARCH_EXTENDS
-	pr_info("%s: btn is %d", __func__, btn);
+	pr_debug("%s: btn is %d", __func__, btn);
 	#endif /* OPLUS_ARCH_EXTENDS */
 
 	switch (btn) {
@@ -1744,7 +1744,7 @@ static int wcd_mbhc_initialise(struct wcd_mbhc *mbhc)
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_HS_L_DET_PULL_UP_CTRL, 3);
 		#else /* OPLUS_ARCH_EXTENDS */
 		{
-			pr_info("%s: default disable pull up for detection\n", __func__);
+			pr_debug("%s: default disable pull up for detection\n", __func__);
 			WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_HS_L_DET_PULL_UP_CTRL, 0);
 		}
 		#endif /* OPLUS_ARCH_EXTENDS */
@@ -2026,7 +2026,7 @@ static void wcd_mbhc_usbc_ana_detect_work_fn(struct work_struct *work)
 		goto exit;
 	}
 
-	pr_info("%s: USB supply mode %d\n", __func__, mode.intval);
+	pr_debug("%s: USB supply mode %d\n", __func__, mode.intval);
 
 	if (mode.intval == POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER) {
 		if (mbhc->mbhc_cb->clk_setup)

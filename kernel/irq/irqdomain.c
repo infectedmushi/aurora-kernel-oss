@@ -333,7 +333,7 @@ struct irq_domain *irq_domain_add_simple(struct device_node *of_node,
 			int rc = irq_alloc_descs(first_irq, first_irq, size,
 						 of_node_to_nid(of_node));
 			if (rc < 0)
-				pr_info("Cannot allocate irq_descs @ IRQ%d, assuming pre-allocated\n",
+				pr_debug("Cannot allocate irq_descs @ IRQ%d, assuming pre-allocated\n",
 					first_irq);
 		}
 		irq_domain_associate_many(domain, first_irq, 0, size);
@@ -542,7 +542,7 @@ int irq_domain_associate(struct irq_domain *domain, unsigned int virq,
 			 * be mapped. Don't bother telling the user about it.
 			 */
 			if (ret != -EPERM) {
-				pr_info("%s didn't like hwirq-0x%lx to VIRQ%i mapping (rc=%d)\n",
+				pr_debug("%s didn't like hwirq-0x%lx to VIRQ%i mapping (rc=%d)\n",
 				       domain->name, hwirq, virq, ret);
 			}
 			irq_data->domain = NULL;

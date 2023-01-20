@@ -1608,7 +1608,7 @@ static void probe_vcache(void)
 	c->vcache.waybit = 0;
 	c->vcache.waysize = vcache_size / c->vcache.ways;
 
-	pr_info("Unified victim cache %ldkB %s, linesize %d bytes.\n",
+	pr_debug("Unified victim cache %ldkB %s, linesize %d bytes.\n",
 		vcache_size >> 10, way_string[c->vcache.ways], c->vcache.linesz);
 }
 
@@ -1683,7 +1683,7 @@ static void loongson2_sc_init(void)
 	c->scache.waybit = 0;
 	c->scache.waysize = scache_size / (c->scache.ways);
 	c->scache.sets = scache_size / (c->scache.linesz * c->scache.ways);
-	pr_info("Unified secondary cache %ldkB %s, linesize %d bytes.\n",
+	pr_debug("Unified secondary cache %ldkB %s, linesize %d bytes.\n",
 	       scache_size >> 10, way_string[c->scache.ways], c->scache.linesz);
 
 	c->options |= MIPS_CPU_INCLUSIVE_CACHES;
@@ -1710,7 +1710,7 @@ static void __init loongson3_sc_init(void)
 	scache_size *= 4;
 	c->scache.waybit = 0;
 	c->scache.waysize = scache_size / c->scache.ways;
-	pr_info("Unified secondary cache %ldkB %s, linesize %d bytes.\n",
+	pr_debug("Unified secondary cache %ldkB %s, linesize %d bytes.\n",
 	       scache_size >> 10, way_string[c->scache.ways], c->scache.linesz);
 	if (scache_size)
 		c->options |= MIPS_CPU_INCLUSIVE_CACHES;

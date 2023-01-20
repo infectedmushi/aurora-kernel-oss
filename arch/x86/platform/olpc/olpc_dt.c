@@ -237,7 +237,7 @@ void __init olpc_dt_fixup(void)
 	if (r > 0)
 		return;
 
-	pr_info("PROM DT: Old firmware detected, applying fixes\n");
+	pr_debug("PROM DT: Old firmware detected, applying fixes\n");
 
 	/* Add olpc,xo1-battery compatible marker to battery node */
 	olpc_dt_interpret("\" /battery@0\" find-device"
@@ -282,7 +282,7 @@ void __init olpc_dt_build_devicetree(void)
 	}
 	of_pdt_build_devicetree(root, &prom_olpc_ops);
 
-	pr_info("PROM DT: Built device tree with %u bytes of memory.\n",
+	pr_debug("PROM DT: Built device tree with %u bytes of memory.\n",
 			prom_early_allocated);
 }
 

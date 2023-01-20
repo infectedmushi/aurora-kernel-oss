@@ -391,7 +391,7 @@ static int __init op_rf_cable_init(void)
 {
     int ret;
 
-    pr_info("%s: enter\n", __func__);
+    pr_debug("%s: enter\n", __func__);
     ret = platform_driver_register(&op_rf_cable_driver);
     if (ret)
         pr_err("rf_cable_driver register failed: %d\n", ret);

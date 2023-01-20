@@ -1258,7 +1258,7 @@ static int pci_sun4v_probe(struct platform_device *op)
 			pr_err(PFX "Could not register hvapi, err=%d\n", err);
 			return err;
 		}
-		pr_info(PFX "Registered hvapi major[%lu] minor[%lu]\n",
+		pr_debug(PFX "Registered hvapi major[%lu] minor[%lu]\n",
 			vpci_major, vpci_minor);
 
 		err = sun4v_hvapi_register(HV_GRP_ATU, vatu_major, &vatu_minor);
@@ -1268,7 +1268,7 @@ static int pci_sun4v_probe(struct platform_device *op)
 			 */
 			hv_atu = false;
 		} else {
-			pr_info(PFX "Registered hvapi ATU major[%lu] minor[%lu]\n",
+			pr_debug(PFX "Registered hvapi ATU major[%lu] minor[%lu]\n",
 				vatu_major, vatu_minor);
 		}
 

@@ -4312,7 +4312,7 @@ static int ipa_init(const struct ipa_plat_drv_res *resource_p,
 
 	ipa_register_panic_hdlr();
 
-	pr_info("IPA driver initialization was successful.\n");
+	pr_debug("IPA driver initialization was successful.\n");
 
 	return 0;
 
@@ -4878,7 +4878,7 @@ int ipa_plat_drv_probe(struct platform_device *pdev_p,
 		    "qcom,smmu-s1-bypass"))
 			smmu_info.s1_bypass = true;
 		smmu_info.arm_smmu = true;
-		pr_info("IPA smmu_info.s1_bypass=%d smmu_info.fast_map=%d\n",
+		pr_debug("IPA smmu_info.s1_bypass=%d smmu_info.fast_map=%d\n",
 			smmu_info.s1_bypass, smmu_info.fast_map);
 		result = of_platform_populate(pdev_p->dev.of_node,
 				pdrv_match, NULL, &pdev_p->dev);

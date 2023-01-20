@@ -1015,9 +1015,9 @@ static ssize_t ipa3_read_proc_ctx(struct file *file, char __user *ubuf,
 	mutex_lock(&ipa3_ctx->lock);
 
 	if (ipa3_ctx->hdr_proc_ctx_tbl_lcl)
-		pr_info("Table resides on local memory\n");
+		pr_debug("Table resides on local memory\n");
 	else
-		pr_info("Table resides on system(ddr) memory\n");
+		pr_debug("Table resides on system(ddr) memory\n");
 
 	list_for_each_entry(entry, &tbl->head_proc_ctx_entry_list, link) {
 		ofst_words = (entry->offset_entry->offset +

@@ -242,9 +242,9 @@ void bootprof_log_boot(char *str)
 	log_count++;
 out:
 	spin_unlock(&bootprof_lock);
-	pr_info("BOOTPROF:%10lld.%06ld:%s\n", msec_high(ts), msec_low(ts), str);
+	pr_debug("BOOTPROF:%10lld.%06ld:%s\n", msec_high(ts), msec_low(ts), str);
 	if (err > 0)
-		pr_info("[BOOTPROF] Error(Ret:%d): Skip log.\n", err);
+		pr_debug("[BOOTPROF] Error(Ret:%d): Skip log.\n", err);
 }
 EXPORT_SYMBOL_GPL(bootprof_log_boot);
 
@@ -254,12 +254,12 @@ static int bootprof_bootloader(void)
 
 	ret = mpm_parse_dt();
 	if (ret < 0) {
-        pr_info("[BOOTPROF] bootprof_bootloader parse dt failed\n");
+        pr_debug("[BOOTPROF] bootprof_bootloader parse dt failed\n");
         return -ENODEV;
 	}
 
 	uefi_time = (readl_relaxed(&boot_stats->bootloader_end) * 1000)/mpm_counter_freq;
-	pr_info("KPI: uefi_time = %u\n", uefi_time);
+	pr_debug("KPI: uefi_time = %u\n", uefi_time);
 
 	iounmap(boot_stats);
 	iounmap(mpm_counter_base);
@@ -282,7 +282,7 @@ void bootprof_initcall(initcall_t fn, unsigned long long ts)
 			"initcall: %ps %5llu.%06lums",
 			fn, ts, msec_rem);
 		if (len < 0)
-			pr_info("BOOTPROF: initcall - Invalid argument.\n");
+			pr_debug("BOOTPROF: initcall - Invalid argument.\n");
 		bootprof_log_boot(msgbuf);
 	}
 }
@@ -323,7 +323,7 @@ tp_initcall_start_cb(void *data, initcall_t fn)
 	/*release entry of err list*/
 	if (!list_empty(&err_list)) {
 		list_for_each_entry_safe(pos, next, &err_list, dev_entry) {
-			pr_info("[BOOTPROF] Warn:duplicated entry.(pid:%d, tid:%d)\n",
+			pr_debug("[BOOTPROF] Warn:duplicated entry.(pid:%d, tid:%d)\n",
 				pos->pid, pos->tid);
 			list_del(&pos->dev_entry);
 			kfree(pos);
@@ -422,7 +422,7 @@ static void tp_deinit(void)
 		}
 	}
 	spin_unlock(&initcall_lock);
-	pr_info("BOOTPROF: Unregister initcalls tracepoint.\n");
+	pr_debug("BOOTPROF: Unregister initcalls tracepoint.\n");
 }
 
 static void tp_init(void)
@@ -436,7 +436,7 @@ static void tp_init(void)
 
 	FOR_EACH_INTEREST(i) {
 		if (!interests[i].tp) {
-			pr_info("[BOOTPROF]TP: %s not found\n",
+			pr_debug("[BOOTPROF]TP: %s not found\n",
 					interests[i].name);
 			/* Unload previously loaded */
 			tp_deinit();
@@ -466,7 +466,7 @@ static void mt_bootprof_switch(int on)
 	spin_unlock(&bootprof_lock);
 
 	if (tmp) {
-		pr_info("BOOTPROF:%10lld.%06ld: %s%d)\n",
+		pr_debug("BOOTPROF:%10lld.%06ld: %s%d)\n",
 			msec_high(ts), msec_low(ts), on ? "ON (TH:" : "OFF (KO:",
 			on ? msec_high(BOOTPROF_THRESHOLD) : atomic_read(&initcall_num));
 
@@ -515,7 +515,7 @@ static int mt_bootprof_show(struct seq_file *m, void *v)
 	struct log_t *p;
 
 	if (!m) {
-		pr_info("seq_file is Null.\n");
+		pr_debug("seq_file is Null.\n");
 		return 0;
 	}
 	seq_puts(m, "----------------------------------------\n");
@@ -630,13 +630,13 @@ int __init phoenix_reboot_speed_init(void)
 	memset(bootprof, 0, sizeof(struct log_t *) * BUF_COUNT);
 	bootprof[0] = kcalloc(LOGS_PER_BUF, sizeof(struct log_t), GFP_ATOMIC | __GFP_NORETRY | __GFP_NOWARN);
 	if (!bootprof[0]) {
-        pr_info("[BOOTPROF] fail to allocate memory\n");
+        pr_debug("[BOOTPROF] fail to allocate memory\n");
         return -ENOMEM;
 	}
 
 	pe = proc_create("bootprof", 0664, NULL, &mt_bootprof_fops);
 	if (!pe) {
-        pr_info("[BOOTPROF] fail to create file node\n");
+        pr_debug("[BOOTPROF] fail to create file node\n");
         return -ENOMEM;
 	}
 

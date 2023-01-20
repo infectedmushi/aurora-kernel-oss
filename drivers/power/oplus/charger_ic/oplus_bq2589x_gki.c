@@ -3443,12 +3443,12 @@ static int pd_tcp_notifier_call(struct notifier_block *nb,
 	case TCP_NOTIFY_TYPEC_STATE:
 		if (noti->typec_state.old_state == TYPEC_UNATTACHED &&
 		    noti->typec_state.new_state == TYPEC_ATTACHED_SNK) {
-			pr_info("USB Plug in\n");
+			pr_debug("USB Plug in\n");
 			power_supply_changed(bq->psy);
 		} else if (noti->typec_state.old_state == TYPEC_ATTACHED_SNK
 			&& noti->typec_state.new_state == TYPEC_UNATTACHED) {
 			bq2589x_en_hiz_mode(bq, false);
-			pr_info("USB Plug out\n");
+			pr_debug("USB Plug out\n");
 			if (oplus_vooc_get_fast_chg_type() == CHARGER_SUBTYPE_FASTCHG_VOOC && oplus_chg_get_wait_for_ffc_flag() != true) {
 				bq->power_good = 0;
 				bq->is_force_aicl = false;
@@ -3478,7 +3478,7 @@ static int pd_tcp_notifier_call(struct notifier_block *nb,
 				cancel_delayed_work_sync(&bq->bq2589x_aicr_setting_work);
 				cancel_delayed_work_sync(&bq->bq2589x_hvdcp_bc12_work);
 				oplus_chg_wake_update_work();
-				pr_info("usb real remove vooc fastchg clear flag!\n");
+				pr_debug("usb real remove vooc fastchg clear flag!\n");
 			}
 		}
 		break;
@@ -3521,7 +3521,7 @@ static int bq2589x_charger_get_online(struct bq2589x *bq, bool *val)
 		return 0;
 	}
 
-	pr_info("online = %d\n", pwr_rdy);
+	pr_debug("online = %d\n", pwr_rdy);
 	*val = pwr_rdy;
 	return 0;
 }
@@ -3547,7 +3547,7 @@ static int bq2589x_charger_get_property(struct power_supply *psy,
 			if (g_bq->usb_connect_start == true)
 				val->intval = g_bq->oplus_chg_type;
 		}
-		pr_info("bq2589x power_supply_type = %d\n", val->intval);
+		pr_debug("bq2589x power_supply_type = %d\n", val->intval);
 		break;
 	default:
 		ret = -ENODATA;

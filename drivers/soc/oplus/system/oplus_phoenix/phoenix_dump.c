@@ -260,7 +260,7 @@ static int creds_change_dac(void)
     struct cred *new;
     int rc = 0;
 
-    pr_info("creds_change_dac enter!\n");
+    pr_debug("creds_change_dac enter!\n");
 
     new = prepare_creds();
     if (!new) {
@@ -283,7 +283,7 @@ static int creds_change_id(void)
     struct cred *new;
     int rc = 0;
 
-    pr_info("creds_change_id enter!\n");
+    pr_debug("creds_change_id enter!\n");
 
     new = prepare_creds();
     if (!new) {

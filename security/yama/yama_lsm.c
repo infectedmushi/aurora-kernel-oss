@@ -481,7 +481,7 @@ static inline void yama_init_sysctl(void) { }
 
 void __init yama_add_hooks(void)
 {
-	pr_info("Yama: becoming mindful.\n");
+	pr_debug("Yama: becoming mindful.\n");
 	security_add_hooks(yama_hooks, ARRAY_SIZE(yama_hooks), "yama");
 	yama_init_sysctl();
 }

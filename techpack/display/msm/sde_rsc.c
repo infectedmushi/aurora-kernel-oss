@@ -1590,7 +1590,7 @@ static int sde_rsc_probe(struct platform_device *pdev)
 	init_waitqueue_head(&rsc->rsc_vsync_waitq);
 	atomic_set(&rsc->resource_refcount, 0);
 
-	pr_info("sde rsc index:%d probed successfully\n",
+	pr_debug("sde rsc index:%d probed successfully\n",
 				SDE_RSC_INDEX + counter);
 
 	rsc_prv_list[SDE_RSC_INDEX + counter] = rsc;

@@ -452,7 +452,7 @@ static int vconsole_setup(struct console *co, char *options)
 	if (co->index < 0 || co->index >= max_ttys)
 		co->index = 0;
 
-	pr_info("OKL4 virtual console init\n");
+	pr_debug("OKL4 virtual console init\n");
 
 	return 0;
 }

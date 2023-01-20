@@ -87,7 +87,7 @@ static DEVICE_ATTR_RW(pkt_threshold);
 
 #define DBG(m, x...) do {			   \
 		if (msm_rmnet_bam_debug_mask & (m)) \
-			pr_info(x);		   \
+			pr_debug(x);		   \
 } while (0)
 #define DBG0(x...) DBG(DEBUG_MASK_LVL0, x)
 #define DBG1(x...) DBG(DEBUG_MASK_LVL1, x)
