@@ -176,10 +176,10 @@ static void omap_irq_fifo_underflow(struct omap_drm_private *priv,
 
 	for (i = 0; i < ARRAY_SIZE(sources); ++i) {
 		if (sources[i].mask & irqstatus)
-			pr_cont("%s ", sources[i].name);
+			pr_debug("%s ", sources[i].name);
 	}
 
-	pr_cont("(0x%08x)\n", irqstatus);
+	pr_debug("(0x%08x)\n", irqstatus);
 }
 
 static void omap_irq_ocp_error_handler(struct drm_device *dev,

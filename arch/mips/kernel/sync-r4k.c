@@ -84,7 +84,7 @@ void synchronise_count_master(int cpu)
 	 * count registers were almost certainly out of sync
 	 * so no point in alarming people
 	 */
-	pr_cont("done.\n");
+	pr_debug("done.\n");
 }
 
 void synchronise_count_slave(int cpu)

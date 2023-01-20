@@ -155,7 +155,7 @@ static void show_backtrace(struct task_struct *task, const struct pt_regs *regs)
 		print_ip_sym(pc);
 		pc = unwind_stack(task, &sp, pc, &ra);
 	} while (pc);
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*
@@ -174,23 +174,23 @@ static void show_stacktrace(struct task_struct *task,
 	i = 0;
 	while ((unsigned long) sp & (PAGE_SIZE - 1)) {
 		if (i && ((i % (64 / field)) == 0)) {
-			pr_cont("\n");
+			pr_debug("\n");
 			printk("       ");
 		}
 		if (i > 39) {
-			pr_cont(" ...");
+			pr_debug(" ...");
 			break;
 		}
 
 		if (__get_user(stackdata, sp++)) {
-			pr_cont(" (Bad stack address)");
+			pr_debug(" (Bad stack address)");
 			break;
 		}
 
-		pr_cont(" %0*lx", field, stackdata);
+		pr_debug(" %0*lx", field, stackdata);
 		i++;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	show_backtrace(task, regs);
 }
 
@@ -239,12 +239,12 @@ static void show_code(unsigned int __user *pc)
 	for(i = -3 ; i < 6 ; i++) {
 		unsigned int insn;
 		if (pc16 ? __get_user(insn, pc16 + i) : __get_user(insn, pc + i)) {
-			pr_cont(" (Bad address in epc)\n");
+			pr_debug(" (Bad address in epc)\n");
 			break;
 		}
-		pr_cont("%c%0*x%c", (i?' ':'<'), pc16 ? 4 : 8, insn, (i?' ':'>'));
+		pr_debug("%c%0*x%c", (i?' ':'<'), pc16 ? 4 : 8, insn, (i?' ':'>'));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static void __show_regs(const struct pt_regs *regs)
@@ -263,15 +263,15 @@ static void __show_regs(const struct pt_regs *regs)
 		if ((i % 4) == 0)
 			printk("$%2d   :", i);
 		if (i == 0)
-			pr_cont(" %0*lx", field, 0UL);
+			pr_debug(" %0*lx", field, 0UL);
 		else if (i == 26 || i == 27)
-			pr_cont(" %*s", field, "");
+			pr_debug(" %*s", field, "");
 		else
-			pr_cont(" %0*lx", field, regs->regs[i]);
+			pr_debug(" %0*lx", field, regs->regs[i]);
 
 		i++;
 		if ((i % 4) == 0)
-			pr_cont("\n");
+			pr_debug("\n");
 	}
 
 #ifdef CONFIG_CPU_HAS_SMARTMIPS
@@ -292,46 +292,46 @@ static void __show_regs(const struct pt_regs *regs)
 
 	if (cpu_has_3kex) {
 		if (regs->cp0_status & ST0_KUO)
-			pr_cont("KUo ");
+			pr_debug("KUo ");
 		if (regs->cp0_status & ST0_IEO)
-			pr_cont("IEo ");
+			pr_debug("IEo ");
 		if (regs->cp0_status & ST0_KUP)
-			pr_cont("KUp ");
+			pr_debug("KUp ");
 		if (regs->cp0_status & ST0_IEP)
-			pr_cont("IEp ");
+			pr_debug("IEp ");
 		if (regs->cp0_status & ST0_KUC)
-			pr_cont("KUc ");
+			pr_debug("KUc ");
 		if (regs->cp0_status & ST0_IEC)
-			pr_cont("IEc ");
+			pr_debug("IEc ");
 	} else if (cpu_has_4kex) {
 		if (regs->cp0_status & ST0_KX)
-			pr_cont("KX ");
+			pr_debug("KX ");
 		if (regs->cp0_status & ST0_SX)
-			pr_cont("SX ");
+			pr_debug("SX ");
 		if (regs->cp0_status & ST0_UX)
-			pr_cont("UX ");
+			pr_debug("UX ");
 		switch (regs->cp0_status & ST0_KSU) {
 		case KSU_USER:
-			pr_cont("USER ");
+			pr_debug("USER ");
 			break;
 		case KSU_SUPERVISOR:
-			pr_cont("SUPERVISOR ");
+			pr_debug("SUPERVISOR ");
 			break;
 		case KSU_KERNEL:
-			pr_cont("KERNEL ");
+			pr_debug("KERNEL ");
 			break;
 		default:
-			pr_cont("BAD_MODE ");
+			pr_debug("BAD_MODE ");
 			break;
 		}
 		if (regs->cp0_status & ST0_ERL)
-			pr_cont("ERL ");
+			pr_debug("ERL ");
 		if (regs->cp0_status & ST0_EXL)
-			pr_cont("EXL ");
+			pr_debug("EXL ");
 		if (regs->cp0_status & ST0_IE)
-			pr_cont("IE ");
+			pr_debug("IE ");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	exccode = (cause & CAUSEF_EXCCODE) >> CAUSEB_EXCCODE;
 	printk("Cause : %08x (ExcCode %02x)\n", cause, exccode);

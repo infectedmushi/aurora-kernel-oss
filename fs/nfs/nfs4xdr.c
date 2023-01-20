@@ -3701,7 +3701,7 @@ static int decode_pathname(struct xdr_stream *xdr, struct nfs4_pathname *path)
 		if (unlikely(status != 0))
 			goto out_eio;
 		ifdebug (XDR)
-			pr_cont("%s%.*s ",
+			pr_debug("%s%.*s ",
 				(path->ncomponents != n ? "/ " : ""),
 				component->len, component->data);
 	}

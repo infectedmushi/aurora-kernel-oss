@@ -1497,43 +1497,43 @@ static void std_log(const struct v4l2_ctrl *ctrl)
 		unsigned i;
 
 		for (i = 0; i < ctrl->nr_of_dims; i++)
-			pr_cont("[%u]", ctrl->dims[i]);
-		pr_cont(" ");
+			pr_debug("[%u]", ctrl->dims[i]);
+		pr_debug(" ");
 	}
 
 	switch (ctrl->type) {
 	case V4L2_CTRL_TYPE_INTEGER:
-		pr_cont("%d", *ptr.p_s32);
+		pr_debug("%d", *ptr.p_s32);
 		break;
 	case V4L2_CTRL_TYPE_BOOLEAN:
-		pr_cont("%s", *ptr.p_s32 ? "true" : "false");
+		pr_debug("%s", *ptr.p_s32 ? "true" : "false");
 		break;
 	case V4L2_CTRL_TYPE_MENU:
-		pr_cont("%s", ctrl->qmenu[*ptr.p_s32]);
+		pr_debug("%s", ctrl->qmenu[*ptr.p_s32]);
 		break;
 	case V4L2_CTRL_TYPE_INTEGER_MENU:
-		pr_cont("%lld", ctrl->qmenu_int[*ptr.p_s32]);
+		pr_debug("%lld", ctrl->qmenu_int[*ptr.p_s32]);
 		break;
 	case V4L2_CTRL_TYPE_BITMASK:
-		pr_cont("0x%08x", *ptr.p_s32);
+		pr_debug("0x%08x", *ptr.p_s32);
 		break;
 	case V4L2_CTRL_TYPE_INTEGER64:
-		pr_cont("%lld", *ptr.p_s64);
+		pr_debug("%lld", *ptr.p_s64);
 		break;
 	case V4L2_CTRL_TYPE_STRING:
-		pr_cont("%s", ptr.p_char);
+		pr_debug("%s", ptr.p_char);
 		break;
 	case V4L2_CTRL_TYPE_U8:
-		pr_cont("%u", (unsigned)*ptr.p_u8);
+		pr_debug("%u", (unsigned)*ptr.p_u8);
 		break;
 	case V4L2_CTRL_TYPE_U16:
-		pr_cont("%u", (unsigned)*ptr.p_u16);
+		pr_debug("%u", (unsigned)*ptr.p_u16);
 		break;
 	case V4L2_CTRL_TYPE_U32:
-		pr_cont("%u", (unsigned)*ptr.p_u32);
+		pr_debug("%u", (unsigned)*ptr.p_u32);
 		break;
 	default:
-		pr_cont("unknown type %d", ctrl->type);
+		pr_debug("unknown type %d", ctrl->type);
 		break;
 	}
 }
@@ -2566,13 +2566,13 @@ static void log_ctrl(const struct v4l2_ctrl *ctrl,
 			   V4L2_CTRL_FLAG_GRABBED |
 			   V4L2_CTRL_FLAG_VOLATILE)) {
 		if (ctrl->flags & V4L2_CTRL_FLAG_INACTIVE)
-			pr_cont(" inactive");
+			pr_debug(" inactive");
 		if (ctrl->flags & V4L2_CTRL_FLAG_GRABBED)
-			pr_cont(" grabbed");
+			pr_debug(" grabbed");
 		if (ctrl->flags & V4L2_CTRL_FLAG_VOLATILE)
-			pr_cont(" volatile");
+			pr_debug(" volatile");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /* Log all controls owned by the handler */

@@ -185,23 +185,23 @@ void show_pte(unsigned long addr)
 
 		pudp = pud_offset(pgdp, addr);
 		pud = READ_ONCE(*pudp);
-		pr_cont(", pud=%016llx", pud_val(pud));
+		pr_debug(", pud=%016llx", pud_val(pud));
 		if (pud_none(pud) || pud_bad(pud))
 			break;
 
 		pmdp = pmd_offset(pudp, addr);
 		pmd = READ_ONCE(*pmdp);
-		pr_cont(", pmd=%016llx", pmd_val(pmd));
+		pr_debug(", pmd=%016llx", pmd_val(pmd));
 		if (pmd_none(pmd) || pmd_bad(pmd))
 			break;
 
 		ptep = pte_offset_map(pmdp, addr);
 		pte = READ_ONCE(*ptep);
-		pr_cont(", pte=%016llx", pte_val(pte));
+		pr_debug(", pte=%016llx", pte_val(pte));
 		pte_unmap(ptep);
 	} while(0);
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*

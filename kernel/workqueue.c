@@ -4547,8 +4547,8 @@ void print_worker_info(const char *log_lvl, struct task_struct *task)
 	if (fn || name[0] || desc[0]) {
 		printk("%sWorkqueue: %s %pf", log_lvl, name, fn);
 		if (strcmp(name, desc))
-			pr_cont(" (%s)", desc);
-		pr_cont("\n");
+			pr_debug(" (%s)", desc);
+		pr_debug("\n");
 	}
 }
 
@@ -4594,13 +4594,13 @@ void get_worker_info(struct task_struct *task, char *buf)
 
 static void pr_cont_pool_info(struct worker_pool *pool)
 {
-	pr_cont(" cpus=%*pbl", nr_cpumask_bits, pool->attrs->cpumask);
+	pr_debug(" cpus=%*pbl", nr_cpumask_bits, pool->attrs->cpumask);
 	if (pool->node != NUMA_NO_NODE)
-		pr_cont(" node=%d", pool->node);
+		pr_debug(" node=%d", pool->node);
 #ifdef OPLUS_FEATURE_SCHED_ASSIST
-	pr_cont(" flags=0x%x nice=%d ux=%d", pool->flags, pool->attrs->nice, pool->attrs->ux_state);
+	pr_debug(" flags=0x%x nice=%d ux=%d", pool->flags, pool->attrs->nice, pool->attrs->ux_state);
 #else
-	pr_cont(" flags=0x%x nice=%d", pool->flags, pool->attrs->nice);
+	pr_debug(" flags=0x%x nice=%d", pool->flags, pool->attrs->nice);
 #endif
 }
 
@@ -4611,10 +4611,10 @@ static void pr_cont_work(bool comma, struct work_struct *work)
 
 		barr = container_of(work, struct wq_barrier, work);
 
-		pr_cont("%s BAR(%d)", comma ? "," : "",
+		pr_debug("%s BAR(%d)", comma ? "," : "",
 			task_pid_nr(barr->task));
 	} else {
-		pr_cont("%s %pf", comma ? "," : "", work->func);
+		pr_debug("%s %pf", comma ? "," : "", work->func);
 	}
 }
 
@@ -4629,7 +4629,7 @@ static void show_pwq(struct pool_workqueue *pwq)
 	pr_debug("  pwq %d:", pool->id);
 	pr_cont_pool_info(pool);
 
-	pr_cont(" active=%d/%d refcnt=%d%s\n",
+	pr_debug(" active=%d/%d refcnt=%d%s\n",
 		pwq->nr_active, pwq->max_active, pwq->refcnt,
 		!list_empty(&pwq->mayday_node) ? " MAYDAY" : "");
 
@@ -4647,7 +4647,7 @@ static void show_pwq(struct pool_workqueue *pwq)
 			if (worker->current_pwq != pwq)
 				continue;
 
-			pr_cont("%s %d%s:%pf", comma ? "," : "",
+			pr_debug("%s %d%s:%pf", comma ? "," : "",
 				task_pid_nr(worker->task),
 				worker == pwq->wq->rescuer ? "(RESCUER)" : "",
 				worker->current_func);
@@ -4655,7 +4655,7 @@ static void show_pwq(struct pool_workqueue *pwq)
 				pr_cont_work(false, work);
 			comma = true;
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	list_for_each_entry(work, &pool->worklist, entry) {
@@ -4675,7 +4675,7 @@ static void show_pwq(struct pool_workqueue *pwq)
 			pr_cont_work(comma, work);
 			comma = !(*work_data_bits(work) & WORK_STRUCT_LINKED);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	if (!list_empty(&pwq->delayed_works)) {
@@ -4686,7 +4686,7 @@ static void show_pwq(struct pool_workqueue *pwq)
 			pr_cont_work(comma, work);
 			comma = !(*work_data_bits(work) & WORK_STRUCT_LINKED);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 
@@ -4746,18 +4746,18 @@ void show_workqueue_state(void)
 
 		pr_debug("pool %d:", pool->id);
 		pr_cont_pool_info(pool);
-		pr_cont(" hung=%us workers=%d",
+		pr_debug(" hung=%us workers=%d",
 			jiffies_to_msecs(jiffies - pool->watchdog_ts) / 1000,
 			pool->nr_workers);
 		if (pool->manager)
-			pr_cont(" manager: %d",
+			pr_debug(" manager: %d",
 				task_pid_nr(pool->manager->task));
 		list_for_each_entry(worker, &pool->idle_list, entry) {
-			pr_cont(" %s%d", first ? "idle: " : "",
+			pr_debug(" %s%d", first ? "idle: " : "",
 				task_pid_nr(worker->task));
 			first = false;
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	next_pool:
 		spin_unlock_irqrestore(&pool->lock, flags);
 		/*
@@ -5743,7 +5743,7 @@ static void wq_watchdog_timer_fn(struct timer_list *unused)
 			lockup_detected = true;
 			pr_emerg("BUG: workqueue lockup - pool");
 			pr_cont_pool_info(pool);
-			pr_cont(" stuck for %us!\n",
+			pr_debug(" stuck for %us!\n",
 				jiffies_to_msecs(now - pool_ts) / 1000);
 		}
 	}

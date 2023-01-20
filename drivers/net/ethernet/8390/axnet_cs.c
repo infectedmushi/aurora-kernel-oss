@@ -1214,16 +1214,16 @@ static void ei_tx_err(struct net_device *dev)
 #ifdef VERBOSE_ERROR_DUMP
 	netdev_dbg(dev, "transmitter error (%#2x):", txsr);
 	if (txsr & ENTSR_ABT)
-		pr_cont(" excess-collisions");
+		pr_debug(" excess-collisions");
 	if (txsr & ENTSR_ND)
-		pr_cont(" non-deferral");
+		pr_debug(" non-deferral");
 	if (txsr & ENTSR_CRS)
-		pr_cont(" lost-carrier");
+		pr_debug(" lost-carrier");
 	if (txsr & ENTSR_FU)
-		pr_cont(" FIFO-underrun");
+		pr_debug(" FIFO-underrun");
 	if (txsr & ENTSR_CDH)
-		pr_cont(" lost-heartbeat");
-	pr_cont("\n");
+		pr_debug(" lost-heartbeat");
+	pr_debug("\n");
 #endif
 
 	if (tx_was_aborted)

@@ -244,10 +244,10 @@ static void raise_backtrace_ipi(cpumask_t *mask)
 			p->irq_soft_mask, p->in_mce, p->in_nmi);
 
 		if (virt_addr_valid(p->__current))
-			pr_cont(" current: %d (%s)\n", p->__current->pid,
+			pr_debug(" current: %d (%s)\n", p->__current->pid,
 				p->__current->comm);
 		else
-			pr_cont(" current pointer corrupt? (%px)\n", p->__current);
+			pr_debug(" current pointer corrupt? (%px)\n", p->__current);
 
 		pr_warn("Back trace of paca->saved_r1 (0x%016llx) (possibly stale):\n", p->saved_r1);
 		show_stack(p->__current, (unsigned long *)p->saved_r1);

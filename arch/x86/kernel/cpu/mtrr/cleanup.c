@@ -646,7 +646,7 @@ static void __init mtrr_print_out_one_result(int i)
 	pr_debug("%sgran_size: %ld%c \tchunk_size: %ld%c \t",
 		result[i].bad ? "*BAD*" : " ",
 		gran_base, gran_factor, chunk_base, chunk_factor);
-	pr_cont("num_reg: %d  \tlose cover RAM: %s%ld%c\n",
+	pr_debug("num_reg: %d  \tlose cover RAM: %s%ld%c\n",
 		result[i].num_reg, result[i].bad ? "-" : "",
 		lose_base, lose_factor);
 }

@@ -126,12 +126,12 @@ void show_registers(struct pt_regs *regs)
 	mode = user_mode(regs) ? "User" : "Krnl";
 	printk("%s PSW : %p %p", mode, (void *)regs->psw.mask, (void *)regs->psw.addr);
 	if (!user_mode(regs))
-		pr_cont(" (%pSR)", (void *)regs->psw.addr);
-	pr_cont("\n");
+		pr_debug(" (%pSR)", (void *)regs->psw.addr);
+	pr_debug("\n");
 	printk("           R:%x T:%x IO:%x EX:%x Key:%x M:%x W:%x "
 	       "P:%x AS:%x CC:%x PM:%x", psw->per, psw->dat, psw->io, psw->ext,
 	       psw->key, psw->mcheck, psw->wait, psw->pstate, psw->as, psw->cc, psw->pm);
-	pr_cont(" RI:%x EA:%x\n", psw->ri, psw->eaba);
+	pr_debug(" RI:%x EA:%x\n", psw->ri, psw->eaba);
 	printk("%s GPRS: %016lx %016lx %016lx %016lx\n", mode,
 	       regs->gprs[0], regs->gprs[1], regs->gprs[2], regs->gprs[3]);
 	printk("           %016lx %016lx %016lx %016lx\n",
@@ -168,14 +168,14 @@ void die(struct pt_regs *regs, const char *str)
 	printk("%s: %04x ilc:%d [#%d] ", str, regs->int_code & 0xffff,
 	       regs->int_code >> 17, ++die_counter);
 #ifdef CONFIG_PREEMPT
-	pr_cont("PREEMPT ");
+	pr_debug("PREEMPT ");
 #endif
 #ifdef CONFIG_SMP
-	pr_cont("SMP ");
+	pr_debug("SMP ");
 #endif
 	if (debug_pagealloc_enabled())
-		pr_cont("DEBUG_PAGEALLOC");
-	pr_cont("\n");
+		pr_debug("DEBUG_PAGEALLOC");
+	pr_debug("\n");
 	notify_die(DIE_OOPS, str, regs, 0, regs->int_code & 0xffff, SIGSEGV);
 	print_modules();
 	show_regs(regs);

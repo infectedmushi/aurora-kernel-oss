@@ -132,7 +132,7 @@ void show_stack(struct task_struct *task, unsigned long *esp)
 			break;
 		if (i % 8 == 0)
 			pr_debug(" ");
-		pr_cont(" %08lx", *stack++);
+		pr_debug(" %08lx", *stack++);
 	}
 
 	pr_debug("\nCall Trace:\n");
@@ -151,7 +151,7 @@ void show_stack(struct task_struct *task, unsigned long *esp)
 		if (check_kernel_text(addr)) {
 			if (i % 4 == 0)
 				pr_debug("       ");
-			pr_cont(" [<%08lx>]", addr);
+			pr_debug(" [<%08lx>]", addr);
 			i++;
 		}
 	}

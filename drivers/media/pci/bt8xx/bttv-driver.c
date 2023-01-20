@@ -3409,12 +3409,12 @@ static int bttv_risc_decode(u32 risc)
 	};
 	int i;
 
-	pr_cont("0x%08x [ %s", risc,
+	pr_debug("0x%08x [ %s", risc,
 	       instr[risc >> 28] ? instr[risc >> 28] : "INVALID");
 	for (i = ARRAY_SIZE(bits)-1; i >= 0; i--)
 		if (risc & (1 << (i + 12)))
-			pr_cont(" %s", bits[i]);
-	pr_cont(" count=%d ]\n", risc & 0xfff);
+			pr_debug(" %s", bits[i]);
+	pr_debug(" count=%d ]\n", risc & 0xfff);
 	return incr[risc >> 28] ? incr[risc >> 28] : 1;
 }
 
@@ -3486,12 +3486,12 @@ static void bttv_print_irqbits(u32 print, u32 mark)
 {
 	unsigned int i;
 
-	pr_cont("bits:");
+	pr_debug("bits:");
 	for (i = 0; i < ARRAY_SIZE(irq_name); i++) {
 		if (print & (1 << i))
-			pr_cont(" %s", irq_name[i]);
+			pr_debug(" %s", irq_name[i]);
 		if (mark & (1 << i))
-			pr_cont("*");
+			pr_debug("*");
 	}
 }
 
@@ -3665,7 +3665,7 @@ static void bttv_irq_timeout(struct timer_list *t)
 			btv->c.nr, btv->framedrop, btv->irq_me, btv->irq_total,
 			btread(BT848_RISC_COUNT));
 		bttv_print_irqbits(btread(BT848_INT_STAT),0);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	spin_lock_irqsave(&btv->s_lock,flags);
@@ -3833,18 +3833,18 @@ static irqreturn_t bttv_irq(int irq, void *dev_id)
 				 stat>>28, btread(BT848_RISC_COUNT));
 			bttv_print_irqbits(stat,astat);
 			if (stat & BT848_INT_HLOCK)
-				pr_cont("   HLOC => %s",
+				pr_debug("   HLOC => %s",
 					dstat & BT848_DSTATUS_HLOC
 					? "yes" : "no");
 			if (stat & BT848_INT_VPRES)
-				pr_cont("   PRES => %s",
+				pr_debug("   PRES => %s",
 					dstat & BT848_DSTATUS_PRES
 					? "yes" : "no");
 			if (stat & BT848_INT_FMTCHG)
-				pr_cont("   NUML => %s",
+				pr_debug("   NUML => %s",
 					dstat & BT848_DSTATUS_NUML
 					? "625" : "525");
-			pr_cont("\n");
+			pr_debug("\n");
 		}
 
 		if (astat&BT848_INT_VSYNC)
@@ -3879,7 +3879,7 @@ static irqreturn_t bttv_irq(int irq, void *dev_id)
 				(astat & BT848_INT_OCERR) ? "OCERR" : "",
 				btread(BT848_RISC_COUNT));
 			bttv_print_irqbits(stat,astat);
-			pr_cont("\n");
+			pr_debug("\n");
 			if (bttv_debug)
 				bttv_print_riscaddr(btv);
 		}
@@ -3908,7 +3908,7 @@ static irqreturn_t bttv_irq(int irq, void *dev_id)
 
 			bttv_print_irqbits(stat,astat);
 
-			pr_cont("]\n");
+			pr_debug("]\n");
 		}
 	}
 	btv->irq_total++;

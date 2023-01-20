@@ -265,18 +265,18 @@ static int __die(const char *str, struct pt_regs *regs, long err)
 		printk("BE ");
 
 	if (IS_ENABLED(CONFIG_PREEMPT))
-		pr_cont("PREEMPT ");
+		pr_debug("PREEMPT ");
 
 	if (IS_ENABLED(CONFIG_SMP))
-		pr_cont("SMP NR_CPUS=%d ", NR_CPUS);
+		pr_debug("SMP NR_CPUS=%d ", NR_CPUS);
 
 	if (debug_pagealloc_enabled())
-		pr_cont("DEBUG_PAGEALLOC ");
+		pr_debug("DEBUG_PAGEALLOC ");
 
 	if (IS_ENABLED(CONFIG_NUMA))
-		pr_cont("NUMA ");
+		pr_debug("NUMA ");
 
-	pr_cont("%s\n", ppc_md.name ? ppc_md.name : "");
+	pr_debug("%s\n", ppc_md.name ? ppc_md.name : "");
 
 	if (notify_die(DIE_OOPS, str, regs, err, 255, SIGSEGV) == NOTIFY_STOP)
 		return 1;
@@ -336,7 +336,7 @@ static void show_signal_msg(int signr, struct pt_regs *regs, int code,
 
 	print_vma_addr(KERN_CONT " in ", regs->nip);
 
-	pr_cont("\n");
+	pr_debug("\n");
 
 	show_user_instructions(regs);
 }

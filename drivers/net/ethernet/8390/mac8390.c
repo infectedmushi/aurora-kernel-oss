@@ -653,7 +653,7 @@ static void interlan_reset(struct net_device *dev)
 	ei_status.txing = 0;
 	target[0xC0000] = 0;
 	if (netif_msg_hw(ei_local))
-		pr_cont("reset complete\n");
+		pr_debug("reset complete\n");
 }
 
 /* dayna_memcpy_fromio/dayna_memcpy_toio */

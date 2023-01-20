@@ -90,12 +90,12 @@ static void pr_err_size_seq(size_t *sizes, int *seq)
 
 	pr_err("alloc sizes: ");
 	for (i = 0; i < BUFFER_NUM; i++)
-		pr_cont("[%zu]", sizes[i]);
-	pr_cont("\n");
+		pr_debug("[%zu]", sizes[i]);
+	pr_debug("\n");
 	pr_err("free seq: ");
 	for (i = 0; i < BUFFER_NUM; i++)
-		pr_cont("[%d]", seq[i]);
-	pr_cont("\n");
+		pr_debug("[%d]", seq[i]);
+	pr_debug("\n");
 }
 
 static bool check_buffer_pages_allocated(struct binder_alloc *alloc,

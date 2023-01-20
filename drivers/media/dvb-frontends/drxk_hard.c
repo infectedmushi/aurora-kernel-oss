@@ -256,8 +256,8 @@ static int i2c_write(struct drxk_state *state, u8 adr, u8 *data, int len)
 	if (debug > 2) {
 		int i;
 		for (i = 0; i < len; i++)
-			pr_cont(" %02x", data[i]);
-		pr_cont("\n");
+			pr_debug(" %02x", data[i]);
+		pr_debug("\n");
 	}
 	status = drxk_i2c_transfer(state, &msg, 1);
 	if (status >= 0 && status != 1)
@@ -283,7 +283,7 @@ static int i2c_read(struct drxk_state *state,
 	status = drxk_i2c_transfer(state, msgs, 2);
 	if (status != 2) {
 		if (debug > 2)
-			pr_cont(": ERROR!\n");
+			pr_debug(": ERROR!\n");
 		if (status >= 0)
 			status = -EIO;
 
@@ -294,11 +294,11 @@ static int i2c_read(struct drxk_state *state,
 		int i;
 		dprintk(2, ": read from");
 		for (i = 0; i < len; i++)
-			pr_cont(" %02x", msg[i]);
-		pr_cont(", value = ");
+			pr_debug(" %02x", msg[i]);
+		pr_debug(", value = ");
 		for (i = 0; i < alen; i++)
-			pr_cont(" %02x", answ[i]);
-		pr_cont("\n");
+			pr_debug(" %02x", answ[i]);
+		pr_debug("\n");
 	}
 	return 0;
 }
@@ -468,8 +468,8 @@ static int write_block(struct drxk_state *state, u32 address,
 			int i;
 			if (p_block)
 				for (i = 0; i < chunk; i++)
-					pr_cont(" %02x", p_block[i]);
-			pr_cont("\n");
+					pr_debug(" %02x", p_block[i]);
+			pr_debug("\n");
 		}
 		status = i2c_write(state, state->demod_address,
 				   &state->chunk[0], chunk + adr_length);

@@ -2304,9 +2304,9 @@ tlan_finish_reset(struct net_device *dev)
 					netdev_info(dev, "Partner capability:");
 					for (i = 5; i < 10; i++)
 						if (partner & (1 << i))
-							pr_cont(" %s",
+							pr_debug(" %s",
 								media[i-5]);
-					pr_cont("\n");
+					pr_debug("\n");
 				}
 			} else
 				netdev_info(dev, "Link active\n");

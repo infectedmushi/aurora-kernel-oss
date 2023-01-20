@@ -108,7 +108,7 @@
 #define DUMP(fmt, arg...)       \
     do {                \
         if (ili_debug_en)   \
-            pr_cont(fmt, ##arg);    \
+            pr_debug(fmt, ##arg);    \
     } while (0)
 
 static struct ini_file_data {
@@ -2998,17 +2998,17 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     ILI_DBG("Up=%d, Down=%d -%s\n", u32up_frame, u32down_frame, tItems[index].desp);
 
     if (ili_debug_en) {
-        pr_cont("\n[Show Original frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[Show Original frist%d and last%d node data]\n", len, len);
 
         for (i = 0; i < core_mp.frame_len; i++) {
             for (j = 0 ; j < tItems[index].frame_count ; j++) {
                 if ((i < len) || (i >= (core_mp.frame_len - len))) {
-                    pr_cont("%d,", u32data_buff[j * core_mp.frame_len + i]);
+                    pr_debug("%d,", u32data_buff[j * core_mp.frame_len + i]);
                 }
             }
 
             if ((i < len) || (i >= (core_mp.frame_len - len))) {
-                pr_cont("\n");
+                pr_debug("\n");
             }
         }
     }
@@ -3029,17 +3029,17 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     }
 
     if (ili_debug_en) {
-        pr_cont("\n[After sorting frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[After sorting frist%d and last%d node data]\n", len, len);
 
         for (i = 0; i < core_mp.frame_len; i++) {
             for (j = u32down_frame; j < tItems[index].frame_count - u32up_frame; j++) {
                 if ((i < len) || (i >= (core_mp.frame_len - len))) {
-                    pr_cont("%d,", u32data_buff[i + j * core_mp.frame_len]);
+                    pr_debug("%d,", u32data_buff[i + j * core_mp.frame_len]);
                 }
             }
 
             if ((i < len) || (i >= (core_mp.frame_len - len))) {
-                pr_cont("\n");
+                pr_debug("\n");
             }
         }
     }
@@ -3055,16 +3055,16 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     }
 
     if (ili_debug_en) {
-        pr_cont("\n[Average result frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[Average result frist%d and last%d node data]\n", len, len);
 
         for (i = 0; i < core_mp.frame_len; i++) {
             if ((i < len) || (i >= (core_mp.frame_len - len))) {
-                pr_cont("%d,", avg_result[i]);
+                pr_debug("%d,", avg_result[i]);
             }
         }
 
         if ((i < len) || (i >= (core_mp.frame_len - len))) {
-            pr_cont("\n");
+            pr_debug("\n");
         }
     }
 

@@ -764,18 +764,18 @@ void __init dump_numa_cpu_topology(void)
 			if (cpumask_test_cpu(cpu,
 					node_to_cpumask_map[node])) {
 				if (count == 0)
-					pr_cont(" %u", cpu);
+					pr_debug(" %u", cpu);
 				++count;
 			} else {
 				if (count > 1)
-					pr_cont("-%u", cpu - 1);
+					pr_debug("-%u", cpu - 1);
 				count = 0;
 			}
 		}
 
 		if (count > 1)
-			pr_cont("-%u", nr_cpu_ids - 1);
-		pr_cont("\n");
+			pr_debug("-%u", nr_cpu_ids - 1);
+		pr_debug("\n");
 	}
 }
 

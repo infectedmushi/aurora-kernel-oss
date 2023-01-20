@@ -1240,13 +1240,13 @@ static int __init ic_dynamic(void)
 			ic_got_reply = 0;
 			/* continue on device that got the reply */
 			d = ic_dev;
-			pr_cont(",");
+			pr_debug(",");
 			continue;
 		}
 #endif /* IPCONFIG_DHCP */
 
 		if (ic_got_reply) {
-			pr_cont(" OK\n");
+			pr_debug(" OK\n");
 			break;
 		}
 
@@ -1254,7 +1254,7 @@ static int __init ic_dynamic(void)
 			continue;
 
 		if (! --retries) {
-			pr_cont(" timed out!\n");
+			pr_debug(" timed out!\n");
 			break;
 		}
 
@@ -1264,7 +1264,7 @@ static int __init ic_dynamic(void)
 		if (timeout > CONF_TIMEOUT_MAX)
 			timeout = CONF_TIMEOUT_MAX;
 
-		pr_cont(".");
+		pr_debug(".");
 	}
 
 #ifdef IPCONFIG_BOOTP
@@ -1574,7 +1574,7 @@ static int __init ip_auto_config(void)
 	pr_debug("     bootserver=%pI4, rootserver=%pI4, rootpath=%s",
 		&ic_servaddr, &root_server_addr, root_server_path);
 	if (ic_dev_mtu)
-		pr_cont(", mtu=%d", ic_dev_mtu);
+		pr_debug(", mtu=%d", ic_dev_mtu);
 	/* Name servers (if any): */
 	for (i = 0; i < CONF_NAMESERVERS_MAX; i++) {
 		if (ic_nameservers[i] != NONE) {
@@ -1582,11 +1582,11 @@ static int __init ip_auto_config(void)
 				pr_debug("     nameserver%u=%pI4",
 					i, &ic_nameservers[i]);
 			else
-				pr_cont(", nameserver%u=%pI4",
+				pr_debug(", nameserver%u=%pI4",
 					i, &ic_nameservers[i]);
 		}
 		if (i + 1 == CONF_NAMESERVERS_MAX)
-			pr_cont("\n");
+			pr_debug("\n");
 	}
 	/* NTP servers (if any): */
 	for (i = 0; i < CONF_NTP_SERVERS_MAX; i++) {
@@ -1595,11 +1595,11 @@ static int __init ip_auto_config(void)
 				pr_debug("     ntpserver%u=%pI4",
 					i, &ic_ntp_servers[i]);
 			else
-				pr_cont(", ntpserver%u=%pI4",
+				pr_debug(", ntpserver%u=%pI4",
 					i, &ic_ntp_servers[i]);
 		}
 		if (i + 1 == CONF_NTP_SERVERS_MAX)
-			pr_cont("\n");
+			pr_debug("\n");
 	}
 #endif /* !SILENT */
 

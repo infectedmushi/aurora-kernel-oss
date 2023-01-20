@@ -871,11 +871,11 @@ static __init void print_parisc_device(struct parisc_device *dev)
 
 	if (dev->num_addrs) {
 		int k;
-		pr_cont(", additional addresses: ");
+		pr_debug(", additional addresses: ");
 		for (k = 0; k < dev->num_addrs; k++)
-			pr_cont("0x%lx ", dev->addr[k]);
+			pr_debug("0x%lx ", dev->addr[k]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /**
@@ -897,8 +897,8 @@ static __init void qemu_header(void)
 
 	pr_debug("--- cut here ---\n");
 	pr_debug("/* AUTO-GENERATED HEADER FILE FOR SEABIOS FIRMWARE */\n");
-	pr_cont("/* generated with Linux kernel */\n");
-	pr_cont("/* search for PARISC_QEMU_MACHINE_HEADER in Linux */\n\n");
+	pr_debug("/* generated with Linux kernel */\n");
+	pr_debug("/* search for PARISC_QEMU_MACHINE_HEADER in Linux */\n\n");
 
 	pr_debug("#define PARISC_MODEL \"%s\"\n\n",
 			boot_cpu_data.pdc.sys_model_name);
@@ -928,13 +928,13 @@ static __init void qemu_header(void)
 	p = (unsigned long *) &cache_info;
 	for (num = 0; num < sizeof(cache_info); num += sizeof(unsigned long)) {
 		if (((num % 5) == 0)) {
-			pr_cont(" \\\n");
+			pr_debug(" \\\n");
 			pr_debug("\t");
 		}
-		pr_cont("%s0x%04lx",
+		pr_debug("%s0x%04lx",
 			num?", ":"", *p++);
 	}
-	pr_cont("\n\n");
+	pr_debug("\n\n");
 }
 
 static __init int qemu_print_hpa(struct device *lin_dev, void *data)
@@ -942,12 +942,12 @@ static __init int qemu_print_hpa(struct device *lin_dev, void *data)
 	struct parisc_device *dev = to_parisc_device(lin_dev);
 	unsigned long hpa = dev->hpa.start;
 
-	pr_cont("\t{\t.hpa = 0x%08lx,\\\n", hpa);
-	pr_cont("\t\t.iodc = &iodc_data_hpa_%08lx,\\\n", hpa);
-	pr_cont("\t\t.mod_info = &mod_info_hpa_%08lx,\\\n", hpa);
-	pr_cont("\t\t.mod_path = &mod_path_hpa_%08lx,\\\n", hpa);
-	pr_cont("\t\t.num_addr = HPA_%08lx_num_addr,\\\n", hpa);
-	pr_cont("\t\t.add_addr = { HPA_%08lx_add_addr } },\\\n", hpa);
+	pr_debug("\t{\t.hpa = 0x%08lx,\\\n", hpa);
+	pr_debug("\t\t.iodc = &iodc_data_hpa_%08lx,\\\n", hpa);
+	pr_debug("\t\t.mod_info = &mod_info_hpa_%08lx,\\\n", hpa);
+	pr_debug("\t\t.mod_path = &mod_path_hpa_%08lx,\\\n", hpa);
+	pr_debug("\t\t.num_addr = HPA_%08lx_num_addr,\\\n", hpa);
+	pr_debug("\t\t.add_addr = { HPA_%08lx_add_addr } },\\\n", hpa);
 	return 0;
 }
 
@@ -956,7 +956,7 @@ static __init void qemu_footer(void)
 {
 	pr_debug("\n\n#define PARISC_DEVICE_LIST \\\n");
 	for_each_padev(qemu_print_hpa, NULL);
-	pr_cont("\t{ 0, }\n");
+	pr_debug("\t{ 0, }\n");
 	pr_debug("--- cut here ---\n");
 }
 
@@ -994,34 +994,34 @@ static __init int qemu_print_iodc_data(struct device *lin_dev, void *data)
 	pr_debug("static struct pdc_system_map_mod_info"
 		" mod_info_hpa_%08lx = {\n", hpa);
 	#define DO(member) \
-		pr_cont("\t." #member " = 0x%x,\n", \
+		pr_debug("\t." #member " = 0x%x,\n", \
 			(unsigned int)pdc_mod_info.member)
 	DO(mod_addr);
 	DO(mod_pgs);
 	DO(add_addrs);
-	pr_cont("};\n");
+	pr_debug("};\n");
 	#undef DO
 	pr_debug("static struct pdc_module_path "
 		"mod_path_hpa_%08lx = {\n", hpa);
-	pr_cont("\t.path = { ");
-	pr_cont(".flags = 0x%x, ", mod_path.path.flags);
-	pr_cont(".bc = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }, ",
+	pr_debug("\t.path = { ");
+	pr_debug(".flags = 0x%x, ", mod_path.path.flags);
+	pr_debug(".bc = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }, ",
 		(unsigned char)mod_path.path.bc[0],
 		(unsigned char)mod_path.path.bc[1],
 		(unsigned char)mod_path.path.bc[2],
 		(unsigned char)mod_path.path.bc[3],
 		(unsigned char)mod_path.path.bc[4],
 		(unsigned char)mod_path.path.bc[5]);
-	pr_cont(".mod = 0x%x ", mod_path.path.mod);
-	pr_cont(" },\n");
-	pr_cont("\t.layers = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }\n",
+	pr_debug(".mod = 0x%x ", mod_path.path.mod);
+	pr_debug(" },\n");
+	pr_debug("\t.layers = { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x }\n",
 		mod_path.layers[0], mod_path.layers[1], mod_path.layers[2],
 		mod_path.layers[3], mod_path.layers[4], mod_path.layers[5]);
-	pr_cont("};\n");
+	pr_debug("};\n");
 
 	pr_debug("static struct pdc_iodc iodc_data_hpa_%08lx = {\n", hpa);
 	#define DO(member) \
-		pr_cont("\t." #member " = 0x%04lx,\n", \
+		pr_debug("\t." #member " = 0x%04lx,\n", \
 			(unsigned long)iodc_data.member)
 	DO(hversion_model);
 	DO(hversion);
@@ -1036,20 +1036,20 @@ static __init int qemu_print_iodc_data(struct device *lin_dev, void *data)
 	DO(checksum);
 	DO(length);
 	#undef DO
-	pr_cont("\t/* pad: 0x%04x, 0x%04x */\n",
+	pr_debug("\t/* pad: 0x%04x, 0x%04x */\n",
 		iodc_data.pad[0], iodc_data.pad[1]);
-	pr_cont("};\n");
+	pr_debug("};\n");
 
 	pr_debug("#define HPA_%08lx_num_addr %d\n", hpa, dev->num_addrs);
 	pr_debug("#define HPA_%08lx_add_addr ", hpa);
 	count = 0;
 	if (dev->num_addrs == 0)
-		pr_cont("0");
+		pr_debug("0");
 	while (count < dev->num_addrs) {
-		pr_cont("0x%08lx, ", dev->addr[count]);
+		pr_debug("0x%08lx, ", dev->addr[count]);
 		count++;
 	}
-	pr_cont("\n\n");
+	pr_debug("\n\n");
 
 	return 0;
 }

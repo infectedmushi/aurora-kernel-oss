@@ -421,9 +421,9 @@ sbni_probe1( struct net_device  *dev,  unsigned long  ioaddr,  int  irq )
 		  / (1 << nl->csr1.rate));
 
 	if( nl->delta_rxl == 0 )
-		pr_cont(", receive level 0x%x (fixed)\n", nl->cur_rxl_index);
+		pr_debug(", receive level 0x%x (fixed)\n", nl->cur_rxl_index);
 	else
-		pr_cont(", receive level (auto)\n");
+		pr_debug(", receive level (auto)\n");
 
 #ifdef CONFIG_SBNI_MULTILINE
 	nl->master = dev;

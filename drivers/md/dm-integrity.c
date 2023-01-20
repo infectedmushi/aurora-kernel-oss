@@ -306,13 +306,13 @@ static void __DEBUG_bytes(__u8 *bytes, size_t len, const char *msg, ...)
 	vprintk(msg, args);
 	va_end(args);
 	if (len)
-		pr_cont(":");
+		pr_debug(":");
 	while (len) {
-		pr_cont(" %02x", *bytes);
+		pr_debug(" %02x", *bytes);
 		bytes++;
 		len--;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 #define DEBUG_bytes(bytes, len, msg, ...)	__DEBUG_bytes(bytes, len, KERN_DEBUG msg, ##__VA_ARGS__)
 #else

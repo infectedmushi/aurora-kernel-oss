@@ -348,16 +348,16 @@ void maar_init(void)
 
 		pr_debug("  [%d]: ", i / 2);
 		if (!(attr & MIPS_MAAR_VL)) {
-			pr_cont("disabled\n");
+			pr_debug("disabled\n");
 			continue;
 		}
 
-		pr_cont("%pa-%pa", &lower, &upper);
+		pr_debug("%pa-%pa", &lower, &upper);
 
 		if (attr & MIPS_MAAR_S)
-			pr_cont(" speculate");
+			pr_debug(" speculate");
 
-		pr_cont("\n");
+		pr_debug("\n");
 
 		/* Record the setup for use on secondary CPUs */
 		if (used <= ARRAY_SIZE(recorded.cfgs)) {

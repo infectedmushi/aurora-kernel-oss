@@ -248,9 +248,9 @@ static void iss_isr_dbg(struct iss_device *iss, u32 irqstatus)
 
 	for (i = 0; i < ARRAY_SIZE(name); i++) {
 		if ((1 << i) & irqstatus)
-			pr_cont("%s ", name[i]);
+			pr_debug("%s ", name[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static void iss_isp_isr_dbg(struct iss_device *iss, u32 irqstatus)
@@ -295,9 +295,9 @@ static void iss_isp_isr_dbg(struct iss_device *iss, u32 irqstatus)
 
 	for (i = 0; i < ARRAY_SIZE(name); i++) {
 		if ((1 << i) & irqstatus)
-			pr_cont("%s ", name[i]);
+			pr_debug("%s ", name[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 #endif
 

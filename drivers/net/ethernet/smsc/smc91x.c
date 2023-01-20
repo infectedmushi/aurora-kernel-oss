@@ -184,18 +184,18 @@ static void PRINT_PKT(u_char *buf, int length)
 			u_char a, b;
 			a = *buf++;
 			b = *buf++;
-			pr_cont("%02x%02x ", a, b);
+			pr_debug("%02x%02x ", a, b);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 	printk(KERN_DEBUG);
 	for (i = 0; i < remainder/2 ; i++) {
 		u_char a, b;
 		a = *buf++;
 		b = *buf++;
-		pr_cont("%02x%02x ", a, b);
+		pr_debug("%02x%02x ", a, b);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 #else
 static inline void PRINT_PKT(u_char *buf, int length) { }
@@ -2035,9 +2035,9 @@ static int smc_probe(struct net_device *dev, void __iomem *ioaddr,
 			    lp->base, dev->irq);
 
 		if (lp->dma_chan)
-			pr_cont(" DMA %p", lp->dma_chan);
+			pr_debug(" DMA %p", lp->dma_chan);
 
-		pr_cont("%s%s\n",
+		pr_debug("%s%s\n",
 			lp->cfg.flags & SMC91X_NOWAIT ? " [nowait]" : "",
 			THROTTLE_TX_PKTS ? " [throttle_tx]" : "");
 

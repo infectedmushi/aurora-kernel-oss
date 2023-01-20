@@ -239,24 +239,24 @@ static void __print_mce(struct mce *m)
 			m->cs, m->ip);
 
 		if (m->cs == __KERNEL_CS)
-			pr_cont("{%pS}", (void *)(unsigned long)m->ip);
-		pr_cont("\n");
+			pr_debug("{%pS}", (void *)(unsigned long)m->ip);
+		pr_debug("\n");
 	}
 
 	pr_emerg(HW_ERR "TSC %llx ", m->tsc);
 	if (m->addr)
-		pr_cont("ADDR %llx ", m->addr);
+		pr_debug("ADDR %llx ", m->addr);
 	if (m->misc)
-		pr_cont("MISC %llx ", m->misc);
+		pr_debug("MISC %llx ", m->misc);
 
 	if (mce_flags.smca) {
 		if (m->synd)
-			pr_cont("SYND %llx ", m->synd);
+			pr_debug("SYND %llx ", m->synd);
 		if (m->ipid)
-			pr_cont("IPID %llx ", m->ipid);
+			pr_debug("IPID %llx ", m->ipid);
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 	/*
 	 * Note this output is parsed by external tools and old fields
 	 * should not be changed.

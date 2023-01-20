@@ -3782,35 +3782,35 @@ static void niu_log_rxchan_errors(struct niu *np, struct rx_ring_info *rp,
 	netdev_err(np->dev, "RX channel %u errors ( ", rp->rx_channel);
 
 	if (stat & RX_DMA_CTL_STAT_RBR_TMOUT)
-		pr_cont("RBR_TMOUT ");
+		pr_debug("RBR_TMOUT ");
 	if (stat & RX_DMA_CTL_STAT_RSP_CNT_ERR)
-		pr_cont("RSP_CNT ");
+		pr_debug("RSP_CNT ");
 	if (stat & RX_DMA_CTL_STAT_BYTE_EN_BUS)
-		pr_cont("BYTE_EN_BUS ");
+		pr_debug("BYTE_EN_BUS ");
 	if (stat & RX_DMA_CTL_STAT_RSP_DAT_ERR)
-		pr_cont("RSP_DAT ");
+		pr_debug("RSP_DAT ");
 	if (stat & RX_DMA_CTL_STAT_RCR_ACK_ERR)
-		pr_cont("RCR_ACK ");
+		pr_debug("RCR_ACK ");
 	if (stat & RX_DMA_CTL_STAT_RCR_SHA_PAR)
-		pr_cont("RCR_SHA_PAR ");
+		pr_debug("RCR_SHA_PAR ");
 	if (stat & RX_DMA_CTL_STAT_RBR_PRE_PAR)
-		pr_cont("RBR_PRE_PAR ");
+		pr_debug("RBR_PRE_PAR ");
 	if (stat & RX_DMA_CTL_STAT_CONFIG_ERR)
-		pr_cont("CONFIG ");
+		pr_debug("CONFIG ");
 	if (stat & RX_DMA_CTL_STAT_RCRINCON)
-		pr_cont("RCRINCON ");
+		pr_debug("RCRINCON ");
 	if (stat & RX_DMA_CTL_STAT_RCRFULL)
-		pr_cont("RCRFULL ");
+		pr_debug("RCRFULL ");
 	if (stat & RX_DMA_CTL_STAT_RBRFULL)
-		pr_cont("RBRFULL ");
+		pr_debug("RBRFULL ");
 	if (stat & RX_DMA_CTL_STAT_RBRLOGPAGE)
-		pr_cont("RBRLOGPAGE ");
+		pr_debug("RBRLOGPAGE ");
 	if (stat & RX_DMA_CTL_STAT_CFIGLOGPAGE)
-		pr_cont("CFIGLOGPAGE ");
+		pr_debug("CFIGLOGPAGE ");
 	if (stat & RX_DMA_CTL_STAT_DC_FIFO_ERR)
-		pr_cont("DC_FIDO ");
+		pr_debug("DC_FIDO ");
 
-	pr_cont(")\n");
+	pr_debug(")\n");
 }
 
 static int niu_rx_error(struct niu *np, struct rx_ring_info *rp)
@@ -3843,23 +3843,23 @@ static void niu_log_txchan_errors(struct niu *np, struct tx_ring_info *rp,
 	netdev_err(np->dev, "TX channel %u errors ( ", rp->tx_channel);
 
 	if (cs & TX_CS_MBOX_ERR)
-		pr_cont("MBOX ");
+		pr_debug("MBOX ");
 	if (cs & TX_CS_PKT_SIZE_ERR)
-		pr_cont("PKT_SIZE ");
+		pr_debug("PKT_SIZE ");
 	if (cs & TX_CS_TX_RING_OFLOW)
-		pr_cont("TX_RING_OFLOW ");
+		pr_debug("TX_RING_OFLOW ");
 	if (cs & TX_CS_PREF_BUF_PAR_ERR)
-		pr_cont("PREF_BUF_PAR ");
+		pr_debug("PREF_BUF_PAR ");
 	if (cs & TX_CS_NACK_PREF)
-		pr_cont("NACK_PREF ");
+		pr_debug("NACK_PREF ");
 	if (cs & TX_CS_NACK_PKT_RD)
-		pr_cont("NACK_PKT_RD ");
+		pr_debug("NACK_PKT_RD ");
 	if (cs & TX_CS_CONF_PART_ERR)
-		pr_cont("CONF_PART ");
+		pr_debug("CONF_PART ");
 	if (cs & TX_CS_PKT_PRT_ERR)
-		pr_cont("PKT_PTR ");
+		pr_debug("PKT_PTR ");
 
-	pr_cont(")\n");
+	pr_debug(")\n");
 }
 
 static int niu_tx_error(struct niu *np, struct tx_ring_info *rp)
@@ -4020,29 +4020,29 @@ static void niu_log_device_error(struct niu *np, u64 stat)
 	netdev_err(np->dev, "Core device errors ( ");
 
 	if (stat & SYS_ERR_MASK_META2)
-		pr_cont("META2 ");
+		pr_debug("META2 ");
 	if (stat & SYS_ERR_MASK_META1)
-		pr_cont("META1 ");
+		pr_debug("META1 ");
 	if (stat & SYS_ERR_MASK_PEU)
-		pr_cont("PEU ");
+		pr_debug("PEU ");
 	if (stat & SYS_ERR_MASK_TXC)
-		pr_cont("TXC ");
+		pr_debug("TXC ");
 	if (stat & SYS_ERR_MASK_RDMC)
-		pr_cont("RDMC ");
+		pr_debug("RDMC ");
 	if (stat & SYS_ERR_MASK_TDMC)
-		pr_cont("TDMC ");
+		pr_debug("TDMC ");
 	if (stat & SYS_ERR_MASK_ZCP)
-		pr_cont("ZCP ");
+		pr_debug("ZCP ");
 	if (stat & SYS_ERR_MASK_FFLP)
-		pr_cont("FFLP ");
+		pr_debug("FFLP ");
 	if (stat & SYS_ERR_MASK_IPP)
-		pr_cont("IPP ");
+		pr_debug("IPP ");
 	if (stat & SYS_ERR_MASK_MAC)
-		pr_cont("MAC ");
+		pr_debug("MAC ");
 	if (stat & SYS_ERR_MASK_SMX)
-		pr_cont("SMX ");
+		pr_debug("SMX ");
 
-	pr_cont(")\n");
+	pr_debug(")\n");
 }
 
 static int niu_device_error(struct niu *np)
@@ -4210,7 +4210,7 @@ static irqreturn_t niu_interrupt(int irq, void *dev_id)
 	v2 = nr64(LDSV2(ldg));
 
 	if (netif_msg_intr(np))
-		pr_cont(" v0[%llx] v1[%llx] v2[%llx]\n",
+		pr_debug(" v0[%llx] v1[%llx] v2[%llx]\n",
 		       (unsigned long long) v0,
 		       (unsigned long long) v1,
 		       (unsigned long long) v2);
@@ -8730,12 +8730,12 @@ static void niu_divide_rdc_groups(struct niu_parent *parent,
 				rt->rxdma_channel[slot] =
 					rdc_channel_base + this_channel_offset;
 
-				pr_cont("%d ", rt->rxdma_channel[slot]);
+				pr_debug("%d ", rt->rxdma_channel[slot]);
 
 				if (++this_channel_offset == num_channels)
 					this_channel_offset = 0;
 			}
-			pr_cont("]\n");
+			pr_debug("]\n");
 		}
 
 		parent->rdc_default[i] = rdc_channel_base;

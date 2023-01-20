@@ -615,16 +615,16 @@ static int pcnet_config(struct pcmcia_device *link)
 	netdev_info(dev, "NE2000 (DL100%d rev %02x): ",
 		    (info->flags & IS_DL10022) ? 22 : 19, id);
 	if (info->pna_phy)
-	    pr_cont("PNA, ");
+	    pr_debug("PNA, ");
     } else {
 	netdev_info(dev, "NE2000 Compatible: ");
     }
-    pr_cont("io %#3lx, irq %d,", dev->base_addr, dev->irq);
+    pr_debug("io %#3lx, irq %d,", dev->base_addr, dev->irq);
     if (info->flags & USE_SHMEM)
-	pr_cont(" mem %#5lx,", dev->mem_start);
+	pr_debug(" mem %#5lx,", dev->mem_start);
     if (info->flags & HAS_MISC_REG)
-	pr_cont(" %s xcvr,", if_names[dev->if_port]);
-    pr_cont(" hw_addr %pM\n", dev->dev_addr);
+	pr_debug(" %s xcvr,", if_names[dev->if_port]);
+    pr_debug(" hw_addr %pM\n", dev->dev_addr);
     return 0;
 
 failed:

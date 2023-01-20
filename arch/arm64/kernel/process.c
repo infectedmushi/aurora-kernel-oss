@@ -269,12 +269,12 @@ static void show_data(unsigned long addr, int nbytes, const char *name)
 			u32	data;
 
 			if (probe_kernel_address(p, data))
-				pr_cont(" ********");
+				pr_debug(" ********");
 			else
-				pr_cont(" %08x", data);
+				pr_debug(" %08x", data);
 			++p;
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 
@@ -330,11 +330,11 @@ void __show_regs(struct pt_regs *regs)
 		i--;
 
 		if (i % 2 == 0) {
-			pr_cont("x%-2d: %016llx ", i, regs->regs[i]);
+			pr_debug("x%-2d: %016llx ", i, regs->regs[i]);
 			i--;
 		}
 
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	if (!user_mode(regs))

@@ -548,12 +548,12 @@ void show_code(struct pt_regs *regs)
 			*ptr++ = '\t';
 		ptr += print_insn(ptr, code + start, addr);
 		start += opsize;
-		pr_cont("%s", buffer);
+		pr_debug("%s", buffer);
 		ptr = buffer;
 		ptr += sprintf(ptr, "\n          ");
 		hops++;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void print_fn_code(unsigned char *code, unsigned long len)

@@ -1234,8 +1234,8 @@ static int late_analysis(struct ubi_device *ubi, struct ubi_attach_info *ai)
 			ai->corr_peb_count);
 		pr_err("Corrupted PEBs are:");
 		list_for_each_entry(aeb, &ai->corr, u.list)
-			pr_cont(" %d", aeb->pnum);
-		pr_cont("\n");
+			pr_debug(" %d", aeb->pnum);
+		pr_debug("\n");
 
 		/*
 		 * If too many PEBs are corrupted, we refuse attaching,

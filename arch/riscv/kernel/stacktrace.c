@@ -116,7 +116,7 @@ static bool print_trace_address(unsigned long pc, void *arg)
 
 void show_stack(struct task_struct *task, unsigned long *sp)
 {
-	pr_cont("Call Trace:\n");
+	pr_debug("Call Trace:\n");
 	walk_stackframe(task, NULL, print_trace_address, NULL);
 }
 

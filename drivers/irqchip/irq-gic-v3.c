@@ -1349,13 +1349,13 @@ static void __init gic_populate_ppi_partitions(struct device_node *gic_node)
 				continue;
 			}
 
-			pr_cont("%pOF[%d] ", cpu_node, cpu);
+			pr_debug("%pOF[%d] ", cpu_node, cpu);
 
 			cpumask_set_cpu(cpu, &part->mask);
 			of_node_put(cpu_node);
 		}
 
-		pr_cont("}\n");
+		pr_debug("}\n");
 		part_idx++;
 	}
 

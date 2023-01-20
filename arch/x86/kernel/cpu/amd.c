@@ -145,9 +145,9 @@ static void init_amd_k6(struct cpuinfo_x86 *c)
 		d = d2-d;
 
 		if (d > 20*K6_BUG_LOOP)
-			pr_cont("system stability may be impaired when more than 32 MB are used.\n");
+			pr_debug("system stability may be impaired when more than 32 MB are used.\n");
 		else
-			pr_cont("probably OK (after B9730xxxx).\n");
+			pr_debug("probably OK (after B9730xxxx).\n");
 	}
 
 	/* K6 with old style WHCR */

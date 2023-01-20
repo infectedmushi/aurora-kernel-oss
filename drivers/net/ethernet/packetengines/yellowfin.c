@@ -692,14 +692,14 @@ static void yellowfin_tx_timeout(struct net_device *dev)
 		int i;
 		pr_warn("  Rx ring %p: ", yp->rx_ring);
 		for (i = 0; i < RX_RING_SIZE; i++)
-			pr_cont(" %08x", yp->rx_ring[i].result_status);
-		pr_cont("\n");
+			pr_debug(" %08x", yp->rx_ring[i].result_status);
+		pr_debug("\n");
 		pr_warn("  Tx ring %p: ", yp->tx_ring);
 		for (i = 0; i < TX_RING_SIZE; i++)
-			pr_cont(" %04x /%08x",
+			pr_debug(" %04x /%08x",
 			       yp->tx_status[i].tx_errs,
 			       yp->tx_ring[i].result_status);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	/* If the hardware is found to hang regularly, we will update the code
@@ -1237,9 +1237,9 @@ static int yellowfin_close(struct net_device *dev)
 
 					printk(KERN_DEBUG);
 					for (j = 0; j < 0x50; j++)
-						pr_cont(" %04x",
+						pr_debug(" %04x",
 							get_unaligned(((u16*)yp->rx_ring[i].addr) + j));
-					pr_cont("\n");
+					pr_debug("\n");
 				}
 			}
 		}

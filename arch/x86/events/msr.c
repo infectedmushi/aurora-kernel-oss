@@ -265,7 +265,7 @@ static int __init msr_init(void)
 	int i, j = 0;
 
 	if (!boot_cpu_has(X86_FEATURE_TSC)) {
-		pr_cont("no MSR PMU driver.\n");
+		pr_debug("no MSR PMU driver.\n");
 		return 0;
 	}
 

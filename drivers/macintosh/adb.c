@@ -535,8 +535,8 @@ adb_input(unsigned char *buf, int nb, int autopoll)
 	if (dump_adb_input) {
 		pr_debug("adb packet: ");
 		for (i = 0; i < nb; ++i)
-			pr_cont(" %x", buf[i]);
-		pr_cont(", id = %d\n", id);
+			pr_debug(" %x", buf[i]);
+		pr_debug(", id = %d\n", id);
 	}
 	write_lock_irqsave(&adb_handler_lock, flags);
 	handler = adb_handler[id].handler;

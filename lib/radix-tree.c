@@ -356,8 +356,8 @@ static void dump_ida_node(void *entry, unsigned long index)
 				index * IDA_BITMAP_BITS,
 				(index + 1) * IDA_BITMAP_BITS - 1);
 		for (i = 0; i < IDA_BITMAP_LONGS; i++)
-			pr_cont(" %lx", bitmap->bitmap[i]);
-		pr_cont("\n");
+			pr_debug(" %lx", bitmap->bitmap[i]);
+		pr_debug("\n");
 	}
 }
 

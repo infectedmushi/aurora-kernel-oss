@@ -821,7 +821,7 @@ void bnx2x_fw_dump_lvl(struct bnx2x *bp, const char *lvl)
 		for (word = 0; word < 8; word++)
 			data[word] = htonl(REG_RD(bp, offset + 4*word));
 		data[8] = 0x0;
-		pr_cont("%s", (char *)data);
+		pr_debug("%s", (char *)data);
 	}
 
 	/* dump buffer before the mark */
@@ -829,7 +829,7 @@ void bnx2x_fw_dump_lvl(struct bnx2x *bp, const char *lvl)
 		for (word = 0; word < 8; word++)
 			data[word] = htonl(REG_RD(bp, offset + 4*word));
 		data[8] = 0x0;
-		pr_cont("%s", (char *)data);
+		pr_debug("%s", (char *)data);
 	}
 	printk("%s" "end of fw dump\n", lvl);
 }
@@ -938,7 +938,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 			  def_sb->atten_status_block.attn_bits_index);
 		BNX2X_ERR("     def (");
 		for (i = 0; i < HC_SP_SB_MAX_INDICES; i++)
-			pr_cont("0x%x%s",
+			pr_debug("0x%x%s",
 				def_sb->sp_sb.index_values[i],
 				(i == HC_SP_SB_MAX_INDICES - 1) ? ")  " : " ");
 
@@ -950,7 +950,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 				REG_RD(bp, BAR_CSTRORM_INTMEM + cstorm_offset +
 					   i * sizeof(u32));
 
-		pr_cont("igu_sb_id(0x%x)  igu_seg_id(0x%x) pf_id(0x%x)  vnic_id(0x%x)  vf_id(0x%x)  vf_valid (0x%x) state(0x%x)\n",
+		pr_debug("igu_sb_id(0x%x)  igu_seg_id(0x%x) pf_id(0x%x)  vnic_id(0x%x)  vf_id(0x%x)  vf_valid (0x%x) state(0x%x)\n",
 			sp_sb_data.igu_sb_id,
 			sp_sb_data.igu_seg_id,
 			sp_sb_data.p_func.pf_id,
@@ -1020,13 +1020,13 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 
 		BNX2X_ERR("     run indexes (");
 		for (j = 0; j < HC_SB_MAX_SM; j++)
-			pr_cont("0x%x%s",
+			pr_debug("0x%x%s",
 			       fp->sb_running_index[j],
 			       (j == HC_SB_MAX_SM - 1) ? ")" : " ");
 
 		BNX2X_ERR("     indexes (");
 		for (j = 0; j < loop; j++)
-			pr_cont("0x%x%s",
+			pr_debug("0x%x%s",
 			       fp->sb_index_values[j],
 			       (j == loop - 1) ? ")" : " ");
 
@@ -1049,7 +1049,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 				j * sizeof(u32));
 
 		if (!CHIP_IS_E1x(bp)) {
-			pr_cont("pf_id(0x%x)  vf_id(0x%x)  vf_valid(0x%x) vnic_id(0x%x)  same_igu_sb_1b(0x%x) state(0x%x)\n",
+			pr_debug("pf_id(0x%x)  vf_id(0x%x)  vf_valid(0x%x) vnic_id(0x%x)  same_igu_sb_1b(0x%x) state(0x%x)\n",
 				sb_data_e2.common.p_func.pf_id,
 				sb_data_e2.common.p_func.vf_id,
 				sb_data_e2.common.p_func.vf_valid,
@@ -1057,7 +1057,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 				sb_data_e2.common.same_igu_sb_1b,
 				sb_data_e2.common.state);
 		} else {
-			pr_cont("pf_id(0x%x)  vf_id(0x%x)  vf_valid(0x%x) vnic_id(0x%x)  same_igu_sb_1b(0x%x) state(0x%x)\n",
+			pr_debug("pf_id(0x%x)  vf_id(0x%x)  vf_valid(0x%x) vnic_id(0x%x)  same_igu_sb_1b(0x%x) state(0x%x)\n",
 				sb_data_e1x.common.p_func.pf_id,
 				sb_data_e1x.common.p_func.vf_id,
 				sb_data_e1x.common.p_func.vf_valid,
@@ -1068,7 +1068,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 
 		/* SB_SMs data */
 		for (j = 0; j < HC_SB_MAX_SM; j++) {
-			pr_cont("SM[%d] __flags (0x%x) igu_sb_id (0x%x)  igu_seg_id(0x%x) time_to_expire (0x%x) timer_value(0x%x)\n",
+			pr_debug("SM[%d] __flags (0x%x) igu_sb_id (0x%x)  igu_seg_id(0x%x) time_to_expire (0x%x) timer_value(0x%x)\n",
 				j, hc_sm_p[j].__flags,
 				hc_sm_p[j].igu_sb_id,
 				hc_sm_p[j].igu_seg_id,
@@ -1078,7 +1078,7 @@ void bnx2x_panic_dump(struct bnx2x *bp, bool disable_int)
 
 		/* Indices data */
 		for (j = 0; j < loop; j++) {
-			pr_cont("INDEX[%d] flags (0x%x) timeout (0x%x)\n", j,
+			pr_debug("INDEX[%d] flags (0x%x) timeout (0x%x)\n", j,
 			       hc_index_p[j].flags,
 			       hc_index_p[j].timeout);
 		}
@@ -4584,12 +4584,12 @@ static bool bnx2x_get_load_status(struct bnx2x *bp, int engine)
 
 static void _print_parity(struct bnx2x *bp, u32 reg)
 {
-	pr_cont(" [0x%08x] ", REG_RD(bp, reg));
+	pr_debug(" [0x%08x] ", REG_RD(bp, reg));
 }
 
 static void _print_next_block(int idx, const char *blk)
 {
-	pr_cont("%s%s", idx ? ", " : "", blk);
+	pr_debug("%s%s", idx ? ", " : "", blk);
 }
 
 static bool bnx2x_check_blocks_with_parity0(struct bnx2x *bp, u32 sig,
@@ -5002,7 +5002,7 @@ static bool bnx2x_parity_attn(struct bnx2x *bp, bool *global, bool print,
 			sig[4] & HW_PRTY_ASSERT_SET_4, &par_num, print);
 
 		if (print)
-			pr_cont("\n");
+			pr_debug("\n");
 	}
 
 	return res;

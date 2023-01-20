@@ -143,7 +143,7 @@ struct net_device * __init apne_probe(int unit)
 
 	/* check if a card is inserted */
 	if (!(PCMCIA_INSERTED)) {
-		pr_cont("NO PCMCIA card inserted\n");
+		pr_debug("NO PCMCIA card inserted\n");
 		return ERR_PTR(-ENODEV);
 	}
 
@@ -163,14 +163,14 @@ struct net_device * __init apne_probe(int unit)
 #ifndef MANUAL_CONFIG
 	if ((pcmcia_copy_tuple(CISTPL_FUNCID, tuple, 8) < 3) ||
 		(tuple[2] != CISTPL_FUNCID_NETWORK)) {
-		pr_cont("not an ethernet card\n");
+		pr_debug("not an ethernet card\n");
 		/* XXX: shouldn't we re-enable irq here? */
 		free_netdev(dev);
 		return ERR_PTR(-ENODEV);
 	}
 #endif
 
-	pr_cont("ethernet PCMCIA card inserted\n");
+	pr_debug("ethernet PCMCIA card inserted\n");
 
 	if (!init_pcmcia()) {
 		/* XXX: shouldn't we re-enable irq here? */
@@ -225,7 +225,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 
 	while ((inb(ioaddr + NE_EN0_ISR) & ENISR_RESET) == 0)
 		if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
-			pr_cont(" not found (no reset ack).\n");
+			pr_debug(" not found (no reset ack).\n");
 			return -ENODEV;
 		}
 
@@ -296,7 +296,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
 	start_page = 0x01;
 	stop_page = (wordlength == 2) ? 0x40 : 0x20;
     } else {
-	pr_cont(" not found.\n");
+	pr_debug(" not found.\n");
 	return -ENXIO;
 
     }
@@ -328,7 +328,7 @@ static int __init apne_probe1(struct net_device *dev, int ioaddr)
     for (i = 0; i < ETH_ALEN; i++)
 	dev->dev_addr[i] = SA_prom[i];
 
-    pr_cont(" %pM\n", dev->dev_addr);
+    pr_debug(" %pM\n", dev->dev_addr);
 
     netdev_info(dev, "%s found.\n", name);
 

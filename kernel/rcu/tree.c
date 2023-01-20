@@ -1408,7 +1408,7 @@ static void print_other_cpu_stall(struct rcu_state *rsp, unsigned long gp_seq)
 	for_each_possible_cpu(cpu)
 		totqlen += rcu_segcblist_n_cbs(&per_cpu_ptr(rsp->rda,
 							    cpu)->cblist);
-	pr_cont("(detected by %d, t=%ld jiffies, g=%ld, q=%lu)\n",
+	pr_debug("(detected by %d, t=%ld jiffies, g=%ld, q=%lu)\n",
 	       smp_processor_id(), (long)(jiffies - rsp->gp_start),
 	       (long)rcu_seq_current(&rsp->gp_seq), totqlen);
 	if (ndetected) {
@@ -1469,7 +1469,7 @@ static void print_cpu_stall(struct rcu_state *rsp)
 	for_each_possible_cpu(cpu)
 		totqlen += rcu_segcblist_n_cbs(&per_cpu_ptr(rsp->rda,
 							    cpu)->cblist);
-	pr_cont(" (t=%lu jiffies g=%ld q=%lu)\n",
+	pr_debug(" (t=%lu jiffies g=%ld q=%lu)\n",
 		jiffies - rsp->gp_start,
 		(long)rcu_seq_current(&rsp->gp_seq), totqlen);
 
@@ -4137,13 +4137,13 @@ static void __init rcu_dump_rcu_node_tree(struct rcu_state *rsp)
 	pr_debug(" ");
 	rcu_for_each_node_breadth_first(rsp, rnp) {
 		if (rnp->level != level) {
-			pr_cont("\n");
+			pr_debug("\n");
 			pr_debug(" ");
 			level = rnp->level;
 		}
-		pr_cont("%d:%d ^%d  ", rnp->grplo, rnp->grphi, rnp->grpnum);
+		pr_debug("%d:%d ^%d  ", rnp->grplo, rnp->grphi, rnp->grpnum);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 struct workqueue_struct *rcu_gp_wq;

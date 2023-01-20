@@ -198,14 +198,14 @@ void __init tx4927_setup(void)
 			continue;	/* disabled */
 		base = (unsigned long)(cr >> 49) << 21;
 		size = (((unsigned long)(cr >> 33) & 0x7fff) + 1) << 21;
-		pr_cont(" CR%d:%016llx", i, cr);
+		pr_debug(" CR%d:%016llx", i, cr);
 		tx4927_sdram_resource[i].name = "SDRAM";
 		tx4927_sdram_resource[i].start = base;
 		tx4927_sdram_resource[i].end = base + size - 1;
 		tx4927_sdram_resource[i].flags = IORESOURCE_MEM;
 		request_resource(&iomem_resource, &tx4927_sdram_resource[i]);
 	}
-	pr_cont(" TR:%09llx\n", ____raw_readq(&tx4927_sdramcptr->tr));
+	pr_debug(" TR:%09llx\n", ____raw_readq(&tx4927_sdramcptr->tr));
 
 	/* TMR */
 	/* disable all timers */

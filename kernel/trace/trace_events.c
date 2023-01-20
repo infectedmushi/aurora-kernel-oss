@@ -3330,7 +3330,7 @@ static __init void event_trace_self_tests(void)
 		event_test_stuff();
 		ftrace_event_enable_disable(file, 0);
 
-		pr_cont("OK\n");
+		pr_debug("OK\n");
 	}
 
 	/* Now test at the sub system level */
@@ -3363,7 +3363,7 @@ static __init void event_trace_self_tests(void)
 			continue;
 		}
 
-		pr_cont("OK\n");
+		pr_debug("OK\n");
 	}
 
 	/* Test with all events enabled */
@@ -3386,7 +3386,7 @@ static __init void event_trace_self_tests(void)
 		return;
 	}
 
-	pr_cont("OK\n");
+	pr_debug("OK\n");
 }
 
 #ifdef CONFIG_FUNCTION_TRACER

@@ -1443,28 +1443,28 @@ rcu_torture_stats_print(void)
 	}
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
-	pr_cont("rtc: %p ver: %lu tfle: %d rta: %d rtaf: %d rtf: %d ",
+	pr_debug("rtc: %p ver: %lu tfle: %d rta: %d rtaf: %d rtf: %d ",
 		rcu_torture_current,
 		rcu_torture_current_version,
 		list_empty(&rcu_torture_freelist),
 		atomic_read(&n_rcu_torture_alloc),
 		atomic_read(&n_rcu_torture_alloc_fail),
 		atomic_read(&n_rcu_torture_free));
-	pr_cont("rtmbe: %d rtbe: %ld rtbke: %ld rtbre: %ld ",
+	pr_debug("rtmbe: %d rtbe: %ld rtbke: %ld rtbre: %ld ",
 		atomic_read(&n_rcu_torture_mberror),
 		n_rcu_torture_barrier_error,
 		n_rcu_torture_boost_ktrerror,
 		n_rcu_torture_boost_rterror);
-	pr_cont("rtbf: %ld rtb: %ld nt: %ld ",
+	pr_debug("rtbf: %ld rtb: %ld nt: %ld ",
 		n_rcu_torture_boost_failure,
 		n_rcu_torture_boosts,
 		atomic_long_read(&n_rcu_torture_timers));
 	torture_onoff_stats();
-	pr_cont("barrier: %ld/%ld:%ld ",
+	pr_debug("barrier: %ld/%ld:%ld ",
 		n_barrier_successes,
 		n_barrier_attempts,
 		n_rcu_torture_barrier_error);
-	pr_cont("cbflood: %ld\n", atomic_long_read(&n_cbfloods));
+	pr_debug("cbflood: %ld\n", atomic_long_read(&n_cbfloods));
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
 	if (atomic_read(&n_rcu_torture_mberror) != 0 ||
@@ -1473,27 +1473,27 @@ rcu_torture_stats_print(void)
 	    n_rcu_torture_boost_rterror != 0 ||
 	    n_rcu_torture_boost_failure != 0 ||
 	    i > 1) {
-		pr_cont("%s", "!!! ");
+		pr_debug("%s", "!!! ");
 		atomic_inc(&n_rcu_torture_error);
 		WARN_ON_ONCE(1);
 	}
-	pr_cont("Reader Pipe: ");
+	pr_debug("Reader Pipe: ");
 	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
-		pr_cont(" %ld", pipesummary[i]);
-	pr_cont("\n");
+		pr_debug(" %ld", pipesummary[i]);
+	pr_debug("\n");
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
-	pr_cont("Reader Batch: ");
+	pr_debug("Reader Batch: ");
 	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
-		pr_cont(" %ld", batchsummary[i]);
-	pr_cont("\n");
+		pr_debug(" %ld", batchsummary[i]);
+	pr_debug("\n");
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
-	pr_cont("Free-Block Circulation: ");
+	pr_debug("Free-Block Circulation: ");
 	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++) {
-		pr_cont(" %d", atomic_read(&rcu_torture_wcount[i]));
+		pr_debug(" %d", atomic_read(&rcu_torture_wcount[i]));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	if (cur_ops->stats)
 		cur_ops->stats();
@@ -1965,8 +1965,8 @@ rcu_torture_init(void)
 			 torture_type);
 		pr_alert("rcu-torture types:");
 		for (i = 0; i < ARRAY_SIZE(torture_ops); i++)
-			pr_cont(" %s", torture_ops[i]->name);
-		pr_cont("\n");
+			pr_debug(" %s", torture_ops[i]->name);
+		pr_debug("\n");
 		firsterr = -EINVAL;
 		cur_ops = NULL;
 		goto unwind;

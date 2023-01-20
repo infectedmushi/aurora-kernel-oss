@@ -227,8 +227,8 @@ void cobalt_irq_log_status(struct cobalt *cobalt)
 		    cobalt->irq_none, cobalt->irq_full_fifo);
 	cobalt_info("irq: dma_tot=%u (", cobalt->irq_dma_tot);
 	for (i = 0; i < COBALT_NUM_STREAMS; i++)
-		pr_cont("%s%u", i ? "/" : "", cobalt->irq_dma[i]);
-	pr_cont(")\n");
+		pr_debug("%s%u", i ? "/" : "", cobalt->irq_dma[i]);
+	pr_debug(")\n");
 	cobalt->irq_dma_tot = cobalt->irq_adv1 = cobalt->irq_adv2 = 0;
 	cobalt->irq_advout = cobalt->irq_none = cobalt->irq_full_fifo = 0;
 	memset(cobalt->irq_dma, 0, sizeof(cobalt->irq_dma));

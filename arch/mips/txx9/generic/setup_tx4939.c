@@ -230,7 +230,7 @@ void __init tx4939_setup(void)
 		__u64 win = ____raw_readq(&tx4939_ddrcptr->win[i]);
 		if (!((__u32)____raw_readq(&tx4939_ddrcptr->winen) & (1 << i)))
 			continue;	/* disabled */
-		pr_cont(" #%d:%016llx", i, win);
+		pr_debug(" #%d:%016llx", i, win);
 		tx4939_sdram_resource[i].name = "DDR SDRAM";
 		tx4939_sdram_resource[i].start =
 			(unsigned long)(win >> 48) << 20;
@@ -240,7 +240,7 @@ void __init tx4939_setup(void)
 		tx4939_sdram_resource[i].flags = IORESOURCE_MEM;
 		request_resource(&iomem_resource, &tx4939_sdram_resource[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	/* SRAM */
 	if (____raw_readq(&tx4939_sramcptr->cr) & 1) {

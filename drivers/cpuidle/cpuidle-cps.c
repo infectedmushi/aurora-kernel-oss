@@ -134,13 +134,13 @@ static int __init cps_cpuidle_init(void)
 		pr_debug("cpuidle-cps: limited to ");
 		switch (cps_driver.state_count - 1) {
 		case STATE_WAIT:
-			pr_cont("coherent wait\n");
+			pr_debug("coherent wait\n");
 			break;
 		case STATE_NC_WAIT:
-			pr_cont("non-coherent wait\n");
+			pr_debug("non-coherent wait\n");
 			break;
 		case STATE_CLOCK_GATED:
-			pr_cont("clock gating\n");
+			pr_debug("clock gating\n");
 			break;
 		}
 	}

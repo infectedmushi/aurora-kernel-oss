@@ -248,8 +248,8 @@ void __init adjust_total_lowmem(void)
 
 	pr_debug("Memory CAM mapping: ");
 	for (i = 0; i < tlbcam_index - 1; i++)
-		pr_cont("%lu/", tlbcam_sz(i) >> 20);
-	pr_cont("%lu Mb, residual: %dMb\n", tlbcam_sz(tlbcam_index - 1) >> 20,
+		pr_debug("%lu/", tlbcam_sz(i) >> 20);
+	pr_debug("%lu Mb, residual: %dMb\n", tlbcam_sz(tlbcam_index - 1) >> 20,
 	        (unsigned int)((total_lowmem - __max_low_memory) >> 20));
 
 	memblock_set_current_limit(memstart_addr + __max_low_memory);

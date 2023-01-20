@@ -162,14 +162,14 @@ void show_stack(struct task_struct *task, unsigned long *sp)
 			break;
 		if ((i % 4) == 0) {
 			if (i)
-				pr_cont("\n");
+				pr_debug("\n");
 			printk("       ");
 		} else {
-			pr_cont(" ");
+			pr_debug(" ");
 		}
-		pr_cont("%016lx", *stack++);
+		pr_debug("%016lx", *stack++);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	dik_show_trace(sp);
 }
 

@@ -275,7 +275,7 @@ do_trap(int trapnr, int signr, char *str, struct pt_regs *regs,
 			tsk->comm, tsk->pid, str,
 			regs->ip, regs->sp, error_code);
 		print_vma_addr(KERN_CONT " in ", regs->ip);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	force_sig_info(signr, info ?: SEND_SIG_PRIV, tsk);
@@ -571,7 +571,7 @@ do_general_protection(struct pt_regs *regs, long error_code)
 			tsk->comm, task_pid_nr(tsk),
 			regs->ip, regs->sp, error_code);
 		print_vma_addr(KERN_CONT " in ", regs->ip);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	force_sig_info(SIGSEGV, SEND_SIG_PRIV, tsk);

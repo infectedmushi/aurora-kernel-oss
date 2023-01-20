@@ -3600,7 +3600,7 @@ do {							\
 	if (m)						\
 		seq_printf(m, fmt, ##__VA_ARGS__);	\
 	else if (c)					\
-		pr_cont(fmt, ##__VA_ARGS__);		\
+		pr_debug(fmt, ##__VA_ARGS__);		\
 	else						\
 		pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)
@@ -4424,7 +4424,7 @@ do {							\
 	if (m)						\
 		seq_printf(m, fmt, ##__VA_ARGS__);	\
 	else if (c)					\
-		pr_cont(fmt, ##__VA_ARGS__);		\
+		pr_debug(fmt, ##__VA_ARGS__);		\
 	else						\
 		pr_debug(fmt, ##__VA_ARGS__);		\
 } while (0)

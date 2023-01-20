@@ -58,10 +58,10 @@ static void regdump(struct net_device *dev)
 	netdev_dbg(dev, "register dump:\n");
 	for (count = 0; count < 16; count++) {
 		if (!(count % 16))
-			pr_cont("%04X:", ioaddr + count);
-		pr_cont(" %02X", arcnet_inb(ioaddr, count));
+			pr_debug("%04X:", ioaddr + count);
+		pr_debug(" %02X", arcnet_inb(ioaddr, count));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	netdev_dbg(dev, "buffer0 dump:\n");
 	/* set up the address register */
@@ -72,12 +72,12 @@ static void regdump(struct net_device *dev)
 
 	for (count = 0; count < 256 + 32; count++) {
 		if (!(count % 16))
-			pr_cont("%04X:", count);
+			pr_debug("%04X:", count);
 
 		/* copy the data */
-		pr_cont(" %02X", arcnet_inb(ioaddr, COM20020_REG_RW_MEMDATA));
+		pr_debug(" %02X", arcnet_inb(ioaddr, COM20020_REG_RW_MEMDATA));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 #endif
 }
 

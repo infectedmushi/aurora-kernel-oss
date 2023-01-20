@@ -156,7 +156,7 @@ static void dump_pagetable(unsigned long asce, unsigned long address)
 		table += (address & _REGION1_INDEX) >> _REGION1_SHIFT;
 		if (bad_address(table))
 			goto bad;
-		pr_cont("R1:%016lx ", *table);
+		pr_debug("R1:%016lx ", *table);
 		if (*table & _REGION_ENTRY_INVALID)
 			goto out;
 		table = (unsigned long *)(*table & _REGION_ENTRY_ORIGIN);
@@ -165,7 +165,7 @@ static void dump_pagetable(unsigned long asce, unsigned long address)
 		table += (address & _REGION2_INDEX) >> _REGION2_SHIFT;
 		if (bad_address(table))
 			goto bad;
-		pr_cont("R2:%016lx ", *table);
+		pr_debug("R2:%016lx ", *table);
 		if (*table & _REGION_ENTRY_INVALID)
 			goto out;
 		table = (unsigned long *)(*table & _REGION_ENTRY_ORIGIN);
@@ -174,7 +174,7 @@ static void dump_pagetable(unsigned long asce, unsigned long address)
 		table += (address & _REGION3_INDEX) >> _REGION3_SHIFT;
 		if (bad_address(table))
 			goto bad;
-		pr_cont("R3:%016lx ", *table);
+		pr_debug("R3:%016lx ", *table);
 		if (*table & (_REGION_ENTRY_INVALID | _REGION3_ENTRY_LARGE))
 			goto out;
 		table = (unsigned long *)(*table & _REGION_ENTRY_ORIGIN);
@@ -183,7 +183,7 @@ static void dump_pagetable(unsigned long asce, unsigned long address)
 		table += (address & _SEGMENT_INDEX) >> _SEGMENT_SHIFT;
 		if (bad_address(table))
 			goto bad;
-		pr_cont("S:%016lx ", *table);
+		pr_debug("S:%016lx ", *table);
 		if (*table & (_SEGMENT_ENTRY_INVALID | _SEGMENT_ENTRY_LARGE))
 			goto out;
 		table = (unsigned long *)(*table & _SEGMENT_ENTRY_ORIGIN);
@@ -191,12 +191,12 @@ static void dump_pagetable(unsigned long asce, unsigned long address)
 	table += (address & _PAGE_INDEX) >> _PAGE_SHIFT;
 	if (bad_address(table))
 		goto bad;
-	pr_cont("P:%016lx ", *table);
+	pr_debug("P:%016lx ", *table);
 out:
-	pr_cont("\n");
+	pr_debug("\n");
 	return;
 bad:
-	pr_cont("BAD\n");
+	pr_debug("BAD\n");
 }
 
 static void dump_fault_info(struct pt_regs *regs)
@@ -208,38 +208,38 @@ static void dump_fault_info(struct pt_regs *regs)
 	pr_alert("Fault in ");
 	switch (regs->int_parm_long & 3) {
 	case 3:
-		pr_cont("home space ");
+		pr_debug("home space ");
 		break;
 	case 2:
-		pr_cont("secondary space ");
+		pr_debug("secondary space ");
 		break;
 	case 1:
-		pr_cont("access register ");
+		pr_debug("access register ");
 		break;
 	case 0:
-		pr_cont("primary space ");
+		pr_debug("primary space ");
 		break;
 	}
-	pr_cont("mode while using ");
+	pr_debug("mode while using ");
 	switch (get_fault_type(regs)) {
 	case USER_FAULT:
 		asce = S390_lowcore.user_asce;
-		pr_cont("user ");
+		pr_debug("user ");
 		break;
 	case VDSO_FAULT:
 		asce = S390_lowcore.vdso_asce;
-		pr_cont("vdso ");
+		pr_debug("vdso ");
 		break;
 	case GMAP_FAULT:
 		asce = ((struct gmap *) S390_lowcore.gmap)->asce;
-		pr_cont("gmap ");
+		pr_debug("gmap ");
 		break;
 	case KERNEL_FAULT:
 		asce = S390_lowcore.kernel_asce;
-		pr_cont("kernel ");
+		pr_debug("kernel ");
 		break;
 	}
-	pr_cont("ASCE.\n");
+	pr_debug("ASCE.\n");
 	dump_pagetable(asce, regs->int_parm_long & __FAIL_ADDR_MASK);
 }
 

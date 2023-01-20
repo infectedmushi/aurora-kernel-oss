@@ -831,11 +831,11 @@ static void bcm_enet_adjust_phy_link(struct net_device *dev)
 		pr_debug("%s: link %s", dev->name, phydev->link ?
 			"UP" : "DOWN");
 		if (phydev->link)
-			pr_cont(" - %d/%s - flow control %s", phydev->speed,
+			pr_debug(" - %d/%s - flow control %s", phydev->speed,
 			       DUPLEX_FULL == phydev->duplex ? "full" : "half",
 			       phydev->pause == 1 ? "rx&tx" : "off");
 
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 

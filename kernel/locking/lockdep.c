@@ -1565,9 +1565,9 @@ print_bad_irq_dependency(struct task_struct *curr,
 	print_lock(prev);
 	pr_warn("which would create a new lock dependency:\n");
 	print_lock_name(hlock_class(prev));
-	pr_cont(" ->");
+	pr_debug(" ->");
 	print_lock_name(hlock_class(next));
-	pr_cont("\n");
+	pr_debug("\n");
 
 	pr_warn("\nbut this new dependency connects a %s-irq-safe lock:\n",
 		irqclass);
@@ -3523,7 +3523,7 @@ print_unlock_imbalance_bug(struct task_struct *curr, struct lockdep_map *lock,
 	pr_warn("%s/%d is trying to release lock (",
 		curr->comm, task_pid_nr(curr));
 	print_lockdep_cache(lock);
-	pr_cont(") at:\n");
+	pr_debug(") at:\n");
 	print_ip_sym(ip);
 	pr_warn("but there are no more locks to release!\n");
 	pr_warn("\nother info that might help us debug this:\n");
@@ -4103,7 +4103,7 @@ print_lock_contention_bug(struct task_struct *curr, struct lockdep_map *lock,
 	pr_warn("%s/%d is trying to contend lock (",
 		curr->comm, task_pid_nr(curr));
 	print_lockdep_cache(lock);
-	pr_cont(") at:\n");
+	pr_debug(") at:\n");
 	print_ip_sym(ip);
 	pr_warn("but there are no locks held!\n");
 	pr_warn("\nother info that might help us debug this:\n");

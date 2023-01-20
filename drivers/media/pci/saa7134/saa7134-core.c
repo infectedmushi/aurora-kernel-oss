@@ -505,16 +505,16 @@ static void print_irqstatus(struct saa7134_dev *dev, int loop,
 	for (i = 0; i < IRQBITS; i++) {
 		if (!(report & (1 << i)))
 			continue;
-		pr_cont(" %s", irqbits[i]);
+		pr_debug(" %s", irqbits[i]);
 	}
 	if (report & SAA7134_IRQ_REPORT_DONE_RA0) {
-		pr_cont(" | RA0=%s,%s,%s,%ld",
+		pr_debug(" | RA0=%s,%s,%s,%ld",
 			(status & 0x40) ? "vbi"  : "video",
 			(status & 0x20) ? "b"    : "a",
 			(status & 0x10) ? "odd"  : "even",
 			(status & 0x0f));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static irqreturn_t saa7134_irq(int irq, void *dev_id)
@@ -793,11 +793,11 @@ static void must_configure_manually(int has_eeprom)
 		for (p = 0; saa7134_pci_tbl[p].driver_data; p++) {
 			if (saa7134_pci_tbl[p].driver_data != i)
 				continue;
-			pr_cont(" %04x:%04x",
+			pr_debug(" %04x:%04x",
 			       saa7134_pci_tbl[p].subvendor,
 			       saa7134_pci_tbl[p].subdevice);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 

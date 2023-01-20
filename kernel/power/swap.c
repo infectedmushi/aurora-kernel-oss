@@ -493,7 +493,7 @@ static int swap_writer_finish(struct swap_map_handle *handle,
 	if (!error) {
 		pr_debug("S");
 		error = mark_swapfiles(handle, flags);
-		pr_cont("|\n");
+		pr_debug("|\n");
 		flush_swap_writer(handle);
 	}
 

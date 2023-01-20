@@ -45,14 +45,14 @@ int __init tx4938_report_pciclk(void)
 		case TX4938_CCFG_PCIDIVMODE_11:
 			pciclk = txx9_cpu_clock / 11; break;
 		}
-		pr_cont("Internal(%u.%uMHz)",
+		pr_debug("Internal(%u.%uMHz)",
 			(pciclk + 50000) / 1000000,
 			((pciclk + 50000) / 100000) % 10);
 	} else {
-		pr_cont("External");
+		pr_debug("External");
 		pciclk = -1;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	return pciclk;
 }
 

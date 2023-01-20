@@ -1697,13 +1697,13 @@ static int __init audit_backlog_limit_set(char *str)
 
 	pr_debug("audit_backlog_limit: ");
 	if (kstrtouint(str, 0, &audit_backlog_limit_arg)) {
-		pr_cont("using default of %u, unable to parse %s\n",
+		pr_debug("using default of %u, unable to parse %s\n",
 			audit_backlog_limit, str);
 		return 1;
 	}
 
 	audit_backlog_limit = audit_backlog_limit_arg;
-	pr_cont("%d\n", audit_backlog_limit);
+	pr_debug("%d\n", audit_backlog_limit);
 
 	return 1;
 }

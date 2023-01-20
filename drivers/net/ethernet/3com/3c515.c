@@ -648,16 +648,16 @@ static int corkscrew_setup(struct net_device *dev, int ioaddr,
 	}
 	checksum = (checksum ^ (checksum >> 8)) & 0xff;
 	if (checksum != 0x00)
-		pr_cont(" ***INVALID CHECKSUM %4.4x*** ", checksum);
-	pr_cont(" %pM", dev->dev_addr);
+		pr_debug(" ***INVALID CHECKSUM %4.4x*** ", checksum);
+	pr_debug(" %pM", dev->dev_addr);
 	if (eeprom[16] == 0x11c7) {	/* Corkscrew */
 		if (request_dma(dev->dma, "3c515")) {
-			pr_cont(", DMA %d allocation failed", dev->dma);
+			pr_debug(", DMA %d allocation failed", dev->dma);
 			dev->dma = 0;
 		} else
-			pr_cont(", DMA %d", dev->dma);
+			pr_debug(", DMA %d", dev->dma);
 	}
-	pr_cont(", IRQ %d\n", dev->irq);
+	pr_debug(", IRQ %d\n", dev->irq);
 	/* Tell them about an invalid IRQ. */
 	if (corkscrew_debug && (dev->irq <= 0 || dev->irq > 15))
 		pr_warn(" *** Warning: this IRQ is unlikely to work! ***\n");
@@ -1221,8 +1221,8 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 						EL3WINDOW(win);
 						pr_notice("Vortex window %d:", win);
 						for (reg = 0; reg < 16; reg++)
-							pr_cont(" %2.2x", inb(ioaddr + reg));
-						pr_cont("\n");
+							pr_debug(" %2.2x", inb(ioaddr + reg));
+						pr_debug("\n");
 					}
 					EL3WINDOW(7);
 					outw(SetIntrEnb | TxAvailable |

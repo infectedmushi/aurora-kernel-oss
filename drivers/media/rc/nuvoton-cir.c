@@ -377,9 +377,9 @@ static void cir_wake_dump_regs(struct nvt_dev *nvt)
 	pr_debug("%s: Dump CIR WAKE FIFO (len %d)\n", NVT_DRIVER_NAME, fifo_len);
 	pr_debug("* Contents =");
 	for (i = 0; i < fifo_len; i++)
-		pr_cont(" %02x",
+		pr_debug(" %02x",
 			nvt_cir_wake_reg_read(nvt, CIR_WAKE_RD_FIFO_ONLY));
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static inline const char *nvt_find_chip(struct nvt_dev *nvt, int id)

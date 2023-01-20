@@ -54,8 +54,8 @@ void __init mminit_verify_zonelist(void)
 
 			/* Iterate the zonelist */
 			for_each_zone_zonelist(zone, z, zonelist, zoneid)
-				pr_cont("%d:%s ", zone_to_nid(zone), zone->name);
-			pr_cont("\n");
+				pr_debug("%d:%s ", zone_to_nid(zone), zone->name);
+			pr_debug("\n");
 		}
 	}
 }

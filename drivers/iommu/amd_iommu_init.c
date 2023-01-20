@@ -1847,13 +1847,13 @@ static void print_iommu_info(void)
 				iommu->features);
 			for (i = 0; i < ARRAY_SIZE(feat_str); ++i) {
 				if (iommu_feature(iommu, (1ULL << i)))
-					pr_cont(" %s", feat_str[i]);
+					pr_debug(" %s", feat_str[i]);
 			}
 
 			if (iommu->features & FEATURE_GAM_VAPIC)
-				pr_cont(" GA_vAPIC");
+				pr_debug(" GA_vAPIC");
 
-			pr_cont("\n");
+			pr_debug("\n");
 		}
 	}
 	if (irq_remapping_enabled) {

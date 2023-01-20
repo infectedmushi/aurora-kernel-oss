@@ -74,21 +74,21 @@ void print_pte (pte_t pte)
 #if 0
 	/* Verbose version. */
 	unsigned long val = pte_val (pte);
-	pr_cont(" pte=%lx [addr=%lx",
+	pr_debug(" pte=%lx [addr=%lx",
 		val, (val & SUN3_PAGE_PGNUM_MASK) << PAGE_SHIFT);
-	if (val & SUN3_PAGE_VALID)	pr_cont(" valid");
-	if (val & SUN3_PAGE_WRITEABLE)	pr_cont(" write");
-	if (val & SUN3_PAGE_SYSTEM)	pr_cont(" sys");
-	if (val & SUN3_PAGE_NOCACHE)	pr_cont(" nocache");
-	if (val & SUN3_PAGE_ACCESSED)	pr_cont(" accessed");
-	if (val & SUN3_PAGE_MODIFIED)	pr_cont(" modified");
+	if (val & SUN3_PAGE_VALID)	pr_debug(" valid");
+	if (val & SUN3_PAGE_WRITEABLE)	pr_debug(" write");
+	if (val & SUN3_PAGE_SYSTEM)	pr_debug(" sys");
+	if (val & SUN3_PAGE_NOCACHE)	pr_debug(" nocache");
+	if (val & SUN3_PAGE_ACCESSED)	pr_debug(" accessed");
+	if (val & SUN3_PAGE_MODIFIED)	pr_debug(" modified");
 	switch (val & SUN3_PAGE_TYPE_MASK) {
-		case SUN3_PAGE_TYPE_MEMORY: pr_cont(" memory"); break;
-		case SUN3_PAGE_TYPE_IO:     pr_cont(" io");     break;
-		case SUN3_PAGE_TYPE_VME16:  pr_cont(" vme16");  break;
-		case SUN3_PAGE_TYPE_VME32:  pr_cont(" vme32");  break;
+		case SUN3_PAGE_TYPE_MEMORY: pr_debug(" memory"); break;
+		case SUN3_PAGE_TYPE_IO:     pr_debug(" io");     break;
+		case SUN3_PAGE_TYPE_VME16:  pr_debug(" vme16");  break;
+		case SUN3_PAGE_TYPE_VME32:  pr_debug(" vme32");  break;
 	}
-	pr_cont("]\n");
+	pr_debug("]\n");
 #else
 	/* Terse version. More likely to fit on a line. */
 	unsigned long val = pte_val (pte);
@@ -110,7 +110,7 @@ void print_pte (pte_t pte)
 		default: type = "unknown?"; break;
 	}
 
-	pr_cont(" pte=%08lx [%07lx %s %s]\n",
+	pr_debug(" pte=%08lx [%07lx %s %s]\n",
 		val, (val & SUN3_PAGE_PGNUM_MASK) << PAGE_SHIFT, flags, type);
 #endif
 }
@@ -118,7 +118,7 @@ void print_pte (pte_t pte)
 /* Print the PTE value for a given virtual address. For debugging. */
 void print_pte_vaddr (unsigned long vaddr)
 {
-	pr_cont(" vaddr=%lx [%02lx]", vaddr, sun3_get_segmap (vaddr));
+	pr_debug(" vaddr=%lx [%02lx]", vaddr, sun3_get_segmap (vaddr));
 	print_pte (__pte (sun3_get_pte (vaddr)));
 }
 
@@ -422,7 +422,7 @@ int mmu_emu_handle_fault (unsigned long vaddr, int read_flag, int kernel_fault)
 #ifdef DEBUG_MMU_EMU
 	pr_debug("seg:%ld crp:%p ->", get_fs().seg, crp);
 	print_pte_vaddr (vaddr);
-	pr_cont("\n");
+	pr_debug("\n");
 #endif
 
 	return 1;

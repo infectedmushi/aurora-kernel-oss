@@ -884,11 +884,11 @@ int __init init_hw_perf_events(void)
 	pr_debug("Performance events: ");
 
 	if (!supported_cpu()) {
-		pr_cont("No support for your CPU.\n");
+		pr_debug("No support for your CPU.\n");
 		return 0;
 	}
 
-	pr_cont("Supported CPU type!\n");
+	pr_debug("Supported CPU type!\n");
 
 	/* Override performance counter IRQ vector */
 

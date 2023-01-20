@@ -6397,12 +6397,12 @@ static void thermal_dump_all_sensors(void)
 
 	for (i = 0; i < n; i++) {
 		if (t.temp[i] != TPACPI_THERMAL_SENSOR_NA)
-			pr_cont(" %d", (int)(t.temp[i] / 1000));
+			pr_debug(" %d", (int)(t.temp[i] / 1000));
 		else
-			pr_cont(" N/A");
+			pr_debug(" N/A");
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /* sysfs temp##_input -------------------------------------------------- */

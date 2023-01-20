@@ -1263,23 +1263,23 @@ el3_up(struct net_device *dev)
 			case 12:
 				/* force full-duplex mode if 3c5x9b */
 				if (sw_info & 0x000f) {
-					pr_cont("Forcing 3c5x9b full-duplex mode");
+					pr_debug("Forcing 3c5x9b full-duplex mode");
 					break;
 				}
 			case 8:
 				/* set full-duplex mode based on eeprom config setting */
 				if ((sw_info & 0x000f) && (sw_info & 0x8000)) {
-					pr_cont("Setting 3c5x9b full-duplex mode (from EEPROM configuration bit)");
+					pr_debug("Setting 3c5x9b full-duplex mode (from EEPROM configuration bit)");
 					break;
 				}
 			default:
 				/* xcvr=(0 || 4) OR user has an old 3c5x9 non "B" model */
-				pr_cont("Setting 3c5x9/3c5x9B half-duplex mode");
+				pr_debug("Setting 3c5x9/3c5x9B half-duplex mode");
 				net_diag = (net_diag & ~FD_ENABLE); /* disable full duplex */
 		}
 
 		outw(net_diag, ioaddr + WN4_NETDIAG);
-		pr_cont(" if_port: %d, sw_info: %4.4x\n", dev->if_port, sw_info);
+		pr_debug(" if_port: %d, sw_info: %4.4x\n", dev->if_port, sw_info);
 		if (el3_debug > 3)
 			pr_debug("%s: 3c5x9 net diag word is now: %4.4x.\n", dev->name, net_diag);
 		/* Enable link beat and jabber check. */

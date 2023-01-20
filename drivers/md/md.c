@@ -6112,9 +6112,9 @@ static void autorun_array(struct mddev *mddev)
 
 	rdev_for_each(rdev, mddev) {
 		char b[BDEVNAME_SIZE];
-		pr_cont("<%s>", bdevname(rdev->bdev,b));
+		pr_debug("<%s>", bdevname(rdev->bdev,b));
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	err = do_md_run(mddev);
 	if (err) {

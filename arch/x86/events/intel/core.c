@@ -4087,7 +4087,7 @@ __init int intel_pmu_init(void)
 	 */
 	switch (boot_cpu_data.x86_model) {
 	case INTEL_FAM6_CORE_YONAH:
-		pr_cont("Core events, ");
+		pr_debug("Core events, ");
 		name = "core";
 		break;
 
@@ -4103,7 +4103,7 @@ __init int intel_pmu_init(void)
 
 		x86_pmu.event_constraints = intel_core2_event_constraints;
 		x86_pmu.pebs_constraints = intel_core2_pebs_event_constraints;
-		pr_cont("Core2 events, ");
+		pr_debug("Core2 events, ");
 		name = "core2";
 		break;
 
@@ -4137,7 +4137,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.pebs_no_tlb = 1;
 		extra_attr = nhm_format_attr;
 
-		pr_cont("Nehalem events, ");
+		pr_debug("Nehalem events, ");
 		name = "nehalem";
 		break;
 
@@ -4154,7 +4154,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.event_constraints = intel_gen_event_constraints;
 		x86_pmu.pebs_constraints = intel_atom_pebs_event_constraints;
 		x86_pmu.pebs_aliases = intel_pebs_aliases_core2;
-		pr_cont("Atom events, ");
+		pr_debug("Atom events, ");
 		name = "bonnell";
 		break;
 
@@ -4176,7 +4176,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
 		x86_pmu.cpu_events = slm_events_attrs;
 		extra_attr = slm_format_attr;
-		pr_cont("Silvermont events, ");
+		pr_debug("Silvermont events, ");
 		name = "silvermont";
 		break;
 
@@ -4203,7 +4203,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
 		x86_pmu.cpu_events = glm_events_attrs;
 		extra_attr = slm_format_attr;
-		pr_cont("Goldmont events, ");
+		pr_debug("Goldmont events, ");
 		name = "goldmont";
 		break;
 
@@ -4231,7 +4231,7 @@ __init int intel_pmu_init(void)
 		/* Goldmont Plus has 4-wide pipeline */
 		event_attr_td_total_slots_scale_glm.event_str = "4";
 		extra_attr = slm_format_attr;
-		pr_cont("Goldmont plus events, ");
+		pr_debug("Goldmont plus events, ");
 		name = "goldmont_plus";
 		break;
 
@@ -4262,7 +4262,7 @@ __init int intel_pmu_init(void)
 
 		intel_pmu_pebs_data_source_nhm();
 		extra_attr = nhm_format_attr;
-		pr_cont("Westmere events, ");
+		pr_debug("Westmere events, ");
 		name = "westmere";
 		break;
 
@@ -4301,7 +4301,7 @@ __init int intel_pmu_init(void)
 
 		extra_attr = nhm_format_attr;
 
-		pr_cont("SandyBridge events, ");
+		pr_debug("SandyBridge events, ");
 		name = "sandybridge";
 		break;
 
@@ -4338,7 +4338,7 @@ __init int intel_pmu_init(void)
 
 		extra_attr = nhm_format_attr;
 
-		pr_cont("IvyBridge events, ");
+		pr_debug("IvyBridge events, ");
 		name = "ivybridge";
 		break;
 
@@ -4369,7 +4369,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.lbr_double_abort = true;
 		extra_attr = boot_cpu_has(X86_FEATURE_RTM) ?
 			hsw_format_attr : nhm_format_attr;
-		pr_cont("Haswell events, ");
+		pr_debug("Haswell events, ");
 		name = "haswell";
 		break;
 
@@ -4408,7 +4408,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.limit_period = bdw_limit_period;
 		extra_attr = boot_cpu_has(X86_FEATURE_RTM) ?
 			hsw_format_attr : nhm_format_attr;
-		pr_cont("Broadwell events, ");
+		pr_debug("Broadwell events, ");
 		name = "broadwell";
 		break;
 
@@ -4428,7 +4428,7 @@ __init int intel_pmu_init(void)
 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
 		extra_attr = slm_format_attr;
-		pr_cont("Knights Landing/Mill events, ");
+		pr_debug("Knights Landing/Mill events, ");
 		name = "knights-landing";
 		break;
 
@@ -4475,7 +4475,7 @@ __init int intel_pmu_init(void)
 			intel_pmu_attrs[1] = &dev_attr_allow_tsx_force_abort.attr.attr;
 		}
 
-		pr_cont("Skylake events, ");
+		pr_debug("Skylake events, ");
 		name = "skylake";
 		break;
 
@@ -4483,7 +4483,7 @@ __init int intel_pmu_init(void)
 		switch (x86_pmu.version) {
 		case 1:
 			x86_pmu.event_constraints = intel_v1_event_constraints;
-			pr_cont("generic architected perfmon v1, ");
+			pr_debug("generic architected perfmon v1, ");
 			name = "generic_arch_v1";
 			break;
 		default:
@@ -4491,7 +4491,7 @@ __init int intel_pmu_init(void)
 			 * default constraints for v2 and up
 			 */
 			x86_pmu.event_constraints = intel_gen_event_constraints;
-			pr_cont("generic architected perfmon, ");
+			pr_debug("generic architected perfmon, ");
 			name = "generic_arch_v2+";
 			break;
 		}
@@ -4555,7 +4555,7 @@ __init int intel_pmu_init(void)
 
 	if (x86_pmu.lbr_nr) {
 		x86_pmu.caps_attrs = merge_attr(x86_pmu.caps_attrs, lbr_attrs);
-		pr_cont("%d-deep LBR, ", x86_pmu.lbr_nr);
+		pr_debug("%d-deep LBR, ", x86_pmu.lbr_nr);
 	}
 
 	/*
@@ -4576,7 +4576,7 @@ __init int intel_pmu_init(void)
 	if (x86_pmu.intel_cap.full_width_write) {
 		x86_pmu.max_period = x86_pmu.cntval_mask >> 1;
 		x86_pmu.perfctr = MSR_IA32_PMC0;
-		pr_cont("full-width counters, ");
+		pr_debug("full-width counters, ");
 	}
 
 	kfree(to_free);

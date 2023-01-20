@@ -818,10 +818,10 @@ static void uv_nmi_kdump(int cpu, int master, struct pt_regs *regs)
 		pr_emerg("UV: crash_kexec unexpectedly returned, ");
 		atomic_set(&uv_nmi_kexec_failed, 1);
 		if (!kexec_crash_image) {
-			pr_cont("crash kernel not loaded\n");
+			pr_debug("crash kernel not loaded\n");
 			return;
 		}
-		pr_cont("kexec busy, stalling cpus while waiting\n");
+		pr_debug("kexec busy, stalling cpus while waiting\n");
 	}
 
 	/* If crash exec fails the slaves should return, otherwise stall */

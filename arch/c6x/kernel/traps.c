@@ -397,10 +397,10 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 		if (p + 1 > endstack)
 			break;
 		if (i % 8 == 0)
-			pr_cont("\n	    ");
-		pr_cont(" %08lx", *p++);
+			pr_debug("\n	    ");
+		pr_debug(" %08lx", *p++);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	show_trace(stack, endstack);
 }
 

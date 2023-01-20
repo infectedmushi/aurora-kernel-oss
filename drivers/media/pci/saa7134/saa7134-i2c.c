@@ -44,7 +44,7 @@ MODULE_PARM_DESC(i2c_scan,"scan i2c bus at insmod time");
 
 #define i2c_cont(level, fmt, arg...) do { \
 	if (i2c_debug == level) \
-		pr_cont(fmt, ## arg); \
+		pr_debug(fmt, ## arg); \
 	} while (0)
 
 #define I2C_WAIT_DELAY  32

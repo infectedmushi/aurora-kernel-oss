@@ -1075,9 +1075,9 @@ static void __init print_APIC_field(int base)
 	printk(KERN_DEBUG);
 
 	for (i = 0; i < 8; i++)
-		pr_cont("%08x", apic_read(base + i*0x10));
+		pr_debug("%08x", apic_read(base + i*0x10));
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static void __init print_local_APIC(void *dummy)
@@ -1184,7 +1184,7 @@ static void __init print_local_APIC(void *dummy)
 			pr_debug("... APIC EILVT%d: %08x\n", i, v);
 		}
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static void __init print_local_APICs(int maxcpu)

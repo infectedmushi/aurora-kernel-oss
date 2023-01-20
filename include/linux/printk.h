@@ -310,7 +310,7 @@ extern int kptr_restrict;
 #define pr_info(fmt, ...) \
 	printk(KERN_INFO pr_fmt(fmt), ##__VA_ARGS__)
 /*
- * Like KERN_CONT, pr_cont() should only be used when continuing
+ * Like KERN_CONT, pr_debug() should only be used when continuing
  * a line with no newline ('\n') enclosed. Otherwise it defaults
  * back to KERN_DEFAULT.
  */

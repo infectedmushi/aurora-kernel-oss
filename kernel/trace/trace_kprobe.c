@@ -1761,9 +1761,9 @@ end:
 	 */
 	wait_for_kprobe_optimizer();
 	if (warn)
-		pr_cont("NG: Some tests are failed. Please check them.\n");
+		pr_debug("NG: Some tests are failed. Please check them.\n");
 	else
-		pr_cont("OK\n");
+		pr_debug("OK\n");
 	return 0;
 }
 

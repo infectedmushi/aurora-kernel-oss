@@ -344,11 +344,11 @@ static int tvaudio_checkcarrier(struct saa7134_dev *dev, struct mainscan *scan)
 				return -1;
 			value = saa_readl(SAA7134_LEVEL_READOUT1 >> 2);
 			if (0 == i)
-				pr_cont("  #  %6d  # ", value >> 16);
+				pr_debug("  #  %6d  # ", value >> 16);
 			else
-				pr_cont(" %6d", value >> 16);
+				pr_debug(" %6d", value >> 16);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	tvaudio_setcarrier(dev,scan->carr-90,scan->carr-90);

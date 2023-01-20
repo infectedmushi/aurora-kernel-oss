@@ -928,7 +928,7 @@ static int smc91c92_config(struct pcmcia_device *link)
 	    netdev_info(dev, "  %lu byte", mir);
 	else
 	    netdev_info(dev, "  %lu kb", mir>>10);
-	pr_cont(" buffer, %s xcvr\n",
+	pr_debug(" buffer, %s xcvr\n",
 		(smc->cfg & CFG_MII_SELECT) ? "MII" : if_names[dev->if_port]);
     }
 
@@ -1037,8 +1037,8 @@ static void smc_dump(struct net_device *dev)
 	SMC_SELECT_BANK(w);
 	netdev_dbg(dev, "bank %d: ", w);
 	for (i = 0; i < 14; i += 2)
-	    pr_cont(" %04x", inw(ioaddr + i));
-	pr_cont("\n");
+	    pr_debug(" %04x", inw(ioaddr + i));
+	pr_debug("\n");
     }
     outw(save, ioaddr + BANK_SELECT);
 }

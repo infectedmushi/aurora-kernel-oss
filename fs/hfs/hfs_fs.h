@@ -49,7 +49,7 @@ do {								\
 #define hfs_dbg_cont(flg, fmt, ...)				\
 do {								\
 	if (DBG_##flg & DBG_MASK)				\
-		pr_cont(fmt, ##__VA_ARGS__);			\
+		pr_debug(fmt, ##__VA_ARGS__);			\
 } while (0)
 
 

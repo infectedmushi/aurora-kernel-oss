@@ -2871,21 +2871,21 @@ MptDisplayIocCapabilities(MPT_ADAPTER *ioc)
 
 	printk(KERN_INFO "%s: ", ioc->name);
 	if (ioc->prod_name)
-		pr_cont("%s: ", ioc->prod_name);
-	pr_cont("Capabilities={");
+		pr_debug("%s: ", ioc->prod_name);
+	pr_debug("Capabilities={");
 
 	if (ioc->pfacts[0].ProtocolFlags & MPI_PORTFACTS_PROTOCOL_INITIATOR) {
-		pr_cont("Initiator");
+		pr_debug("Initiator");
 		i++;
 	}
 
 	if (ioc->pfacts[0].ProtocolFlags & MPI_PORTFACTS_PROTOCOL_TARGET) {
-		pr_cont("%sTarget", i ? "," : "");
+		pr_debug("%sTarget", i ? "," : "");
 		i++;
 	}
 
 	if (ioc->pfacts[0].ProtocolFlags & MPI_PORTFACTS_PROTOCOL_LAN) {
-		pr_cont("%sLAN", i ? "," : "");
+		pr_debug("%sLAN", i ? "," : "");
 		i++;
 	}
 
@@ -2894,12 +2894,12 @@ MptDisplayIocCapabilities(MPT_ADAPTER *ioc)
 	 *  This would probably evoke more questions than it's worth
 	 */
 	if (ioc->pfacts[0].ProtocolFlags & MPI_PORTFACTS_PROTOCOL_TARGET) {
-		pr_cont("%sLogBusAddr", i ? "," : "");
+		pr_debug("%sLogBusAddr", i ? "," : "");
 		i++;
 	}
 #endif
 
-	pr_cont("}\n");
+	pr_debug("}\n");
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/

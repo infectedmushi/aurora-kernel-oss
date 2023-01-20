@@ -236,8 +236,8 @@ btcx_calc_skips(int line, int width, int *maxy,
 	if (btcx_debug) {
 		dprintk("btcx: skips line %d-%d:", line, maxline);
 		for (skip = 0; skip < *nskips; skip++) {
-			pr_cont(" %d-%d", skips[skip].start, skips[skip].end);
+			pr_debug(" %d-%d", skips[skip].start, skips[skip].end);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }

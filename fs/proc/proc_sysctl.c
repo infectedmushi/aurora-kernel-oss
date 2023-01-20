@@ -82,7 +82,7 @@ static void sysctl_print_dir(struct ctl_dir *dir)
 {
 	if (dir->header.parent)
 		sysctl_print_dir(dir->header.parent);
-	pr_cont("%s/", dir->header.ctl_table[0].procname);
+	pr_debug("%s/", dir->header.ctl_table[0].procname);
 }
 
 static int namecmp(const char *name1, int len1, const char *name2, int len2)
@@ -161,7 +161,7 @@ static int insert_entry(struct ctl_table_header *head, struct ctl_table *entry)
 		else {
 			pr_err("sysctl duplicate entry: ");
 			sysctl_print_dir(head->parent);
-			pr_cont("/%s\n", entry->procname);
+			pr_debug("/%s\n", entry->procname);
 			return -EEXIST;
 		}
 	}
@@ -1018,7 +1018,7 @@ failed:
 	if (IS_ERR(subdir)) {
 		pr_err("sysctl could not get directory: ");
 		sysctl_print_dir(dir);
-		pr_cont("/%*.*s %ld\n",
+		pr_debug("/%*.*s %ld\n",
 			namelen, namelen, name, PTR_ERR(subdir));
 	}
 	drop_sysctl_table(&dir->header);
@@ -1618,7 +1618,7 @@ static void put_links(struct ctl_table_header *header)
 		else {
 			pr_err("sysctl link missing during unregister: ");
 			sysctl_print_dir(parent);
-			pr_cont("/%s\n", name);
+			pr_debug("/%s\n", name);
 		}
 	}
 }

@@ -28,8 +28,8 @@ static void __init of_dump_addr(const char *s, const __be32 *addr, int na)
 {
 	pr_debug("%s", s);
 	while(na--)
-		pr_cont(" %08x", *(addr++));
-	pr_cont("\n");
+		pr_debug(" %08x", *(addr++));
+	pr_debug("\n");
 }
 #else
 static void __init of_dump_addr(const char *s, const __be32 *addr, int na) { }

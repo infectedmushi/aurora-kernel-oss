@@ -838,7 +838,7 @@ void signal_fault(struct pt_regs *regs, void __user *frame, char *where)
 		       me->comm, me->pid, where, frame,
 		       regs->ip, regs->sp, regs->orig_ax);
 		print_vma_addr(KERN_CONT " in ", regs->ip);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 
 	force_sig(SIGSEGV, me);

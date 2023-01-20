@@ -202,7 +202,7 @@ static int test_mb_aead_jiffies(struct test_mb_aead_data *data, int enc,
 			goto out;
 	}
 
-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+	pr_debug("%d operations in %d seconds (%llu bytes)\n",
 		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
 
 out:
@@ -243,7 +243,7 @@ static int test_mb_aead_cycles(struct test_mb_aead_data *data, int enc,
 		cycles += end - start;
 	}
 
-	pr_cont("1 operation in %lu cycles (%d bytes)\n",
+	pr_debug("1 operation in %lu cycles (%d bytes)\n",
 		(cycles + 4) / (8 * num_mb), blen);
 
 out:
@@ -472,7 +472,7 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
 			return ret;
 	}
 
-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+	pr_debug("%d operations in %d seconds (%llu bytes)\n",
 	        bcount, secs, (u64)bcount * blen);
 	return 0;
 }
@@ -763,7 +763,7 @@ static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
 			goto out;
 	}
 
-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+	pr_debug("%d operations in %d seconds (%llu bytes)\n",
 		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
 
 out:
@@ -804,7 +804,7 @@ static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
 		cycles += end - start;
 	}
 
-	pr_cont("1 operation in %lu cycles (%d bytes)\n",
+	pr_debug("1 operation in %lu cycles (%d bytes)\n",
 		(cycles + 4) / (8 * num_mb), blen);
 
 out:
@@ -954,7 +954,7 @@ static int test_ahash_jiffies(struct ahash_request *req, int blen,
 			return ret;
 	}
 
-	pr_cont("%6u opers/sec, %9lu bytes/sec\n",
+	pr_debug("%6u opers/sec, %9lu bytes/sec\n",
 		bcount / secs, ((long)bcount * blen) / secs);
 
 	return 0;
@@ -992,7 +992,7 @@ out:
 	if (ret)
 		return ret;
 
-	pr_cont("%6lu cycles/operation, %4lu cycles/byte\n",
+	pr_debug("%6lu cycles/operation, %4lu cycles/byte\n",
 		cycles / 8, cycles / (8 * blen));
 
 	return 0;
@@ -1049,7 +1049,7 @@ out:
 	if (ret)
 		return ret;
 
-	pr_cont("%6lu cycles/operation, %4lu cycles/byte\n",
+	pr_debug("%6lu cycles/operation, %4lu cycles/byte\n",
 		cycles / 8, cycles / (8 * blen));
 
 	return 0;
@@ -1200,7 +1200,7 @@ static int test_mb_acipher_jiffies(struct test_mb_skcipher_data *data, int enc,
 			goto out;
 	}
 
-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+	pr_debug("%d operations in %d seconds (%llu bytes)\n",
 		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
 
 out:
@@ -1241,7 +1241,7 @@ static int test_mb_acipher_cycles(struct test_mb_skcipher_data *data, int enc,
 		cycles += end - start;
 	}
 
-	pr_cont("1 operation in %lu cycles (%d bytes)\n",
+	pr_debug("1 operation in %lu cycles (%d bytes)\n",
 		(cycles + 4) / (8 * num_mb), blen);
 
 out:
@@ -1429,7 +1429,7 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
 			return ret;
 	}
 
-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+	pr_debug("%d operations in %d seconds (%llu bytes)\n",
 		bcount, secs, (u64)bcount * blen);
 	return 0;
 }
@@ -1475,7 +1475,7 @@ static int test_acipher_cycles(struct skcipher_request *req, int enc,
 
 out:
 	if (ret == 0)
-		pr_cont("1 operation in %lu cycles (%d bytes)\n",
+		pr_debug("1 operation in %lu cycles (%d bytes)\n",
 			(cycles + 4) / 8, blen);
 
 	return ret;

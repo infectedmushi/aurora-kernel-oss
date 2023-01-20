@@ -360,7 +360,7 @@ calc_reloc(unsigned long r, struct lib_info *p, int curid, int internalp)
 	return addr;
 
 failed:
-	pr_cont(", killing %s!\n", current->comm);
+	pr_debug(", killing %s!\n", current->comm);
 	send_sig(SIGSEGV, current, 0);
 
 	return RELOC_FAILED;

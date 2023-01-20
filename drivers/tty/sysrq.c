@@ -590,10 +590,10 @@ void __handle_sysrq(int key, bool check_mask)
 					;
 				if (j != i)
 					continue;
-				pr_cont("%s ", sysrq_key_table[i]->help_msg);
+				pr_debug("%s ", sysrq_key_table[i]->help_msg);
 			}
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 		console_loglevel = orig_log_level;
 	}
 	rcu_read_unlock();

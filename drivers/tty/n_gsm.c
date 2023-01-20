@@ -479,59 +479,59 @@ static void gsm_print_packet(const char *hdr, int addr, int cr,
 
 	switch (control & ~PF) {
 	case SABM:
-		pr_cont("SABM");
+		pr_debug("SABM");
 		break;
 	case UA:
-		pr_cont("UA");
+		pr_debug("UA");
 		break;
 	case DISC:
-		pr_cont("DISC");
+		pr_debug("DISC");
 		break;
 	case DM:
-		pr_cont("DM");
+		pr_debug("DM");
 		break;
 	case UI:
-		pr_cont("UI");
+		pr_debug("UI");
 		break;
 	case UIH:
-		pr_cont("UIH");
+		pr_debug("UIH");
 		break;
 	default:
 		if (!(control & 0x01)) {
-			pr_cont("I N(S)%d N(R)%d",
+			pr_debug("I N(S)%d N(R)%d",
 				(control & 0x0E) >> 1, (control & 0xE0) >> 5);
 		} else switch (control & 0x0F) {
 			case RR:
-				pr_cont("RR(%d)", (control & 0xE0) >> 5);
+				pr_debug("RR(%d)", (control & 0xE0) >> 5);
 				break;
 			case RNR:
-				pr_cont("RNR(%d)", (control & 0xE0) >> 5);
+				pr_debug("RNR(%d)", (control & 0xE0) >> 5);
 				break;
 			case REJ:
-				pr_cont("REJ(%d)", (control & 0xE0) >> 5);
+				pr_debug("REJ(%d)", (control & 0xE0) >> 5);
 				break;
 			default:
-				pr_cont("[%02X]", control);
+				pr_debug("[%02X]", control);
 		}
 	}
 
 	if (control & PF)
-		pr_cont("(P)");
+		pr_debug("(P)");
 	else
-		pr_cont("(F)");
+		pr_debug("(F)");
 
 	if (dlen) {
 		int ct = 0;
 		while (dlen--) {
 			if (ct % 8 == 0) {
-				pr_cont("\n");
+				pr_debug("\n");
 				pr_debug("    ");
 			}
-			pr_cont("%02X ", *data++);
+			pr_debug("%02X ", *data++);
 			ct++;
 		}
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 

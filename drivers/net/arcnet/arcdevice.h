@@ -96,7 +96,7 @@ do {									\
 #define arc_cont(x, fmt, ...)						\
 do {									\
 	if (BUGLVL(x))							\
-		pr_cont(fmt, ##__VA_ARGS__);				\
+		pr_debug(fmt, ##__VA_ARGS__);				\
 } while (0)
 
 /* see how long a function call takes to run, expressed in CPU cycles */

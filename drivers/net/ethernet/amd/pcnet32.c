@@ -1090,8 +1090,8 @@ static int pcnet32_loopback_test(struct net_device *dev, uint64_t * data1)
 			netdev_printk(KERN_DEBUG, dev, "Packet %d: ", x);
 			skb = lp->rx_skbuff[x];
 			for (i = 0; i < size; i++)
-				pr_cont(" %02x", *(skb->data + i));
-			pr_cont("\n");
+				pr_debug(" %02x", *(skb->data + i));
+			pr_debug("\n");
 		}
 	}
 
@@ -1786,7 +1786,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	    !is_valid_ether_addr(dev->dev_addr)) {
 		if (is_valid_ether_addr(promaddr)) {
 			if (pcnet32_debug & NETIF_MSG_PROBE) {
-				pr_cont(" warning: CSR address invalid,\n");
+				pr_debug(" warning: CSR address invalid,\n");
 				pr_debug("    using instead PROM address of");
 			}
 			memcpy(dev->dev_addr, promaddr, ETH_ALEN);
@@ -1798,7 +1798,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		eth_zero_addr(dev->dev_addr);
 
 	if (pcnet32_debug & NETIF_MSG_PROBE) {
-		pr_cont(" %pM", dev->dev_addr);
+		pr_debug(" %pM", dev->dev_addr);
 
 		/* Version 0x2623 and 0x2624 */
 		if (((chip_version + 1) & 0xfffe) == 0x2624) {
@@ -1806,35 +1806,35 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 			pr_debug("    tx_start_pt(0x%04x):", i);
 			switch (i >> 10) {
 			case 0:
-				pr_cont("  20 bytes,");
+				pr_debug("  20 bytes,");
 				break;
 			case 1:
-				pr_cont("  64 bytes,");
+				pr_debug("  64 bytes,");
 				break;
 			case 2:
-				pr_cont(" 128 bytes,");
+				pr_debug(" 128 bytes,");
 				break;
 			case 3:
-				pr_cont("~220 bytes,");
+				pr_debug("~220 bytes,");
 				break;
 			}
 			i = a->read_bcr(ioaddr, 18);	/* Check Burst/Bus control */
-			pr_cont(" BCR18(%x):", i & 0xffff);
+			pr_debug(" BCR18(%x):", i & 0xffff);
 			if (i & (1 << 5))
-				pr_cont("BurstWrEn ");
+				pr_debug("BurstWrEn ");
 			if (i & (1 << 6))
-				pr_cont("BurstRdEn ");
+				pr_debug("BurstRdEn ");
 			if (i & (1 << 7))
-				pr_cont("DWordIO ");
+				pr_debug("DWordIO ");
 			if (i & (1 << 11))
-				pr_cont("NoUFlow ");
+				pr_debug("NoUFlow ");
 			i = a->read_bcr(ioaddr, 25);
 			pr_debug("    SRAMSIZE=0x%04x,", i << 8);
 			i = a->read_bcr(ioaddr, 26);
-			pr_cont(" SRAM_BND=0x%04x,", i << 8);
+			pr_debug(" SRAM_BND=0x%04x,", i << 8);
 			i = a->read_bcr(ioaddr, 27);
 			if (i & (1 << 14))
-				pr_cont("LowLatRx");
+				pr_debug("LowLatRx");
 		}
 	}
 
@@ -1922,7 +1922,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	if (pdev) {		/* use the IRQ provided by PCI */
 		dev->irq = pdev->irq;
 		if (pcnet32_debug & NETIF_MSG_PROBE)
-			pr_cont(" assigned IRQ %d\n", dev->irq);
+			pr_debug(" assigned IRQ %d\n", dev->irq);
 	} else {
 		unsigned long irq_mask = probe_irq_on();
 
@@ -1938,12 +1938,12 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		dev->irq = probe_irq_off(irq_mask);
 		if (!dev->irq) {
 			if (pcnet32_debug & NETIF_MSG_PROBE)
-				pr_cont(", failed to detect IRQ line\n");
+				pr_debug(", failed to detect IRQ line\n");
 			ret = -ENODEV;
 			goto err_free_ring;
 		}
 		if (pcnet32_debug & NETIF_MSG_PROBE)
-			pr_cont(", probed IRQ %d\n", dev->irq);
+			pr_debug(", probed IRQ %d\n", dev->irq);
 	}
 
 	/* Set the mii phy_id so that we can query the link state */

@@ -105,7 +105,7 @@ static void __init setup_initrd(void)
 		(void *)(initrd_start), size);
 	return;
 disable:
-	pr_cont(" - disabling initrd\n");
+	pr_debug(" - disabling initrd\n");
 	initrd_start = 0;
 	initrd_end = 0;
 }

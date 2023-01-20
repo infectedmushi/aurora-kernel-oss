@@ -533,12 +533,12 @@ static int gem_pci_interrupt(struct net_device *dev, struct gem *gp, u32 gem_sta
 		netdev_err(dev, "PCI error [%04x]", pci_estat);
 
 		if (pci_estat & GREG_PCIESTAT_BADACK)
-			pr_cont(" <No ACK64# during ABS64 cycle>");
+			pr_debug(" <No ACK64# during ABS64 cycle>");
 		if (pci_estat & GREG_PCIESTAT_DTRTO)
-			pr_cont(" <Delayed transaction timeout>");
+			pr_debug(" <Delayed transaction timeout>");
 		if (pci_estat & GREG_PCIESTAT_OTHER)
-			pr_cont(" <other>");
-		pr_cont("\n");
+			pr_debug(" <other>");
+		pr_debug("\n");
 	} else {
 		pci_estat |= GREG_PCIESTAT_OTHER;
 		netdev_err(dev, "PCI error\n");

@@ -844,10 +844,10 @@ static void mace_tx_timeout(struct net_device *dev)
 
   netdev_notice(dev, "transmit timed out -- ");
 #if RESET_ON_TIMEOUT
-  pr_cont("resetting card\n");
+  pr_debug("resetting card\n");
   pcmcia_reset_card(link->socket);
 #else /* #if RESET_ON_TIMEOUT */
-  pr_cont("NOT resetting card\n");
+  pr_debug("NOT resetting card\n");
 #endif /* #if RESET_ON_TIMEOUT */
   netif_trans_update(dev); /* prevent tx timeout */
   netif_wake_queue(dev);
@@ -1343,8 +1343,8 @@ static void BuildLAF(int *ladrf, int *adr)
     printk(KERN_DEBUG "    adr =%pM\n", adr);
   printk(KERN_DEBUG "    hashcode = %d(decimal), ladrf[0:63] =", hashcode);
   for (i = 0; i < 8; i++)
-    pr_cont(" %02X", ladrf[i]);
-  pr_cont("\n");
+    pr_debug(" %02X", ladrf[i]);
+  pr_debug("\n");
 #endif
 } /* BuildLAF */
 

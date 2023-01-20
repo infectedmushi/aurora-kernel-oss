@@ -95,17 +95,17 @@ omap_otg_init(struct omap_usb_config *config)
 
 	printk("USB: hmc %d", config->hmc_mode);
 	if (!alt_pingroup)
-		pr_cont(", usb2 alt %d wires", config->pins[2]);
+		pr_debug(", usb2 alt %d wires", config->pins[2]);
 	else if (config->pins[0])
-		pr_cont(", usb0 %d wires%s", config->pins[0],
+		pr_debug(", usb0 %d wires%s", config->pins[0],
 			is_usb0_device(config) ? " (dev)" : "");
 	if (config->pins[1])
-		pr_cont(", usb1 %d wires", config->pins[1]);
+		pr_debug(", usb1 %d wires", config->pins[1]);
 	if (!alt_pingroup && config->pins[2])
-		pr_cont(", usb2 %d wires", config->pins[2]);
+		pr_debug(", usb2 %d wires", config->pins[2]);
 	if (config->otg)
-		pr_cont(", Mini-AB on usb%d", config->otg - 1);
-	pr_cont("\n");
+		pr_debug(", Mini-AB on usb%d", config->otg - 1);
+	pr_debug("\n");
 
 	/* leave USB clocks/controllers off until needed */
 	w = omap_readw(ULPD_SOFT_REQ);
@@ -570,13 +570,13 @@ static void __init omap_1510_usb_init(struct omap_usb_config *config)
 
 	printk("USB: hmc %d", config->hmc_mode);
 	if (config->pins[0])
-		pr_cont(", usb0 %d wires%s", config->pins[0],
+		pr_debug(", usb0 %d wires%s", config->pins[0],
 			is_usb0_device(config) ? " (dev)" : "");
 	if (config->pins[1])
-		pr_cont(", usb1 %d wires", config->pins[1]);
+		pr_debug(", usb1 %d wires", config->pins[1]);
 	if (config->pins[2])
-		pr_cont(", usb2 %d wires", config->pins[2]);
-	pr_cont("\n");
+		pr_debug(", usb2 %d wires", config->pins[2]);
+	pr_debug("\n");
 
 	/* use DPLL for 48 MHz function clock */
 	pr_debug("APLL %04x DPLL %04x REQ %04x\n", omap_readw(ULPD_APLL_CTRL),

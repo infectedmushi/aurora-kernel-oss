@@ -59,16 +59,16 @@ static void __init cps_smp_setup(void)
 	pr_debug("%s topology ", cpu_has_mips_r6 ? "VP" : "VPE");
 	for (cl = 0; cl < nclusters; cl++) {
 		if (cl > 0)
-			pr_cont(",");
-		pr_cont("{");
+			pr_debug(",");
+		pr_debug("{");
 
 		ncores = mips_cps_numcores(cl);
 		for (c = 0; c < ncores; c++) {
 			core_vpes = core_vpe_count(cl, c);
 
 			if (c > 0)
-				pr_cont(",");
-			pr_cont("%u", core_vpes);
+				pr_debug(",");
+			pr_debug("%u", core_vpes);
 
 			/* Use the number of VPEs in cluster 0 core 0 for smp_num_siblings */
 			if (!cl && !c)
@@ -83,9 +83,9 @@ static void __init cps_smp_setup(void)
 			nvpes += core_vpes;
 		}
 
-		pr_cont("}");
+		pr_debug("}");
 	}
-	pr_cont(" total %u\n", nvpes);
+	pr_debug(" total %u\n", nvpes);
 
 	/* Indicate present CPUs (CPU being synonymous with VPE) */
 	for (v = 0; v < min_t(unsigned, nvpes, NR_CPUS); v++) {

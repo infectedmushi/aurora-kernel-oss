@@ -418,7 +418,7 @@ static int epic_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (debug > 2) {
 		dev_dbg(&pdev->dev, "EEPROM contents:\n");
 		for (i = 0; i < 64; i++)
-			pr_cont(" %4.4x%s", read_eeprom(ep, i),
+			pr_debug(" %4.4x%s", read_eeprom(ep, i),
 				   i % 16 == 15 ? "\n" : "");
 	}
 

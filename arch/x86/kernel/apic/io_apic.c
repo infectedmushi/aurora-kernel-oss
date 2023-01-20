@@ -1360,8 +1360,8 @@ void __init print_IO_APICs(void)
 
 		printk(KERN_DEBUG "IRQ%d ", irq);
 		for_each_irq_pin(entry, data->irq_2_pin)
-			pr_cont("-> %d:%d", entry->apic, entry->pin);
-		pr_cont("\n");
+			pr_debug("-> %d:%d", entry->apic, entry->pin);
+		pr_debug("\n");
 	}
 
 	printk(KERN_INFO ".................................... done.\n");
@@ -1559,7 +1559,7 @@ void __init setup_ioapic_ids_from_mpc_nocheck(void)
 		reg_00.raw = io_apic_read(ioapic_idx, 0);
 		raw_spin_unlock_irqrestore(&ioapic_lock, flags);
 		if (reg_00.bits.ID != mpc_ioapic_id(ioapic_idx))
-			pr_cont("could not set ID!\n");
+			pr_debug("could not set ID!\n");
 		else
 			apic_printk(APIC_VERBOSE, " ok.\n");
 	}

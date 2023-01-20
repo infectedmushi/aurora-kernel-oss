@@ -462,15 +462,15 @@ static void wmi_dump_wdg(const struct guid_block *g)
 	pr_debug("\tflags: %#x", g->flags);
 	if (g->flags) {
 		if (g->flags & ACPI_WMI_EXPENSIVE)
-			pr_cont(" ACPI_WMI_EXPENSIVE");
+			pr_debug(" ACPI_WMI_EXPENSIVE");
 		if (g->flags & ACPI_WMI_METHOD)
-			pr_cont(" ACPI_WMI_METHOD");
+			pr_debug(" ACPI_WMI_METHOD");
 		if (g->flags & ACPI_WMI_STRING)
-			pr_cont(" ACPI_WMI_STRING");
+			pr_debug(" ACPI_WMI_STRING");
 		if (g->flags & ACPI_WMI_EVENT)
-			pr_cont(" ACPI_WMI_EVENT");
+			pr_debug(" ACPI_WMI_EVENT");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 }
 
@@ -494,19 +494,19 @@ static void wmi_notify_debug(u32 value, void *context)
 	pr_debug("DEBUG Event ");
 	switch(obj->type) {
 	case ACPI_TYPE_BUFFER:
-		pr_cont("BUFFER_TYPE - length %d\n", obj->buffer.length);
+		pr_debug("BUFFER_TYPE - length %d\n", obj->buffer.length);
 		break;
 	case ACPI_TYPE_STRING:
-		pr_cont("STRING_TYPE - %s\n", obj->string.pointer);
+		pr_debug("STRING_TYPE - %s\n", obj->string.pointer);
 		break;
 	case ACPI_TYPE_INTEGER:
-		pr_cont("INTEGER_TYPE - %llu\n", obj->integer.value);
+		pr_debug("INTEGER_TYPE - %llu\n", obj->integer.value);
 		break;
 	case ACPI_TYPE_PACKAGE:
-		pr_cont("PACKAGE_TYPE - %d elements\n", obj->package.count);
+		pr_debug("PACKAGE_TYPE - %d elements\n", obj->package.count);
 		break;
 	default:
-		pr_cont("object type 0x%X\n", obj->type);
+		pr_debug("object type 0x%X\n", obj->type);
 	}
 	kfree(obj);
 }

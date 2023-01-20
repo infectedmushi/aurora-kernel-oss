@@ -860,8 +860,8 @@ struct dvb_frontend *dvb_pll_attach(struct dvb_frontend *fe, int pll_addr,
 	if ((debug) || (id[priv->nr] == pll_desc_id)) {
 		dprintk("dvb-pll[%d]", priv->nr);
 		if (i2c != NULL)
-			pr_cont(" %d-%04x", i2c_adapter_id(i2c), pll_addr);
-		pr_cont(": id# %d (%s) attached, %s\n", pll_desc_id, desc->name,
+			pr_debug(" %d-%04x", i2c_adapter_id(i2c), pll_addr);
+		pr_debug(": id# %d (%s) attached, %s\n", pll_desc_id, desc->name,
 		       id[priv->nr] == pll_desc_id ?
 				"insmod option" : "autodetected");
 	}

@@ -196,7 +196,7 @@ static void do_io_probe(struct pcmcia_socket *s, unsigned int base,
 	/* First, what does a floating port look like? */
 	b = kzalloc(256, GFP_KERNEL);
 	if (!b) {
-		pr_cont("\n");
+		pr_debug("\n");
 		dev_err(&s->dev, "do_io_probe: unable to kmalloc 256 bytes\n");
 		return;
 	}
@@ -221,7 +221,7 @@ static void do_io_probe(struct pcmcia_socket *s, unsigned int base,
 		res = claim_region(s, i, 8, IORESOURCE_IO, "PCMCIA ioprobe");
 		if (!res) {
 			if (!any)
-				pr_cont(" excluding");
+				pr_debug(" excluding");
 			if (!bad)
 				bad = any = i;
 			continue;
@@ -232,13 +232,13 @@ static void do_io_probe(struct pcmcia_socket *s, unsigned int base,
 		free_region(res);
 		if (j < 8) {
 			if (!any)
-				pr_cont(" excluding");
+				pr_debug(" excluding");
 			if (!bad)
 				bad = any = i;
 		} else {
 			if (bad) {
 				sub_interval(&s_data->io_db, bad, i-bad);
-				pr_cont(" %#x-%#x", bad, i-1);
+				pr_debug(" %#x-%#x", bad, i-1);
 				bad = 0;
 			}
 		}
@@ -246,15 +246,15 @@ static void do_io_probe(struct pcmcia_socket *s, unsigned int base,
 	if (bad) {
 		if ((num > 16) && (bad == base) && (i == base+num)) {
 			sub_interval(&s_data->io_db, bad, i-bad);
-			pr_cont(" nothing: probe failed.\n");
+			pr_debug(" nothing: probe failed.\n");
 			return;
 		} else {
 			sub_interval(&s_data->io_db, bad, i-bad);
-			pr_cont(" %#x-%#x", bad, i-1);
+			pr_debug(" %#x-%#x", bad, i-1);
 		}
 	}
 
-	pr_cont("%s\n", !any ? " clean" : "");
+	pr_debug("%s\n", !any ? " clean" : "");
 }
 #endif
 
@@ -436,13 +436,13 @@ static int do_mem_probe(struct pcmcia_socket *s, u_long base, u_long num,
 		}
 		if (i != j) {
 			if (!bad)
-				pr_cont(" excluding");
-			pr_cont(" %#05lx-%#05lx", i, j-1);
+				pr_debug(" excluding");
+			pr_debug(" %#05lx-%#05lx", i, j-1);
 			sub_interval(&s_data->mem_db, i, j-i);
 			bad += j-i;
 		}
 	}
-	pr_cont("%s\n", !bad ? " clean" : "");
+	pr_debug("%s\n", !bad ? " clean" : "");
 	return num - bad;
 }
 

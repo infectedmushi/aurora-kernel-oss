@@ -175,14 +175,14 @@ static void __init e820_print_type(enum e820_type type)
 {
 	switch (type) {
 	case E820_TYPE_RAM:		/* Fall through: */
-	case E820_TYPE_RESERVED_KERN:	pr_cont("usable");			break;
-	case E820_TYPE_RESERVED:	pr_cont("reserved");			break;
-	case E820_TYPE_ACPI:		pr_cont("ACPI data");			break;
-	case E820_TYPE_NVS:		pr_cont("ACPI NVS");			break;
-	case E820_TYPE_UNUSABLE:	pr_cont("unusable");			break;
+	case E820_TYPE_RESERVED_KERN:	pr_debug("usable");			break;
+	case E820_TYPE_RESERVED:	pr_debug("reserved");			break;
+	case E820_TYPE_ACPI:		pr_debug("ACPI data");			break;
+	case E820_TYPE_NVS:		pr_debug("ACPI NVS");			break;
+	case E820_TYPE_UNUSABLE:	pr_debug("unusable");			break;
 	case E820_TYPE_PMEM:		/* Fall through: */
-	case E820_TYPE_PRAM:		pr_cont("persistent (type %u)", type);	break;
-	default:			pr_cont("type %u", type);		break;
+	case E820_TYPE_PRAM:		pr_debug("persistent (type %u)", type);	break;
+	default:			pr_debug("type %u", type);		break;
 	}
 }
 
@@ -197,7 +197,7 @@ void __init e820__print_table(char *who)
 			e820_table->entries[i].addr + e820_table->entries[i].size - 1);
 
 		e820_print_type(e820_table->entries[i].type);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 
@@ -446,9 +446,9 @@ __e820__range_update(struct e820_table *table, u64 start, u64 size, enum e820_ty
 	end = start + size;
 	printk(KERN_DEBUG "e820: update [mem %#010Lx-%#010Lx] ", start, end - 1);
 	e820_print_type(old_type);
-	pr_cont(" ==> ");
+	pr_debug(" ==> ");
 	e820_print_type(new_type);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	for (i = 0; i < table->nr_entries; i++) {
 		struct e820_entry *entry = &table->entries[i];
@@ -523,7 +523,7 @@ u64 __init e820__range_remove(u64 start, u64 size, enum e820_type old_type, bool
 	printk(KERN_DEBUG "e820: remove [mem %#010Lx-%#010Lx] ", start, end - 1);
 	if (check_type)
 		e820_print_type(old_type);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	for (i = 0; i < e820_table->nr_entries; i++) {
 		struct e820_entry *entry = &e820_table->entries[i];

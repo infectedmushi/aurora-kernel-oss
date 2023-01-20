@@ -426,8 +426,8 @@ static int cx23885_risc_decode(u32 risc)
 	       instr[risc >> 28] ? instr[risc >> 28] : "INVALID");
 	for (i = ARRAY_SIZE(bits) - 1; i >= 0; i--)
 		if (risc & (1 << (i + 12)))
-			pr_cont(" %s", bits[i]);
-	pr_cont(" count=%d ]\n", risc & 0xfff);
+			pr_debug(" %s", bits[i]);
+	pr_debug(" count=%d ]\n", risc & 0xfff);
 	return incr[risc >> 28] ? incr[risc >> 28] : 1;
 }
 

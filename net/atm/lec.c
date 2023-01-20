@@ -1191,9 +1191,9 @@ static void lane2_associate_ind(struct net_device *dev, const u8 *mac_addr,
 	pr_debug("\n");
 	pr_debug("dump of tlvs, sizeoftlvs=%d\n", sizeoftlvs);
 	while (i < sizeoftlvs)
-		pr_cont("%02x ", tlvs[i++]);
+		pr_debug("%02x ", tlvs[i++]);
 
-	pr_cont("\n");
+	pr_debug("\n");
 #endif
 
 	/* tell MPOA about the TLVs we saw */

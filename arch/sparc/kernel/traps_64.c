@@ -1925,20 +1925,20 @@ static void sun4v_emit_err_attr_strings(u32 attrs)
 		if (attrs & (1U << i)) {
 			const char *s = attr_names[i];
 
-			pr_cont("%s ", s);
+			pr_debug("%s ", s);
 		}
 	}
 
 	sp_state = ((attrs & SUN4V_ERR_ATTRS_SPSTATE_MSK) >>
 		    SUN4V_ERR_ATTRS_SPSTATE_SHFT);
-	pr_cont("%s ", sp_states[sp_state]);
+	pr_debug("%s ", sp_states[sp_state]);
 
 	mode = ((attrs & SUN4V_ERR_ATTRS_MODE_MSK) >>
 		SUN4V_ERR_ATTRS_MODE_SHFT);
-	pr_cont("%s ", modes[mode]);
+	pr_debug("%s ", modes[mode]);
 
 	if (attrs & SUN4V_ERR_ATTRS_RES_QUEUE_FULL)
-		pr_cont("res-queue-full ");
+		pr_debug("res-queue-full ");
 }
 
 /* When the report contains a real-address of "-1" it means that the
@@ -1988,7 +1988,7 @@ static void sun4v_log_error(struct pt_regs *regs, struct sun4v_error_entry *ent,
 	attrs = ent->err_attrs;
 	printk("%s: attrs [0x%08x] < ", pfx, attrs);
 	sun4v_emit_err_attr_strings(attrs);
-	pr_cont(">\n");
+	pr_debug(">\n");
 
 	/* Various fields in the error report are only valid if
 	 * certain attribute bits are set.

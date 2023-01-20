@@ -1014,16 +1014,16 @@ bnx2_report_link(struct bnx2 *bp)
 
 		if (bp->flow_ctrl) {
 			if (bp->flow_ctrl & FLOW_CTRL_RX) {
-				pr_cont(", receive ");
+				pr_debug(", receive ");
 				if (bp->flow_ctrl & FLOW_CTRL_TX)
-					pr_cont("& transmit ");
+					pr_debug("& transmit ");
 			}
 			else {
-				pr_cont(", transmit ");
+				pr_debug(", transmit ");
 			}
-			pr_cont("flow control ON");
+			pr_debug("flow control ON");
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	} else {
 		netif_carrier_off(bp->dev);
 		netdev_err(bp->dev, "NIC %s Link is Down\n",
@@ -2508,11 +2508,11 @@ bnx2_dump_mcp_state(struct bnx2 *bp)
 		   bnx2_shmem_rd(bp, BNX2_DRV_MB),
 		   bnx2_shmem_rd(bp, BNX2_FW_MB),
 		   bnx2_shmem_rd(bp, BNX2_LINK_STATUS));
-	pr_cont(" drv_pulse_mb[%08x]\n", bnx2_shmem_rd(bp, BNX2_DRV_PULSE_MB));
+	pr_debug(" drv_pulse_mb[%08x]\n", bnx2_shmem_rd(bp, BNX2_DRV_PULSE_MB));
 	netdev_err(dev, "DEBUG: dev_info_signature[%08x] reset_type[%08x]",
 		   bnx2_shmem_rd(bp, BNX2_DEV_INFO_SIGNATURE),
 		   bnx2_shmem_rd(bp, BNX2_BC_STATE_RESET_TYPE));
-	pr_cont(" condition[%08x]\n",
+	pr_debug(" condition[%08x]\n",
 		bnx2_shmem_rd(bp, BNX2_BC_STATE_CONDITION));
 	DP_SHMEM_LINE(bp, BNX2_BC_RESET_TYPE);
 	DP_SHMEM_LINE(bp, 0x3cc);

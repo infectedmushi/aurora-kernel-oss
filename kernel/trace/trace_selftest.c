@@ -464,7 +464,7 @@ trace_selftest_function_recursion(void)
 	int ret;
 
 	/* The previous test PASSED */
-	pr_cont("PASSED\n");
+	pr_debug("PASSED\n");
 	pr_debug("Testing ftrace recursion: ");
 
 
@@ -477,13 +477,13 @@ trace_selftest_function_recursion(void)
 
 	ret = ftrace_set_filter(&test_rec_probe, func_name, len, 1);
 	if (ret) {
-		pr_cont("*Could not set filter* ");
+		pr_debug("*Could not set filter* ");
 		goto out;
 	}
 
 	ret = register_ftrace_function(&test_rec_probe);
 	if (ret) {
-		pr_cont("*could not register callback* ");
+		pr_debug("*could not register callback* ");
 		goto out;
 	}
 
@@ -498,25 +498,25 @@ trace_selftest_function_recursion(void)
 	 */
 	if (trace_selftest_recursion_cnt != 1 &&
 	    trace_selftest_recursion_cnt != 2) {
-		pr_cont("*callback not called once (or twice) (%d)* ",
+		pr_debug("*callback not called once (or twice) (%d)* ",
 			trace_selftest_recursion_cnt);
 		goto out;
 	}
 
 	trace_selftest_recursion_cnt = 1;
 
-	pr_cont("PASSED\n");
+	pr_debug("PASSED\n");
 	pr_debug("Testing ftrace recursion safe: ");
 
 	ret = ftrace_set_filter(&test_recsafe_probe, func_name, len, 1);
 	if (ret) {
-		pr_cont("*Could not set filter* ");
+		pr_debug("*Could not set filter* ");
 		goto out;
 	}
 
 	ret = register_ftrace_function(&test_recsafe_probe);
 	if (ret) {
-		pr_cont("*could not register callback* ");
+		pr_debug("*could not register callback* ");
 		goto out;
 	}
 
@@ -526,7 +526,7 @@ trace_selftest_function_recursion(void)
 
 	ret = -1;
 	if (trace_selftest_recursion_cnt != 2) {
-		pr_cont("*callback not called expected 2 times (%d)* ",
+		pr_debug("*callback not called expected 2 times (%d)* ",
 			trace_selftest_recursion_cnt);
 		goto out;
 	}
@@ -578,7 +578,7 @@ trace_selftest_function_regs(void)
 #endif
 
 	/* The previous test PASSED */
-	pr_cont("PASSED\n");
+	pr_debug("PASSED\n");
 	pr_debug("Testing ftrace regs%s: ",
 		!supported ? "(no arch support)" : "");
 
@@ -595,7 +595,7 @@ trace_selftest_function_regs(void)
 	 * This test really doesn't care.
 	 */
 	if (ret && ret != -ENODEV) {
-		pr_cont("*Could not set filter* ");
+		pr_debug("*Could not set filter* ");
 		goto out;
 	}
 
@@ -606,14 +606,14 @@ trace_selftest_function_regs(void)
 	 */
 	if (!supported) {
 		if (!ret) {
-			pr_cont("*registered save-regs without arch support* ");
+			pr_debug("*registered save-regs without arch support* ");
 			goto out;
 		}
 		test_regs_probe.flags |= FTRACE_OPS_FL_SAVE_REGS_IF_SUPPORTED;
 		ret = register_ftrace_function(&test_regs_probe);
 	}
 	if (ret) {
-		pr_cont("*could not register callback* ");
+		pr_debug("*could not register callback* ");
 		goto out;
 	}
 
@@ -626,19 +626,19 @@ trace_selftest_function_regs(void)
 
 	switch (trace_selftest_regs_stat) {
 	case TRACE_SELFTEST_REGS_START:
-		pr_cont("*callback never called* ");
+		pr_debug("*callback never called* ");
 		goto out;
 
 	case TRACE_SELFTEST_REGS_FOUND:
 		if (supported)
 			break;
-		pr_cont("*callback received regs without arch support* ");
+		pr_debug("*callback received regs without arch support* ");
 		goto out;
 
 	case TRACE_SELFTEST_REGS_NOT_FOUND:
 		if (!supported)
 			break;
-		pr_cont("*callback received NULL regs* ");
+		pr_debug("*callback received NULL regs* ");
 		goto out;
 	}
 

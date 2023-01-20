@@ -245,7 +245,7 @@ int __init rd_load_image(char *from)
 		nblocks, ((nblocks-1)/devblocks)+1, nblocks>devblocks ? "s" : "");
 	for (i = 0, disk = 1; i < nblocks; i++) {
 		if (i && (i % devblocks == 0)) {
-			pr_cont("done disk #%d.\n", disk++);
+			pr_debug("done disk #%d.\n", disk++);
 			rotate = 0;
 			if (ksys_close(in_fd)) {
 				printk("Error closing the disk.\n");
@@ -263,12 +263,12 @@ int __init rd_load_image(char *from)
 		ksys_write(out_fd, buf, BLOCK_SIZE);
 #if !defined(CONFIG_S390)
 		if (!(i % 16)) {
-			pr_cont("%c\b", rotator[rotate & 0x3]);
+			pr_debug("%c\b", rotator[rotate & 0x3]);
 			rotate++;
 		}
 #endif
 	}
-	pr_cont("done.\n");
+	pr_debug("done.\n");
 
 successful_load:
 	res = 1;

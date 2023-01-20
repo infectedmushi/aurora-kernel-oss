@@ -1703,17 +1703,17 @@ static int cas_pci_interrupt(struct net_device *dev, struct cas *cp,
 	/* cassini+ has this reserved */
 	if ((stat & PCI_ERR_BADACK) &&
 	    ((cp->cas_flags & CAS_FLAG_REG_PLUS) == 0))
-		pr_cont(" <No ACK64# during ABS64 cycle>");
+		pr_debug(" <No ACK64# during ABS64 cycle>");
 
 	if (stat & PCI_ERR_DTRTO)
-		pr_cont(" <Delayed transaction timeout>");
+		pr_debug(" <Delayed transaction timeout>");
 	if (stat & PCI_ERR_OTHER)
-		pr_cont(" <other>");
+		pr_debug(" <other>");
 	if (stat & PCI_ERR_BIM_DMA_WRITE)
-		pr_cont(" <BIM DMA 0 write req>");
+		pr_debug(" <BIM DMA 0 write req>");
 	if (stat & PCI_ERR_BIM_DMA_READ)
-		pr_cont(" <BIM DMA 0 read req>");
-	pr_cont("\n");
+		pr_debug(" <BIM DMA 0 read req>");
+	pr_debug("\n");
 
 	if (stat & PCI_ERR_OTHER) {
 		u16 cfg;

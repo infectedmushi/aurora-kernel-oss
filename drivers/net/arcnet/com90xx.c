@@ -409,9 +409,9 @@ static void __init com90xx_probe(void)
 
 		if (openparen) {
 			if (BUGLVL(D_INIT))
-				pr_cont("no matching shmem)\n");
+				pr_debug("no matching shmem)\n");
 			if (BUGLVL(D_INIT_REASONS)) {
-				pr_cont("S5: ");
+				pr_debug("S5: ");
 				numprint = 0;
 			}
 		}
@@ -421,7 +421,7 @@ static void __init com90xx_probe(void)
 	}
 
 	if (BUGLVL(D_INIT_REASONS))
-		pr_cont("\n");
+		pr_debug("\n");
 
 	/* Now put back TESTvalue on all leftover shmems. */
 	for (index = 0; index < numshmems; index++) {

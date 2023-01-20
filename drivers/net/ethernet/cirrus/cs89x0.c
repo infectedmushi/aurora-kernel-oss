@@ -1428,10 +1428,10 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 		if (lp->chip_type == CS8900)
 			lp->isa_config = readreg(dev, PP_CS8900_ISAINT) & INT_NO_MASK;
 
-		pr_cont("[Cirrus EEPROM] ");
+		pr_debug("[Cirrus EEPROM] ");
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 
 	/* First check to see if an EEPROM is attached. */
 
@@ -1548,18 +1548,18 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 			dev->irq = i;
 	}
 
-	pr_cont(" IRQ %d", dev->irq);
+	pr_debug(" IRQ %d", dev->irq);
 
 #if ALLOW_DMA
 	if (lp->use_dma) {
 		get_dma_channel(dev);
-		pr_cont(", DMA %d", dev->dma);
+		pr_debug(", DMA %d", dev->dma);
 	} else
 #endif
-		pr_cont(", programmed I/O");
+		pr_debug(", programmed I/O");
 
 	/* print the ethernet address. */
-	pr_cont(", MAC %pM\n", dev->dev_addr);
+	pr_debug(", MAC %pM\n", dev->dev_addr);
 
 	dev->netdev_ops	= &net_ops;
 	dev->watchdog_timeo = HZ;

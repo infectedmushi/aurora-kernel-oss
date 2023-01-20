@@ -237,38 +237,38 @@ void __init config_atari(void)
 		 * addresses below generate a DTACK so no bus error occurs! */
 	} else if (hwreg_present(f030_xreg)) {
 		ATARIHW_SET(VIDEL_SHIFTER);
-		pr_cont(" VIDEL");
+		pr_debug(" VIDEL");
 		/* This is a temporary hack: If there is Falcon video
 		 * hardware, we assume that the ST-DMA serves SCSI instead of
 		 * ACSI. In the future, there should be a better method for
 		 * this...
 		 */
 		ATARIHW_SET(ST_SCSI);
-		pr_cont(" STDMA-SCSI");
+		pr_debug(" STDMA-SCSI");
 	} else if (hwreg_present(tt_palette)) {
 		ATARIHW_SET(TT_SHIFTER);
-		pr_cont(" TT_SHIFTER");
+		pr_debug(" TT_SHIFTER");
 	} else if (hwreg_present(&shifter.bas_hi)) {
 		if (hwreg_present(&shifter.bas_lo) &&
 		    (shifter.bas_lo = 0x0aau, shifter.bas_lo == 0x0aau)) {
 			ATARIHW_SET(EXTD_SHIFTER);
-			pr_cont(" EXTD_SHIFTER");
+			pr_debug(" EXTD_SHIFTER");
 		} else {
 			ATARIHW_SET(STND_SHIFTER);
-			pr_cont(" STND_SHIFTER");
+			pr_debug(" STND_SHIFTER");
 		}
 	}
 	if (hwreg_present(&st_mfp.par_dt_reg)) {
 		ATARIHW_SET(ST_MFP);
-		pr_cont(" ST_MFP");
+		pr_debug(" ST_MFP");
 	}
 	if (hwreg_present(&tt_mfp.par_dt_reg)) {
 		ATARIHW_SET(TT_MFP);
-		pr_cont(" TT_MFP");
+		pr_debug(" TT_MFP");
 	}
 	if (hwreg_present(&tt_scsi_dma.dma_addr_hi)) {
 		ATARIHW_SET(SCSI_DMA);
-		pr_cont(" TT_SCSI_DMA");
+		pr_debug(" TT_SCSI_DMA");
 	}
 	/*
 	 * The ST-DMA address registers aren't readable
@@ -281,27 +281,27 @@ void __init config_atari(void)
 	     (st_dma.dma_vhi = 0xaa) && (st_dma.dma_hi = 0x55) &&
 	     st_dma.dma_vhi == 0xaa && st_dma.dma_hi == 0x55)) {
 		ATARIHW_SET(EXTD_DMA);
-		pr_cont(" EXTD_DMA");
+		pr_debug(" EXTD_DMA");
 	}
 	if (hwreg_present(&tt_scsi.scsi_data)) {
 		ATARIHW_SET(TT_SCSI);
-		pr_cont(" TT_SCSI");
+		pr_debug(" TT_SCSI");
 	}
 	if (hwreg_present(&sound_ym.rd_data_reg_sel)) {
 		ATARIHW_SET(YM_2149);
-		pr_cont(" YM2149");
+		pr_debug(" YM2149");
 	}
 	if (!MACH_IS_MEDUSA && hwreg_present(&tt_dmasnd.ctrl)) {
 		ATARIHW_SET(PCM_8BIT);
-		pr_cont(" PCM");
+		pr_debug(" PCM");
 	}
 	if (hwreg_present(&falcon_codec.unused5)) {
 		ATARIHW_SET(CODEC);
-		pr_cont(" CODEC");
+		pr_debug(" CODEC");
 	}
 	if (hwreg_present(&dsp56k_host_interface.icr)) {
 		ATARIHW_SET(DSP56K);
-		pr_cont(" DSP56K");
+		pr_debug(" DSP56K");
 	}
 	if (hwreg_present(&tt_scc_dma.dma_ctrl) &&
 #if 0
@@ -313,33 +313,33 @@ void __init config_atari(void)
 #endif
 	    ) {
 		ATARIHW_SET(SCC_DMA);
-		pr_cont(" SCC_DMA");
+		pr_debug(" SCC_DMA");
 	}
 	if (scc_test(&atari_scc.cha_a_ctrl)) {
 		ATARIHW_SET(SCC);
-		pr_cont(" SCC");
+		pr_debug(" SCC");
 	}
 	if (scc_test(&st_escc.cha_b_ctrl)) {
 		ATARIHW_SET(ST_ESCC);
-		pr_cont(" ST_ESCC");
+		pr_debug(" ST_ESCC");
 	}
 	if (hwreg_present(&tt_scu.sys_mask)) {
 		ATARIHW_SET(SCU);
 		/* Assume a VME bus if there's a SCU */
 		ATARIHW_SET(VME);
-		pr_cont(" VME SCU");
+		pr_debug(" VME SCU");
 	}
 	if (hwreg_present((void *)(0xffff9210))) {
 		ATARIHW_SET(ANALOG_JOY);
-		pr_cont(" ANALOG_JOY");
+		pr_debug(" ANALOG_JOY");
 	}
 	if (hwreg_present(blitter.halftone)) {
 		ATARIHW_SET(BLITTER);
-		pr_cont(" BLITTER");
+		pr_debug(" BLITTER");
 	}
 	if (hwreg_present((void *)0xfff00039)) {
 		ATARIHW_SET(IDE);
-		pr_cont(" IDE");
+		pr_debug(" IDE");
 	}
 #if 1 /* This maybe wrong */
 	if (!MACH_IS_MEDUSA && hwreg_present(&tt_microwire.data) &&
@@ -352,29 +352,29 @@ void __init config_atari(void)
 		ATARIHW_SET(MICROWIRE);
 		while (tt_microwire.mask != 0x7ff)
 			;
-		pr_cont(" MICROWIRE");
+		pr_debug(" MICROWIRE");
 	}
 #endif
 	if (hwreg_present(&tt_rtc.regsel)) {
 		ATARIHW_SET(TT_CLK);
-		pr_cont(" TT_CLK");
+		pr_debug(" TT_CLK");
 		mach_hwclk = atari_tt_hwclk;
 	}
 	if (hwreg_present(&mste_rtc.sec_ones)) {
 		ATARIHW_SET(MSTE_CLK);
-		pr_cont(" MSTE_CLK");
+		pr_debug(" MSTE_CLK");
 		mach_hwclk = atari_mste_hwclk;
 	}
 	if (!MACH_IS_MEDUSA && hwreg_present(&dma_wd.fdc_speed) &&
 	    hwreg_write(&dma_wd.fdc_speed, 0)) {
 		ATARIHW_SET(FDCSPEED);
-		pr_cont(" FDC_SPEED");
+		pr_debug(" FDC_SPEED");
 	}
 	if (!ATARIHW_PRESENT(ST_SCSI)) {
 		ATARIHW_SET(ACSI);
-		pr_cont(" ACSI");
+		pr_debug(" ACSI");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	if (CPU_IS_040_OR_060)
 		/* Now it seems to be safe to turn of the tt0 transparent

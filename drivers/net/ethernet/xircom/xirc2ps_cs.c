@@ -322,14 +322,14 @@ PrintRegisters(struct net_device *dev)
 
 	printk(KERN_DEBUG pr_fmt("Register  common: "));
 	for (i = 0; i < 8; i++)
-	    pr_cont(" %2.2x", GetByte(i));
-	pr_cont("\n");
+	    pr_debug(" %2.2x", GetByte(i));
+	pr_debug("\n");
 	for (page = 0; page <= 8; page++) {
 	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
 	    SelectPage(page);
 	    for (i = 8; i < 16; i++)
-		pr_cont(" %2.2x", GetByte(i));
-	    pr_cont("\n");
+		pr_debug(" %2.2x", GetByte(i));
+	    pr_debug("\n");
 	}
 	for (page=0x40 ; page <= 0x5f; page++) {
 		if (page == 0x43 || (page >= 0x46 && page <= 0x4f) ||
@@ -338,8 +338,8 @@ PrintRegisters(struct net_device *dev)
 	    printk(KERN_DEBUG pr_fmt("Register page %2x: "), page);
 	    SelectPage(page);
 	    for (i = 8; i < 16; i++)
-		pr_cont(" %2.2x", GetByte(i));
-	    pr_cont("\n");
+		pr_debug(" %2.2x", GetByte(i));
+	    pr_debug("\n");
 	}
     }
 }
@@ -859,21 +859,21 @@ xirc2ps_config(struct pcmcia_device * link)
 	    pr_debug("ECOR:");
 	    for (i=0; i < 7; i++) {
 		tmp = readb(local->dingo_ccr + i*2);
-		pr_cont(" %02x", tmp);
+		pr_debug(" %02x", tmp);
 	    }
-	    pr_cont("\n");
+	    pr_debug("\n");
 	    pr_debug("DCOR:");
 	    for (i=0; i < 4; i++) {
 		tmp = readb(local->dingo_ccr + 0x20 + i*2);
-		pr_cont(" %02x", tmp);
+		pr_debug(" %02x", tmp);
 	    }
-	    pr_cont("\n");
+	    pr_debug("\n");
 	    pr_debug("SCOR:");
 	    for (i=0; i < 10; i++) {
 		tmp = readb(local->dingo_ccr + 0x40 + i*2);
-		pr_cont(" %02x", tmp);
+		pr_debug(" %02x", tmp);
 	    }
-	    pr_cont("\n");
+	    pr_debug("\n");
 	}
       #endif
 

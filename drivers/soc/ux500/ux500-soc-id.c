@@ -55,13 +55,13 @@ static void ux500_print_soc_info(unsigned int asicid)
 	pr_debug("DB%4x ", dbx500_id.partnumber);
 
 	if (rev == 0x01)
-		pr_cont("Early Drop");
+		pr_debug("Early Drop");
 	else if (rev >= 0xA0)
-		pr_cont("v%d.%d" , (rev >> 4) - 0xA + 1, rev & 0xf);
+		pr_debug("v%d.%d" , (rev >> 4) - 0xA + 1, rev & 0xf);
 	else
-		pr_cont("Unknown");
+		pr_debug("Unknown");
 
-	pr_cont(" [%#010x]\n", asicid);
+	pr_debug(" [%#010x]\n", asicid);
 }
 
 static unsigned int partnumber(unsigned int asicid)

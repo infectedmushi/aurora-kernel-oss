@@ -1229,7 +1229,7 @@ void __init intel_pmu_lbr_init_atom(void)
 	 */
 	if (boot_cpu_data.x86_model == 28
 	    && boot_cpu_data.x86_stepping < 10) {
-		pr_cont("LBR disabled due to erratum");
+		pr_debug("LBR disabled due to erratum");
 		return;
 	}
 
@@ -1259,7 +1259,7 @@ void __init intel_pmu_lbr_init_slm(void)
 	 * SW branch filter usage:
 	 * - compensate for lack of HW filter
 	 */
-	pr_cont("8-deep LBR, ");
+	pr_debug("8-deep LBR, ");
 }
 
 /* Knights Landing */

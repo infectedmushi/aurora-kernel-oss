@@ -506,7 +506,7 @@ static __init int match_config_table(efi_guid_t *guid,
 			if (!efi_guidcmp(*guid, table_types[i].guid)) {
 				*(table_types[i].ptr) = table;
 				if (table_types[i].name)
-					pr_cont(" %s=0x%lx ",
+					pr_debug(" %s=0x%lx ",
 						table_types[i].name, table);
 				return 1;
 			}
@@ -535,7 +535,7 @@ int __init efi_config_parse_tables(void *config_tables, int count, int sz,
 			table = table64;
 #ifndef CONFIG_64BIT
 			if (table64 >> 32) {
-				pr_cont("\n");
+				pr_debug("\n");
 				pr_err("Table located above 4GB, disabling EFI.\n");
 				return -EINVAL;
 			}
@@ -550,7 +550,7 @@ int __init efi_config_parse_tables(void *config_tables, int count, int sz,
 
 		tablep += sz;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	set_bit(EFI_CONFIG_TABLES, &efi.flags);
 
 	if (efi.rng_seed != EFI_INVALID_TABLE_ADDR) {

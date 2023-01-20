@@ -349,10 +349,10 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		while ((inb_p(ioaddr + EN0_ISR) & ENISR_RESET) == 0)
 		if (time_after(jiffies, reset_start_time + 2*HZ/100)) {
 			if (bad_card) {
-				pr_cont(" (warning: no reset ack)");
+				pr_debug(" (warning: no reset ack)");
 				break;
 			} else {
-				pr_cont(" not found (no reset ack).\n");
+				pr_debug(" not found (no reset ack).\n");
 				ret = -ENODEV;
 				goto err_out;
 			}
@@ -455,13 +455,13 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		}
 		if (bad_clone_list[i].name8 == NULL)
 		{
-			pr_cont(" not found (invalid signature %2.2x %2.2x).\n",
+			pr_debug(" not found (invalid signature %2.2x %2.2x).\n",
 				SA_prom[14], SA_prom[15]);
 			ret = -ENXIO;
 			goto err_out;
 		}
 #else
-		pr_cont(" not found.\n");
+		pr_debug(" not found.\n");
 		ret = -ENXIO;
 		goto err_out;
 #endif
@@ -478,14 +478,14 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		outb_p(0x00, ioaddr + EN0_IMR); 		/* Mask it again. */
 		dev->irq = probe_irq_off(cookie);
 		if (ne_msg_enable & NETIF_MSG_PROBE)
-			pr_cont(" autoirq is %d", dev->irq);
+			pr_debug(" autoirq is %d", dev->irq);
 	} else if (dev->irq == 2)
 		/* Fixup for users that don't know that IRQ 2 is really IRQ 9,
 		   or don't know which one to set. */
 		dev->irq = 9;
 
 	if (! dev->irq) {
-		pr_cont(" failed to detect IRQ line.\n");
+		pr_debug(" failed to detect IRQ line.\n");
 		ret = -EAGAIN;
 		goto err_out;
 	}
@@ -494,7 +494,7 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 	   share and the board will usually be enabled. */
 	ret = request_irq(dev->irq, eip_interrupt, 0, name, dev);
 	if (ret) {
-		pr_cont(" unable to get IRQ %d (errno=%d).\n", dev->irq, ret);
+		pr_debug(" unable to get IRQ %d (errno=%d).\n", dev->irq, ret);
 		goto err_out;
 	}
 
@@ -504,7 +504,7 @@ static int __init ne_probe1(struct net_device *dev, unsigned long ioaddr)
 		dev->dev_addr[i] = SA_prom[i];
 	}
 
-	pr_cont("%pM\n", dev->dev_addr);
+	pr_debug("%pM\n", dev->dev_addr);
 
 	ei_status.name = name;
 	ei_status.tx_start_page = start_page;

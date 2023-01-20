@@ -462,9 +462,9 @@ void ili_dump_data(void *data, int type, int len, int row_len, const char *name)
         return;
     }
 
-    pr_cont("\n\n");
-    pr_cont("ILITEK: Dump %s data\n", name);
-    pr_cont("ILITEK: ");
+    pr_debug("\n\n");
+    pr_debug("ILITEK: Dump %s data\n", name);
+    pr_debug("ILITEK: ");
 
     if (type == 8) {
         p8 = (u8 *) data;
@@ -480,22 +480,22 @@ void ili_dump_data(void *data, int type, int len, int row_len, const char *name)
 
     for (i = 0; i < len; i++) {
         if (type == 8) {
-            pr_cont(" %4x ", p8[i]);
+            pr_debug(" %4x ", p8[i]);
         } else if (type == 32) {
-            pr_cont(" %4x ", p32[i]);
+            pr_debug(" %4x ", p32[i]);
         } else if (type == 10) {
-            pr_cont(" %4d ", p32[i]);
+            pr_debug(" %4d ", p32[i]);
         } else if (type == 16) {
-            pr_cont(" %4d ", p16[i]);
+            pr_debug(" %4d ", p16[i]);
         }
 
         if ((i % row) == row - 1) {
-            pr_cont("\n");
-            pr_cont("ILITEK: ");
+            pr_debug("\n");
+            pr_debug("ILITEK: ");
         }
     }
 
-    pr_cont("\n\n");
+    pr_debug("\n\n");
 }
 
 int ili_move_mp_code_iram(void)

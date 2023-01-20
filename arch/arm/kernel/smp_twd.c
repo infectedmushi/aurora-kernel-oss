@@ -225,7 +225,7 @@ static void twd_calibrate_rate(void)
 
 		twd_timer_rate = (0xFFFFFFFFU - count) * (HZ / 5);
 
-		pr_cont("%lu.%02luMHz.\n", twd_timer_rate / 1000000,
+		pr_debug("%lu.%02luMHz.\n", twd_timer_rate / 1000000,
 			(twd_timer_rate / 10000) % 100);
 	}
 }

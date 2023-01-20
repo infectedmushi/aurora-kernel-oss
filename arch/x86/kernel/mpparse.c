@@ -193,7 +193,7 @@ static void skip_entry(unsigned char **ptr, int *count, int size)
 static void __init smp_dump_mptable(struct mpc_table *mpc, unsigned char *mpt)
 {
 	pr_err("Your mptable is wrong, contact your HW vendor!\n");
-	pr_cont("type %x\n", *mpt);
+	pr_debug("type %x\n", *mpt);
 	print_hex_dump(KERN_ERR, "  ", DUMP_PREFIX_ADDRESS, 16,
 			1, mpc, mpc->length, 1);
 }
@@ -466,7 +466,7 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
 		smp_found_config = 0;
 #endif
 		pr_err("BIOS bug, MP table errors detected!...\n");
-		pr_cont("... disabling SMP support. (tell your hw vendor)\n");
+		pr_debug("... disabling SMP support. (tell your hw vendor)\n");
 		early_memunmap(mpc, size);
 		return -1;
 	}

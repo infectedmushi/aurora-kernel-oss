@@ -1058,8 +1058,8 @@ static void setup_DMA(void)
 
 		pr_debug("zero dma transfer size:");
 		for (i = 0; i < raw_cmd->cmd_count; i++)
-			pr_cont("%x,", raw_cmd->cmd[i]);
-		pr_cont("\n");
+			pr_debug("%x,", raw_cmd->cmd[i]);
+		pr_debug("\n");
 		cont->done(0);
 		FDCS->reset = 1;
 		return;
@@ -1365,7 +1365,7 @@ static int fdc_dtr(void)
 
 static void tell_sector(void)
 {
-	pr_cont(": track %d, head %d, sector %d, size %d",
+	pr_debug(": track %d, head %d, sector %d, size %d",
 		R_TRACK, R_HEAD, R_SECTOR, R_SIZECODE);
 }				/* tell_sector */
 
@@ -1373,30 +1373,30 @@ static void print_errors(void)
 {
 	DPRINT("");
 	if (ST0 & ST0_ECE) {
-		pr_cont("Recalibrate failed!");
+		pr_debug("Recalibrate failed!");
 	} else if (ST2 & ST2_CRC) {
-		pr_cont("data CRC error");
+		pr_debug("data CRC error");
 		tell_sector();
 	} else if (ST1 & ST1_CRC) {
-		pr_cont("CRC error");
+		pr_debug("CRC error");
 		tell_sector();
 	} else if ((ST1 & (ST1_MAM | ST1_ND)) ||
 		   (ST2 & ST2_MAM)) {
 		if (!probing) {
-			pr_cont("sector not found");
+			pr_debug("sector not found");
 			tell_sector();
 		} else
-			pr_cont("probe failed...");
+			pr_debug("probe failed...");
 	} else if (ST2 & ST2_WC) {	/* seek error */
-		pr_cont("wrong cylinder");
+		pr_debug("wrong cylinder");
 	} else if (ST2 & ST2_BC) {	/* cylinder marked as bad */
-		pr_cont("bad cylinder");
+		pr_debug("bad cylinder");
 	} else {
-		pr_cont("unknown error. ST[0..2] are: 0x%x 0x%x 0x%x",
+		pr_debug("unknown error. ST[0..2] are: 0x%x 0x%x 0x%x",
 			ST0, ST1, ST2);
 		tell_sector();
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*
@@ -1672,8 +1672,8 @@ static void print_result(char *message, int inr)
 	DPRINT("%s ", message);
 	if (inr >= 0)
 		for (i = 0; i < inr; i++)
-			pr_cont("repl[%d]=%x ", i, reply_buffer[i]);
-	pr_cont("\n");
+			pr_debug("repl[%d]=%x ", i, reply_buffer[i]);
+	pr_debug("\n");
 }
 
 /* interrupt handler. Note that this can be called externally on the Sparc */
@@ -3998,13 +3998,13 @@ static void __init config_types(void)
 				prepend = ",";
 			}
 
-			pr_cont("%s fd%d is %s", prepend, drive, name);
+			pr_debug("%s fd%d is %s", prepend, drive, name);
 		}
 		*UDP = *params;
 	}
 
 	if (has_drive)
-		pr_cont("\n");
+		pr_debug("\n");
 }
 
 static void floppy_release(struct gendisk *disk, fmode_t mode)
@@ -4484,8 +4484,8 @@ static int __init floppy_setup(char *str)
 
 		DPRINT("allowed options are:");
 		for (i = 0; i < ARRAY_SIZE(config_params); i++)
-			pr_cont(" %s", config_params[i].name);
-		pr_cont("\n");
+			pr_debug(" %s", config_params[i].name);
+		pr_debug("\n");
 	} else
 		DPRINT("botched floppy option\n");
 	DPRINT("Read Documentation/blockdev/floppy.txt\n");

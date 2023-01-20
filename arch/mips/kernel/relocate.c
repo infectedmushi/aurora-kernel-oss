@@ -419,10 +419,10 @@ void show_kernel_relocation(const char *level)
 
 	if (IS_ENABLED(CONFIG_RELOCATABLE) && offset > 0) {
 		printk(level);
-		pr_cont("Kernel relocated by 0x%pK\n", (void *)offset);
-		pr_cont(" .text @ 0x%pK\n", _text);
-		pr_cont(" .data @ 0x%pK\n", _sdata);
-		pr_cont(" .bss  @ 0x%pK\n", __bss_start);
+		pr_debug("Kernel relocated by 0x%pK\n", (void *)offset);
+		pr_debug(" .text @ 0x%pK\n", _text);
+		pr_debug(" .data @ 0x%pK\n", _sdata);
+		pr_debug(" .bss  @ 0x%pK\n", __bss_start);
 	}
 }
 

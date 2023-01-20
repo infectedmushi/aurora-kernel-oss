@@ -52,7 +52,7 @@ static noinline void print_reg_file(long *reg_rev, int start_num)
 	if (start_num == 0)
 		pr_debug("%s", buf);
 	else
-		pr_cont("%s\n", buf);
+		pr_debug("%s\n", buf);
 }
 
 static void show_callee_regs(struct callee_regs *cregs)
@@ -132,41 +132,41 @@ static void show_ecr_verbose(struct pt_regs *regs)
 
 	/* For DTLB Miss or ProtV, display the memory involved too */
 	if (vec == ECR_V_DTLB_MISS) {
-		pr_cont("Invalid %s @ 0x%08lx by insn @ 0x%08lx\n",
+		pr_debug("Invalid %s @ 0x%08lx by insn @ 0x%08lx\n",
 		       (cause_code == 0x01) ? "Read" :
 		       ((cause_code == 0x02) ? "Write" : "EX"),
 		       address, regs->ret);
 	} else if (vec == ECR_V_ITLB_MISS) {
-		pr_cont("Insn could not be fetched\n");
+		pr_debug("Insn could not be fetched\n");
 	} else if (vec == ECR_V_MACH_CHK) {
-		pr_cont("Machine Check (%s)\n", (cause_code == 0x0) ?
+		pr_debug("Machine Check (%s)\n", (cause_code == 0x0) ?
 					"Double Fault" : "Other Fatal Err");
 
 	} else if (vec == ECR_V_PROTV) {
 		if (cause_code == ECR_C_PROTV_INST_FETCH)
-			pr_cont("Execute from Non-exec Page\n");
+			pr_debug("Execute from Non-exec Page\n");
 		else if (cause_code == ECR_C_PROTV_MISALIG_DATA)
-			pr_cont("Misaligned r/w from 0x%08lx\n", address);
+			pr_debug("Misaligned r/w from 0x%08lx\n", address);
 		else
-			pr_cont("%s access not allowed on page\n",
+			pr_debug("%s access not allowed on page\n",
 				(cause_code == 0x01) ? "Read" :
 				((cause_code == 0x02) ? "Write" : "EX"));
 	} else if (vec == ECR_V_INSN_ERR) {
-		pr_cont("Illegal Insn\n");
+		pr_debug("Illegal Insn\n");
 #ifdef CONFIG_ISA_ARCV2
 	} else if (vec == ECR_V_MEM_ERR) {
 		if (cause_code == 0x00)
-			pr_cont("Bus Error from Insn Mem\n");
+			pr_debug("Bus Error from Insn Mem\n");
 		else if (cause_code == 0x10)
-			pr_cont("Bus Error from Data Mem\n");
+			pr_debug("Bus Error from Data Mem\n");
 		else
-			pr_cont("Bus Error, check PRM\n");
+			pr_debug("Bus Error, check PRM\n");
 #endif
 	} else if (vec == ECR_V_TRAP) {
 		if (regs->ecr_param == 5)
-			pr_cont("gcc generated __builtin_trap\n");
+			pr_debug("gcc generated __builtin_trap\n");
 	} else {
-		pr_cont("Check Programmer's Manual\n");
+		pr_debug("Check Programmer's Manual\n");
 	}
 }
 
@@ -202,13 +202,13 @@ void show_regs(struct pt_regs *regs)
 #define STS_BIT(r, bit)	r->status32 & STATUS_##bit##_MASK ? #bit" " : ""
 
 #ifdef CONFIG_ISA_ARCOMPACT
-	pr_cont(" : %2s%2s%2s%2s%2s%2s%2s\n",
+	pr_debug(" : %2s%2s%2s%2s%2s%2s%2s\n",
 			(regs->status32 & STATUS_U_MASK) ? "U " : "K ",
 			STS_BIT(regs, DE), STS_BIT(regs, AE),
 			STS_BIT(regs, A2), STS_BIT(regs, A1),
 			STS_BIT(regs, E2), STS_BIT(regs, E1));
 #else
-	pr_cont(" : %2s%2s%2s%2s\n",
+	pr_debug(" : %2s%2s%2s%2s\n",
 			STS_BIT(regs, IE),
 			(regs->status32 & STATUS_U_MASK) ? "U " : "K ",
 			STS_BIT(regs, DE), STS_BIT(regs, AE));

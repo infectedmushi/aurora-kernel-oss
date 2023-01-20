@@ -1746,14 +1746,14 @@ static int __init fd_probe_drives(void)
 
 		disk = fd_alloc_disk(drive);
 		if (!disk) {
-			pr_cont(" no mem for fd%d", drive);
+			pr_debug(" no mem for fd%d", drive);
 			nomem = 1;
 			continue;
 		}
 		unit[drive].gendisk = disk;
 		drives++;
 
-		pr_cont(" fd%d",drive);
+		pr_debug(" fd%d",drive);
 		disk->major = FLOPPY_MAJOR;
 		disk->first_minor = drive;
 		disk->fops = &floppy_fops;
@@ -1764,11 +1764,11 @@ static int __init fd_probe_drives(void)
 	}
 	if ((drives > 0) || (nomem == 0)) {
 		if (drives == 0)
-			pr_cont(" no drives");
-		pr_cont("\n");
+			pr_debug(" no drives");
+		pr_debug("\n");
 		return drives;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	return -ENOMEM;
 }
  

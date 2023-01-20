@@ -54,7 +54,7 @@ static void dump_tlb(int first, int last)
 			 */
 			printk("Index: %2d ", i);
 
-			pr_cont("va=%08lx asid=%08lx"
+			pr_debug("va=%08lx asid=%08lx"
 				"  [pa=%06lx n=%d d=%d v=%d g=%d]",
 				entryhi & PAGE_MASK,
 				entryhi & asid_mask,

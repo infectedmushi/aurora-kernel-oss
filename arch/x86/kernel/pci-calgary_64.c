@@ -886,9 +886,9 @@ static void calioc2_dump_error_regs(struct iommu_table *tbl)
 		erroff = (0x810 + (i * 0x10));
 		target = calgary_reg(bbar, phboff | erroff);
 		errregs[i] = be32_to_cpu(readl(target));
-		pr_cont("0x%08x@0x%lx ", errregs[i], erroff);
+		pr_debug("0x%08x@0x%lx ", errregs[i], erroff);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	/* root complex status */
 	target = calgary_reg(bbar, phboff | PHB_ROOT_COMPLEX_STATUS);

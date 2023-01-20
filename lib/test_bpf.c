@@ -6596,12 +6596,12 @@ static struct bpf_prog *generate_filter(int which, int *err)
 		*err = bpf_prog_create(&fp, &fprog);
 		if (tests[which].aux & FLAG_EXPECTED_FAIL) {
 			if (*err == tests[which].expected_errcode) {
-				pr_cont("PASS\n");
+				pr_debug("PASS\n");
 				/* Verifier rejected filter as expected. */
 				*err = 0;
 				return NULL;
 			} else {
-				pr_cont("UNEXPECTED_PASS\n");
+				pr_debug("UNEXPECTED_PASS\n");
 				/* Verifier didn't reject the test that's
 				 * bad enough, just return!
 				 */
@@ -6610,7 +6610,7 @@ static struct bpf_prog *generate_filter(int which, int *err)
 			}
 		}
 		if (*err) {
-			pr_cont("FAIL to prog_create err=%d len=%d\n",
+			pr_debug("FAIL to prog_create err=%d len=%d\n",
 				*err, fprog.len);
 			return NULL;
 		}
@@ -6619,7 +6619,7 @@ static struct bpf_prog *generate_filter(int which, int *err)
 	case INTERNAL:
 		fp = bpf_prog_alloc(bpf_prog_size(flen), 0);
 		if (fp == NULL) {
-			pr_cont("UNEXPECTED_FAIL no memory left\n");
+			pr_debug("UNEXPECTED_FAIL no memory left\n");
 			*err = -ENOMEM;
 			return NULL;
 		}
@@ -6635,7 +6635,7 @@ static struct bpf_prog *generate_filter(int which, int *err)
 		 */
 		fp = bpf_prog_select_runtime(fp, err);
 		if (*err) {
-			pr_cont("FAIL to select_runtime err=%d\n", *err);
+			pr_debug("FAIL to select_runtime err=%d\n", *err);
 			return NULL;
 		}
 		break;
@@ -6700,7 +6700,7 @@ static int run_one(const struct bpf_prog *fp, struct bpf_test *test)
 
 		data = generate_test_data(test, i);
 		if (!data && !(test->aux & FLAG_NO_DATA)) {
-			pr_cont("data generation failed ");
+			pr_debug("data generation failed ");
 			err_cnt++;
 			break;
 		}
@@ -6708,9 +6708,9 @@ static int run_one(const struct bpf_prog *fp, struct bpf_test *test)
 		release_test_data(test, data);
 
 		if (ret == test->test[i].result) {
-			pr_cont("%lld ", duration);
+			pr_debug("%lld ", duration);
 		} else {
-			pr_cont("ret %d != %d ", ret,
+			pr_debug("ret %d != %d ", ret,
 				test->test[i].result);
 			err_cnt++;
 		}
@@ -6922,7 +6922,7 @@ static __init int test_bpf(void)
 			continue;
 		}
 
-		pr_cont("jited:%u ", fp->jited);
+		pr_debug("jited:%u ", fp->jited);
 
 		run_cnt++;
 		if (fp->jited)
@@ -6932,10 +6932,10 @@ static __init int test_bpf(void)
 		release_filter(fp, i);
 
 		if (err) {
-			pr_cont("FAIL (%d times)\n", err);
+			pr_debug("FAIL (%d times)\n", err);
 			err_cnt++;
 		} else {
-			pr_cont("PASS\n");
+			pr_debug("PASS\n");
 			pass_cnt++;
 		}
 	}

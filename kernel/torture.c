@@ -267,7 +267,7 @@ EXPORT_SYMBOL_GPL(torture_onoff_cleanup);
 void torture_onoff_stats(void)
 {
 #ifdef CONFIG_HOTPLUG_CPU
-	pr_cont("onoff: %ld/%ld:%ld/%ld %d,%d:%d,%d %lu:%lu (HZ=%d) ",
+	pr_debug("onoff: %ld/%ld:%ld/%ld %d,%d:%d,%d %lu:%lu (HZ=%d) ",
 		n_online_successes, n_online_attempts,
 		n_offline_successes, n_offline_attempts,
 		min_online, max_online,

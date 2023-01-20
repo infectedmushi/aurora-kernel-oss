@@ -1904,14 +1904,14 @@ static void de21041_get_srom_info(struct de_private *de)
 				sizeof(ib->csr15);
 
 			if (netif_msg_probe(de))
-				pr_cont(" (%x,%x,%x)\n",
+				pr_debug(" (%x,%x,%x)\n",
 					de->media[idx].csr13,
 					de->media[idx].csr14,
 					de->media[idx].csr15);
 
 		} else {
 			if (netif_msg_probe(de))
-				pr_cont("\n");
+				pr_debug("\n");
 		}
 
 		if (bufp > ((void *)&ee_data[DE_EEPROM_SIZE - 3]))

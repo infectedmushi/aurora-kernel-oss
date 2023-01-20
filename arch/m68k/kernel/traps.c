@@ -834,13 +834,13 @@ void show_trace(unsigned long *stack)
 		if (__kernel_text_address(addr)) {
 #ifndef CONFIG_KALLSYMS
 			if (i % 5 == 0)
-				pr_cont("\n       ");
+				pr_debug("\n       ");
 #endif
-			pr_cont(" [<%08lx>] %pS\n", addr, (void *)addr);
+			pr_debug(" [<%08lx>] %pS\n", addr, (void *)addr);
 			i++;
 		}
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void show_registers(struct pt_regs *regs)
@@ -865,24 +865,24 @@ void show_registers(struct pt_regs *regs)
 	pr_debug("Frame format=%X ", regs->format);
 	switch (regs->format) {
 	case 0x2:
-		pr_cont("instr addr=%08lx\n", fp->un.fmt2.iaddr);
+		pr_debug("instr addr=%08lx\n", fp->un.fmt2.iaddr);
 		addr += sizeof(fp->un.fmt2);
 		break;
 	case 0x3:
-		pr_cont("eff addr=%08lx\n", fp->un.fmt3.effaddr);
+		pr_debug("eff addr=%08lx\n", fp->un.fmt3.effaddr);
 		addr += sizeof(fp->un.fmt3);
 		break;
 	case 0x4:
 		if (CPU_IS_060)
-			pr_cont("fault addr=%08lx fslw=%08lx\n",
+			pr_debug("fault addr=%08lx fslw=%08lx\n",
 				fp->un.fmt4.effaddr, fp->un.fmt4.pc);
 		else
-			pr_cont("eff addr=%08lx pc=%08lx\n",
+			pr_debug("eff addr=%08lx pc=%08lx\n",
 				fp->un.fmt4.effaddr, fp->un.fmt4.pc);
 		addr += sizeof(fp->un.fmt4);
 		break;
 	case 0x7:
-		pr_cont("eff addr=%08lx ssw=%04x faddr=%08lx\n",
+		pr_debug("eff addr=%08lx ssw=%04x faddr=%08lx\n",
 			fp->un.fmt7.effaddr, fp->un.fmt7.ssw, fp->un.fmt7.faddr);
 		pr_debug("wb 1 stat/addr/data: %04x %08lx %08lx\n",
 			fp->un.fmt7.wb1s, fp->un.fmt7.wb1a, fp->un.fmt7.wb1dpd0);
@@ -896,17 +896,17 @@ void show_registers(struct pt_regs *regs)
 		addr += sizeof(fp->un.fmt7);
 		break;
 	case 0x9:
-		pr_cont("instr addr=%08lx\n", fp->un.fmt9.iaddr);
+		pr_debug("instr addr=%08lx\n", fp->un.fmt9.iaddr);
 		addr += sizeof(fp->un.fmt9);
 		break;
 	case 0xa:
-		pr_cont("ssw=%04x isc=%04x isb=%04x daddr=%08lx dobuf=%08lx\n",
+		pr_debug("ssw=%04x isc=%04x isb=%04x daddr=%08lx dobuf=%08lx\n",
 			fp->un.fmta.ssw, fp->un.fmta.isc, fp->un.fmta.isb,
 			fp->un.fmta.daddr, fp->un.fmta.dobuf);
 		addr += sizeof(fp->un.fmta);
 		break;
 	case 0xb:
-		pr_cont("ssw=%04x isc=%04x isb=%04x daddr=%08lx dobuf=%08lx\n",
+		pr_debug("ssw=%04x isc=%04x isb=%04x daddr=%08lx dobuf=%08lx\n",
 			fp->un.fmtb.ssw, fp->un.fmtb.isc, fp->un.fmtb.isb,
 			fp->un.fmtb.daddr, fp->un.fmtb.dobuf);
 		pr_debug("baddr=%08lx dibuf=%08lx ver=%x\n",
@@ -914,7 +914,7 @@ void show_registers(struct pt_regs *regs)
 		addr += sizeof(fp->un.fmtb);
 		break;
 	default:
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 	show_stack(NULL, (unsigned long *)addr);
 
@@ -923,16 +923,16 @@ void show_registers(struct pt_regs *regs)
 	cp = (u16 *)regs->pc;
 	for (i = -8; i < 16; i++) {
 		if (get_user(c, cp + i) && i >= 0) {
-			pr_cont(" Bad PC value.");
+			pr_debug(" Bad PC value.");
 			break;
 		}
 		if (i)
-			pr_cont(" %04x", c);
+			pr_debug(" %04x", c);
 		else
-			pr_cont(" <%04x>", c);
+			pr_debug(" <%04x>", c);
 	}
 	set_fs(old_fs);
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void show_stack(struct task_struct *task, unsigned long *stack)
@@ -955,10 +955,10 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 		if (p + 1 > endstack)
 			break;
 		if (i % 8 == 0)
-			pr_cont("\n       ");
-		pr_cont(" %08lx", *p++);
+			pr_debug("\n       ");
+		pr_debug(" %08lx", *p++);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	show_trace(stack);
 }
 

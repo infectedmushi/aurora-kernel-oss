@@ -520,7 +520,7 @@ struct jffs2_raw_node_ref *jffs2_add_physical_node_ref(struct jffs2_sb_info *c,
 			pr_warn("nextblock 0x%08x", c->nextblock->offset);
 		else
 			pr_warn("No nextblock");
-		pr_cont(", expected at %08x\n",
+		pr_debug(", expected at %08x\n",
 			jeb->offset + (c->sector_size - jeb->free_size));
 		return ERR_PTR(-EINVAL);
 	}

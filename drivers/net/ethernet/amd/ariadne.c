@@ -261,38 +261,38 @@ static irqreturn_t ariadne_interrupt(int irq, void *data)
 			netdev_dbg(dev, "interrupt  csr0=%#02x new csr=%#02x [",
 				   csr0, lance->RDP);
 			if (csr0 & INTR)
-				pr_cont(" INTR");
+				pr_debug(" INTR");
 			if (csr0 & INEA)
-				pr_cont(" INEA");
+				pr_debug(" INEA");
 			if (csr0 & RXON)
-				pr_cont(" RXON");
+				pr_debug(" RXON");
 			if (csr0 & TXON)
-				pr_cont(" TXON");
+				pr_debug(" TXON");
 			if (csr0 & TDMD)
-				pr_cont(" TDMD");
+				pr_debug(" TDMD");
 			if (csr0 & STOP)
-				pr_cont(" STOP");
+				pr_debug(" STOP");
 			if (csr0 & STRT)
-				pr_cont(" STRT");
+				pr_debug(" STRT");
 			if (csr0 & INIT)
-				pr_cont(" INIT");
+				pr_debug(" INIT");
 			if (csr0 & ERR)
-				pr_cont(" ERR");
+				pr_debug(" ERR");
 			if (csr0 & BABL)
-				pr_cont(" BABL");
+				pr_debug(" BABL");
 			if (csr0 & CERR)
-				pr_cont(" CERR");
+				pr_debug(" CERR");
 			if (csr0 & MISS)
-				pr_cont(" MISS");
+				pr_debug(" MISS");
 			if (csr0 & MERR)
-				pr_cont(" MERR");
+				pr_debug(" MERR");
 			if (csr0 & RINT)
-				pr_cont(" RINT");
+				pr_debug(" RINT");
 			if (csr0 & TINT)
-				pr_cont(" TINT");
+				pr_debug(" TINT");
 			if (csr0 & IDON)
-				pr_cont(" IDON");
-			pr_cont(" ]\n");
+				pr_debug(" IDON");
+			pr_debug(" ]\n");
 		}
 #endif
 

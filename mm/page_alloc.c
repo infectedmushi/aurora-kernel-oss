@@ -7787,9 +7787,9 @@ void __init free_area_init_nodes(unsigned long *max_zone_pfn)
 		pr_debug("  %-8s ", zone_names[i]);
 		if (arch_zone_lowest_possible_pfn[i] ==
 				arch_zone_highest_possible_pfn[i])
-			pr_cont("empty\n");
+			pr_debug("empty\n");
 		else
-			pr_cont("[mem %#018Lx-%#018Lx]\n",
+			pr_debug("[mem %#018Lx-%#018Lx]\n",
 				(u64)arch_zone_lowest_possible_pfn[i]
 					<< PAGE_SHIFT,
 				((u64)arch_zone_highest_possible_pfn[i]

@@ -511,8 +511,8 @@ static void it821x_dev_config(struct ata_device *adev)
 			     adev->id[147] ? "Bootable " : "",
 			     adev->id[129]);
 		if (adev->id[129] != 1)
-			pr_cont("(%dK stripe)", adev->id[146]);
-		pr_cont("\n");
+			pr_debug("(%dK stripe)", adev->id[146]);
+		pr_debug("\n");
 	}
 	/* This is a controller firmware triggered funny, don't
 	   report the drive faulty! */

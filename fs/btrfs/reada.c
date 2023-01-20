@@ -823,13 +823,13 @@ static void dump_devs(struct btrfs_fs_info *fs_info, int all)
 				    zone->start, zone->end, zone->elems,
 				    zone->locked);
 			for (j = 0; j < zone->ndevs; ++j) {
-				pr_cont(" %lld",
+				pr_debug(" %lld",
 					zone->devs[j]->devid);
 			}
 			if (device->reada_curr_zone == zone)
-				pr_cont(" curr off %llu",
+				pr_debug(" curr off %llu",
 					device->reada_next - zone->start);
-			pr_cont("\n");
+			pr_debug("\n");
 			index = (zone->end >> PAGE_SHIFT) + 1;
 		}
 		cnt = 0;
@@ -846,15 +846,15 @@ static void dump_devs(struct btrfs_fs_info *fs_info, int all)
 				list_empty(&re->extctl), re->scheduled);
 
 			for (i = 0; i < re->nzones; ++i) {
-				pr_cont(" zone %llu-%llu devs",
+				pr_debug(" zone %llu-%llu devs",
 					re->zones[i]->start,
 					re->zones[i]->end);
 				for (j = 0; j < re->zones[i]->ndevs; ++j) {
-					pr_cont(" %lld",
+					pr_debug(" %lld",
 						re->zones[i]->devs[j]->devid);
 				}
 			}
-			pr_cont("\n");
+			pr_debug("\n");
 			index = (re->logical >> PAGE_SHIFT) + 1;
 			if (++cnt > 15)
 				break;
@@ -878,15 +878,15 @@ static void dump_devs(struct btrfs_fs_info *fs_info, int all)
 			re->logical, fs_info->nodesize,
 			list_empty(&re->extctl), re->scheduled);
 		for (i = 0; i < re->nzones; ++i) {
-			pr_cont(" zone %llu-%llu devs",
+			pr_debug(" zone %llu-%llu devs",
 				re->zones[i]->start,
 				re->zones[i]->end);
 			for (j = 0; j < re->zones[i]->ndevs; ++j) {
-				pr_cont(" %lld",
+				pr_debug(" %lld",
 				       re->zones[i]->devs[j]->devid);
 			}
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 		index = (re->logical >> PAGE_SHIFT) + 1;
 	}
 	spin_unlock(&fs_info->reada_lock);

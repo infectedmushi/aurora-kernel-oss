@@ -135,18 +135,18 @@ static void PRINT_PKT(u_char *buf, int length)
 			u_char a, b;
 			a = *buf++;
 			b = *buf++;
-			pr_cont("%02x%02x ", a, b);
+			pr_debug("%02x%02x ", a, b);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 	printk(KERN_DEBUG);
 	for (i = 0; i < remainder/2 ; i++) {
 		u_char a, b;
 		a = *buf++;
 		b = *buf++;
-		pr_cont("%02x%02x ", a, b);
+		pr_debug("%02x%02x ", a, b);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 #else
 #define PRINT_PKT(x...)  do { } while (0)
@@ -2005,12 +2005,12 @@ static int smc911x_probe(struct net_device *dev)
 
 #ifdef SMC_USE_DMA
 		if (lp->rxdma)
-			pr_cont(" RXDMA %p", lp->rxdma);
+			pr_debug(" RXDMA %p", lp->rxdma);
 
 		if (lp->txdma)
-			pr_cont(" TXDMA %p", lp->txdma);
+			pr_debug(" TXDMA %p", lp->txdma);
 #endif
-		pr_cont("\n");
+		pr_debug("\n");
 		if (!is_valid_ether_addr(dev->dev_addr)) {
 			netdev_warn(dev, "Invalid ethernet MAC address. Please set using ifconfig\n");
 		} else {

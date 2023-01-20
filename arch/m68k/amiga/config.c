@@ -210,7 +210,7 @@ static void __init amiga_identify(void)
 
 	pr_debug("Amiga hardware found: ");
 	if (amiga_model >= AMI_500 && amiga_model <= AMI_DRACO) {
-		pr_cont("[%s] ", amiga_models[amiga_model-AMI_500]);
+		pr_debug("[%s] ", amiga_models[amiga_model-AMI_500]);
 		strcat(amiga_model_name, amiga_models[amiga_model-AMI_500]);
 	}
 
@@ -321,7 +321,7 @@ static void __init amiga_identify(void)
 
 #define AMIGAHW_ANNOUNCE(name, str)		\
 	if (AMIGAHW_PRESENT(name))		\
-		pr_cont(str)
+		pr_debug(str)
 
 	AMIGAHW_ANNOUNCE(AMI_VIDEO, "VIDEO ");
 	AMIGAHW_ANNOUNCE(AMI_BLITTER, "BLITTER ");
@@ -353,8 +353,8 @@ static void __init amiga_identify(void)
 	AMIGAHW_ANNOUNCE(MAGIC_REKICK, "MAGIC_REKICK ");
 	AMIGAHW_ANNOUNCE(PCMCIA, "PCMCIA ");
 	if (AMIGAHW_PRESENT(ZORRO))
-		pr_cont("ZORRO%s ", AMIGAHW_PRESENT(ZORRO3) ? "3" : "");
-	pr_cont("\n");
+		pr_debug("ZORRO%s ", AMIGAHW_PRESENT(ZORRO3) ? "3" : "");
+	pr_debug("\n");
 
 #undef AMIGAHW_ANNOUNCE
 }

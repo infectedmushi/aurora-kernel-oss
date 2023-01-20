@@ -904,30 +904,30 @@ static void ata_dump_status(unsigned id, struct ata_taskfile *tf)
 
 	pr_warn("ata%u: status=0x%02x { ", id, stat);
 	if (stat & ATA_BUSY) {
-		pr_cont("Busy }\n");	/* Data is not valid in this case */
+		pr_debug("Busy }\n");	/* Data is not valid in this case */
 	} else {
-		if (stat & ATA_DRDY)	pr_cont("DriveReady ");
-		if (stat & ATA_DF)	pr_cont("DeviceFault ");
-		if (stat & ATA_DSC)	pr_cont("SeekComplete ");
-		if (stat & ATA_DRQ)	pr_cont("DataRequest ");
-		if (stat & ATA_CORR)	pr_cont("CorrectedError ");
-		if (stat & ATA_SENSE)	pr_cont("Sense ");
-		if (stat & ATA_ERR)	pr_cont("Error ");
-		pr_cont("}\n");
+		if (stat & ATA_DRDY)	pr_debug("DriveReady ");
+		if (stat & ATA_DF)	pr_debug("DeviceFault ");
+		if (stat & ATA_DSC)	pr_debug("SeekComplete ");
+		if (stat & ATA_DRQ)	pr_debug("DataRequest ");
+		if (stat & ATA_CORR)	pr_debug("CorrectedError ");
+		if (stat & ATA_SENSE)	pr_debug("Sense ");
+		if (stat & ATA_ERR)	pr_debug("Error ");
+		pr_debug("}\n");
 
 		if (err) {
 			pr_warn("ata%u: error=0x%02x { ", id, err);
-			if (err & ATA_ABORTED)	pr_cont("DriveStatusError ");
+			if (err & ATA_ABORTED)	pr_debug("DriveStatusError ");
 			if (err & ATA_ICRC) {
 				if (err & ATA_ABORTED)
-						pr_cont("BadCRC ");
-				else		pr_cont("Sector ");
+						pr_debug("BadCRC ");
+				else		pr_debug("Sector ");
 			}
-			if (err & ATA_UNC)	pr_cont("UncorrectableError ");
-			if (err & ATA_IDNF)	pr_cont("SectorIdNotFound ");
-			if (err & ATA_TRK0NF)	pr_cont("TrackZeroNotFound ");
-			if (err & ATA_AMNF)	pr_cont("AddrMarkNotFound ");
-			pr_cont("}\n");
+			if (err & ATA_UNC)	pr_debug("UncorrectableError ");
+			if (err & ATA_IDNF)	pr_debug("SectorIdNotFound ");
+			if (err & ATA_TRK0NF)	pr_debug("TrackZeroNotFound ");
+			if (err & ATA_AMNF)	pr_debug("AddrMarkNotFound ");
+			pr_debug("}\n");
 		}
 	}
 }

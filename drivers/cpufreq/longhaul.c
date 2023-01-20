@@ -846,10 +846,10 @@ static int longhaul_cpu_init(struct cpufreq_policy *policy)
 	switch (longhaul_version) {
 	case TYPE_LONGHAUL_V1:
 	case TYPE_LONGHAUL_V2:
-		pr_cont("Longhaul v%d supported\n", longhaul_version);
+		pr_debug("Longhaul v%d supported\n", longhaul_version);
 		break;
 	case TYPE_POWERSAVER:
-		pr_cont("Powersaver supported\n");
+		pr_debug("Powersaver supported\n");
 		break;
 	};
 

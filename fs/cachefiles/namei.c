@@ -60,8 +60,8 @@ void __cachefiles_printk_object(struct cachefiles_object *object,
 		k = (cookie->key_len <= sizeof(cookie->inline_key)) ?
 			cookie->inline_key : cookie->key;
 		for (loop = 0; loop < cookie->key_len; loop++)
-			pr_cont("%02x", k[loop]);
-		pr_cont("'\n");
+			pr_debug("%02x", k[loop]);
+		pr_debug("'\n");
 	} else {
 		pr_err("%scookie=NULL\n", prefix);
 	}

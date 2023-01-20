@@ -233,14 +233,14 @@ static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 	}
 
 	if (!fp) {
-		pr_cont("no frame pointer");
+		pr_debug("no frame pointer");
 		ok = 0;
 	} else if (verify_stack(fp)) {
-		pr_cont("invalid frame pointer 0x%08x", fp);
+		pr_debug("invalid frame pointer 0x%08x", fp);
 		ok = 0;
 	} else if (fp < (unsigned long)end_of_stack(tsk))
-		pr_cont("frame pointer underflow");
-	pr_cont("\n");
+		pr_debug("frame pointer underflow");
+	pr_debug("\n");
 
 	if (ok)
 		c_backtrace(fp, mode);

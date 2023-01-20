@@ -74,9 +74,9 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode)
 	show_iret_regs(regs);
 
 	if (regs->orig_ax != -1)
-		pr_cont(" ORIG_RAX: %016lx\n", regs->orig_ax);
+		pr_debug(" ORIG_RAX: %016lx\n", regs->orig_ax);
 	else
-		pr_cont("\n");
+		pr_debug("\n");
 
 	printk(KERN_DEFAULT "RAX: %016lx RBX: %016lx RCX: %016lx\n",
 	       regs->ax, regs->bx, regs->cx);

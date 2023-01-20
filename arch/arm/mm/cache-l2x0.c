@@ -737,8 +737,8 @@ static void __init l2c310_fixup(void __iomem *base, u32 cache_id,
 
 		pr_debug("L2C-310 errat%s", n > 1 ? "a" : "um");
 		for (i = 0; i < n; i++)
-			pr_cont(" %s", errata[i]);
-		pr_cont(" enabled\n");
+			pr_debug(" %s", errata[i]);
+		pr_debug(" enabled\n");
 	}
 }
 

@@ -273,11 +273,11 @@ void arm64_force_sig_info(struct siginfo *info, const char *str,
 
 	pr_debug("%s[%d]: unhandled exception: ", tsk->comm, task_pid_nr(tsk));
 	if (esr)
-		pr_cont("%s, ESR 0x%08x, ", esr_get_class_string(esr), esr);
+		pr_debug("%s, ESR 0x%08x, ", esr_get_class_string(esr), esr);
 
-	pr_cont("%s", str);
+	pr_debug("%s", str);
 	print_vma_addr(KERN_CONT " in ", regs->pc);
-	pr_cont("\n");
+	pr_debug("\n");
 	__show_regs(regs);
 
 send_sig:

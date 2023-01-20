@@ -89,7 +89,7 @@
 #define DUMP(fmt, arg...)        \
     do {                    \
         if ((LEVEL_DEBUG == tp_debug) || ipio_debug_level)    \
-        pr_cont(fmt, ##arg);        \
+        pr_debug(fmt, ##arg);        \
     } while (0)
 
 struct ini_file_data {
@@ -311,17 +311,17 @@ static void dump_benchmark_data(s32 *max_ptr, s32 *min_ptr)
         TPD_DEBUG("Dump Benchmark Max\n");
 
         for (i = 0; i < core_mp.frame_len; i++) {
-            pr_cont("%d, ", max_ptr[i]);
+            pr_debug("%d, ", max_ptr[i]);
             if (i % core_mp.xch_len == core_mp.xch_len - 1)
-                pr_cont("\n");
+                pr_debug("\n");
         }
 
-        pr_cont("Dump Denchmark Min\n");
+        pr_debug("Dump Denchmark Min\n");
 
         for (i = 0; i < core_mp.frame_len; i++) {
-            pr_cont("%d, ", min_ptr[i]);
+            pr_debug("%d, ", min_ptr[i]);
             if (i % core_mp.xch_len == core_mp.xch_len - 1)
-                pr_cont("\n");
+                pr_debug("\n");
         }
     }
 }
@@ -333,9 +333,9 @@ static void dump_node_type_buffer(s32 *node_ptr, u8 *name)
     if (ipio_debug_level) {
         TPD_DEBUG("Dump NodeType\n");
         for (i = 0; i < core_mp.frame_len; i++) {
-            pr_cont("%d, ", node_ptr[i]);
+            pr_debug("%d, ", node_ptr[i]);
             if (i % core_mp.xch_len == core_mp.xch_len - 1)
-                pr_cont("\n");
+                pr_debug("\n");
         }
     }
 }
@@ -2416,14 +2416,14 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     TPD_DEBUG("Up=%d, Down=%d -%s\n", u32up_frame, u32down_frame, tItems[index].desp);
 
     if (ipio_debug_level) {
-        pr_cont("\n[Show Original frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[Show Original frist%d and last%d node data]\n", len, len);
         for (i = 0; i < core_mp.frame_len; i++) {
             for (j = 0 ; j < tItems[index].frame_count ; j++) {
                 if ((i < len) || (i >= (core_mp.frame_len - len)))
-                    pr_cont("%d,", u32data_buff[j * core_mp.frame_len + i]);
+                    pr_debug("%d,", u32data_buff[j * core_mp.frame_len + i]);
             }
             if ((i < len) || (i >= (core_mp.frame_len - len)))
-                pr_cont("\n");
+                pr_debug("\n");
         }
     }
 
@@ -2442,14 +2442,14 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     }
 
     if (ipio_debug_level) {
-        pr_cont("\n[After sorting frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[After sorting frist%d and last%d node data]\n", len, len);
         for (i = 0; i < core_mp.frame_len; i++) {
             for (j = u32down_frame; j < tItems[index].frame_count - u32up_frame; j++) {
                 if ((i < len) || (i >= (core_mp.frame_len - len)))
-                    pr_cont("%d,", u32data_buff[i + j * core_mp.frame_len]);
+                    pr_debug("%d,", u32data_buff[i + j * core_mp.frame_len]);
             }
             if ((i < len) || (i >= (core_mp.frame_len - len)))
-                pr_cont("\n");
+                pr_debug("\n");
         }
     }
 
@@ -2462,13 +2462,13 @@ static int mp_test_data_sort_average(s32 *oringin_data, int index, s32 *avg_resu
     }
 
     if (ipio_debug_level) {
-        pr_cont("\n[Average result frist%d and last%d node data]\n", len, len);
+        pr_debug("\n[Average result frist%d and last%d node data]\n", len, len);
         for (i = 0; i < core_mp.frame_len; i++) {
             if ((i < len) || (i >= (core_mp.frame_len - len)))
-                pr_cont("%d,", avg_result[i]);
+                pr_debug("%d,", avg_result[i]);
         }
         if ((i < len) || (i >= (core_mp.frame_len - len)))
-            pr_cont("\n");
+            pr_debug("\n");
     }
 
     ipio_kfree((void **)&u32data_buff);

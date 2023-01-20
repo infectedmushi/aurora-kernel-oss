@@ -77,31 +77,31 @@ void show_pte(struct mm_struct *mm, unsigned long addr)
 			break;
 
 		if (pgd_bad(*pgd)) {
-			pr_cont("(bad)");
+			pr_debug("(bad)");
 			break;
 		}
 
 		pud = pud_offset(pgd, addr);
 		if (PTRS_PER_PUD != 1)
-			pr_cont(", *pud=%08llx", (long long)pud_val(*pud));
+			pr_debug(", *pud=%08llx", (long long)pud_val(*pud));
 
 		if (pud_none(*pud))
 			break;
 
 		if (pud_bad(*pud)) {
-			pr_cont("(bad)");
+			pr_debug("(bad)");
 			break;
 		}
 
 		pmd = pmd_offset(pud, addr);
 		if (PTRS_PER_PMD != 1)
-			pr_cont(", *pmd=%08llx", (long long)pmd_val(*pmd));
+			pr_debug(", *pmd=%08llx", (long long)pmd_val(*pmd));
 
 		if (pmd_none(*pmd))
 			break;
 
 		if (pmd_bad(*pmd)) {
-			pr_cont("(bad)");
+			pr_debug("(bad)");
 			break;
 		}
 
@@ -110,15 +110,15 @@ void show_pte(struct mm_struct *mm, unsigned long addr)
 			break;
 
 		pte = pte_offset_map(pmd, addr);
-		pr_cont(", *pte=%08llx", (long long)pte_val(*pte));
+		pr_debug(", *pte=%08llx", (long long)pte_val(*pte));
 #ifndef CONFIG_ARM_LPAE
-		pr_cont(", *ppte=%08llx",
+		pr_debug(", *ppte=%08llx",
 		       (long long)pte_val(pte[PTE_HWTABLE_PTRS]));
 #endif
 		pte_unmap(pte);
 	} while(0);
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 #else					/* CONFIG_MMU */
 void show_pte(struct mm_struct *mm, unsigned long addr)

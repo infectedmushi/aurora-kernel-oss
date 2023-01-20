@@ -175,7 +175,7 @@ void __init time_init(void)
 #ifdef CONFIG_XTENSA_CALIBRATE_CCOUNT
 	pr_debug("Calibrating CPU frequency ");
 	calibrate_ccount();
-	pr_cont("%d.%02d MHz\n",
+	pr_debug("%d.%02d MHz\n",
 		(int)ccount_freq / 1000000,
 		(int)(ccount_freq / 10000) % 100);
 #else

@@ -313,7 +313,7 @@ static void quirk_slc90e66_ide(struct pci_dev *dev)
 		pci_read_config_byte(dev, regs[i], &dat);
 		pci_write_config_byte(dev, regs[i], dat | 0x80);
 		pci_read_config_byte(dev, regs[i], &dat);
-		pr_cont(" IDETIM%d %02x", i, dat);
+		pr_debug(" IDETIM%d %02x", i, dat);
 	}
 	pci_read_config_byte(dev, 0x5c, &dat);
 	/*
@@ -328,7 +328,7 @@ static void quirk_slc90e66_ide(struct pci_dev *dev)
 	dat |= 0x01;
 	pci_write_config_byte(dev, 0x5c, dat);
 	pci_read_config_byte(dev, 0x5c, &dat);
-	pr_cont(" REG5C %02x\n", dat);
+	pr_debug(" REG5C %02x\n", dat);
 }
 #endif /* CONFIG_TOSHIBA_FPCIB0 */
 
@@ -359,9 +359,9 @@ static void final_fixup(struct pci_dev *dev)
 				break;
 		} while (bist & PCI_BIST_START);
 		if (bist & (PCI_BIST_CODE_MASK | PCI_BIST_START))
-			pr_cont("failed. (0x%x)\n", bist);
+			pr_debug("failed. (0x%x)\n", bist);
 		else
-			pr_cont("OK.\n");
+			pr_debug("OK.\n");
 	}
 }
 

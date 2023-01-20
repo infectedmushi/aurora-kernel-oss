@@ -7635,9 +7635,9 @@ _scsih_pcie_enumeration_event(struct MPT3SAS_ADAPTER *ioc,
 			"started" : "completed",
 		event_data->Flags);
 	if (event_data->EnumerationStatus)
-		pr_cont("enumeration_status(0x%08x)",
+		pr_debug("enumeration_status(0x%08x)",
 			le32_to_cpu(event_data->EnumerationStatus));
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /**

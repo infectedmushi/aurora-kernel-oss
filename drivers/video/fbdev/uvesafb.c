@@ -449,22 +449,22 @@ static int uvesafb_vbe_getinfo(struct uvesafb_ktask *task,
 	 * video adapter and its vendor.
 	 */
 	if (par->vbe_ib.oem_vendor_name_ptr)
-		pr_cont("%s, ",
+		pr_debug("%s, ",
 			((char *)task->buf) + par->vbe_ib.oem_vendor_name_ptr);
 
 	if (par->vbe_ib.oem_product_name_ptr)
-		pr_cont("%s, ",
+		pr_debug("%s, ",
 			((char *)task->buf) + par->vbe_ib.oem_product_name_ptr);
 
 	if (par->vbe_ib.oem_product_rev_ptr)
-		pr_cont("%s, ",
+		pr_debug("%s, ",
 			((char *)task->buf) + par->vbe_ib.oem_product_rev_ptr);
 
 	if (par->vbe_ib.oem_string_ptr)
-		pr_cont("OEM: %s, ",
+		pr_debug("OEM: %s, ",
 			((char *)task->buf) + par->vbe_ib.oem_string_ptr);
 
-	pr_cont("VBE v%d.%d\n",
+	pr_debug("VBE v%d.%d\n",
 		(par->vbe_ib.vbe_version & 0xff00) >> 8,
 		par->vbe_ib.vbe_version & 0xff);
 
@@ -576,8 +576,8 @@ static int uvesafb_vbe_getpmi(struct uvesafb_ktask *task,
 			pr_debug("pmi: ports =");
 			for (i = par->pmi_base[3]/2;
 					par->pmi_base[i] != 0xffff; i++)
-				pr_cont(" %x", par->pmi_base[i]);
-			pr_cont("\n");
+				pr_debug(" %x", par->pmi_base[i]);
+			pr_debug("\n");
 
 			if (par->pmi_base[i] != 0xffff) {
 				pr_debug("can't handle memory requests, pmi disabled\n");

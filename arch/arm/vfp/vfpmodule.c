@@ -744,7 +744,7 @@ static int __init vfp_init(void)
 
 	pr_debug("VFP support v0.3: ");
 	if (VFP_arch) {
-		pr_cont("not present\n");
+		pr_debug("not present\n");
 		return 0;
 	/* Extract the architecture on CPUID scheme */
 	} else if ((read_cpuid_id() & 0x000f0000) == 0x000f0000) {
@@ -783,7 +783,7 @@ static int __init vfp_init(void)
 	/* Extract the architecture version on pre-cpuid scheme */
 	} else {
 		if (vfpsid & FPSID_NODOUBLE) {
-			pr_cont("no double precision support\n");
+			pr_debug("no double precision support\n");
 			return 0;
 		}
 
@@ -805,7 +805,7 @@ static int __init vfp_init(void)
 	 */
 	elf_hwcap |= HWCAP_VFP;
 
-	pr_cont("implementor %02x architecture %d part %02x variant %x rev %x\n",
+	pr_debug("implementor %02x architecture %d part %02x variant %x rev %x\n",
 		(vfpsid & FPSID_IMPLEMENTER_MASK) >> FPSID_IMPLEMENTER_BIT,
 		VFP_arch,
 		(vfpsid & FPSID_PART_MASK) >> FPSID_PART_BIT,

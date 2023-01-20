@@ -46,7 +46,7 @@ int send_fault_sig(struct pt_regs *regs)
 			pr_alert("Unable to handle kernel NULL pointer dereference");
 		else
 			pr_alert("Unable to handle kernel access");
-		pr_cont(" at virtual address %p\n", addr);
+		pr_debug(" at virtual address %p\n", addr);
 		die_if_kernel("Oops", regs, 0 /*error_code*/);
 		do_exit(SIGKILL);
 	}

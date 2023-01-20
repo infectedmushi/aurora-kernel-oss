@@ -59,8 +59,8 @@ unsigned char *hpfs_translate_name(struct super_block *s, unsigned char *from,
 	if (hpfs_sb(s)->sb_chk >= 2) if (hpfs_is_name_long(from, len) != lng) {
 		pr_err("Long name flag mismatch - name ");
 		for (i = 0; i < len; i++)
-			pr_cont("%c", from[i]);
-		pr_cont(" misidentified as %s.\n", lng ? "short" : "long");
+			pr_debug("%c", from[i]);
+		pr_debug(" misidentified as %s.\n", lng ? "short" : "long");
 		pr_err("It's nothing serious. It could happen because of bug in OS/2.\nSet checks=normal to disable this message.\n");
 	}
 	if (!lc) return from;

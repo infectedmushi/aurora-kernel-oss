@@ -247,103 +247,103 @@ static void nxt6000_dump_status(struct nxt6000_state *state)
 
 	val = nxt6000_readreg(state, RS_COR_STAT);
 
-	pr_cont(" DATA DESCR LOCK: %d,", val & 0x01);
-	pr_cont(" DATA SYNC LOCK: %d,", (val >> 1) & 0x01);
+	pr_debug(" DATA DESCR LOCK: %d,", val & 0x01);
+	pr_debug(" DATA SYNC LOCK: %d,", (val >> 1) & 0x01);
 
 	val = nxt6000_readreg(state, VIT_SYNC_STATUS);
 
-	pr_cont(" VITERBI LOCK: %d,", (val >> 7) & 0x01);
+	pr_debug(" VITERBI LOCK: %d,", (val >> 7) & 0x01);
 
 	switch ((val >> 4) & 0x07) {
 
 	case 0x00:
-		pr_cont(" VITERBI CODERATE: 1/2,");
+		pr_debug(" VITERBI CODERATE: 1/2,");
 		break;
 
 	case 0x01:
-		pr_cont(" VITERBI CODERATE: 2/3,");
+		pr_debug(" VITERBI CODERATE: 2/3,");
 		break;
 
 	case 0x02:
-		pr_cont(" VITERBI CODERATE: 3/4,");
+		pr_debug(" VITERBI CODERATE: 3/4,");
 		break;
 
 	case 0x03:
-		pr_cont(" VITERBI CODERATE: 5/6,");
+		pr_debug(" VITERBI CODERATE: 5/6,");
 		break;
 
 	case 0x04:
-		pr_cont(" VITERBI CODERATE: 7/8,");
+		pr_debug(" VITERBI CODERATE: 7/8,");
 		break;
 
 	default:
-		pr_cont(" VITERBI CODERATE: Reserved,");
+		pr_debug(" VITERBI CODERATE: Reserved,");
 
 	}
 
 	val = nxt6000_readreg(state, OFDM_COR_STAT);
 
-	pr_cont(" CHCTrack: %d,", (val >> 7) & 0x01);
-	pr_cont(" TPSLock: %d,", (val >> 6) & 0x01);
-	pr_cont(" SYRLock: %d,", (val >> 5) & 0x01);
-	pr_cont(" AGCLock: %d,", (val >> 4) & 0x01);
+	pr_debug(" CHCTrack: %d,", (val >> 7) & 0x01);
+	pr_debug(" TPSLock: %d,", (val >> 6) & 0x01);
+	pr_debug(" SYRLock: %d,", (val >> 5) & 0x01);
+	pr_debug(" AGCLock: %d,", (val >> 4) & 0x01);
 
 	switch (val & 0x0F) {
 
 	case 0x00:
-		pr_cont(" CoreState: IDLE,");
+		pr_debug(" CoreState: IDLE,");
 		break;
 
 	case 0x02:
-		pr_cont(" CoreState: WAIT_AGC,");
+		pr_debug(" CoreState: WAIT_AGC,");
 		break;
 
 	case 0x03:
-		pr_cont(" CoreState: WAIT_SYR,");
+		pr_debug(" CoreState: WAIT_SYR,");
 		break;
 
 	case 0x04:
-		pr_cont(" CoreState: WAIT_PPM,");
+		pr_debug(" CoreState: WAIT_PPM,");
 		break;
 
 	case 0x01:
-		pr_cont(" CoreState: WAIT_TRL,");
+		pr_debug(" CoreState: WAIT_TRL,");
 		break;
 
 	case 0x05:
-		pr_cont(" CoreState: WAIT_TPS,");
+		pr_debug(" CoreState: WAIT_TPS,");
 		break;
 
 	case 0x06:
-		pr_cont(" CoreState: MONITOR_TPS,");
+		pr_debug(" CoreState: MONITOR_TPS,");
 		break;
 
 	default:
-		pr_cont(" CoreState: Reserved,");
+		pr_debug(" CoreState: Reserved,");
 
 	}
 
 	val = nxt6000_readreg(state, OFDM_SYR_STAT);
 
-	pr_cont(" SYRLock: %d,", (val >> 4) & 0x01);
-	pr_cont(" SYRMode: %s,", (val >> 2) & 0x01 ? "8K" : "2K");
+	pr_debug(" SYRLock: %d,", (val >> 4) & 0x01);
+	pr_debug(" SYRMode: %s,", (val >> 2) & 0x01 ? "8K" : "2K");
 
 	switch ((val >> 4) & 0x03) {
 
 	case 0x00:
-		pr_cont(" SYRGuard: 1/32,");
+		pr_debug(" SYRGuard: 1/32,");
 		break;
 
 	case 0x01:
-		pr_cont(" SYRGuard: 1/16,");
+		pr_debug(" SYRGuard: 1/16,");
 		break;
 
 	case 0x02:
-		pr_cont(" SYRGuard: 1/8,");
+		pr_debug(" SYRGuard: 1/8,");
 		break;
 
 	case 0x03:
-		pr_cont(" SYRGuard: 1/4,");
+		pr_debug(" SYRGuard: 1/4,");
 		break;
 	}
 
@@ -352,77 +352,77 @@ static void nxt6000_dump_status(struct nxt6000_state *state)
 	switch ((val >> 4) & 0x07) {
 
 	case 0x00:
-		pr_cont(" TPSLP: 1/2,");
+		pr_debug(" TPSLP: 1/2,");
 		break;
 
 	case 0x01:
-		pr_cont(" TPSLP: 2/3,");
+		pr_debug(" TPSLP: 2/3,");
 		break;
 
 	case 0x02:
-		pr_cont(" TPSLP: 3/4,");
+		pr_debug(" TPSLP: 3/4,");
 		break;
 
 	case 0x03:
-		pr_cont(" TPSLP: 5/6,");
+		pr_debug(" TPSLP: 5/6,");
 		break;
 
 	case 0x04:
-		pr_cont(" TPSLP: 7/8,");
+		pr_debug(" TPSLP: 7/8,");
 		break;
 
 	default:
-		pr_cont(" TPSLP: Reserved,");
+		pr_debug(" TPSLP: Reserved,");
 
 	}
 
 	switch (val & 0x07) {
 
 	case 0x00:
-		pr_cont(" TPSHP: 1/2,");
+		pr_debug(" TPSHP: 1/2,");
 		break;
 
 	case 0x01:
-		pr_cont(" TPSHP: 2/3,");
+		pr_debug(" TPSHP: 2/3,");
 		break;
 
 	case 0x02:
-		pr_cont(" TPSHP: 3/4,");
+		pr_debug(" TPSHP: 3/4,");
 		break;
 
 	case 0x03:
-		pr_cont(" TPSHP: 5/6,");
+		pr_debug(" TPSHP: 5/6,");
 		break;
 
 	case 0x04:
-		pr_cont(" TPSHP: 7/8,");
+		pr_debug(" TPSHP: 7/8,");
 		break;
 
 	default:
-		pr_cont(" TPSHP: Reserved,");
+		pr_debug(" TPSHP: Reserved,");
 
 	}
 
 	val = nxt6000_readreg(state, OFDM_TPS_RCVD_4);
 
-	pr_cont(" TPSMode: %s,", val & 0x01 ? "8K" : "2K");
+	pr_debug(" TPSMode: %s,", val & 0x01 ? "8K" : "2K");
 
 	switch ((val >> 4) & 0x03) {
 
 	case 0x00:
-		pr_cont(" TPSGuard: 1/32,");
+		pr_debug(" TPSGuard: 1/32,");
 		break;
 
 	case 0x01:
-		pr_cont(" TPSGuard: 1/16,");
+		pr_debug(" TPSGuard: 1/16,");
 		break;
 
 	case 0x02:
-		pr_cont(" TPSGuard: 1/8,");
+		pr_debug(" TPSGuard: 1/8,");
 		break;
 
 	case 0x03:
-		pr_cont(" TPSGuard: 1/4,");
+		pr_debug(" TPSGuard: 1/4,");
 		break;
 
 	}
@@ -432,8 +432,8 @@ static void nxt6000_dump_status(struct nxt6000_state *state)
 	val = nxt6000_readreg(state, RF_AGC_STATUS);
 	val = nxt6000_readreg(state, RF_AGC_STATUS);
 
-	pr_cont(" RF AGC LOCK: %d,", (val >> 4) & 0x01);
-	pr_cont("\n");
+	pr_debug(" RF AGC LOCK: %d,", (val >> 4) & 0x01);
+	pr_debug("\n");
 }
 
 static int nxt6000_read_status(struct dvb_frontend *fe, enum fe_status *status)

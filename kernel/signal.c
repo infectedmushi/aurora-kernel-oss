@@ -1274,10 +1274,10 @@ static void print_fatal_signal(int signr)
 
 			if (get_user(insn, (unsigned char *)(regs->ip + i)))
 				break;
-			pr_cont("%02x ", insn);
+			pr_debug("%02x ", insn);
 		}
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 #endif
 	preempt_disable();
 	show_regs(regs);

@@ -154,7 +154,7 @@ bttv_i2c_sendbytes(struct bttv *btv, const struct i2c_msg *msg, int last)
 	if (retval == 0)
 		goto eio;
 	if (i2c_debug) {
-		pr_cont(" <W %02x %02x", msg->addr << 1, msg->buf[0]);
+		pr_debug(" <W %02x %02x", msg->addr << 1, msg->buf[0]);
 	}
 
 	for (cnt = 1; cnt < msg->len; cnt++ ) {
@@ -169,17 +169,17 @@ bttv_i2c_sendbytes(struct bttv *btv, const struct i2c_msg *msg, int last)
 		if (retval == 0)
 			goto eio;
 		if (i2c_debug)
-			pr_cont(" %02x", msg->buf[cnt]);
+			pr_debug(" %02x", msg->buf[cnt]);
 	}
 	if (i2c_debug && !(xmit & BT878_I2C_NOSTOP))
-		pr_cont(">\n");
+		pr_debug(">\n");
 	return msg->len;
 
  eio:
 	retval = -EIO;
  err:
 	if (i2c_debug)
-		pr_cont(" ERR: %d\n",retval);
+		pr_debug(" ERR: %d\n",retval);
 	return retval;
 }
 
@@ -201,7 +201,7 @@ bttv_i2c_readbytes(struct bttv *btv, const struct i2c_msg *msg, int last)
 
 		if (i2c_debug) {
 			if (!(xmit & BT878_I2C_NOSTART))
-				pr_cont(" <R %02x", (msg->addr << 1) +1);
+				pr_debug(" <R %02x", (msg->addr << 1) +1);
 		}
 
 		btwrite(xmit, BT848_I2C);
@@ -212,10 +212,10 @@ bttv_i2c_readbytes(struct bttv *btv, const struct i2c_msg *msg, int last)
 			goto eio;
 		msg->buf[cnt] = ((u32)btread(BT848_I2C) >> 8) & 0xff;
 		if (i2c_debug) {
-			pr_cont(" =%02x", msg->buf[cnt]);
+			pr_debug(" =%02x", msg->buf[cnt]);
 		}
 		if (i2c_debug && !(xmit & BT878_I2C_NOSTOP))
-			pr_cont(" >\n");
+			pr_debug(" >\n");
 	}
 
 
@@ -225,7 +225,7 @@ bttv_i2c_readbytes(struct bttv *btv, const struct i2c_msg *msg, int last)
 	retval = -EIO;
  err:
 	if (i2c_debug)
-		pr_cont(" ERR: %d\n",retval);
+		pr_debug(" ERR: %d\n",retval);
 	return retval;
 }
 
@@ -281,14 +281,14 @@ int bttv_I2CRead(struct bttv *btv, unsigned char addr, char *probe_for)
 	if (1 != i2c_master_recv(&btv->i2c_client, &buffer, 1)) {
 		if (NULL != probe_for) {
 			if (bttv_verbose)
-				pr_cont("not found\n");
+				pr_debug("not found\n");
 		} else
 			pr_warn("%d: i2c read 0x%x: error\n",
 				btv->c.nr, addr);
 		return -1;
 	}
 	if (bttv_verbose && NULL != probe_for)
-		pr_cont("found\n");
+		pr_debug("found\n");
 	return buffer;
 }
 

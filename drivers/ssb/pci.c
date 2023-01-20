@@ -297,13 +297,13 @@ static int sprom_do_write(struct ssb_bus *bus, const u16 *sprom)
 	msleep(500);
 	for (i = 0; i < size; i++) {
 		if (i == size / 4)
-			pr_cont("25%%");
+			pr_debug("25%%");
 		else if (i == size / 2)
-			pr_cont("50%%");
+			pr_debug("50%%");
 		else if (i == (size * 3) / 4)
-			pr_cont("75%%");
+			pr_debug("75%%");
 		else if (i % 2)
-			pr_cont(".");
+			pr_debug(".");
 		writew(sprom[i], bus->mmio + bus->sprom_offset + (i * 2));
 		mmiowb();
 		msleep(20);
@@ -316,7 +316,7 @@ static int sprom_do_write(struct ssb_bus *bus, const u16 *sprom)
 	if (err)
 		goto err_ctlreg;
 	msleep(500);
-	pr_cont("100%% ]\n");
+	pr_debug("100%% ]\n");
 	pr_notice("SPROM written\n");
 
 	return 0;

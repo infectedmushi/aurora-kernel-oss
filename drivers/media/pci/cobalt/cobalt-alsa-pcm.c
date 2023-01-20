@@ -192,10 +192,10 @@ static int alsa_fnc(struct vb2_buffer *vb, void *priv)
 		pr_debug("alsa: ");
 		for (i = 0; i < 8 * 4; i++) {
 			if (!(i & 3))
-				pr_cont(" ");
-			pr_cont("%02x", p[i]);
+				pr_debug(" ");
+			pr_debug("%02x", p[i]);
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 	cobalt_alsa_announce_pcm_data(s->alsa,
 			vb2_plane_vaddr(vb, 0),

@@ -3155,10 +3155,10 @@ static int build_mlx_header(struct mlx4_ib_sqp *sqp, const struct ib_ud_wr *wr,
 		for (i = 0; i < header_size / 4; ++i) {
 			if (i % 8 == 0)
 				pr_err("  [%02x] ", i * 4);
-			pr_cont(" %08x",
+			pr_debug(" %08x",
 				be32_to_cpu(((__be32 *) sqp->header_buf)[i]));
 			if ((i + 1) % 8 == 0)
-				pr_cont("\n");
+				pr_debug("\n");
 		}
 		pr_err("\n");
 	}

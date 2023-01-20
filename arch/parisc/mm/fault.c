@@ -245,11 +245,11 @@ show_signal_msg(struct pt_regs *regs, unsigned long code,
 	    tsk->comm, code, address);
 	print_vma_addr(KERN_CONT " in ", regs->iaoq[0]);
 
-	pr_cont("\ntrap #%lu: %s%c", code, trap_name(code),
+	pr_debug("\ntrap #%lu: %s%c", code, trap_name(code),
 		vma ? ',':'\n');
 
 	if (vma)
-		pr_cont(" vm_start = 0x%08lx, vm_end = 0x%08lx\n",
+		pr_debug(" vm_start = 0x%08lx, vm_end = 0x%08lx\n",
 			vma->vm_start, vma->vm_end);
 
 	show_regs(regs);

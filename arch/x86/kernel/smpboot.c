@@ -633,7 +633,7 @@ void __inquire_remote_apic(int apicid)
 		 */
 		status = safe_apic_wait_icr_idle();
 		if (status)
-			pr_cont("a previous APIC delivery may have failed\n");
+			pr_debug("a previous APIC delivery may have failed\n");
 
 		apic_icr_write(APIC_DM_REMRD | regs[i], apicid);
 
@@ -646,10 +646,10 @@ void __inquire_remote_apic(int apicid)
 		switch (status) {
 		case APIC_ICR_RR_VALID:
 			status = apic_read(APIC_RRR);
-			pr_cont("%08x\n", status);
+			pr_debug("%08x\n", status);
 			break;
 		default:
-			pr_cont("failed\n");
+			pr_debug("failed\n");
 		}
 	}
 }
@@ -864,7 +864,7 @@ static void announce_cpu(int cpu, int apicid)
 	if (system_state < SYSTEM_RUNNING) {
 		if (node != current_node) {
 			if (current_node > (-1))
-				pr_cont("\n");
+				pr_debug("\n");
 			current_node = node;
 
 			printk(KERN_INFO ".... node %*s#%d, CPUs:  ",
@@ -873,9 +873,9 @@ static void announce_cpu(int cpu, int apicid)
 
 		/* Add padding for the BSP */
 		if (cpu == 1)
-			pr_cont("%*s", width + 1, " ");
+			pr_debug("%*s", width + 1, " ");
 
-		pr_cont("%*s#%d", width - num_digits(cpu), " ", cpu);
+		pr_debug("%*s#%d", width - num_digits(cpu), " ", cpu);
 
 	} else
 		pr_debug("Booting Node %d Processor %d APIC 0x%x\n",

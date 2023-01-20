@@ -91,54 +91,54 @@ void r600_dpm_print_class_info(u32 class, u32 class2)
 	printk("\tinternal class:");
 	if (((class & ~ATOM_PPLIB_CLASSIFICATION_UI_MASK) == 0) &&
 	    (class2 == 0))
-		pr_cont(" none");
+		pr_debug(" none");
 	else {
 		if (class & ATOM_PPLIB_CLASSIFICATION_BOOT)
-			pr_cont(" boot");
+			pr_debug(" boot");
 		if (class & ATOM_PPLIB_CLASSIFICATION_THERMAL)
-			pr_cont(" thermal");
+			pr_debug(" thermal");
 		if (class & ATOM_PPLIB_CLASSIFICATION_LIMITEDPOWERSOURCE)
-			pr_cont(" limited_pwr");
+			pr_debug(" limited_pwr");
 		if (class & ATOM_PPLIB_CLASSIFICATION_REST)
-			pr_cont(" rest");
+			pr_debug(" rest");
 		if (class & ATOM_PPLIB_CLASSIFICATION_FORCED)
-			pr_cont(" forced");
+			pr_debug(" forced");
 		if (class & ATOM_PPLIB_CLASSIFICATION_3DPERFORMANCE)
-			pr_cont(" 3d_perf");
+			pr_debug(" 3d_perf");
 		if (class & ATOM_PPLIB_CLASSIFICATION_OVERDRIVETEMPLATE)
-			pr_cont(" ovrdrv");
+			pr_debug(" ovrdrv");
 		if (class & ATOM_PPLIB_CLASSIFICATION_UVDSTATE)
-			pr_cont(" uvd");
+			pr_debug(" uvd");
 		if (class & ATOM_PPLIB_CLASSIFICATION_3DLOW)
-			pr_cont(" 3d_low");
+			pr_debug(" 3d_low");
 		if (class & ATOM_PPLIB_CLASSIFICATION_ACPI)
-			pr_cont(" acpi");
+			pr_debug(" acpi");
 		if (class & ATOM_PPLIB_CLASSIFICATION_HD2STATE)
-			pr_cont(" uvd_hd2");
+			pr_debug(" uvd_hd2");
 		if (class & ATOM_PPLIB_CLASSIFICATION_HDSTATE)
-			pr_cont(" uvd_hd");
+			pr_debug(" uvd_hd");
 		if (class & ATOM_PPLIB_CLASSIFICATION_SDSTATE)
-			pr_cont(" uvd_sd");
+			pr_debug(" uvd_sd");
 		if (class2 & ATOM_PPLIB_CLASSIFICATION2_LIMITEDPOWERSOURCE_2)
-			pr_cont(" limited_pwr2");
+			pr_debug(" limited_pwr2");
 		if (class2 & ATOM_PPLIB_CLASSIFICATION2_ULV)
-			pr_cont(" ulv");
+			pr_debug(" ulv");
 		if (class2 & ATOM_PPLIB_CLASSIFICATION2_MVC)
-			pr_cont(" uvd_mvc");
+			pr_debug(" uvd_mvc");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void r600_dpm_print_cap_info(u32 caps)
 {
 	printk("\tcaps:");
 	if (caps & ATOM_PPLIB_SINGLE_DISPLAY_ONLY)
-		pr_cont(" single_disp");
+		pr_debug(" single_disp");
 	if (caps & ATOM_PPLIB_SUPPORTS_VIDEO_PLAYBACK)
-		pr_cont(" video");
+		pr_debug(" video");
 	if (caps & ATOM_PPLIB_DISALLOW_ON_DC)
-		pr_cont(" no_dc");
-	pr_cont("\n");
+		pr_debug(" no_dc");
+	pr_debug("\n");
 }
 
 void r600_dpm_print_ps_status(struct radeon_device *rdev,
@@ -146,12 +146,12 @@ void r600_dpm_print_ps_status(struct radeon_device *rdev,
 {
 	printk("\tstatus:");
 	if (rps == rdev->pm.dpm.current_ps)
-		pr_cont(" c");
+		pr_debug(" c");
 	if (rps == rdev->pm.dpm.requested_ps)
-		pr_cont(" r");
+		pr_debug(" r");
 	if (rps == rdev->pm.dpm.boot_ps)
-		pr_cont(" b");
-	pr_cont("\n");
+		pr_debug(" b");
+	pr_debug("\n");
 }
 
 u32 r600_dpm_get_vblank_time(struct radeon_device *rdev)

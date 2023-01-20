@@ -53,8 +53,8 @@ static void fscache_print_cookie(struct fscache_cookie *cookie, char prefix)
 	k = (cookie->key_len <= sizeof(cookie->inline_key)) ?
 		cookie->inline_key : cookie->key;
 	for (loop = 0; loop < cookie->key_len; loop++)
-		pr_cont("%02x", k[loop]);
-	pr_cont("'\n");
+		pr_debug("%02x", k[loop]);
+	pr_debug("'\n");
 }
 
 void fscache_free_cookie(struct fscache_cookie *cookie)

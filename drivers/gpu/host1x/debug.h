@@ -39,7 +39,7 @@ static inline void write_to_printk(void *ctx, const char *str, size_t len,
 				   bool cont)
 {
 	if (cont)
-		pr_cont("%s", str);
+		pr_debug("%s", str);
 	else
 		pr_debug("%s", str);
 }

@@ -2043,10 +2043,10 @@ void ftrace_bug(int failed, struct dyn_ftrace *rec)
 		pr_debug("ftrace failed to modify ");
 		print_ip_sym(ip);
 		print_ip_ins(" actual:   ", (unsigned char *)ip);
-		pr_cont("\n");
+		pr_debug("\n");
 		if (ftrace_expected) {
 			print_ip_ins(" expected: ", ftrace_expected);
-			pr_cont("\n");
+			pr_debug("\n");
 		}
 		break;
 	case -EPERM:
@@ -2064,23 +2064,23 @@ void ftrace_bug(int failed, struct dyn_ftrace *rec)
 		struct ftrace_ops *ops = NULL;
 
 		pr_debug("ftrace record flags: %lx\n", rec->flags);
-		pr_cont(" (%ld)%s", ftrace_rec_count(rec),
+		pr_debug(" (%ld)%s", ftrace_rec_count(rec),
 			rec->flags & FTRACE_FL_REGS ? " R" : "  ");
 		if (rec->flags & FTRACE_FL_TRAMP_EN) {
 			ops = ftrace_find_tramp_ops_any(rec);
 			if (ops) {
 				do {
-					pr_cont("\ttramp: %pS (%pS)",
+					pr_debug("\ttramp: %pS (%pS)",
 						(void *)ops->trampoline,
 						(void *)ops->func);
 					ops = ftrace_find_tramp_ops_next(rec, ops);
 				} while (ops);
 			} else
-				pr_cont("\ttramp: ERROR!");
+				pr_debug("\ttramp: ERROR!");
 
 		}
 		ip = ftrace_get_addr_curr(rec);
-		pr_cont("\n expected tramp: %lx\n", ip);
+		pr_debug("\n expected tramp: %lx\n", ip);
 	}
 }
 

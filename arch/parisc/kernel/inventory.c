@@ -63,7 +63,7 @@ void __init setup_pdc(void)
 	status = pdc_system_map_find_mods(&module_result, &module_path, 0);
 	if (status == PDC_OK) {
 		pdc_type = PDC_TYPE_SYSTEM_MAP;
-		pr_cont("System Map.\n");
+		pr_debug("System Map.\n");
 		return;
 	}
 
@@ -82,7 +82,7 @@ void __init setup_pdc(void)
 	status = pdc_pat_cell_get_number(&cell_info);
 	if (status == PDC_OK) {
 		pdc_type = PDC_TYPE_PAT;
-		pr_cont("64 bit PAT.\n");
+		pr_debug("64 bit PAT.\n");
 		parisc_cell_num = cell_info.cell_num;
 		parisc_cell_loc = cell_info.cell_loc;
 		pr_debug("PAT: Running on cell %lu and location %lu.\n",
@@ -106,12 +106,12 @@ void __init setup_pdc(void)
 	case 0xC:		/* 715/64, at least */
 
 		pdc_type = PDC_TYPE_SNAKE;
-		pr_cont("Snake.\n");
+		pr_debug("Snake.\n");
 		return;
 
 	default:		/* Everything else */
 
-		pr_cont("Unsupported.\n");
+		pr_debug("Unsupported.\n");
 		panic("If this is a 64-bit machine, please try a 64-bit kernel.\n");
 	}
 }

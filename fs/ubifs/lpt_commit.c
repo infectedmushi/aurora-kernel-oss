@@ -1945,12 +1945,12 @@ static void dump_lpt_leb(const struct ubifs_info *c, int lnum)
 				break;
 			}
 			for (i = 0; i < UBIFS_LPT_FANOUT; i++) {
-				pr_cont("%d:%d", nnode.nbranch[i].lnum,
+				pr_debug("%d:%d", nnode.nbranch[i].lnum,
 				       nnode.nbranch[i].offs);
 				if (i != UBIFS_LPT_FANOUT - 1)
-					pr_cont(", ");
+					pr_debug(", ");
 			}
-			pr_cont("\n");
+			pr_debug("\n");
 			break;
 		}
 		case UBIFS_LPT_LTAB:

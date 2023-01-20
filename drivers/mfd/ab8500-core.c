@@ -1197,13 +1197,13 @@ static int ab8500_probe(struct platform_device *pdev)
 	if (value) {
 		for (i = 0; i < ARRAY_SIZE(switch_off_status); i++) {
 			if (value & 1)
-				pr_cont(" \"%s\"", switch_off_status[i]);
+				pr_debug(" \"%s\"", switch_off_status[i]);
 			value = value >> 1;
 
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	} else {
-		pr_cont(" None\n");
+		pr_debug(" None\n");
 	}
 	ret = get_register_interruptible(ab8500, AB8500_SYS_CTRL1_BLOCK,
 		AB8500_TURN_ON_STATUS, &value);
@@ -1214,12 +1214,12 @@ static int ab8500_probe(struct platform_device *pdev)
 	if (value) {
 		for (i = 0; i < ARRAY_SIZE(turn_on_status); i++) {
 			if (value & 1)
-				pr_cont("\"%s\" ", turn_on_status[i]);
+				pr_debug("\"%s\" ", turn_on_status[i]);
 			value = value >> 1;
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	} else {
-		pr_cont("None\n");
+		pr_debug("None\n");
 	}
 
 	if (is_ab9540(ab8500)) {

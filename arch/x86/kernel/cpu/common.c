@@ -1683,19 +1683,19 @@ void print_cpu_info(struct cpuinfo_x86 *c)
 	}
 
 	if (vendor && !strstr(c->x86_model_id, vendor))
-		pr_cont("%s ", vendor);
+		pr_debug("%s ", vendor);
 
 	if (c->x86_model_id[0])
-		pr_cont("%s", c->x86_model_id);
+		pr_debug("%s", c->x86_model_id);
 	else
-		pr_cont("%d86", c->x86);
+		pr_debug("%d86", c->x86);
 
-	pr_cont(" (family: 0x%x, model: 0x%x", c->x86, c->x86_model);
+	pr_debug(" (family: 0x%x, model: 0x%x", c->x86, c->x86_model);
 
 	if (c->x86_stepping || c->cpuid_level >= 0)
-		pr_cont(", stepping: 0x%x)\n", c->x86_stepping);
+		pr_debug(", stepping: 0x%x)\n", c->x86_stepping);
 	else
-		pr_cont(")\n");
+		pr_debug(")\n");
 }
 
 /*

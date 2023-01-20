@@ -20,7 +20,7 @@
 	if (m)					\
 		seq_printf(m, x);		\
 	else					\
-		pr_cont(x);			\
+		pr_debug(x);			\
  } while (0)
 
 /*

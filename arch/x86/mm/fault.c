@@ -405,9 +405,9 @@ static void dump_pagetable(unsigned long address)
 		goto out;
 
 	pte = pte_offset_kernel(pmd, address);
-	pr_cont("*pte = %0*Lx ", sizeof(*pte) * 2, (u64)pte_val(*pte));
+	pr_debug("*pte = %0*Lx ", sizeof(*pte) * 2, (u64)pte_val(*pte));
 out:
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 #else /* CONFIG_X86_64: */
@@ -548,7 +548,7 @@ static void dump_pagetable(unsigned long address)
 	if (bad_address(p4d))
 		goto bad;
 
-	pr_cont("P4D %lx ", p4d_val(*p4d));
+	pr_debug("P4D %lx ", p4d_val(*p4d));
 	if (!p4d_present(*p4d) || p4d_large(*p4d))
 		goto out;
 
@@ -556,7 +556,7 @@ static void dump_pagetable(unsigned long address)
 	if (bad_address(pud))
 		goto bad;
 
-	pr_cont("PUD %lx ", pud_val(*pud));
+	pr_debug("PUD %lx ", pud_val(*pud));
 	if (!pud_present(*pud) || pud_large(*pud))
 		goto out;
 
@@ -564,7 +564,7 @@ static void dump_pagetable(unsigned long address)
 	if (bad_address(pmd))
 		goto bad;
 
-	pr_cont("PMD %lx ", pmd_val(*pmd));
+	pr_debug("PMD %lx ", pmd_val(*pmd));
 	if (!pmd_present(*pmd) || pmd_large(*pmd))
 		goto out;
 
@@ -572,9 +572,9 @@ static void dump_pagetable(unsigned long address)
 	if (bad_address(pte))
 		goto bad;
 
-	pr_cont("PTE %lx", pte_val(*pte));
+	pr_debug("PTE %lx", pte_val(*pte));
 out:
-	pr_cont("\n");
+	pr_debug("\n");
 	return;
 bad:
 	pr_debug("BAD\n");

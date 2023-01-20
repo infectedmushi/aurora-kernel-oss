@@ -67,8 +67,8 @@ void __dump_page(struct page *page, const char *reason)
 		  page, page_ref_count(page), mapcount,
 		  page->mapping, page_to_pgoff(page));
 	if (PageCompound(page))
-		pr_cont(" compound_mapcount: %d", compound_mapcount(page));
-	pr_cont("\n");
+		pr_debug(" compound_mapcount: %d", compound_mapcount(page));
+	pr_debug("\n");
 	BUILD_BUG_ON(ARRAY_SIZE(pageflag_names) != __NR_PAGEFLAGS + 1);
 
 	pr_emerg("flags: %#lx(%pGp)\n", page->flags, &page->flags);

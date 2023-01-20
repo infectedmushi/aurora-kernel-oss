@@ -834,24 +834,24 @@ static int au1000_rx(struct net_device *dev)
 			if (au1000_debug > 4) {
 				pr_err("rx_error(s):");
 				if (status & RX_MISSED_FRAME)
-					pr_cont(" miss");
+					pr_debug(" miss");
 				if (status & RX_WDOG_TIMER)
-					pr_cont(" wdog");
+					pr_debug(" wdog");
 				if (status & RX_RUNT)
-					pr_cont(" runt");
+					pr_debug(" runt");
 				if (status & RX_OVERLEN)
-					pr_cont(" overlen");
+					pr_debug(" overlen");
 				if (status & RX_COLL)
-					pr_cont(" coll");
+					pr_debug(" coll");
 				if (status & RX_MII_ERROR)
-					pr_cont(" mii error");
+					pr_debug(" mii error");
 				if (status & RX_CRC_ERROR)
-					pr_cont(" crc error");
+					pr_debug(" crc error");
 				if (status & RX_LEN_ERROR)
-					pr_cont(" len error");
+					pr_debug(" len error");
 				if (status & RX_U_CNTRL_FRAME)
-					pr_cont(" u control frame");
-				pr_cont("\n");
+					pr_debug(" u control frame");
+				pr_debug("\n");
 			}
 		}
 		prxd->buff_stat = (u32)(pDB->dma_addr | RX_DMA_ENABLE);

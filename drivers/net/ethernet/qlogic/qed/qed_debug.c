@@ -7667,8 +7667,8 @@ static void qed_dbg_print_feature(u8 *p_text_buf, u32 text_size)
 
 	pr_notice("\n%.*s", precision, p_text_buf);
 	for (i = precision; i < text_size; i += precision)
-		pr_cont("%.*s", precision, p_text_buf + i);
-	pr_cont("\n");
+		pr_debug("%.*s", precision, p_text_buf + i);
+	pr_debug("\n");
 }
 
 #define QED_RESULTS_BUF_MIN_SIZE 16

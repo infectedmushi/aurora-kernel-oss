@@ -1347,7 +1347,7 @@ __init int p4_pmu_init(void)
 
 	rdmsr(MSR_IA32_MISC_ENABLE, low, high);
 	if (!(low & (1 << 7))) {
-		pr_cont("unsupported Netburst CPU model %d ",
+		pr_debug("unsupported Netburst CPU model %d ",
 			boot_cpu_data.x86_model);
 		return -ENODEV;
 	}
@@ -1355,7 +1355,7 @@ __init int p4_pmu_init(void)
 	memcpy(hw_cache_event_ids, p4_hw_cache_event_ids,
 		sizeof(hw_cache_event_ids));
 
-	pr_cont("Netburst events, ");
+	pr_debug("Netburst events, ");
 
 	x86_pmu = p4_pmu;
 

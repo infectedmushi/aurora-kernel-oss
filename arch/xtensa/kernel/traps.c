@@ -463,15 +463,15 @@ void show_regs(struct pt_regs * regs)
 	for (i = 0; i < 16; i++) {
 		if ((i % 8) == 0)
 			pr_debug("a%02d:", i);
-		pr_cont(" %08lx", regs->areg[i]);
+		pr_debug(" %08lx", regs->areg[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	pr_debug("pc: %08lx, ps: %08lx, depc: %08lx, excvaddr: %08lx\n",
 		regs->pc, regs->ps, regs->depc, regs->excvaddr);
 	pr_debug("lbeg: %08lx, lend: %08lx lcount: %08lx, sar: %08lx\n",
 		regs->lbeg, regs->lend, regs->lcount, regs->sar);
 	if (user_mode(regs))
-		pr_cont("wb: %08lx, ws: %08lx, wmask: %08lx, syscall: %ld\n",
+		pr_debug("wb: %08lx, ws: %08lx, wmask: %08lx, syscall: %ld\n",
 			regs->windowbase, regs->windowstart, regs->wmask,
 			regs->syscall);
 }
@@ -479,7 +479,7 @@ void show_regs(struct pt_regs * regs)
 static int show_trace_cb(struct stackframe *frame, void *data)
 {
 	if (kernel_text_address(frame->pc))
-		pr_cont(" [<%08lx>] %pB\n", frame->pc, (void *)frame->pc);
+		pr_debug(" [<%08lx>] %pB\n", frame->pc, (void *)frame->pc);
 	return 0;
 }
 
@@ -491,7 +491,7 @@ void show_trace(struct task_struct *task, unsigned long *sp)
 	pr_debug("Call Trace:\n");
 	walk_stackframe(sp, show_trace_cb, NULL);
 #ifndef CONFIG_KALLSYMS
-	pr_cont("\n");
+	pr_debug("\n");
 #endif
 }
 
@@ -511,9 +511,9 @@ void show_stack(struct task_struct *task, unsigned long *sp)
 	for (i = 0; i < kstack_depth_to_print; i++) {
 		if (kstack_end(sp))
 			break;
-		pr_cont(" %08lx", *sp++);
+		pr_debug(" %08lx", *sp++);
 		if (i % 8 == 7)
-			pr_cont("\n");
+			pr_debug("\n");
 	}
 	show_trace(task, stack);
 }

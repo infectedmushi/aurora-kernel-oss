@@ -737,7 +737,7 @@ static void pcibios_allocate_bus_resources(struct pci_bus *bus)
 
 		}
 		pr_warn("PCI: Cannot allocate resource region ");
-		pr_cont("%d of PCI bridge %d, will remap\n", i, bus->number);
+		pr_debug("%d of PCI bridge %d, will remap\n", i, bus->number);
 		res->start = res->end = 0;
 		res->flags = 0;
 	}
@@ -760,7 +760,7 @@ static inline void alloc_resource(struct pci_dev *dev, int idx)
 	if (!pr || (pr->flags & IORESOURCE_UNSET) ||
 	    request_resource(pr, r) < 0) {
 		pr_warn("PCI: Cannot allocate resource region %d ", idx);
-		pr_cont("of device %s, will remap\n", pci_name(dev));
+		pr_debug("of device %s, will remap\n", pci_name(dev));
 		if (pr)
 			pr_debug("PCI:  parent is %p: %016llx-%016llx [%x]\n",
 				 pr,
@@ -919,7 +919,7 @@ static void pcibios_setup_phb_resources(struct pci_controller *hose,
 
 	if (!res->flags) {
 		pr_warn("PCI: I/O resource not set for host ");
-		pr_cont("bridge %pOF (domain %d)\n",
+		pr_debug("bridge %pOF (domain %d)\n",
 			hose->dn, hose->global_number);
 		/* Workaround for lack of IO resource only on 32-bit */
 		res->start = (unsigned long)hose->io_base_virt - isa_io_base;
@@ -941,7 +941,7 @@ static void pcibios_setup_phb_resources(struct pci_controller *hose,
 			if (i > 0)
 				continue;
 			pr_err("PCI: Memory resource 0 not set for ");
-			pr_cont("host bridge %pOF (domain %d)\n",
+			pr_debug("host bridge %pOF (domain %d)\n",
 				hose->dn, hose->global_number);
 
 			/* Workaround for lack of MEM resource only on 32-bit */

@@ -266,7 +266,7 @@ static int __init ultra_probe1(struct net_device *dev, int ioaddr)
 		irq = irqmap[((irqreg & 0x40) >> 4) + ((irqreg & 0x0c) >> 2)];
 
 		if (irq == 0) {
-			pr_cont(", failed to detect IRQ line.\n");
+			pr_debug(", failed to detect IRQ line.\n");
 			retval =  -EAGAIN;
 			goto out;
 		}
@@ -297,7 +297,7 @@ static int __init ultra_probe1(struct net_device *dev, int ioaddr)
 
 	ei_status.mem = ioremap(dev->mem_start, (ei_status.stop_page - START_PG)*256);
 	if (!ei_status.mem) {
-		pr_cont(", failed to ioremap.\n");
+		pr_debug(", failed to ioremap.\n");
 		retval =  -ENOMEM;
 		goto out;
 	}
@@ -305,13 +305,13 @@ static int __init ultra_probe1(struct net_device *dev, int ioaddr)
 	dev->mem_end = dev->mem_start + (ei_status.stop_page - START_PG)*256;
 
 	if (piomode) {
-		pr_cont(", %s IRQ %d programmed-I/O mode.\n",
+		pr_debug(", %s IRQ %d programmed-I/O mode.\n",
 			eeprom_irq ? "EEPROM" : "assigned ", dev->irq);
 		ei_status.block_input = &ultra_pio_input;
 		ei_status.block_output = &ultra_pio_output;
 		ei_status.get_8390_hdr = &ultra_pio_get_hdr;
 	} else {
-		pr_cont(", %s IRQ %d memory %#lx-%#lx.\n",
+		pr_debug(", %s IRQ %d memory %#lx-%#lx.\n",
 			eeprom_irq ? "" : "assigned ", dev->irq, dev->mem_start,
 			dev->mem_end-1);
 		ei_status.block_input = &ultra_block_input;

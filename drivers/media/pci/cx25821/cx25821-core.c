@@ -337,13 +337,13 @@ static int cx25821_risc_decode(u32 risc)
 	};
 	int i;
 
-	pr_cont("0x%08x [ %s",
+	pr_debug("0x%08x [ %s",
 		risc, instr[risc >> 28] ? instr[risc >> 28] : "INVALID");
 	for (i = ARRAY_SIZE(bits) - 1; i >= 0; i--) {
 		if (risc & (1 << (i + 12)))
-			pr_cont(" %s", bits[i]);
+			pr_debug(" %s", bits[i]);
 	}
-	pr_cont(" count=%d ]\n", risc & 0xfff);
+	pr_debug(" count=%d ]\n", risc & 0xfff);
 	return incr[risc >> 28] ? incr[risc >> 28] : 1;
 }
 
@@ -703,9 +703,9 @@ void cx25821_sram_channel_dump_audio(struct cx25821_dev *dev,
 	pr_warn("\nread cdt loc=0x%x\n", risc);
 	for (i = 0; i < 8; i++) {
 		n = cx_read(risc + i * 4);
-		pr_cont("0x%x ", n);
+		pr_debug("0x%x ", n);
 	}
-	pr_cont("\n\n");
+	pr_debug("\n\n");
 
 	value = cx_read(CLK_RST);
 	CX25821_INFO(" CLK_RST = 0x%x\n\n", value);
@@ -1259,14 +1259,14 @@ void cx25821_print_irqbits(char *name, char *tag, char **strings,
 		if (!(bits & (1 << i)))
 			continue;
 		if (strings[i])
-			pr_cont(" %s", strings[i]);
+			pr_debug(" %s", strings[i]);
 		else
-			pr_cont(" %d", i);
+			pr_debug(" %d", i);
 		if (!(mask & (1 << i)))
 			continue;
-		pr_cont("*");
+		pr_debug("*");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 EXPORT_SYMBOL(cx25821_print_irqbits);
 

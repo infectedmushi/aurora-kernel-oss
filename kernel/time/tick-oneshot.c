@@ -84,12 +84,12 @@ int tick_switch_to_oneshot(void (*handler)(struct clock_event_device *))
 
 		pr_debug("Clockevents: could not switch to one-shot mode:");
 		if (!dev) {
-			pr_cont(" no tick device\n");
+			pr_debug(" no tick device\n");
 		} else {
 			if (!tick_device_is_functional(dev))
-				pr_cont(" %s is not functional.\n", dev->name);
+				pr_debug(" %s is not functional.\n", dev->name);
 			else
-				pr_cont(" %s does not support one-shot mode.\n",
+				pr_debug(" %s does not support one-shot mode.\n",
 					dev->name);
 		}
 		return -EINVAL;

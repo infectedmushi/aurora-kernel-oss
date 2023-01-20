@@ -155,12 +155,12 @@ void __init machine_early_init(const char *cmdline, unsigned int ram,
 #if CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR
 	if (msr) {
 		pr_debug("!!!Your kernel has setup MSR instruction but ");
-		pr_cont("CPU don't have it %x\n", msr);
+		pr_debug("CPU don't have it %x\n", msr);
 	}
 #else
 	if (!msr) {
 		pr_debug("!!!Your kernel not setup MSR instruction but ");
-		pr_cont("CPU have it %x\n", msr);
+		pr_debug("CPU have it %x\n", msr);
 	}
 #endif
 

@@ -797,9 +797,9 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
 
 	pr_debug("%s: port", pci_name(pdev));
 	for (i = 0; i < ports; i++)
-		pr_cont("%s #%i: %s",
+		pr_debug("%s #%i: %s",
 			i ? "," : "", i, card->ports[i].dev->name);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	for (i = 0; i < ports; i++)
 		wanxl_cable_intr(&card->ports[i]); /* get carrier status etc.*/

@@ -145,19 +145,19 @@ static int check_powernow(void)
 	pr_debug("PowerNOW! Technology present. Can scale: ");
 
 	if (edx & 1 << 1) {
-		pr_cont("frequency");
+		pr_debug("frequency");
 		can_scale_bus = 1;
 	}
 
 	if ((edx & (1 << 1 | 1 << 2)) == 0x6)
-		pr_cont(" and ");
+		pr_debug(" and ");
 
 	if (edx & 1 << 2) {
-		pr_cont("voltage");
+		pr_debug("voltage");
 		can_scale_vid = 1;
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 	return 1;
 }
 

@@ -393,8 +393,8 @@ static void sdla_errors(struct net_device *dev, int cmd, int dlci, int ret, int 
 			netdev_info(dev, "Received unknown DLCIs:");
 			len /= sizeof(short);
 			for(pdlci = data,i=0;i < len;i++,pdlci++)
-				pr_cont(" %i", *pdlci);
-			pr_cont("\n");
+				pr_debug(" %i", *pdlci);
+			pr_debug("\n");
 			break;
 
 		case SDLA_RET_TIMEOUT:

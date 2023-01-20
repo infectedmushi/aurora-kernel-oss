@@ -260,8 +260,8 @@ static int ddebug_tokenize(char *buf, char *words[], int maxwords)
 		int i;
 		pr_debug("split into words:");
 		for (i = 0; i < nwords; i++)
-			pr_cont(" \"%s\"", words[i]);
-		pr_cont("\n");
+			pr_debug(" \"%s\"", words[i]);
+		pr_debug("\n");
 	}
 
 	return nwords;

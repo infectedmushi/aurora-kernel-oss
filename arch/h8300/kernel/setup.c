@@ -208,7 +208,7 @@ void __init calibrate_delay(void)
 	cpu = of_find_compatible_node(NULL, NULL, "renesas,h8300");
 	of_property_read_s32(cpu, "clock-frequency", &freq);
 	loops_per_jiffy = freq / HZ / (access_timing() * 2);
-	pr_cont("%lu.%02lu BogoMIPS (lpj=%lu)\n",
+	pr_debug("%lu.%02lu BogoMIPS (lpj=%lu)\n",
 		loops_per_jiffy / (500000 / HZ),
 		(loops_per_jiffy / (5000 / HZ)) % 100, loops_per_jiffy);
 }

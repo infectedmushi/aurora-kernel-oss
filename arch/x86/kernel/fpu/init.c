@@ -286,11 +286,11 @@ static void __init fpu__init_parse_early_param(void)
 			break;
 
 		if (bit >= 0 && bit < NCAPINTS * 32) {
-			pr_cont(" " X86_CAP_FMT, x86_cap_flag(bit));
+			pr_debug(" " X86_CAP_FMT, x86_cap_flag(bit));
 			setup_clear_cpu_cap(bit);
 		}
 	} while (res == 2);
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*

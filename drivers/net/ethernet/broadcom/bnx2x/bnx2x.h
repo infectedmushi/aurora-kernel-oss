@@ -103,7 +103,7 @@ do {								\
 #define DP_CONT(__mask, fmt, ...)				\
 do {								\
 	if (unlikely(bp->msg_enable & (__mask)))		\
-		pr_cont(fmt, ##__VA_ARGS__);			\
+		pr_debug(fmt, ##__VA_ARGS__);			\
 } while (0)
 
 /* errors debug print */

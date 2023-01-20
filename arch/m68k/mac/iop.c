@@ -118,12 +118,12 @@
 #ifdef DEBUG
 #define iop_pr_debug(fmt, ...) \
 	printk(KERN_DEBUG "%s: " fmt, __func__, ##__VA_ARGS__)
-#define iop_pr_cont(fmt, ...) \
+#define iop_pr_debug(fmt, ...) \
 	printk(KERN_CONT fmt, ##__VA_ARGS__)
 #else
 #define iop_pr_debug(fmt, ...) \
 	no_printk(KERN_DEBUG "%s: " fmt, __func__, ##__VA_ARGS__)
-#define iop_pr_cont(fmt, ...) \
+#define iop_pr_debug(fmt, ...) \
 	no_printk(KERN_CONT fmt, ##__VA_ARGS__)
 #endif
 
@@ -567,12 +567,12 @@ irqreturn_t iop_ism_irq(int irq, void *dev_id)
 		iop_pr_debug("new status %02X, send states", iop->status_ctrl);
 		for (i = 0 ; i < NUM_IOP_CHAN  ; i++) {
 			state = iop_readb(iop, IOP_ADDR_SEND_STATE + i);
-			iop_pr_cont(" %02X", state);
+			iop_pr_debug(" %02X", state);
 			if (state == IOP_MSG_COMPLETE) {
 				iop_handle_send(iop_num, i);
 			}
 		}
-		iop_pr_cont("\n");
+		iop_pr_debug("\n");
 	}
 
 	if (iop->status_ctrl & IOP_INT1) {	/* INT1 for incoming msgs */
@@ -580,12 +580,12 @@ irqreturn_t iop_ism_irq(int irq, void *dev_id)
 		iop_pr_debug("new status %02X, recv states", iop->status_ctrl);
 		for (i = 0 ; i < NUM_IOP_CHAN ; i++) {
 			state = iop_readb(iop, IOP_ADDR_RECV_STATE + i);
-			iop_pr_cont(" %02X", state);
+			iop_pr_debug(" %02X", state);
 			if (state == IOP_MSG_NEW) {
 				iop_handle_recv(iop_num, i);
 			}
 		}
-		iop_pr_cont("\n");
+		iop_pr_debug("\n");
 	}
 	return IRQ_HANDLED;
 }

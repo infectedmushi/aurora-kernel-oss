@@ -202,8 +202,8 @@ void __init omap_check_revision(void)
 
 	pr_debug("OMAP%04x", omap_revision >> 16);
 	if ((omap_revision >> 8) & 0xff)
-		pr_cont("%x", (omap_revision >> 8) & 0xff);
-	pr_cont(" revision %i handled as %02xxx id: %08x%08x\n",
+		pr_debug("%x", (omap_revision >> 8) & 0xff);
+	pr_debug(" revision %i handled as %02xxx id: %08x%08x\n",
 	       die_rev, omap_revision & 0xff, system_serial_low,
 	       system_serial_high);
 }

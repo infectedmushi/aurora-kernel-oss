@@ -199,30 +199,30 @@ static int eps_cpu_init(struct cpufreq_policy *policy)
 	case 10:
 		rdmsr(0x1153, lo, hi);
 		brand = (((lo >> 2) ^ lo) >> 18) & 3;
-		pr_cont("Model A ");
+		pr_debug("Model A ");
 		break;
 	case 13:
 		rdmsr(0x1154, lo, hi);
 		brand = (((lo >> 4) ^ (lo >> 2))) & 0x000000ff;
-		pr_cont("Model D ");
+		pr_debug("Model D ");
 		break;
 	}
 
 	switch (brand) {
 	case EPS_BRAND_C7M:
-		pr_cont("C7-M\n");
+		pr_debug("C7-M\n");
 		break;
 	case EPS_BRAND_C7:
-		pr_cont("C7\n");
+		pr_debug("C7\n");
 		break;
 	case EPS_BRAND_EDEN:
-		pr_cont("Eden\n");
+		pr_debug("Eden\n");
 		break;
 	case EPS_BRAND_C7D:
-		pr_cont("C7-D\n");
+		pr_debug("C7-D\n");
 		break;
 	case EPS_BRAND_C3:
-		pr_cont("C3\n");
+		pr_debug("C3\n");
 		return -ENODEV;
 		break;
 	}

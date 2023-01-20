@@ -69,23 +69,23 @@ void hpfs_error(struct super_block *s, const char *fmt, ...)
 
 	if (!hpfs_sb(s)->sb_was_error) {
 		if (hpfs_sb(s)->sb_err == 2) {
-			pr_cont("; crashing the system because you wanted it\n");
+			pr_debug("; crashing the system because you wanted it\n");
 			mark_dirty(s, 0);
 			panic("HPFS panic");
 		} else if (hpfs_sb(s)->sb_err == 1) {
 			if (sb_rdonly(s))
-				pr_cont("; already mounted read-only\n");
+				pr_debug("; already mounted read-only\n");
 			else {
-				pr_cont("; remounting read-only\n");
+				pr_debug("; remounting read-only\n");
 				mark_dirty(s, 0);
 				s->s_flags |= SB_RDONLY;
 			}
 		} else if (sb_rdonly(s))
-				pr_cont("; going on - but anything won't be destroyed because it's read-only\n");
+				pr_debug("; going on - but anything won't be destroyed because it's read-only\n");
 		else
-			pr_cont("; corrupted filesystem mounted read/write - your computer will explode within 20 seconds ... but you wanted it so!\n");
+			pr_debug("; corrupted filesystem mounted read/write - your computer will explode within 20 seconds ... but you wanted it so!\n");
 	} else
-		pr_cont("\n");
+		pr_debug("\n");
 	hpfs_sb(s)->sb_was_error = 1;
 }
 

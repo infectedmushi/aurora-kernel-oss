@@ -323,7 +323,7 @@ do {						\
 #define dprintk_cont(fmt, ...)			\
 do {						\
 	if (bttv_debug >= 1)			\
-		pr_cont(fmt, ##__VA_ARGS__);	\
+		pr_debug(fmt, ##__VA_ARGS__);	\
 } while (0)
 #define d2printk(fmt, ...)			\
 do {						\

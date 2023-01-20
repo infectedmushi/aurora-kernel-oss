@@ -315,9 +315,9 @@ static bool f12h_mc0_mce(u16 ec, u8 xec)
 		ret = true;
 
 		if (ll == LL_L2)
-			pr_cont("during L1 linefill from L2.\n");
+			pr_debug("during L1 linefill from L2.\n");
 		else if (ll == LL_L1)
-			pr_cont("Data/Tag %s error.\n", R4_MSG(ec));
+			pr_debug("Data/Tag %s error.\n", R4_MSG(ec));
 		else
 			ret = false;
 	}
@@ -327,7 +327,7 @@ static bool f12h_mc0_mce(u16 ec, u8 xec)
 static bool f10h_mc0_mce(u16 ec, u8 xec)
 {
 	if (R4(ec) == R4_GEN && LL(ec) == LL_L1) {
-		pr_cont("during data scrub.\n");
+		pr_debug("during data scrub.\n");
 		return true;
 	}
 	return f12h_mc0_mce(ec, xec);
@@ -336,7 +336,7 @@ static bool f10h_mc0_mce(u16 ec, u8 xec)
 static bool k8_mc0_mce(u16 ec, u8 xec)
 {
 	if (BUS_ERROR(ec)) {
-		pr_cont("during system linefill.\n");
+		pr_debug("during system linefill.\n");
 		return true;
 	}
 
@@ -356,14 +356,14 @@ static bool cat_mc0_mce(u16 ec, u8 xec)
 		switch (r4) {
 		case R4_DRD:
 		case R4_DWR:
-			pr_cont("Data/Tag parity error due to %s.\n",
+			pr_debug("Data/Tag parity error due to %s.\n",
 				(r4 == R4_DRD ? "load/hw prf" : "store"));
 			break;
 		case R4_EVICT:
-			pr_cont("Copyback parity error on a tag miss.\n");
+			pr_debug("Copyback parity error on a tag miss.\n");
 			break;
 		case R4_SNOOP:
-			pr_cont("Tag parity error during snoop.\n");
+			pr_debug("Tag parity error during snoop.\n");
 			break;
 		default:
 			ret = false;
@@ -373,17 +373,17 @@ static bool cat_mc0_mce(u16 ec, u8 xec)
 		if ((II(ec) != II_MEM && II(ec) != II_IO) || LL(ec) != LL_LG)
 			return false;
 
-		pr_cont("System read data error on a ");
+		pr_debug("System read data error on a ");
 
 		switch (r4) {
 		case R4_RD:
-			pr_cont("TLB reload.\n");
+			pr_debug("TLB reload.\n");
 			break;
 		case R4_DWR:
-			pr_cont("store.\n");
+			pr_debug("store.\n");
 			break;
 		case R4_DRD:
-			pr_cont("load.\n");
+			pr_debug("load.\n");
 			break;
 		default:
 			ret = false;
@@ -403,28 +403,28 @@ static bool f15h_mc0_mce(u16 ec, u8 xec)
 
 		switch (xec) {
 		case 0x0:
-			pr_cont("Data Array access error.\n");
+			pr_debug("Data Array access error.\n");
 			break;
 
 		case 0x1:
-			pr_cont("UC error during a linefill from L2/NB.\n");
+			pr_debug("UC error during a linefill from L2/NB.\n");
 			break;
 
 		case 0x2:
 		case 0x11:
-			pr_cont("STQ access error.\n");
+			pr_debug("STQ access error.\n");
 			break;
 
 		case 0x3:
-			pr_cont("SCB access error.\n");
+			pr_debug("SCB access error.\n");
 			break;
 
 		case 0x10:
-			pr_cont("Tag error.\n");
+			pr_debug("Tag error.\n");
 			break;
 
 		case 0x12:
-			pr_cont("LDQ access error.\n");
+			pr_debug("LDQ access error.\n");
 			break;
 
 		default:
@@ -433,12 +433,12 @@ static bool f15h_mc0_mce(u16 ec, u8 xec)
 	} else if (BUS_ERROR(ec)) {
 
 		if (!xec)
-			pr_cont("System Read Data Error.\n");
+			pr_debug("System Read Data Error.\n");
 		else
-			pr_cont(" Internal error condition type %d.\n", xec);
+			pr_debug(" Internal error condition type %d.\n", xec);
 	} else if (INT_ERROR(ec)) {
 		if (xec <= 0x1f)
-			pr_cont("Hardware Assert.\n");
+			pr_debug("Hardware Assert.\n");
 		else
 			ret = false;
 
@@ -458,7 +458,7 @@ static void decode_mc0_mce(struct mce *m)
 	/* TLB error signatures are the same across families */
 	if (TLB_ERROR(ec)) {
 		if (TT(ec) == TT_DATA) {
-			pr_cont("%s TLB %s.\n", LL_MSG(ec),
+			pr_debug("%s TLB %s.\n", LL_MSG(ec),
 				((xec == 2) ? "locked miss"
 					    : (xec ? "multimatch" : "parity")));
 			return;
@@ -478,19 +478,19 @@ static bool k8_mc1_mce(u16 ec, u8 xec)
 		return false;
 
 	if (ll == 0x2)
-		pr_cont("during a linefill from L2.\n");
+		pr_debug("during a linefill from L2.\n");
 	else if (ll == 0x1) {
 		switch (R4(ec)) {
 		case R4_IRD:
-			pr_cont("Parity error during data load.\n");
+			pr_debug("Parity error during data load.\n");
 			break;
 
 		case R4_EVICT:
-			pr_cont("Copyback Parity/Victim error.\n");
+			pr_debug("Copyback Parity/Victim error.\n");
 			break;
 
 		case R4_SNOOP:
-			pr_cont("Tag Snoop error.\n");
+			pr_debug("Tag Snoop error.\n");
 			break;
 
 		default:
@@ -515,13 +515,13 @@ static bool cat_mc1_mce(u16 ec, u8 xec)
 		return false;
 
 	if (r4 == R4_IRD)
-		pr_cont("Data/tag array parity error for a tag hit.\n");
+		pr_debug("Data/tag array parity error for a tag hit.\n");
 	else if (r4 == R4_SNOOP)
-		pr_cont("Tag error during snoop/victimization.\n");
+		pr_debug("Tag error during snoop/victimization.\n");
 	else if (xec == 0x0)
-		pr_cont("Tag parity error from victim castout.\n");
+		pr_debug("Tag parity error from victim castout.\n");
 	else if (xec == 0x2)
-		pr_cont("Microcode patch RAM parity error.\n");
+		pr_debug("Microcode patch RAM parity error.\n");
 	else
 		ret = false;
 
@@ -537,19 +537,19 @@ static bool f15h_mc1_mce(u16 ec, u8 xec)
 
 	switch (xec) {
 	case 0x0 ... 0xa:
-		pr_cont("%s.\n", f15h_mc1_mce_desc[xec]);
+		pr_debug("%s.\n", f15h_mc1_mce_desc[xec]);
 		break;
 
 	case 0xd:
-		pr_cont("%s.\n", f15h_mc1_mce_desc[xec-2]);
+		pr_debug("%s.\n", f15h_mc1_mce_desc[xec-2]);
 		break;
 
 	case 0x10:
-		pr_cont("%s.\n", f15h_mc1_mce_desc[xec-4]);
+		pr_debug("%s.\n", f15h_mc1_mce_desc[xec-4]);
 		break;
 
 	case 0x11 ... 0x15:
-		pr_cont("Decoder %s parity error.\n", f15h_mc1_mce_desc[xec-4]);
+		pr_debug("Decoder %s parity error.\n", f15h_mc1_mce_desc[xec-4]);
 		break;
 
 	default:
@@ -566,15 +566,15 @@ static void decode_mc1_mce(struct mce *m)
 	pr_emerg(HW_ERR "MC1 Error: ");
 
 	if (TLB_ERROR(ec))
-		pr_cont("%s TLB %s.\n", LL_MSG(ec),
+		pr_debug("%s TLB %s.\n", LL_MSG(ec),
 			(xec ? "multimatch" : "parity error"));
 	else if (BUS_ERROR(ec)) {
 		bool k8 = (boot_cpu_data.x86 == 0xf && (m->status & BIT_64(58)));
 
-		pr_cont("during %s.\n", (k8 ? "system linefill" : "NB data read"));
+		pr_debug("during %s.\n", (k8 ? "system linefill" : "NB data read"));
 	} else if (INT_ERROR(ec)) {
 		if (xec <= 0x3f)
-			pr_cont("Hardware Assert.\n");
+			pr_debug("Hardware Assert.\n");
 		else
 			goto wrong_mc1_mce;
 	} else if (fam_ops->mc1_mce(ec, xec))
@@ -593,26 +593,26 @@ static bool k8_mc2_mce(u16 ec, u8 xec)
 	bool ret = true;
 
 	if (xec == 0x1)
-		pr_cont(" in the write data buffers.\n");
+		pr_debug(" in the write data buffers.\n");
 	else if (xec == 0x3)
-		pr_cont(" in the victim data buffers.\n");
+		pr_debug(" in the victim data buffers.\n");
 	else if (xec == 0x2 && MEM_ERROR(ec))
-		pr_cont(": %s error in the L2 cache tags.\n", R4_MSG(ec));
+		pr_debug(": %s error in the L2 cache tags.\n", R4_MSG(ec));
 	else if (xec == 0x0) {
 		if (TLB_ERROR(ec))
-			pr_cont("%s error in a Page Descriptor Cache or Guest TLB.\n",
+			pr_debug("%s error in a Page Descriptor Cache or Guest TLB.\n",
 				TT_MSG(ec));
 		else if (BUS_ERROR(ec))
-			pr_cont(": %s/ECC error in data read from NB: %s.\n",
+			pr_debug(": %s/ECC error in data read from NB: %s.\n",
 				R4_MSG(ec), PP_MSG(ec));
 		else if (MEM_ERROR(ec)) {
 			u8 r4 = R4(ec);
 
 			if (r4 >= 0x7)
-				pr_cont(": %s error during data copyback.\n",
+				pr_debug(": %s error during data copyback.\n",
 					R4_MSG(ec));
 			else if (r4 <= 0x1)
-				pr_cont(": %s parity/ECC error during data "
+				pr_debug(": %s parity/ECC error during data "
 					"access from L2.\n", R4_MSG(ec));
 			else
 				ret = false;
@@ -630,24 +630,24 @@ static bool f15h_mc2_mce(u16 ec, u8 xec)
 
 	if (TLB_ERROR(ec)) {
 		if (xec == 0x0)
-			pr_cont("Data parity TLB read error.\n");
+			pr_debug("Data parity TLB read error.\n");
 		else if (xec == 0x1)
-			pr_cont("Poison data provided for TLB fill.\n");
+			pr_debug("Poison data provided for TLB fill.\n");
 		else
 			ret = false;
 	} else if (BUS_ERROR(ec)) {
 		if (xec > 2)
 			ret = false;
 
-		pr_cont("Error during attempted NB data read.\n");
+		pr_debug("Error during attempted NB data read.\n");
 	} else if (MEM_ERROR(ec)) {
 		switch (xec) {
 		case 0x4 ... 0xc:
-			pr_cont("%s.\n", f15h_mc2_mce_desc[xec - 0x4]);
+			pr_debug("%s.\n", f15h_mc2_mce_desc[xec - 0x4]);
 			break;
 
 		case 0x10 ... 0x14:
-			pr_cont("%s.\n", f15h_mc2_mce_desc[xec - 0x7]);
+			pr_debug("%s.\n", f15h_mc2_mce_desc[xec - 0x7]);
 			break;
 
 		default:
@@ -655,7 +655,7 @@ static bool f15h_mc2_mce(u16 ec, u8 xec)
 		}
 	} else if (INT_ERROR(ec)) {
 		if (xec <= 0x3f)
-			pr_cont("Hardware Assert.\n");
+			pr_debug("Hardware Assert.\n");
 		else
 			ret = false;
 	}
@@ -672,19 +672,19 @@ static bool f16h_mc2_mce(u16 ec, u8 xec)
 
 	switch (xec) {
 	case 0x04 ... 0x05:
-		pr_cont("%cBUFF parity error.\n", (r4 == R4_RD) ? 'I' : 'O');
+		pr_debug("%cBUFF parity error.\n", (r4 == R4_RD) ? 'I' : 'O');
 		break;
 
 	case 0x09 ... 0x0b:
 	case 0x0d ... 0x0f:
-		pr_cont("ECC error in L2 tag (%s).\n",
+		pr_debug("ECC error in L2 tag (%s).\n",
 			((r4 == R4_GEN)   ? "BankReq" :
 			((r4 == R4_SNOOP) ? "Prb"     : "Fill")));
 		break;
 
 	case 0x10 ... 0x19:
 	case 0x1b:
-		pr_cont("ECC error in L2 data array (%s).\n",
+		pr_debug("ECC error in L2 data array (%s).\n",
 			(((r4 == R4_RD) && !(xec & 0x3)) ? "Hit"  :
 			((r4 == R4_GEN)   ? "Attr" :
 			((r4 == R4_EVICT) ? "Vict" : "Fill"))));
@@ -692,7 +692,7 @@ static bool f16h_mc2_mce(u16 ec, u8 xec)
 
 	case 0x1c ... 0x1d:
 	case 0x1f:
-		pr_cont("Parity error in L2 attribute bits (%s).\n",
+		pr_debug("Parity error in L2 attribute bits (%s).\n",
 			((r4 == R4_RD)  ? "Hit"  :
 			((r4 == R4_GEN) ? "Attr" : "Fill")));
 		break;
@@ -712,7 +712,7 @@ static void decode_mc2_mce(struct mce *m)
 	pr_emerg(HW_ERR "MC2 Error: ");
 
 	if (!fam_ops->mc2_mce(ec, xec))
-		pr_cont(HW_ERR "Corrupted MC2 MCE info?\n");
+		pr_debug(HW_ERR "Corrupted MC2 MCE info?\n");
 }
 
 static void decode_mc3_mce(struct mce *m)
@@ -734,7 +734,7 @@ static void decode_mc3_mce(struct mce *m)
 		if (!BUS_ERROR(ec) || (r4 != R4_DRD && r4 != R4_DWR))
 			goto wrong_mc3_mce;
 
-		pr_cont(" during %s.\n", R4_MSG(ec));
+		pr_debug(" during %s.\n", R4_MSG(ec));
 	} else
 		goto wrong_mc3_mce;
 
@@ -763,7 +763,7 @@ static void decode_mc4_mce(struct mce *m)
 			if (fam == 0x11)
 				goto wrong_mc4_mce;
 
-			pr_cont("%s.\n", mc4_mce_desc[xec]);
+			pr_debug("%s.\n", mc4_mce_desc[xec]);
 
 			if (decode_dram_ecc)
 				decode_dram_ecc(node_id, m);
@@ -773,16 +773,16 @@ static void decode_mc4_mce(struct mce *m)
 
 	case 0xf:
 		if (TLB_ERROR(ec))
-			pr_cont("GART Table Walk data error.\n");
+			pr_debug("GART Table Walk data error.\n");
 		else if (BUS_ERROR(ec))
-			pr_cont("DMA Exclusion Vector Table Walk error.\n");
+			pr_debug("DMA Exclusion Vector Table Walk error.\n");
 		else
 			goto wrong_mc4_mce;
 		return;
 
 	case 0x19:
 		if (fam == 0x15 || fam == 0x16)
-			pr_cont("Compute Unit Data Error.\n");
+			pr_debug("Compute Unit Data Error.\n");
 		else
 			goto wrong_mc4_mce;
 		return;
@@ -795,7 +795,7 @@ static void decode_mc4_mce(struct mce *m)
 		goto wrong_mc4_mce;
 	}
 
-	pr_cont("%s.\n", mc4_mce_desc[xec - offset]);
+	pr_debug("%s.\n", mc4_mce_desc[xec - offset]);
 	return;
 
  wrong_mc4_mce:
@@ -815,16 +815,16 @@ static void decode_mc5_mce(struct mce *m)
 
 	if (INT_ERROR(ec)) {
 		if (xec <= 0x1f) {
-			pr_cont("Hardware Assert.\n");
+			pr_debug("Hardware Assert.\n");
 			return;
 		} else
 			goto wrong_mc5_mce;
 	}
 
 	if (xec == 0x0 || xec == 0xc)
-		pr_cont("%s.\n", mc5_mce_desc[xec]);
+		pr_debug("%s.\n", mc5_mce_desc[xec]);
 	else if (xec <= 0xd)
-		pr_cont("%s parity error.\n", mc5_mce_desc[xec]);
+		pr_debug("%s parity error.\n", mc5_mce_desc[xec]);
 	else
 		goto wrong_mc5_mce;
 
@@ -843,7 +843,7 @@ static void decode_mc6_mce(struct mce *m)
 	if (xec > 0x5)
 		goto wrong_mc6_mce;
 
-	pr_cont("%s parity error.\n", mc6_mce_desc[xec]);
+	pr_debug("%s parity error.\n", mc6_mce_desc[xec]);
 	return;
 
  wrong_mc6_mce:
@@ -880,7 +880,7 @@ static void decode_smca_error(struct mce *m)
 	if (xec < smca_mce_descs[bank_type].num_descs &&
 			(hwid->xec_bitmap & BIT_ULL(xec))) {
 		pr_emerg(HW_ERR "%s Error: ", ip_name);
-		pr_cont("%s.\n", smca_mce_descs[bank_type].descs[xec]);
+		pr_debug("%s.\n", smca_mce_descs[bank_type].descs[xec]);
 	}
 
 	if (bank_type == SMCA_UMC && xec == 0 && decode_dram_ecc)
@@ -897,18 +897,18 @@ static inline void amd_decode_err_code(u16 ec)
 	pr_emerg(HW_ERR "cache level: %s", LL_MSG(ec));
 
 	if (BUS_ERROR(ec))
-		pr_cont(", mem/io: %s", II_MSG(ec));
+		pr_debug(", mem/io: %s", II_MSG(ec));
 	else
-		pr_cont(", tx: %s", TT_MSG(ec));
+		pr_debug(", tx: %s", TT_MSG(ec));
 
 	if (MEM_ERROR(ec) || BUS_ERROR(ec)) {
-		pr_cont(", mem-tx: %s", R4_MSG(ec));
+		pr_debug(", mem-tx: %s", R4_MSG(ec));
 
 		if (BUS_ERROR(ec))
-			pr_cont(", part-proc: %s (%s)", PP_MSG(ec), TO_MSG(ec));
+			pr_debug(", part-proc: %s (%s)", PP_MSG(ec), TO_MSG(ec));
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*
@@ -965,30 +965,30 @@ amd_decode_mce(struct notifier_block *nb, unsigned long val, void *data)
 		((m->status & MCI_STATUS_ADDRV)	? "AddrV" : "-"));
 
 	if (fam >= 0x15) {
-		pr_cont("|%s", (m->status & MCI_STATUS_DEFERRED ? "Deferred" : "-"));
+		pr_debug("|%s", (m->status & MCI_STATUS_DEFERRED ? "Deferred" : "-"));
 
 		/* F15h, bank4, bit 43 is part of McaStatSubCache. */
 		if (fam != 0x15 || m->bank != 4)
-			pr_cont("|%s", (m->status & MCI_STATUS_POISON ? "Poison" : "-"));
+			pr_debug("|%s", (m->status & MCI_STATUS_POISON ? "Poison" : "-"));
 	}
 
 	if (boot_cpu_has(X86_FEATURE_SMCA)) {
 		u32 low, high;
 		u32 addr = MSR_AMD64_SMCA_MCx_CONFIG(m->bank);
 
-		pr_cont("|%s", ((m->status & MCI_STATUS_SYNDV) ? "SyndV" : "-"));
+		pr_debug("|%s", ((m->status & MCI_STATUS_SYNDV) ? "SyndV" : "-"));
 
 		if (!rdmsr_safe(addr, &low, &high) &&
 		    (low & MCI_CONFIG_MCAX))
-			pr_cont("|%s", ((m->status & MCI_STATUS_TCC) ? "TCC" : "-"));
+			pr_debug("|%s", ((m->status & MCI_STATUS_TCC) ? "TCC" : "-"));
 	}
 
 	/* do the two bits[14:13] together */
 	ecc = (m->status >> 45) & 0x3;
 	if (ecc)
-		pr_cont("|%sECC", ((ecc == 2) ? "C" : "U"));
+		pr_debug("|%sECC", ((ecc == 2) ? "C" : "U"));
 
-	pr_cont("]: 0x%016llx\n", m->status);
+	pr_debug("]: 0x%016llx\n", m->status);
 
 	if (m->status & MCI_STATUS_ADDRV)
 		pr_emerg(HW_ERR "Error Addr: 0x%016llx\n", m->addr);
@@ -997,9 +997,9 @@ amd_decode_mce(struct notifier_block *nb, unsigned long val, void *data)
 		pr_emerg(HW_ERR "IPID: 0x%016llx", m->ipid);
 
 		if (m->status & MCI_STATUS_SYNDV)
-			pr_cont(", Syndrome: 0x%016llx", m->synd);
+			pr_debug(", Syndrome: 0x%016llx", m->synd);
 
-		pr_cont("\n");
+		pr_debug("\n");
 
 		decode_smca_error(m);
 		goto err_code;

@@ -49,10 +49,10 @@ void show_stack(struct task_struct *task, unsigned long *stack)
 		if (kstack_end(stack))
 			break;
 		if (i && ((i % STACKSLOTS_PER_LINE) == 0))
-			pr_cont("\n");
-		pr_cont(" %08lx", *stack++);
+			pr_debug("\n");
+		pr_debug(" %08lx", *stack++);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 
 	pr_debug("Call Trace:\n");
 	dump_trace(current, &stackops, NULL);

@@ -22,7 +22,7 @@ DEFINE_MUTEX(kernfs_mutex);
 static DEFINE_SPINLOCK(kernfs_rename_lock);	/* kn->parent and ->name */
 /*
  * Don't use rename_lock to piggy back on pr_cont_buf. We don't want to
- * call pr_cont() while holding rename_lock. Because sometimes pr_cont()
+ * call pr_debug() while holding rename_lock. Because sometimes pr_debug()
  * will perform wakeups when releasing console_sem. Holding rename_lock
  * will introduce deadlock if the scheduler reads the kernfs_name in the
  * wakeup path.
@@ -240,7 +240,7 @@ void pr_cont_kernfs_name(struct kernfs_node *kn)
 	spin_lock_irqsave(&kernfs_pr_cont_lock, flags);
 
 	kernfs_name(kn, kernfs_pr_cont_buf, sizeof(kernfs_pr_cont_buf));
-	pr_cont("%s", kernfs_pr_cont_buf);
+	pr_debug("%s", kernfs_pr_cont_buf);
 
 	spin_unlock_irqrestore(&kernfs_pr_cont_lock, flags);
 }
@@ -261,16 +261,16 @@ void pr_cont_kernfs_path(struct kernfs_node *kn)
 	sz = kernfs_path_from_node(kn, NULL, kernfs_pr_cont_buf,
 				   sizeof(kernfs_pr_cont_buf));
 	if (sz < 0) {
-		pr_cont("(error)");
+		pr_debug("(error)");
 		goto out;
 	}
 
 	if (sz >= sizeof(kernfs_pr_cont_buf)) {
-		pr_cont("(name too long)");
+		pr_debug("(name too long)");
 		goto out;
 	}
 
-	pr_cont("%s", kernfs_pr_cont_buf);
+	pr_debug("%s", kernfs_pr_cont_buf);
 
 out:
 	spin_unlock_irqrestore(&kernfs_pr_cont_lock, flags);

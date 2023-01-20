@@ -1284,11 +1284,11 @@ static int vortex_probe1(struct device *gendev, void __iomem *ioaddr, int irq,
 		checksum = (checksum ^ (checksum >> 8)) & 0xff;
 	}
 	if ((checksum != 0x00) && !(vci->drv_flags & IS_TORNADO))
-		pr_cont(" ***INVALID CHECKSUM %4.4x*** ", checksum);
+		pr_debug(" ***INVALID CHECKSUM %4.4x*** ", checksum);
 	for (i = 0; i < 3; i++)
 		((__be16 *)dev->dev_addr)[i] = htons(eeprom[i + 10]);
 	if (print_info)
-		pr_cont(" %pM", dev->dev_addr);
+		pr_debug(" %pM", dev->dev_addr);
 	/* Unfortunately an all zero eeprom passes the checksum and this
 	   gets found in the wild in failure cases. Crypto is hard 8) */
 	if (!is_valid_ether_addr(dev->dev_addr)) {
@@ -1300,7 +1300,7 @@ static int vortex_probe1(struct device *gendev, void __iomem *ioaddr, int irq,
 		window_write8(vp, dev->dev_addr[i], 2, i);
 
 	if (print_info)
-		pr_cont(", IRQ %d\n", dev->irq);
+		pr_debug(", IRQ %d\n", dev->irq);
 	/* Tell them about an invalid IRQ. */
 	if (dev->irq <= 0 || dev->irq >= nr_irqs)
 		pr_warn(" *** Warning: IRQ %d is unlikely to work! ***\n",

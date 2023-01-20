@@ -4242,7 +4242,7 @@ static noinline void __schedule_bug(struct task_struct *prev)
 	    && in_atomic_preempt_off()) {
 		pr_err("Preemption disabled at:");
 		print_ip_sym(preempt_disable_ip);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 	if (panic_on_warn)
 		panic("scheduling while atomic\n");
@@ -7603,7 +7603,7 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
 	    && !preempt_count_equals(preempt_offset)) {
 		pr_err("Preemption disabled at:");
 		print_ip_sym(preempt_disable_ip);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 #ifdef CONFIG_PANIC_ON_SCHED_BUG
 	BUG();

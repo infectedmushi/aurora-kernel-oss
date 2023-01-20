@@ -231,11 +231,11 @@ repeat:
 					pr_warn("Key with scancode %d ", scancode);
 					if (keytyp == KT_LATIN || keytyp == KT_LETTER) {
 						if (keyval < ' ')
-							pr_cont("('^%c') ", keyval + '@');
+							pr_debug("('^%c') ", keyval + '@');
 						else
-							pr_cont("('%c') ", keyval);
+							pr_debug("('%c') ", keyval);
 					}
-					pr_cont("is broken -- will be ignored.\n");
+					pr_debug("is broken -- will be ignored.\n");
 					break;
 				} else if (test_bit(scancode, broken_keys))
 					break;

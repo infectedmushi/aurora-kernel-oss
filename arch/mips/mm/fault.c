@@ -216,11 +216,11 @@ bad_area_nosemaphore:
 			pr_debug("epc = %0*lx in", field,
 				(unsigned long) regs->cp0_epc);
 			print_vma_addr(KERN_CONT " ", regs->cp0_epc);
-			pr_cont("\n");
+			pr_debug("\n");
 			pr_debug("ra  = %0*lx in", field,
 				(unsigned long) regs->regs[31]);
 			print_vma_addr(KERN_CONT " ", regs->regs[31]);
-			pr_cont("\n");
+			pr_debug("\n");
 		}
 		current->thread.trap_nr = (regs->cp0_cause >> 2) & 0x1f;
 		force_sig_fault(SIGSEGV, si_code, (void __user *)address, tsk);

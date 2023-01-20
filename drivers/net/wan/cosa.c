@@ -1249,8 +1249,8 @@ static int cosa_start_tx(struct channel_data *chan, char *buf, int len)
 	pr_debug("cosa%dc%d: starting tx(0x%x)",
 		chan->cosa->num, chan->num, len);
 	for (i=0; i<len; i++)
-		pr_cont(" %02x", buf[i]&0xff);
-	pr_cont("\n");
+		pr_debug(" %02x", buf[i]&0xff);
+	pr_debug("\n");
 #endif
 	spin_lock_irqsave(&cosa->lock, flags);
 	chan->txbuf = buf;
@@ -1912,8 +1912,8 @@ static inline void eot_interrupt(struct cosa_data *cosa, int status)
 		pr_debug("cosa%dc%d: done rx(0x%x)",
 			cosa->num, cosa->rxchan->num, cosa->rxsize);
 		for (i=0; i<cosa->rxsize; i++)
-			pr_cont(" %02x", cosa->rxbuf[i]&0xff);
-		pr_cont("\n");
+			pr_debug(" %02x", cosa->rxbuf[i]&0xff);
+		pr_debug("\n");
 	}
 #endif
 		/* Packet for unknown channel? */

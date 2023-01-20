@@ -4684,9 +4684,9 @@ static int bond_check_params(struct bond_params *params)
 			arp_interval, valptr->string, arp_ip_count);
 
 		for (i = 0; i < arp_ip_count; i++)
-			pr_cont(" %s", arp_ip_target[i]);
+			pr_debug(" %s", arp_ip_target[i]);
 
-		pr_cont("\n");
+		pr_debug("\n");
 
 	} else if (max_bonds) {
 		/* miimon and arp_interval not set, we need one so things

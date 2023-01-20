@@ -1828,13 +1828,13 @@ int hibernate_preallocate_memory(void)
 
  out:
 	stop = ktime_get();
-	pr_cont("done (allocated %lu pages)\n", pages);
+	pr_debug("done (allocated %lu pages)\n", pages);
 	swsusp_show_speed(start, stop, pages, "Allocated");
 
 	return 0;
 
  err_out:
-	pr_cont("\n");
+	pr_debug("\n");
 	swsusp_free();
 	return -ENOMEM;
 }

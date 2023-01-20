@@ -98,13 +98,13 @@ static void __init xilinx_early_pci_scan(struct pci_controller *hose)
 				early_read_config_dword(hose, bus,
 					PCI_DEVFN(dev, func), offset, &val);
 				if (offset == 0 && val == 0xFFFFFFFF) {
-					pr_cont("\nABSENT");
+					pr_debug("\nABSENT");
 					break;
 				}
 				if (!(offset % 0x10))
-					pr_cont("\n%04x:    ", offset);
+					pr_debug("\n%04x:    ", offset);
 
-				pr_cont("%08x  ", val);
+				pr_debug("%08x  ", val);
 			}
 			pr_debug("\n");
 		}

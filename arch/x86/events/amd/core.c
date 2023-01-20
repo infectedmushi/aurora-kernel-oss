@@ -915,11 +915,11 @@ static int __init amd_core_pmu_init(void)
 
 	switch (boot_cpu_data.x86) {
 	case 0x15:
-		pr_cont("Fam15h ");
+		pr_debug("Fam15h ");
 		x86_pmu.get_event_constraints = amd_get_event_constraints_f15h;
 		break;
 	case 0x17:
-		pr_cont("Fam17h ");
+		pr_debug("Fam17h ");
 		/*
 		 * In family 17h, there are no event constraints in the PMC hardware.
 		 * We fallback to using default amd_get_event_constraints.
@@ -944,7 +944,7 @@ static int __init amd_core_pmu_init(void)
 	 */
 	x86_pmu.amd_nb_constraints = 0;
 
-	pr_cont("core perfctr, ");
+	pr_debug("core perfctr, ");
 	return 0;
 }
 

@@ -467,10 +467,10 @@ void ubifs_dump_node(const struct ubifs_info *c, const void *node)
 			pr_err("(bad name length, not printing, bad or corrupted node)");
 		else {
 			for (i = 0; i < nlen && dent->name[i]; i++)
-				pr_cont("%c", isprint(dent->name[i]) ?
+				pr_debug("%c", isprint(dent->name[i]) ?
 					dent->name[i] : '?');
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 
 		break;
 	}
@@ -669,9 +669,9 @@ void ubifs_dump_lprop(const struct ubifs_info *c, const struct ubifs_lprops *lp)
 
 	if (lp->flags & LPROPS_TAKEN) {
 		if (lp->flags & LPROPS_INDEX)
-			pr_cont("index, taken");
+			pr_debug("index, taken");
 		else
-			pr_cont("taken");
+			pr_debug("taken");
 	} else {
 		const char *s;
 
@@ -708,7 +708,7 @@ void ubifs_dump_lprop(const struct ubifs_info *c, const struct ubifs_lprops *lp)
 				break;
 			}
 		}
-		pr_cont("%s", s);
+		pr_debug("%s", s);
 	}
 
 	for (rb = rb_first((struct rb_root *)&c->buds); rb; rb = rb_next(rb)) {
@@ -723,18 +723,18 @@ void ubifs_dump_lprop(const struct ubifs_info *c, const struct ubifs_lprops *lp)
 				 */
 				if (c->jheads &&
 				    lp->lnum == c->jheads[i].wbuf.lnum) {
-					pr_cont(", jhead %s", dbg_jhead(i));
+					pr_debug(", jhead %s", dbg_jhead(i));
 					head = 1;
 				}
 			}
 			if (!head)
-				pr_cont(", bud of jhead %s",
+				pr_debug(", bud of jhead %s",
 				       dbg_jhead(bud->jhead));
 		}
 	}
 	if (lp->lnum == c->gc_lnum)
-		pr_cont(", GC LEB");
-	pr_cont(")\n");
+		pr_debug(", GC LEB");
+	pr_debug(")\n");
 }
 
 void ubifs_dump_lprops(struct ubifs_info *c)

@@ -245,7 +245,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 		}
 #ifndef final_version
 		if ( !ancient && (inb(ioaddr+1) & 0x01) != (word16 & 0x01))
-			pr_cont("\nWD80?3: Bus width conflict, %d (probe) != %d (reg report).",
+			pr_debug("\nWD80?3: Bus width conflict, %d (probe) != %d (reg report).",
 				word16 ? 16 : 8,
 				(inb(ioaddr+1) & 0x01) ? 16 : 8);
 #endif
@@ -261,7 +261,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 		if (reg0 == 0xff || reg0 == 0) {
 			/* Future plan: this could check a few likely locations first. */
 			dev->mem_start = 0xd0000;
-			pr_cont(" assigning address %#lx", dev->mem_start);
+			pr_debug(" assigning address %#lx", dev->mem_start);
 		} else {
 			int high_addr_bits = inb(ioaddr+WD_CMDREG5) & 0x1f;
 			/* Some boards don't have the register 5 -- it returns 0xff. */
@@ -300,7 +300,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 			outb_p(0x00, nic_addr+EN0_IMR);	/* Mask all intrs. again. */
 
 			if (wd_msg_enable & NETIF_MSG_PROBE)
-				pr_cont(" autoirq is %d", dev->irq);
+				pr_debug(" autoirq is %d", dev->irq);
 			if (dev->irq < 2)
 				dev->irq = word16 ? 10 : 5;
 		} else
@@ -312,7 +312,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 	   share and the board will usually be enabled. */
 	i = request_irq(dev->irq, ei_interrupt, 0, DRV_NAME, dev);
 	if (i) {
-		pr_cont(" unable to get IRQ %d.\n", dev->irq);
+		pr_debug(" unable to get IRQ %d.\n", dev->irq);
 		return i;
 	}
 
@@ -340,7 +340,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 		return -ENOMEM;
 	}
 
-	pr_cont(" %s, IRQ %d, shared memory at %#lx-%#lx.\n",
+	pr_debug(" %s, IRQ %d, shared memory at %#lx-%#lx.\n",
 		model_name, dev->irq, dev->mem_start, dev->mem_end-1);
 
 	ei_status.reset_8390 = wd_reset_8390;

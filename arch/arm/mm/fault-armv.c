@@ -261,9 +261,9 @@ void __init check_writebuffer_bugs(void)
 	}
 
 	if (v) {
-		pr_cont("failed, %s\n", reason);
+		pr_debug("failed, %s\n", reason);
 		shared_pte_mask = L_PTE_MT_UNCACHED;
 	} else {
-		pr_cont("ok\n");
+		pr_debug("ok\n");
 	}
 }

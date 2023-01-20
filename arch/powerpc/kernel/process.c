@@ -1256,7 +1256,7 @@ static void show_instructions(struct pt_regs *regs)
 		int instr;
 
 		if (!(i % 8))
-			pr_cont("\n");
+			pr_debug("\n");
 
 #if !defined(CONFIG_BOOKE)
 		/* If executing with the IMMU off, adjust pc rather
@@ -1268,18 +1268,18 @@ static void show_instructions(struct pt_regs *regs)
 
 		if (!__kernel_text_address(pc) ||
 		     probe_kernel_address((unsigned int __user *)pc, instr)) {
-			pr_cont("XXXXXXXX ");
+			pr_debug("XXXXXXXX ");
 		} else {
 			if (regs->nip == pc)
-				pr_cont("<%08x> ", instr);
+				pr_debug("<%08x> ", instr);
 			else
-				pr_cont("%08x ", instr);
+				pr_debug("%08x ", instr);
 		}
 
 		pc += sizeof(int);
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void show_user_instructions(struct pt_regs *regs)
@@ -1305,23 +1305,23 @@ void show_user_instructions(struct pt_regs *regs)
 		int instr;
 
 		if (!(i % 8) && (i > 0)) {
-			pr_cont("\n");
+			pr_debug("\n");
 			pr_debug("%s[%d]: code: ", current->comm, current->pid);
 		}
 
 		if (probe_kernel_address((unsigned int __user *)pc, instr)) {
-			pr_cont("XXXXXXXX ");
+			pr_debug("XXXXXXXX ");
 		} else {
 			if (regs->nip == pc)
-				pr_cont("<%08x> ", instr);
+				pr_debug("<%08x> ", instr);
 			else
-				pr_cont("%08x ", instr);
+				pr_debug("%08x ", instr);
 		}
 
 		pc += sizeof(int);
 	}
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 struct regbit {
@@ -1365,7 +1365,7 @@ static void print_bits(unsigned long val, struct regbit *bits, const char *sep)
 
 	for (; bits->bit; ++bits)
 		if (val & bits->bit) {
-			pr_cont("%s%s", s, bits->name);
+			pr_debug("%s%s", s, bits->name);
 			s = sep;
 		}
 }
@@ -1388,9 +1388,9 @@ static void print_tm_bits(unsigned long val)
  *   T: Transactional	(bit 34)
  */
 	if (val & (MSR_TM | MSR_TS_S | MSR_TS_T)) {
-		pr_cont(",TM[");
+		pr_debug(",TM[");
 		print_bits(val, msr_tm_bits, "");
-		pr_cont("]");
+		pr_debug("]");
 	}
 }
 #else
@@ -1399,10 +1399,10 @@ static void print_tm_bits(unsigned long val) {}
 
 static void print_msr_bits(unsigned long val)
 {
-	pr_cont("<");
+	pr_debug("<");
 	print_bits(val, msr_bits, ",");
 	print_tm_bits(val);
-	pr_cont(">");
+	pr_debug(">");
 }
 
 #ifdef CONFIG_PPC64
@@ -1427,32 +1427,32 @@ void show_regs(struct pt_regs * regs)
 	       regs, regs->trap, print_tainted(), init_utsname()->release);
 	printk("MSR:  "REG" ", regs->msr);
 	print_msr_bits(regs->msr);
-	pr_cont("  CR: %08lx  XER: %08lx\n", regs->ccr, regs->xer);
+	pr_debug("  CR: %08lx  XER: %08lx\n", regs->ccr, regs->xer);
 	trap = TRAP(regs);
 	if ((TRAP(regs) != 0xc00) && cpu_has_feature(CPU_FTR_CFAR))
-		pr_cont("CFAR: "REG" ", regs->orig_gpr3);
+		pr_debug("CFAR: "REG" ", regs->orig_gpr3);
 	if (trap == 0x200 || trap == 0x300 || trap == 0x600)
 #if defined(CONFIG_4xx) || defined(CONFIG_BOOKE)
-		pr_cont("DEAR: "REG" ESR: "REG" ", regs->dar, regs->dsisr);
+		pr_debug("DEAR: "REG" ESR: "REG" ", regs->dar, regs->dsisr);
 #else
-		pr_cont("DAR: "REG" DSISR: %08lx ", regs->dar, regs->dsisr);
+		pr_debug("DAR: "REG" DSISR: %08lx ", regs->dar, regs->dsisr);
 #endif
 #ifdef CONFIG_PPC64
-	pr_cont("IRQMASK: %lx ", regs->softe);
+	pr_debug("IRQMASK: %lx ", regs->softe);
 #endif
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 	if (MSR_TM_ACTIVE(regs->msr))
-		pr_cont("\nPACATMSCRATCH: %016llx ", get_paca()->tm_scratch);
+		pr_debug("\nPACATMSCRATCH: %016llx ", get_paca()->tm_scratch);
 #endif
 
 	for (i = 0;  i < 32;  i++) {
 		if ((i % REGS_PER_LINE) == 0)
-			pr_cont("\nGPR%02d: ", i);
-		pr_cont(REG " ", regs->gpr[i]);
+			pr_debug("\nGPR%02d: ", i);
+		pr_debug(REG " ", regs->gpr[i]);
 		if (i == LAST_VOLATILE && !FULL_REGS(regs))
 			break;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 #ifdef CONFIG_KALLSYMS
 	/*
 	 * Lookup NIP late so we have the best change of getting the
@@ -2066,14 +2066,14 @@ void show_stack(struct task_struct *tsk, unsigned long *stack)
 			printk("["REG"] ["REG"] %pS", sp, ip, (void *)ip);
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 			if ((ip == rth) && curr_frame >= 0) {
-				pr_cont(" (%pS)",
+				pr_debug(" (%pS)",
 				       (void *)current->ret_stack[curr_frame].ret);
 				curr_frame--;
 			}
 #endif
 			if (firstframe)
-				pr_cont(" (unreliable)");
-			pr_cont("\n");
+				pr_debug(" (unreliable)");
+			pr_debug("\n");
 		}
 		firstframe = 0;
 

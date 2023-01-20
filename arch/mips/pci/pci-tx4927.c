@@ -37,14 +37,14 @@ int __init tx4927_report_pciclk(void)
 		case TX4927_CCFG_PCIDIVMODE_6:
 			pciclk = txx9_cpu_clock / 6; break;
 		}
-		pr_cont("Internal(%u.%uMHz)",
+		pr_debug("Internal(%u.%uMHz)",
 			(pciclk + 50000) / 1000000,
 			((pciclk + 50000) / 100000) % 10);
 	} else {
-		pr_cont("External");
+		pr_debug("External");
 		pciclk = -1;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	return pciclk;
 }
 

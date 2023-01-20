@@ -420,8 +420,8 @@ static int cx88_risc_decode(u32 risc)
 		 instr[risc >> 28] ? instr[risc >> 28] : "INVALID");
 	for (i = ARRAY_SIZE(bits) - 1; i >= 0; i--)
 		if (risc & (1 << (i + 12)))
-			pr_cont(" %s", bits[i]);
-	pr_cont(" count=%d ]\n", risc & 0xfff);
+			pr_debug(" %s", bits[i]);
+	pr_debug(" count=%d ]\n", risc & 0xfff);
 	return incr[risc >> 28] ? incr[risc >> 28] : 1;
 }
 
@@ -450,9 +450,9 @@ void cx88_sram_channel_dump(struct cx88_core *core,
 			 name[i], cx_read(ch->cmds_start + 4 * i));
 	for (n = 1, i = 0; i < 4; i++) {
 		risc = cx_read(ch->cmds_start + 4 * (i + 11));
-		pr_cont("  risc%d: ", i);
+		pr_debug("  risc%d: ", i);
 		if (--n)
-			pr_cont("0x%08x [ arg #%d ]\n", risc, n);
+			pr_debug("0x%08x [ arg #%d ]\n", risc, n);
 		else
 			n = cx88_risc_decode(risc);
 	}
@@ -462,7 +462,7 @@ void cx88_sram_channel_dump(struct cx88_core *core,
 		n = cx88_risc_decode(risc);
 		for (j = 1; j < n; j++) {
 			risc = cx_read(ch->ctrl_start + 4 * (i + j));
-			pr_cont("  iq %x: 0x%08x [ arg #%d ]\n",
+			pr_debug("  iq %x: 0x%08x [ arg #%d ]\n",
 				i + j, risc, j);
 		}
 	}
@@ -495,14 +495,14 @@ void cx88_print_irqbits(const char *tag, const char *strings[],
 		if (!(bits & (1 << i)))
 			continue;
 		if (strings[i])
-			pr_cont(" %s", strings[i]);
+			pr_debug(" %s", strings[i]);
 		else
-			pr_cont(" %d", i);
+			pr_debug(" %d", i);
 		if (!(mask & (1 << i)))
 			continue;
-		pr_cont("*");
+		pr_debug("*");
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 EXPORT_SYMBOL(cx88_print_irqbits);
 

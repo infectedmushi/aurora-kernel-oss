@@ -682,8 +682,8 @@ rcu_perf_init(void)
 		pr_alert("rcu-perf: invalid perf type: \"%s\"\n", perf_type);
 		pr_alert("rcu-perf types:");
 		for (i = 0; i < ARRAY_SIZE(perf_ops); i++)
-			pr_cont(" %s", perf_ops[i]->name);
-		pr_cont("\n");
+			pr_debug(" %s", perf_ops[i]->name);
+		pr_debug("\n");
 		firsterr = -EINVAL;
 		cur_ops = NULL;
 		goto unwind;

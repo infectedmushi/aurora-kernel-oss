@@ -1340,13 +1340,13 @@ void mem_cgroup_print_oom_info(struct mem_cgroup *memcg, struct task_struct *p)
 	if (p) {
 		pr_debug("Task in ");
 		pr_cont_cgroup_path(task_cgroup(p, memory_cgrp_id));
-		pr_cont(" killed as a result of limit of ");
+		pr_debug(" killed as a result of limit of ");
 	} else {
 		pr_debug("Memory limit reached of cgroup ");
 	}
 
 	pr_cont_cgroup_path(memcg->css.cgroup);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	rcu_read_unlock();
 
@@ -1363,20 +1363,20 @@ void mem_cgroup_print_oom_info(struct mem_cgroup *memcg, struct task_struct *p)
 	for_each_mem_cgroup_tree(iter, memcg) {
 		pr_debug("Memory cgroup stats for ");
 		pr_cont_cgroup_path(iter->css.cgroup);
-		pr_cont(":");
+		pr_debug(":");
 
 		for (i = 0; i < ARRAY_SIZE(memcg1_stats); i++) {
 			if (memcg1_stats[i] == MEMCG_SWAP && !do_swap_account)
 				continue;
-			pr_cont(" %s:%luKB", memcg1_stat_names[i],
+			pr_debug(" %s:%luKB", memcg1_stat_names[i],
 				K(memcg_page_state(iter, memcg1_stats[i])));
 		}
 
 		for (i = 0; i < NR_LRU_LISTS; i++)
-			pr_cont(" %s:%luKB", mem_cgroup_lru_names[i],
+			pr_debug(" %s:%luKB", mem_cgroup_lru_names[i],
 				K(mem_cgroup_nr_lru_pages(iter, BIT(i))));
 
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 
@@ -1878,7 +1878,7 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
 {
 	pr_debug("Tasks in ");
 	pr_cont_cgroup_path(memcg->css.cgroup);
-	pr_cont(" are going to be killed due to memory.oom.group set\n");
+	pr_debug(" are going to be killed due to memory.oom.group set\n");
 }
 
 /**

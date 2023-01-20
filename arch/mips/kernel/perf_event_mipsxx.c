@@ -1693,7 +1693,7 @@ init_hw_perf_events(void)
 
 	counters = n_counters();
 	if (counters == 0) {
-		pr_cont("No available PMU.\n");
+		pr_debug("No available PMU.\n");
 		return -ENODEV;
 	}
 
@@ -1797,7 +1797,7 @@ init_hw_perf_events(void)
 		mipspmu.map_raw_event = xlp_pmu_map_raw_event;
 		break;
 	default:
-		pr_cont("Either hardware does not support performance "
+		pr_debug("Either hardware does not support performance "
 			"counters, or not yet implemented.\n");
 		return -ENODEV;
 	}
@@ -1823,7 +1823,7 @@ init_hw_perf_events(void)
 
 	on_each_cpu(reset_counters, (void *)(long)counters, 1);
 
-	pr_cont("%s PMU enabled, %d %d-bit counters available to each "
+	pr_debug("%s PMU enabled, %d %d-bit counters available to each "
 		"CPU, irq %d%s\n", mipspmu.name, counters, counter_bits, irq,
 		irq < 0 ? " (share with timer interrupt)" : "");
 

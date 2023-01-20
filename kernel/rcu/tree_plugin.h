@@ -650,7 +650,7 @@ static void rcu_print_task_stall_begin(struct rcu_node *rnp)
 
 static void rcu_print_task_stall_end(void)
 {
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*
@@ -668,7 +668,7 @@ static int rcu_print_task_stall(struct rcu_node *rnp)
 	t = list_entry(rnp->gp_tasks->prev,
 		       struct task_struct, rcu_node_entry);
 	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		pr_cont(" P%d", t->pid);
+		pr_debug(" P%d", t->pid);
 		ndetected++;
 	}
 	rcu_print_task_stall_end();
@@ -690,7 +690,7 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp)
 	t = list_entry(rnp->exp_tasks->prev,
 		       struct task_struct, rcu_node_entry);
 	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		pr_cont(" P%d", t->pid);
+		pr_debug(" P%d", t->pid);
 		ndetected++;
 	}
 	return ndetected;
@@ -888,11 +888,11 @@ dump_blkd_tasks(struct rcu_state *rsp, struct rcu_node *rnp, int ncheck)
 	pr_debug("%s: ->blkd_tasks", __func__);
 	i = 0;
 	list_for_each(lhp, &rnp->blkd_tasks) {
-		pr_cont(" %p", lhp);
+		pr_debug(" %p", lhp);
 		if (++i >= 10)
 			break;
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 	for (cpu = rnp->grplo; cpu <= rnp->grphi; cpu++) {
 		rdp = per_cpu_ptr(rsp->rda, cpu);
 		onl = !!(rdp->grpmask & rcu_rnp_online_cpus(rnp));
@@ -1763,7 +1763,7 @@ static void print_cpu_stall_fast_no_hz(char *cp, int cpu)
 /* Initiate the stall-info list. */
 static void print_cpu_stall_info_begin(void)
 {
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*

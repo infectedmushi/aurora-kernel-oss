@@ -2963,10 +2963,10 @@ void bttv_idcard(struct bttv *btv)
 	pr_debug("%d: gpio config override: mask=0x%x, mux=",
 		btv->c.nr, bttv_tvcards[btv->c.type].gpiomask);
 	for (i = 0; i < ARRAY_SIZE(bttv_tvcards->gpiomux); i++) {
-		pr_cont("%s0x%x",
+		pr_debug("%s0x%x",
 			i ? "," : "", bttv_tvcards[btv->c.type].gpiomux[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 /*
@@ -4085,10 +4085,10 @@ static void avermedia_eeprom(struct bttv *btv)
 		btv->c.nr, eeprom_data[0x41], eeprom_data[0x42]);
 	if (tuner_type) {
 		btv->tuner_type = tuner_type;
-		pr_cont("%d", tuner_type);
+		pr_debug("%d", tuner_type);
 	} else
-		pr_cont("Unknown type");
-	pr_cont(" radio:%s remote control:%s\n",
+		pr_debug("Unknown type");
+	pr_debug(" radio:%s remote control:%s\n",
 	       tuner_tv_fm     ? "yes" : "no",
 	       btv->has_remote ? "yes" : "no");
 }

@@ -2943,43 +2943,43 @@ static void print_supported_features(struct toshiba_acpi_dev *dev)
 	pr_debug("Supported laptop features:");
 
 	if (dev->hotkey_dev)
-		pr_cont(" hotkeys");
+		pr_debug(" hotkeys");
 	if (dev->backlight_dev)
-		pr_cont(" backlight");
+		pr_debug(" backlight");
 	if (dev->video_supported)
-		pr_cont(" video-out");
+		pr_debug(" video-out");
 	if (dev->fan_supported)
-		pr_cont(" fan");
+		pr_debug(" fan");
 	if (dev->tr_backlight_supported)
-		pr_cont(" transflective-backlight");
+		pr_debug(" transflective-backlight");
 	if (dev->illumination_supported)
-		pr_cont(" illumination");
+		pr_debug(" illumination");
 	if (dev->kbd_illum_supported)
-		pr_cont(" keyboard-backlight");
+		pr_debug(" keyboard-backlight");
 	if (dev->touchpad_supported)
-		pr_cont(" touchpad");
+		pr_debug(" touchpad");
 	if (dev->eco_supported)
-		pr_cont(" eco-led");
+		pr_debug(" eco-led");
 	if (dev->accelerometer_supported)
-		pr_cont(" accelerometer-axes");
+		pr_debug(" accelerometer-axes");
 	if (dev->usb_sleep_charge_supported)
-		pr_cont(" usb-sleep-charge");
+		pr_debug(" usb-sleep-charge");
 	if (dev->usb_rapid_charge_supported)
-		pr_cont(" usb-rapid-charge");
+		pr_debug(" usb-rapid-charge");
 	if (dev->usb_sleep_music_supported)
-		pr_cont(" usb-sleep-music");
+		pr_debug(" usb-sleep-music");
 	if (dev->kbd_function_keys_supported)
-		pr_cont(" special-function-keys");
+		pr_debug(" special-function-keys");
 	if (dev->panel_power_on_supported)
-		pr_cont(" panel-power-on");
+		pr_debug(" panel-power-on");
 	if (dev->usb_three_supported)
-		pr_cont(" usb3");
+		pr_debug(" usb3");
 	if (dev->wwan_supported)
-		pr_cont(" wwan");
+		pr_debug(" wwan");
 	if (dev->cooling_method_supported)
-		pr_cont(" cooling-method");
+		pr_debug(" cooling-method");
 
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 static int toshiba_acpi_remove(struct acpi_device *acpi_dev)

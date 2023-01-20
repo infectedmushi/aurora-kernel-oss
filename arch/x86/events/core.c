@@ -258,7 +258,7 @@ static bool check_hw_exists(void)
 	 * We still allow the PMU driver to operate:
 	 */
 	if (bios_fail) {
-		pr_cont("Broken BIOS detected, complain to your hardware vendor.\n");
+		pr_debug("Broken BIOS detected, complain to your hardware vendor.\n");
 		pr_err(FW_BUG "the BIOS has corrupted hw-PMU resources (MSR %x is %Lx)\n",
 			      reg_fail, val_fail);
 	}
@@ -267,9 +267,9 @@ static bool check_hw_exists(void)
 
 msr_fail:
 	if (boot_cpu_has(X86_FEATURE_HYPERVISOR)) {
-		pr_cont("PMU not available due to virtualization, using software events only.\n");
+		pr_debug("PMU not available due to virtualization, using software events only.\n");
 	} else {
-		pr_cont("Broken PMU hardware detected, using software events only.\n");
+		pr_debug("Broken PMU hardware detected, using software events only.\n");
 		pr_err("Failed to access perfctr msr (MSR %x is %Lx)\n",
 		       reg, val_new);
 	}
@@ -1758,7 +1758,7 @@ static int __init init_hw_perf_events(void)
 		err = -ENOTSUPP;
 	}
 	if (err != 0) {
-		pr_cont("no PMU driver, software events only.\n");
+		pr_debug("no PMU driver, software events only.\n");
 		return 0;
 	}
 
@@ -1768,7 +1768,7 @@ static int __init init_hw_perf_events(void)
 	if (!check_hw_exists())
 		return 0;
 
-	pr_cont("%s PMU driver.\n", x86_pmu.name);
+	pr_debug("%s PMU driver.\n", x86_pmu.name);
 
 	x86_pmu.attr_rdpmc = 1; /* enable userspace RDPMC usage by default */
 

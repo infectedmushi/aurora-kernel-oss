@@ -62,10 +62,10 @@ print_ports(const struct sk_buff *skb, uint8_t protocol, int offset)
 		pptr = skb_header_pointer(skb, offset,
 					  sizeof(_ports), &_ports);
 		if (pptr == NULL) {
-			pr_cont(" INCOMPLETE TCP/UDP header");
+			pr_debug(" INCOMPLETE TCP/UDP header");
 			return;
 		}
-		pr_cont(" SPT=%u DPT=%u", ntohs(pptr->src), ntohs(pptr->dst));
+		pr_debug(" SPT=%u DPT=%u", ntohs(pptr->src), ntohs(pptr->dst));
 	}
 }
 
@@ -100,10 +100,10 @@ ebt_log_packet(struct net *net, u_int8_t pf, unsigned int hooknum,
 
 		ih = skb_header_pointer(skb, 0, sizeof(_iph), &_iph);
 		if (ih == NULL) {
-			pr_cont(" INCOMPLETE IP header");
+			pr_debug(" INCOMPLETE IP header");
 			goto out;
 		}
-		pr_cont(" IP SRC=%pI4 IP DST=%pI4, IP tos=0x%02X, IP proto=%d",
+		pr_debug(" IP SRC=%pI4 IP DST=%pI4, IP tos=0x%02X, IP proto=%d",
 			&ih->saddr, &ih->daddr, ih->tos, ih->protocol);
 		print_ports(skb, ih->protocol, ih->ihl*4);
 		goto out;
@@ -120,10 +120,10 @@ ebt_log_packet(struct net *net, u_int8_t pf, unsigned int hooknum,
 
 		ih = skb_header_pointer(skb, 0, sizeof(_iph), &_iph);
 		if (ih == NULL) {
-			pr_cont(" INCOMPLETE IPv6 header");
+			pr_debug(" INCOMPLETE IPv6 header");
 			goto out;
 		}
-		pr_cont(" IPv6 SRC=%pI6 IPv6 DST=%pI6, IPv6 priority=0x%01X, Next Header=%d",
+		pr_debug(" IPv6 SRC=%pI6 IPv6 DST=%pI6, IPv6 priority=0x%01X, Next Header=%d",
 			&ih->saddr, &ih->daddr, ih->priority, ih->nexthdr);
 		nexthdr = ih->nexthdr;
 		offset_ph = ipv6_skip_exthdr(skb, sizeof(_iph), &nexthdr, &frag_off);
@@ -142,10 +142,10 @@ ebt_log_packet(struct net *net, u_int8_t pf, unsigned int hooknum,
 
 		ah = skb_header_pointer(skb, 0, sizeof(_arph), &_arph);
 		if (ah == NULL) {
-			pr_cont(" INCOMPLETE ARP header");
+			pr_debug(" INCOMPLETE ARP header");
 			goto out;
 		}
-		pr_cont(" ARP HTYPE=%d, PTYPE=0x%04x, OPCODE=%d",
+		pr_debug(" ARP HTYPE=%d, PTYPE=0x%04x, OPCODE=%d",
 			ntohs(ah->ar_hrd), ntohs(ah->ar_pro),
 			ntohs(ah->ar_op));
 
@@ -161,16 +161,16 @@ ebt_log_packet(struct net *net, u_int8_t pf, unsigned int hooknum,
 			ap = skb_header_pointer(skb, sizeof(_arph),
 						sizeof(_arpp), &_arpp);
 			if (ap == NULL) {
-				pr_cont(" INCOMPLETE ARP payload");
+				pr_debug(" INCOMPLETE ARP payload");
 				goto out;
 			}
-			pr_cont(" ARP MAC SRC=%pM ARP IP SRC=%pI4 ARP MAC DST=%pM ARP IP DST=%pI4",
+			pr_debug(" ARP MAC SRC=%pM ARP IP SRC=%pI4 ARP MAC DST=%pM ARP IP DST=%pI4",
 				ap->mac_src, ap->ip_src,
 				ap->mac_dst, ap->ip_dst);
 		}
 	}
 out:
-	pr_cont("\n");
+	pr_debug("\n");
 	spin_unlock_bh(&ebt_log_lock);
 }
 

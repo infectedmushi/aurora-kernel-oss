@@ -2576,7 +2576,7 @@ static void remove_tasks_in_empty_cpuset(struct cpuset *cs)
 	if (cgroup_transfer_tasks(parent->css.cgroup, cs->css.cgroup)) {
 		pr_err("cpuset: failed to transfer tasks out of empty cpuset ");
 		pr_cont_cgroup_name(cs->css.cgroup);
-		pr_cont("\n");
+		pr_debug("\n");
 	}
 }
 
@@ -3097,7 +3097,7 @@ void cpuset_print_current_mems_allowed(void)
 	cgrp = task_cs(current)->css.cgroup;
 	pr_debug("%s cpuset=", current->comm);
 	pr_cont_cgroup_name(cgrp);
-	pr_cont(" mems_allowed=%*pbl\n",
+	pr_debug(" mems_allowed=%*pbl\n",
 		nodemask_pr_args(&current->mems_allowed));
 
 	rcu_read_unlock();

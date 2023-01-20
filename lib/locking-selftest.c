@@ -1147,21 +1147,21 @@ static void dotest(void (*testcase_fn)(void), int expected, int lockclass_mask)
 #ifndef CONFIG_PROVE_LOCKING
 	if (expected == FAILURE && debug_locks) {
 		expected_testcase_failures++;
-		pr_cont("failed|");
+		pr_debug("failed|");
 	}
 	else
 #endif
 	if (debug_locks != expected) {
 		unexpected_testcase_failures++;
-		pr_cont("FAILED|");
+		pr_debug("FAILED|");
 	} else {
 		testcase_successes++;
-		pr_cont("  ok  |");
+		pr_debug("  ok  |");
 	}
 	testcase_total++;
 
 	if (debug_locks_verbose)
-		pr_cont(" lockclass mask: %x, debug_locks: %d, expected: %d\n",
+		pr_debug(" lockclass mask: %x, debug_locks: %d, expected: %d\n",
 			lockclass_mask, debug_locks, expected);
 	/*
 	 * Some tests (e.g. double-unlock) might corrupt the preemption
@@ -1192,26 +1192,26 @@ static inline void print_testname(const char *testname)
 #define DO_TESTCASE_1(desc, name, nr)				\
 	print_testname(desc"/"#nr);				\
 	dotest(name##_##nr, SUCCESS, LOCKTYPE_RWLOCK);		\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_1B(desc, name, nr)				\
 	print_testname(desc"/"#nr);				\
 	dotest(name##_##nr, FAILURE, LOCKTYPE_RWLOCK);		\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_3(desc, name, nr)				\
 	print_testname(desc"/"#nr);				\
 	dotest(name##_spin_##nr, FAILURE, LOCKTYPE_SPIN);	\
 	dotest(name##_wlock_##nr, FAILURE, LOCKTYPE_RWLOCK);	\
 	dotest(name##_rlock_##nr, SUCCESS, LOCKTYPE_RWLOCK);	\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_3RW(desc, name, nr)				\
 	print_testname(desc"/"#nr);				\
 	dotest(name##_spin_##nr, FAILURE, LOCKTYPE_SPIN|LOCKTYPE_RWLOCK);\
 	dotest(name##_wlock_##nr, FAILURE, LOCKTYPE_RWLOCK);	\
 	dotest(name##_rlock_##nr, SUCCESS, LOCKTYPE_RWLOCK);	\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_6(desc, name)				\
 	print_testname(desc);					\
@@ -1222,7 +1222,7 @@ static inline void print_testname(const char *testname)
 	dotest(name##_wsem, FAILURE, LOCKTYPE_RWSEM);		\
 	dotest(name##_rsem, FAILURE, LOCKTYPE_RWSEM);		\
 	dotest_rt(name##_rtmutex, FAILURE, LOCKTYPE_RTMUTEX);	\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_6_SUCCESS(desc, name)			\
 	print_testname(desc);					\
@@ -1233,7 +1233,7 @@ static inline void print_testname(const char *testname)
 	dotest(name##_wsem, SUCCESS, LOCKTYPE_RWSEM);		\
 	dotest(name##_rsem, SUCCESS, LOCKTYPE_RWSEM);		\
 	dotest_rt(name##_rtmutex, SUCCESS, LOCKTYPE_RTMUTEX);	\
-	pr_cont("\n");
+	pr_debug("\n");
 
 /*
  * 'read' variant: rlocks must not trigger.
@@ -1247,7 +1247,7 @@ static inline void print_testname(const char *testname)
 	dotest(name##_wsem, FAILURE, LOCKTYPE_RWSEM);		\
 	dotest(name##_rsem, FAILURE, LOCKTYPE_RWSEM);		\
 	dotest_rt(name##_rtmutex, FAILURE, LOCKTYPE_RTMUTEX);	\
-	pr_cont("\n");
+	pr_debug("\n");
 
 #define DO_TESTCASE_2I(desc, name, nr)				\
 	DO_TESTCASE_1("hard-"desc, name##_hard, nr);		\
@@ -1900,25 +1900,25 @@ static void ww_tests(void)
 	dotest(ww_test_fail_acquire, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_normal, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_unneeded_slow, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("ww contexts mixing");
 	dotest(ww_test_two_contexts, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_diff_class, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("finishing ww context");
 	dotest(ww_test_context_done_twice, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_context_unlock_twice, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_context_fini_early, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_context_lock_after_done, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("locking mismatches");
 	dotest(ww_test_object_unlock_twice, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_object_lock_unbalanced, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_object_lock_stale_context, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("EDEADLK handling");
 	dotest(ww_test_edeadlk_normal, SUCCESS, LOCKTYPE_WW);
@@ -1931,11 +1931,11 @@ static void ww_tests(void)
 	dotest(ww_test_edeadlk_acquire_more_edeadlk_slow, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_edeadlk_acquire_wrong, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_edeadlk_acquire_wrong_slow, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("spinlock nest unlocked");
 	dotest(ww_test_spin_nest_unlocked, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	printk("  -----------------------------------------------------\n");
 	printk("                                 |block | try  |context|\n");
@@ -1945,25 +1945,25 @@ static void ww_tests(void)
 	dotest(ww_test_context_block, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_context_try, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_context_context, SUCCESS, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("try");
 	dotest(ww_test_try_block, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_try_try, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_try_context, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("block");
 	dotest(ww_test_block_block, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_block_try, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_block_context, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("spinlock");
 	dotest(ww_test_spin_block, FAILURE, LOCKTYPE_WW);
 	dotest(ww_test_spin_try, SUCCESS, LOCKTYPE_WW);
 	dotest(ww_test_spin_context, FAILURE, LOCKTYPE_WW);
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 void locking_selftest(void)
@@ -2002,35 +2002,35 @@ void locking_selftest(void)
 
 	printk("  --------------------------------------------------------------------------\n");
 	print_testname("recursive read-lock");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_AA1, SUCCESS, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rsem_AA1, FAILURE, LOCKTYPE_RWSEM);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("recursive read-lock #2");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_AA1B, SUCCESS, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rsem_AA1B, FAILURE, LOCKTYPE_RWSEM);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("mixed read-write-lock");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_AA2, FAILURE, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rsem_AA2, FAILURE, LOCKTYPE_RWSEM);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("mixed write-read-lock");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_AA3, FAILURE, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rsem_AA3, FAILURE, LOCKTYPE_RWSEM);
-	pr_cont("\n");
+	pr_debug("\n");
 
 	print_testname("mixed read-lock/lock-write ABBA");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_ABBA1, FAILURE, LOCKTYPE_RWLOCK);
 #ifdef CONFIG_PROVE_LOCKING
 	/*
@@ -2040,19 +2040,19 @@ void locking_selftest(void)
 	unexpected_testcase_failures--;
 #endif
 
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rwsem_ABBA1, FAILURE, LOCKTYPE_RWSEM);
 
 	print_testname("mixed read-lock/lock-read ABBA");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_ABBA2, SUCCESS, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rwsem_ABBA2, FAILURE, LOCKTYPE_RWSEM);
 
 	print_testname("mixed write-lock/lock-write ABBA");
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rlock_ABBA3, FAILURE, LOCKTYPE_RWLOCK);
-	pr_cont("             |");
+	pr_debug("             |");
 	dotest(rwsem_ABBA3, FAILURE, LOCKTYPE_RWSEM);
 
 	printk("  --------------------------------------------------------------------------\n");

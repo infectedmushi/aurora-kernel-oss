@@ -31,7 +31,7 @@ static void print_dev_item(struct extent_buffer *eb,
 static void print_extent_data_ref(struct extent_buffer *eb,
 				  struct btrfs_extent_data_ref *ref)
 {
-	pr_cont("extent data backref root %llu objectid %llu offset %llu count %u\n",
+	pr_debug("extent data backref root %llu objectid %llu offset %llu count %u\n",
 	       btrfs_extent_data_ref_root(eb, ref),
 	       btrfs_extent_data_ref_objectid(eb, ref),
 	       btrfs_extent_data_ref_offset(eb, ref),
@@ -87,10 +87,10 @@ static void print_extent_item(struct extent_buffer *eb, int slot, int type)
 		pr_debug("\t\tref#%d: ", ref_index++);
 		switch (type) {
 		case BTRFS_TREE_BLOCK_REF_KEY:
-			pr_cont("tree block backref root %llu\n", offset);
+			pr_debug("tree block backref root %llu\n", offset);
 			break;
 		case BTRFS_SHARED_BLOCK_REF_KEY:
-			pr_cont("shared block backref parent %llu\n", offset);
+			pr_debug("shared block backref parent %llu\n", offset);
 			/*
 			 * offset is supposed to be a tree block which
 			 * must be aligned to nodesize.
@@ -106,7 +106,7 @@ static void print_extent_item(struct extent_buffer *eb, int slot, int type)
 			break;
 		case BTRFS_SHARED_DATA_REF_KEY:
 			sref = (struct btrfs_shared_data_ref *)(iref + 1);
-			pr_cont("shared data backref parent %llu count %u\n",
+			pr_debug("shared data backref parent %llu count %u\n",
 			       offset, btrfs_shared_data_ref_count(eb, sref));
 			/*
 			 * offset is supposed to be a tree block which
@@ -118,7 +118,7 @@ static void print_extent_item(struct extent_buffer *eb, int slot, int type)
 				     offset, eb->fs_info->sectorsize);
 			break;
 		default:
-			pr_cont("(extent %llu has INVALID ref type %d)\n",
+			pr_debug("(extent %llu has INVALID ref type %d)\n",
 				  eb->start, type);
 			return;
 		}

@@ -1636,7 +1636,7 @@ void __init intel_ds_init(void)
 
 		switch (format) {
 		case 0:
-			pr_cont("PEBS fmt0%c, ", pebs_type);
+			pr_debug("PEBS fmt0%c, ", pebs_type);
 			x86_pmu.pebs_record_size = sizeof(struct pebs_record_core);
 			/*
 			 * Using >PAGE_SIZE buffers makes the WRMSR to
@@ -1650,19 +1650,19 @@ void __init intel_ds_init(void)
 			break;
 
 		case 1:
-			pr_cont("PEBS fmt1%c, ", pebs_type);
+			pr_debug("PEBS fmt1%c, ", pebs_type);
 			x86_pmu.pebs_record_size = sizeof(struct pebs_record_nhm);
 			x86_pmu.drain_pebs = intel_pmu_drain_pebs_nhm;
 			break;
 
 		case 2:
-			pr_cont("PEBS fmt2%c, ", pebs_type);
+			pr_debug("PEBS fmt2%c, ", pebs_type);
 			x86_pmu.pebs_record_size = sizeof(struct pebs_record_hsw);
 			x86_pmu.drain_pebs = intel_pmu_drain_pebs_nhm;
 			break;
 
 		case 3:
-			pr_cont("PEBS fmt3%c, ", pebs_type);
+			pr_debug("PEBS fmt3%c, ", pebs_type);
 			x86_pmu.pebs_record_size =
 						sizeof(struct pebs_record_skl);
 			x86_pmu.drain_pebs = intel_pmu_drain_pebs_nhm;
@@ -1670,7 +1670,7 @@ void __init intel_ds_init(void)
 			break;
 
 		default:
-			pr_cont("no PEBS fmt%d%c, ", format, pebs_type);
+			pr_debug("no PEBS fmt%d%c, ", format, pebs_type);
 			x86_pmu.pebs = 0;
 		}
 	}

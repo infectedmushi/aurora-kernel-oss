@@ -1225,9 +1225,9 @@ void of_print_phandle_args(const char *msg, const struct of_phandle_args *args)
 	for (i = 0; i < args->args_count; i++) {
 		const char delim = i ? ',' : ':';
 
-		pr_cont("%c%08x", delim, args->args[i]);
+		pr_debug("%c%08x", delim, args->args[i]);
 	}
-	pr_cont("\n");
+	pr_debug("\n");
 }
 
 int of_phandle_iterator_init(struct of_phandle_iterator *it,

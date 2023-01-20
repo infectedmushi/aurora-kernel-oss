@@ -260,7 +260,7 @@ static inline void jffs2_remove_node_refs_from_ino_list(struct jffs2_sb_info *c,
 
 		printk(KERN_DEBUG);
 		while(this) {
-			pr_cont("0x%08x(%d)->",
+			pr_debug("0x%08x(%d)->",
 			       ref_offset(this), ref_flags(this));
 			if (++i == 5) {
 				printk(KERN_DEBUG);
@@ -268,7 +268,7 @@ static inline void jffs2_remove_node_refs_from_ino_list(struct jffs2_sb_info *c,
 			}
 			this = this->next_in_ino;
 		}
-		pr_cont("\n");
+		pr_debug("\n");
 	});
 
 	switch (ic->class) {

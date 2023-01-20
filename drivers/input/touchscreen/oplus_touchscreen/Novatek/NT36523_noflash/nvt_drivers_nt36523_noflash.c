@@ -2124,12 +2124,12 @@ static void nvt_read_debug_gesture_coordinate_buffer(struct chip_data_nt36523 *c
     }
 
     //---remove dummy data---
-    pr_cont("nova read gesture xdata\n");
+    pr_debug("nova read gesture xdata\n");
     for (i = 0; i < xdata_len ; i++) {
         xdata[i] = xdata_tmp[dummy_len + i];
-        pr_cont("0x%02X,", xdata[i]);
+        pr_debug("0x%02X,", xdata[i]);
     }
-    pr_cont("\n");
+    pr_debug("\n");
     //---set xdata index to EVENT BUF ADDR---
     nvt_set_page(chip_info, chip_info->trim_id_table.mmap->EVENT_BUF_ADDR);
 
