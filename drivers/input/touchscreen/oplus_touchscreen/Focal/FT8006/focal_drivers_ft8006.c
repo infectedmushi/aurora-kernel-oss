@@ -69,11 +69,11 @@ static int focal_enter_sleep(struct chip_data_ft8006 *chip_info, bool config)
     if (config) {
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.FTS_REG_POWER_MODE, 0x03);
         if (ret < 0) {
-            TPD_INFO("%s: enter sleep mode failed!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode failed!\n", __func__);
             return -1;
         } else {
             chip_info->is_sleep_reg_write = true;
-            TPD_INFO("%s: enter sleep mode sucess!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode sucess!\n", __func__);
         }
     }
 
@@ -94,7 +94,7 @@ void focal_rst_pin_output(bool enable)
             }
             rst_pulled_down = false;
         }
-        TPD_INFO("%s: enable = %d\n", __func__, enable);
+        TPD_DEBUG("%s: enable = %d\n", __func__, enable);
     }
 }
 
@@ -117,7 +117,7 @@ static int focal_reset(void *chip_data)
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
     focal_reset_via_gpio(chip_info, RESET_TO_NORMAL_TIME);
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     return 0;
 }
 
@@ -127,7 +127,7 @@ static int focal_enable_black_gesture(struct chip_data_ft8006 *chip_info, bool e
     int ret = -1;
     int i = 0;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
     if (chip_info->is_sleep_reg_write) {
         focal_reset(chip_info);
     }
@@ -135,7 +135,7 @@ static int focal_enable_black_gesture(struct chip_data_ft8006 *chip_info, bool e
     for (i = 0; i < 5; i++) {
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_CHIP_ID);
         if (ret != 0x80) {
-            TPD_INFO("%s: read chip id failed,ret:0x%02x, try %d(<4 is ok) times\n", __func__, ret, i);
+            TPD_DEBUG("%s: read chip id failed,ret:0x%02x, try %d(<4 is ok) times\n", __func__, ret, i);
             msleep(10);
         } else {
             break;
@@ -168,9 +168,9 @@ static int focal_enable_black_gesture(struct chip_data_ft8006 *chip_info, bool e
 
     if (i >= 5) {
         ret = -1;
-        TPD_INFO("%s: enter black gesture state: %d failed\n", __func__, enable);
+        TPD_DEBUG("%s: enter black gesture state: %d failed\n", __func__, enable);
     } else {
-        TPD_INFO("%s: enter black gesture state: %d success\n", __func__, enable);
+        TPD_DEBUG("%s: enter black gesture state: %d success\n", __func__, enable);
     }
     return ret;
 }
@@ -179,7 +179,7 @@ static int focal_enable_edge_limit(struct chip_data_ft8006 *chip_info, bool enab
 {
     int ret = -1;
 
-    TPD_INFO("%s: edge limit enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s: edge limit enable = %d\n", __func__, enable);
     if (enable) {
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.FTS_REG_EDG_CTR, 0x00);
         ret |= touch_i2c_write_byte(chip_info->client, chip_info->reg_info.FTS_REG_EDGESCREEN_Y1, chip_info->grip_area.ver_edgescreen_y1/8);
@@ -190,9 +190,9 @@ static int focal_enable_edge_limit(struct chip_data_ft8006 *chip_info, bool enab
     }
 
     if (ret < 0) {
-        TPD_INFO("%s: enable edge limit state: %d failed!\n", __func__, enable);
+        TPD_DEBUG("%s: enable edge limit state: %d failed!\n", __func__, enable);
     } else {
-        TPD_INFO("%s: enable edge limit state: %d success!\n", __func__, enable);
+        TPD_DEBUG("%s: enable edge limit state: %d success!\n", __func__, enable);
     }
     return ret;
 }
@@ -208,9 +208,9 @@ static int focal_enable_charge_mode(struct chip_data_ft8006 *chip_info, bool ena
     }
 
     if (ret < 0) {
-        TPD_INFO("%s: enable charge state: %d failed!\n", __func__, enable);
+        TPD_DEBUG("%s: enable charge state: %d failed!\n", __func__, enable);
     } else {
-        TPD_INFO("%s: enable charge state: %d success!\n", __func__, enable);
+        TPD_DEBUG("%s: enable charge state: %d success!\n", __func__, enable);
     }
     return ret;
 }
@@ -253,7 +253,7 @@ static int focal_ftm_process(void *chip_data)
     int ret = -1;
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     ret = focal_get_chip_info(chip_info);
     if (!ret) {
         ret = focal_enter_sleep(chip_info, true);
@@ -278,7 +278,7 @@ static int focal_get_vendor(void *chip_data, struct panel_info *panel_data)
     chip_info->tp_type = panel_data->tp_type;
     strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -320,7 +320,7 @@ static int focal_get_chip_info(void *chip_data)
         msleep(90);
     }
     if (i == 3) {
-        TPD_INFO("%s: read chip id failed(ret:%d), ic work abnormal\n", __func__, ret);
+        TPD_DEBUG("%s: read chip id failed(ret:%d), ic work abnormal\n", __func__, ret);
     }
 
     return 0;
@@ -346,13 +346,13 @@ static fw_check_state focal_fw_check(void *chip_data, struct resolution_info *re
 
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_CHIP_ID);
     if (ret != 0x80) {
-        TPD_INFO("Read chip Id failed, need Update the Firmware, ret: %d\n", ret);
+        TPD_DEBUG("Read chip Id failed, need Update the Firmware, ret: %d\n", ret);
         return FW_ABNORMAL;
     }
 
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_FW_VER);
     if (ret <= 0) {
-        TPD_INFO("Read firmware version failed, need Update the Firmware, ret: %d\n", ret);
+        TPD_DEBUG("Read firmware version failed, need Update the Firmware, ret: %d\n", ret);
         return FW_ABNORMAL;
     } else {
         panel_data->TP_FW = ret;
@@ -383,57 +383,57 @@ static fw_update_state focal_fw_update(void *chip_data, const struct firmware *f
     int fw_len = fw->size;
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return 0;
     }
 
-    TPD_INFO("%s is called, force update:%d\n", __func__, force);
+    TPD_DEBUG("%s is called, force update:%d\n", __func__, force);
 
     if (fw_len < APP_FILE_MIN_SIZE || fw_len > APP_FILE_MAX_SIZE) {
-        TPD_INFO("%s: firmware size have some problem, no need update\n", __func__);
+        TPD_DEBUG("%s: firmware size have some problem, no need update\n", __func__);
         return FW_NO_NEED_UPDATE;
     }
 
     fw_data = kzalloc(fw_len, GFP_KERNEL);
     if (!fw_data) {
-        TPD_INFO("%s: kzalloc memory failed\n", __func__);
+        TPD_DEBUG("%s: kzalloc memory failed\n", __func__);
         return FW_UPDATE_ERROR;
     }
     memcpy(fw_data, fw->data, fw_len);
 
     PANEL_ID_IN_BIN = fw_data[0x0F9E];  //read out panel id in fw.bin
     PANEL_ID_IN_FLASH = touch_i2c_read_byte(chip_info->client, 0xE3);   //read out panel id in flash
-    TPD_INFO("PANEL_ID_IN_BIN = %02x, PANEL_ID_IN_FLASH= %02x [0x8a-tianma/0xb0-truly/0xc3-boeb3/0xc8-boeb8]\n", PANEL_ID_IN_BIN, PANEL_ID_IN_FLASH);
+    TPD_DEBUG("PANEL_ID_IN_BIN = %02x, PANEL_ID_IN_FLASH= %02x [0x8a-tianma/0xb0-truly/0xc3-boeb3/0xc8-boeb8]\n", PANEL_ID_IN_BIN, PANEL_ID_IN_FLASH);
     if (PANEL_ID_IN_BIN != PANEL_ID_IN_FLASH) {
         force = 1;  //set force update flag
-        TPD_INFO("panel id not match, will force update\n");
+        TPD_DEBUG("panel id not match, will force update\n");
     }
 
     TP_CURRENT_FIRMWARE_ID = fw_data[APP_FILE_VER_MAPPING];
     TP_FIRMWARE_ID = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_FW_VER);
-    TPD_INFO("%s, TP_FIRMWARE_ID(in .bin) = %02x, TP_FIRMWARE_ID(in flash) = %02x\n", __func__, TP_CURRENT_FIRMWARE_ID, TP_FIRMWARE_ID);
+    TPD_DEBUG("%s, TP_FIRMWARE_ID(in .bin) = %02x, TP_FIRMWARE_ID(in flash) = %02x\n", __func__, TP_CURRENT_FIRMWARE_ID, TP_FIRMWARE_ID);
     if (!force) {
         if (TP_CURRENT_FIRMWARE_ID == TP_FIRMWARE_ID) {
             update_state = FW_NO_NEED_UPDATE;
-            TPD_INFO("%s: tp fw no need update!\n", __func__);
+            TPD_DEBUG("%s: tp fw no need update!\n", __func__);
         } else {
             ret = focal_upgrade_use_buf(chip_info, fw_data + APP_OFFSET, fw_len - APP_OFFSET);
             if (ret != 0) {
                 update_state = FW_UPDATE_ERROR;
-                TPD_INFO("%s: tp fw update failed!\n", __func__);
+                TPD_DEBUG("%s: tp fw update failed!\n", __func__);
             } else {
                 update_state =  FW_UPDATE_SUCCESS;
-                TPD_INFO("%s: tp fw update success!\n", __func__);
+                TPD_DEBUG("%s: tp fw update success!\n", __func__);
             }
         }
     } else {
         ret = focal_upgrade_use_buf(chip_info, fw_data + APP_OFFSET, fw_len - APP_OFFSET);
         if (ret != 0) {
             update_state = FW_UPDATE_ERROR;
-            TPD_INFO("%s: tp fw update failed!\n", __func__);
+            TPD_DEBUG("%s: tp fw update failed!\n", __func__);
         } else {
             update_state =  FW_UPDATE_SUCCESS;
-            TPD_INFO("%s: tp fw update success!\n", __func__);
+            TPD_DEBUG("%s: tp fw update success!\n", __func__);
         }
     }
 
@@ -445,43 +445,43 @@ static fw_update_state focal_fw_update(void *chip_data, const struct firmware *f
         msleep(10);
     }
     if (i == 3) {
-        TPD_INFO("%s: Read chip Id failed(ret:%d), no need Update the Firmware\n", __func__, ret);
+        TPD_DEBUG("%s: Read chip Id failed(ret:%d), no need Update the Firmware\n", __func__, ret);
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
 
     initcode_len = (uint32_t)((uint32_t)(fw_data[2] << 8) + fw_data[3]);
     if (0xFF != fw_data[initcode_len] + fw_data[initcode_len + 1]) {
-        TPD_INFO("%s: init code check failed, no need update\n", __func__);
+        TPD_DEBUG("%s: init code check failed, no need update\n", __func__);
     } else {
-        TPD_INFO("%s: init code check success\n", __func__);
+        TPD_DEBUG("%s: init code check success\n", __func__);
 
         LCD_CURRENT_FIRMWARE_ID = fw_data[initcode_len];
         LCD_FIRMWARE_ID = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_INITCODE_VER);
-        TPD_INFO("%s: LCD_FIRMWARE_ID(in .bin) = %02x, LCD_FIRMWARE_ID(in flash) = %02x\n", __func__, LCD_CURRENT_FIRMWARE_ID, LCD_FIRMWARE_ID);
+        TPD_DEBUG("%s: LCD_FIRMWARE_ID(in .bin) = %02x, LCD_FIRMWARE_ID(in flash) = %02x\n", __func__, LCD_CURRENT_FIRMWARE_ID, LCD_FIRMWARE_ID);
         if (!force) {
             if (LCD_FIRMWARE_ID == 0xA5) {  //0xA5: the lcd initcode is stable
-                TPD_INFO("%s : check lcd version is A5, must no update initcode\n", __func__);
+                TPD_DEBUG("%s : check lcd version is A5, must no update initcode\n", __func__);
                 goto OUT;
             }
             if ((LCD_CURRENT_FIRMWARE_ID != LCD_FIRMWARE_ID) || (LCD_FIRMWARE_ID == 0xFF)) {    //0xFF: lcd initcode must update
                 ret = focal_lcd_cfg_upgrade_use_buf(chip_info, fw_data, 4096);
                 if (ret != 0) {
                     update_state = FW_UPDATE_ERROR;
-                    TPD_INFO("%s: init code update failed!\n", __func__);
+                    TPD_DEBUG("%s: init code update failed!\n", __func__);
                 } else {
-                    TPD_INFO("%s: init code update success!\n", __func__);
+                    TPD_DEBUG("%s: init code update success!\n", __func__);
                 }
             } else {
-                TPD_INFO("%s: init code no need update!\n", __func__);
+                TPD_DEBUG("%s: init code no need update!\n", __func__);
             }
         } else {
             ret = focal_lcd_cfg_upgrade_use_buf(chip_info, fw_data, 4096);
             if (ret != 0) {
                 update_state = FW_UPDATE_ERROR;
-                TPD_INFO("%s: init code update failed!\n", __func__);
+                TPD_DEBUG("%s: init code update failed!\n", __func__);
             } else {
-                TPD_INFO("%s: init code update success!\n", __func__);
+                TPD_DEBUG("%s: init code update success!\n", __func__);
             }
         }
     }
@@ -531,20 +531,20 @@ static int focal_get_touch_points(void *chip_data, struct point_info *points, in
     focal_esd_check_enable(chip_info, false);
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_TOUCH_DATA, 3, buf);
     if (ret < 0) {
-        TPD_INFO("read touch data header failed\n");
+        TPD_DEBUG("read touch data header failed\n");
         focal_esd_check_enable(chip_info, true);
         return -1;
     }
 
     point_num = buf[2] & 0x0F;
     if (point_num > max_num) {
-        TPD_INFO("read invalid point number, no need handle\n");
+        TPD_DEBUG("read invalid point number, no need handle\n");
         focal_esd_check_enable(chip_info, true);
         return -1;
     } else if (point_num) {
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_TOUCH_DATA + 3, 6 * point_num, buf + 3);
         if (ret < 0) {
-            TPD_INFO("read touch data content failed\n");
+            TPD_DEBUG("read touch data content failed\n");
             focal_esd_check_enable(chip_info, true);
             return -1;
         }
@@ -587,7 +587,7 @@ static int focal_get_gesture_info(void *chip_data, struct gesture_info * gesture
     focal_esd_check_enable(chip_info, false);
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_GESTURE_DATA, 8, &(buf[0]));
     if (ret < 0) {
-        TPD_INFO("Read gesture header data failed!\n");
+        TPD_DEBUG("Read gesture header data failed!\n");
         focal_esd_check_enable(chip_info, true);
         return ret;
     }
@@ -597,12 +597,12 @@ static int focal_get_gesture_info(void *chip_data, struct gesture_info * gesture
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_GESTURE_DATA, 4 * point_num + 2, &(buf[0]));
     focal_esd_check_enable(chip_info, true);
     if (ret < 0) {
-        TPD_INFO("Read gesture point data failed!\n");
+        TPD_DEBUG("Read gesture point data failed!\n");
         return ret;
     }
 
     if (LEVEL_BASIC != tp_debug) {
-        TPD_INFO("gesture pointNum(%d), points:", point_num);
+        TPD_DEBUG("gesture pointNum(%d), points:", point_num);
         for (i = 0; i < point_num; i++) {
             printk("(%d, %d) ",(buf[4*i+2] & 0x0F) << 8 | (buf[4*i+3] & 0xFF), (buf[4*i+4] & 0x0F) << 8 | (buf[4*i+5] & 0xFF));
         }
@@ -753,7 +753,7 @@ static int focal_get_gesture_info(void *chip_data, struct gesture_info * gesture
             gesture->gesture_type = UnkownGesture;
     }
 
-    TPD_INFO("%s, gesture_id: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
+    TPD_DEBUG("%s, gesture_id: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
                 __func__, gesture_id, gesture->gesture_type, gesture->clockwise, \
                 gesture->Point_start.x, gesture->Point_start.y, \
                 gesture->Point_end.x, gesture->Point_end.y, \
@@ -778,14 +778,14 @@ static int focal_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_SLEEP:
             ret = focal_enter_sleep(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: focal enter sleep failed\n", __func__);
+                TPD_DEBUG("%s: focal enter sleep failed\n", __func__);
             }
             break;
 
         case MODE_GESTURE:
             ret = focal_enable_black_gesture(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: focal enable gesture failed.\n", __func__);
+                TPD_DEBUG("%s: focal enable gesture failed.\n", __func__);
                 return ret;
             }
             break;
@@ -793,7 +793,7 @@ static int focal_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = focal_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: focal enable edg limit failed.\n", __func__);
+                TPD_DEBUG("%s: focal enable edg limit failed.\n", __func__);
                 return ret;
             }
             break;
@@ -801,12 +801,12 @@ static int focal_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_CHARGE:
             ret = focal_enable_charge_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
             }
             break;
 
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -835,7 +835,7 @@ static int focal_esd_handle(void *chip_data)
     for (i = 0; i < 3; i++) {
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_CHIP_ID);
         if (ret != 0x80) {
-            TPD_INFO("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
+            TPD_DEBUG("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
             msleep(10);
             i2c_err++;
         } else {
@@ -845,7 +845,7 @@ static int focal_esd_handle(void *chip_data)
     }
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.FTS_REG_FLOW_WORK_CNT);
     if (ret < 0) {
-        TPD_INFO("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
+        TPD_DEBUG("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
         i2c_err++;
     }
 
@@ -857,7 +857,7 @@ static int focal_esd_handle(void *chip_data)
     flow_work_cnt_last = ret;
 
     if ((err_cnt >= 5) || (i2c_err >= 3)) {
-        TPD_INFO("esd check failed, start reset!\n");
+        TPD_DEBUG("esd check failed, start reset!\n");
         disable_irq_nosync(chip_info->client->irq);
         tp_touch_btnkey_release();
         focal_reset(chip_info);
@@ -888,10 +888,10 @@ static void focal_black_screen_test(void *chip_data, char *message)
     }
 
     if (retry) {
-        TPD_INFO("%s,:try %d times, get into gesture mode success!\n", __func__, 5-retry);
+        TPD_DEBUG("%s,:try %d times, get into gesture mode success!\n", __func__, 5-retry);
         sprintf(message, "0 errors. get into gesture mode success\n");
     } else {
-        TPD_INFO("%s,:try %d times, get into gesture mode failed!\n", __func__, 5-retry);
+        TPD_DEBUG("%s,:try %d times, get into gesture mode failed!\n", __func__, 5-retry);
         sprintf(message, "1 errors. get into gesture mode failed\n");
     }
 }
@@ -905,21 +905,21 @@ static fp_touch_state focal_spurious_fp_check(void *chip_data)
     fp_touch_state fp_touch_state = FINGER_PROTECT_TOUCH_UP;
 
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
-    TPD_INFO(" synaptics_spurious_fp_check  start\n");
+    TPD_DEBUG(" synaptics_spurious_fp_check  start\n");
 
     if(TX_NUM*RX_NUM*(sizeof(int16_t)) > 1800){
-        TPD_INFO("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
+        TPD_DEBUG("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
         return FINGER_PROTECT_NOTREADY ;
     }
 
     if (!chip_info->spuri_fp_data) {
-        TPD_INFO("chip_info->spuri_fp_data kzalloc error\n");
+        TPD_DEBUG("chip_info->spuri_fp_data kzalloc error\n");
         return fp_touch_state;
     }
 
     raw_data = kzalloc(TX_NUM * SPURIOUS_FP_RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-            TPD_INFO("raw_data kzalloc error\n");
+            TPD_DEBUG("raw_data kzalloc error\n");
             return fp_touch_state;
     }
     TX_NUM = chip_info->hw_res->TX_NUM;
@@ -927,7 +927,7 @@ static fp_touch_state focal_spurious_fp_check(void *chip_data)
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_BASELINE_DATA, TX_NUM*SPURIOUS_FP_RX_NUM*2, raw_data); //read baseline data
     if (ret < 0) {
-        TPD_INFO("%s: read baseline failed\n", __func__);
+        TPD_DEBUG("%s: read baseline failed\n", __func__);
         return fp_touch_state;
     }
 
@@ -940,7 +940,7 @@ static fp_touch_state focal_spurious_fp_check(void *chip_data)
             TPD_DEBUG_NTAG("%4d, ", delta_data);
             if ((delta_data + SPURIOUS_FP_LIMIT) < 0) {
                 if (!tp_debug)
-                    TPD_INFO("delta_data too large, delta_data = %d TX[%d] RX[%d]\n", delta_data, x, y);
+                    TPD_DEBUG("delta_data too large, delta_data = %d TX[%d] RX[%d]\n", delta_data, x, y);
                 err_count++;
             }
         }
@@ -953,7 +953,7 @@ static fp_touch_state focal_spurious_fp_check(void *chip_data)
         }
     }
 
-    TPD_INFO("finger protect trigger fp_touch_state= %d\n", fp_touch_state);
+    TPD_DEBUG("finger protect trigger fp_touch_state= %d\n", fp_touch_state);
 
     return fp_touch_state;
 }
@@ -969,19 +969,19 @@ static void focal_finger_proctect_data_get(void * chip_data)
     int RX_NUM = chip_info->hw_res->RX_NUM;
 
     if (TX_NUM*RX_NUM*(sizeof(int16_t)) > 1800) {
-        TPD_INFO("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
+        TPD_DEBUG("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
         return;
     }
 
     raw_data = kzalloc(TX_NUM * SPURIOUS_FP_RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-            TPD_INFO("raw_data kzalloc error\n");
+            TPD_DEBUG("raw_data kzalloc error\n");
             return;
     }
 
     chip_info->spuri_fp_data = kzalloc(TX_NUM*SPURIOUS_FP_RX_NUM*(sizeof(int16_t)), GFP_KERNEL);
     if (!chip_info->spuri_fp_data) {
-        TPD_INFO("chip_info->spuri_fp_data kzalloc error\n");
+        TPD_DEBUG("chip_info->spuri_fp_data kzalloc error\n");
         kfree(raw_data);
         ret = -ENOMEM;
         return;
@@ -991,7 +991,7 @@ RE_TRY:
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.FTS_REG_BASELINE_DATA, TX_NUM*SPURIOUS_FP_RX_NUM*2, raw_data);     //read data
     if (ret < 0) {
         if (retry_time) {
-            TPD_INFO("%s touch_i2c_read_block error\n",__func__);
+            TPD_DEBUG("%s touch_i2c_read_block error\n",__func__);
             retry_time--;
             msleep(10);
             goto RE_TRY;
@@ -1072,7 +1072,7 @@ enum FW_STATUS focal_get_pram_or_rom_id(void *chip_data)
     buf[1] = buf[2] = buf[3] =0x00;
     touch_i2c_read(chip_info->client, buf, 4, reg_val, 2);
 
-    TPD_INFO("[UPGRADE] Read ROM/PRAM/Bootloader id:0x%02x%02x\n", reg_val[0], reg_val[1]);
+    TPD_DEBUG("[UPGRADE] Read ROM/PRAM/Bootloader id:0x%02x%02x\n", reg_val[0], reg_val[1]);
     if ((reg_val[0] == 0x00) || (reg_val[0] == 0xFF)) {
         inRomBoot = FTS_RUN_IN_ERROR;
     } else if (reg_val[0] == 0x80 && reg_val[1] == 0xC6) {
@@ -1126,7 +1126,7 @@ int focal_erase_flash(void *chip_data)
     u8 reg_val[4] = {0};
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
 
-    TPD_INFO("[UPGRADE]**********erase app now**********\n");
+    TPD_DEBUG("[UPGRADE]**********erase app now**********\n");
 
     /*send to erase flash*/
     auc_i2c_write_buf[0] = 0x61;
@@ -1134,7 +1134,7 @@ int focal_erase_flash(void *chip_data)
     msleep(1350);
 
     for (i = 0; i < 15; i++) {
-        /*get the erase app status, if get 0xF0AA£¬erase flash success*/
+        /*get the erase app status, if get 0xF0AAï¿½ï¿½erase flash success*/
         auc_i2c_write_buf[0] = 0x6a;
         reg_val[0] = reg_val[1] = 0x00;
         touch_i2c_read(chip_info->client, auc_i2c_write_buf, 1, reg_val, 2);
@@ -1147,10 +1147,10 @@ int focal_erase_flash(void *chip_data)
 
     /*erase flash fail*/
     if ((0xF0!=reg_val[0] || 0xAA!=reg_val[1]) && (i >= 15)) {
-        TPD_INFO("[UPGRADE]: erase app error.need reset tp and reload FW!!\n");
+        TPD_DEBUG("[UPGRADE]: erase app error.need reset tp and reload FW!!\n");
         return -EIO;
     }
-    TPD_INFO("[UPGRADE]: erase app ok!!\n");
+    TPD_DEBUG("[UPGRADE]: erase app ok!!\n");
 
     return 0;
 }
@@ -1175,7 +1175,7 @@ static int print_data(u8 *buf, u32 len)
         n += sprintf(p + n, "%02x ", buf[i]);
     }
 
-    TPD_INFO("%s \n", p);
+    TPD_DEBUG("%s \n", p);
 
     kfree(p);
     return 0;
@@ -1208,7 +1208,7 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
     msleep(10);
     ret = touch_i2c_read(client, NULL, 0, gamma_header, 0x20);
     if(ret < 0) {
-         TPD_INFO("read 3-gamma header fail\n");
+         TPD_DEBUG("read 3-gamma header fail\n");
            return ret;
     }
 
@@ -1216,17 +1216,17 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
     gamma_len_n = (u16)((u16)gamma_header[2] << 8) + gamma_header[3];
 
     if((gamma_len + gamma_len_n) != 0xFFFF) {
-        TPD_INFO("gamma length check fail:%x %x\n", gamma_len, gamma_len);
+        TPD_DEBUG("gamma length check fail:%x %x\n", gamma_len, gamma_len);
         return -EIO;
     }
 
     if((gamma_header[4] + gamma_header[5]) != 0xFF) {
-        TPD_INFO("gamma ecc check fail:%x %x\n", gamma_header[4], gamma_header[5]);
+        TPD_DEBUG("gamma ecc check fail:%x %x\n", gamma_header[4], gamma_header[5]);
         return -EIO;
     }
 
     if(gamma_len > MAX_GAMMA_LEN) {
-        TPD_INFO("gamma data len(%d) is too long\n", gamma_len);
+        TPD_DEBUG("gamma data len(%d) is too long\n", gamma_len);
         return -EINVAL;
     }
 
@@ -1237,7 +1237,7 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
     if(remainder) {
         packet_num++;
     }
-    TPD_INFO("3-gamma len:%d\n", gamma_len);
+    TPD_DEBUG("3-gamma len:%d\n", gamma_len);
     cmd[0] = 0x03;
     addr += 0x20;
     for(i = 0; i < packet_num; i++) {
@@ -1252,7 +1252,7 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
         msleep(10);
         ret = touch_i2c_read(client, NULL, 0, pgamma + i*FTS_PACKET_LENGTH, packet_len);
         if(ret < 0) {
-            TPD_INFO("read 3-gamma data fail\n");
+            TPD_DEBUG("read 3-gamma data fail\n");
             return ret;
         }
     }
@@ -1261,9 +1261,9 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
     for(j = 0; j < gamma_len; j++) {
         gamma_ecc ^= pgamma[j];
     }
-    TPD_INFO("back_3gamma_ecc: 0x%x, 0x%x\n",gamma_ecc,gamma_header[0x04]);
+    TPD_DEBUG("back_3gamma_ecc: 0x%x, 0x%x\n",gamma_ecc,gamma_header[0x04]);
     if(gamma_ecc != gamma_header[0x04]) {
-        TPD_INFO("back gamma ecc check fail:%x %x\n", gamma_ecc, gamma_header[0x04]);
+        TPD_DEBUG("back gamma ecc check fail:%x %x\n", gamma_ecc, gamma_header[0x04]);
         return -EIO;
     }
 
@@ -1275,7 +1275,7 @@ static int focal_read_3gamma(struct i2c_client *client, u8 **gamma, u16 *len)
     }
 
     if(false == gamma_has_enable) {
-        TPD_INFO("3-gamma has no gamma enable info\n");
+        TPD_DEBUG("3-gamma has no gamma enable info\n");
         pgamma[gamma_len++] = gamma_enable[1];
         pgamma[gamma_len++] = gamma_enable[2];
         pgamma[gamma_len++] = gamma_enable[3];
@@ -1341,7 +1341,7 @@ static int focal_replace_3gamma(u8 *initcode, u8 *gamma, u16 gamma_len)
     return 0;
 
 find_gamma_bank_err:
-    TPD_INFO("3-gamma bank(%02x %02x) not find", gamma[gamma_pos], gamma[gamma_pos+1]);
+    TPD_DEBUG("3-gamma bank(%02x %02x) not find", gamma[gamma_pos], gamma[gamma_pos+1]);
     return -ENODATA;
 }
 
@@ -1371,13 +1371,13 @@ static int focal_cal_lcdinitcode_ecc(u8 *buf, u16 *ecc_val)
 
     file_len = (u16)(((u16)buf[2] << 8) + buf[3]);
     bank_crc_en = (u32)(((u32)buf[9] << 24) + ((u32)buf[8] << 16) + ((u32)buf[7] << 8) + (u32)buf[6]);
-    TPD_INFO("lcd init code len=%x bank en=%x\n", file_len, bank_crc_en);
+    TPD_DEBUG("lcd init code len=%x bank en=%x\n", file_len, bank_crc_en);
 
     pos = 0x0A; // addr of first bank
     while(pos < file_len) {
         bank_addr = (u16)(((u16)buf[pos + 0] << 8 ) + buf[pos + 1]);
         bank_len = (u16)(((u16)buf[pos + 2] << 8 ) + buf[pos + 3]);
-        TPD_INFO("bank pos=%x bank_addr=%x bank_len=%x\n", pos, bank_addr, bank_len);
+        TPD_DEBUG("bank pos=%x bank_addr=%x bank_len=%x\n", pos, bank_addr, bank_len);
         if(bank_len > MAX_BANK_DATA) {
             return -EINVAL;
         }
@@ -1385,7 +1385,7 @@ static int focal_cal_lcdinitcode_ecc(u8 *buf, u16 *ecc_val)
         memcpy(bank_data, buf + pos + 4, bank_len);
 
         bank_num = (bank_addr - 0x8000)/MAX_BANK_DATA;
-        TPD_INFO("actual mipi bank number = %x\n", bank_num);
+        TPD_DEBUG("actual mipi bank number = %x\n", bank_num);
         for(i = 0; i < sizeof(bank_mapping)/sizeof(u8); i++) {
             if(bank_num == bank_mapping[i]) {
                 banknum_8006 = i;
@@ -1393,14 +1393,14 @@ static int focal_cal_lcdinitcode_ecc(u8 *buf, u16 *ecc_val)
             }
         }
         if(i >= sizeof(bank_mapping)/sizeof(u8)) {
-            TPD_INFO("actual mipi bank(%d) not find in bank mapping, need jump\n", bank_num);
+            TPD_DEBUG("actual mipi bank(%d) not find in bank mapping, need jump\n", bank_num);
         } else {
-            TPD_INFO("8006 bank number = %d\n", banknum_8006);
+            TPD_DEBUG("8006 bank number = %d\n", banknum_8006);
             if((bank_crc_en >> banknum_8006) & 0x01) {
                 for(i = 0; i < MAX_BANK_DATA; i++) {
                     temp_byte.dshort = (u16)bank_data[i];
                     if(i == 0) {
-                        TPD_INFO("data0=%x, %d %d %d %d %d %d %d %d", temp_byte.dshort, temp_byte.bits.bit0, 
+                        TPD_DEBUG("data0=%x, %d %d %d %d %d %d %d %d", temp_byte.dshort, temp_byte.bits.bit0, 
                             temp_byte.bits.bit1, temp_byte.bits.bit2, temp_byte.bits.bit3, temp_byte.bits.bit4, 
                             temp_byte.bits.bit5, temp_byte.bits.bit6, temp_byte.bits.bit7);
                     }
@@ -1477,35 +1477,35 @@ static int focal_read_replace_3gamma(struct i2c_client *client, u8 *buf)
 
     gamma = kmalloc(MAX_GAMMA_LEN, GFP_KERNEL);
     if(NULL == gamma) {
-        TPD_INFO("malloc gamma memory fail\n");
+        TPD_DEBUG("malloc gamma memory fail\n");
         return -ENOMEM;
     }
 
     ret = focal_read_3gamma(client, &gamma, &gamma_len); //read out 3gamma data from ic backup
     if(ret < 0) {
-        TPD_INFO("no valid 3-gamma data, not replace\n");
+        TPD_DEBUG("no valid 3-gamma data, not replace\n");
         goto OUT;
     }
 
     ret = focal_replace_3gamma(buf, gamma, gamma_len); //replace initcode in fw with reading out 3gamma
     if(ret < 0) {
-        TPD_INFO("replace 3-gamma fail\n");
+        TPD_DEBUG("replace 3-gamma fail\n");
         goto OUT;
     }
 
     ret = focal_cal_lcdinitcode_ecc(buf, &initcode_ecc);
     if (ret < 0) {
-        TPD_INFO("lcd init code ecc calculate fail\n");
+        TPD_DEBUG("lcd init code ecc calculate fail\n");
         goto OUT;
     }
-    TPD_INFO("lcd init code cal ecc:%04x\n", initcode_ecc);
+    TPD_DEBUG("lcd init code cal ecc:%04x\n", initcode_ecc);
     buf[4] = (u8)(initcode_ecc >> 8);
     buf[5] = (u8)(initcode_ecc);
     buf[0x43d] = (u8)(initcode_ecc >> 8);
     buf[0x43c] = (u8)(initcode_ecc);
 
     initcode_checksum = focal_cal_lcdinitcode_checksum(buf + 2, 0x43e - 2);
-    TPD_INFO("lcd init code calc checksum:%04x\n", initcode_checksum);
+    TPD_DEBUG("lcd init code calc checksum:%04x\n", initcode_checksum);
     buf[0] = (u8)(initcode_checksum >> 8);
     buf[1] = (u8)(initcode_checksum);
 
@@ -1521,20 +1521,20 @@ int focal_check_initialCode_valid(struct i2c_client *client, u8 *buf)
     u16 initcode_checksum = 0;
 
     initcode_checksum = focal_cal_lcdinitcode_checksum(buf + 2, 0x43e - 2);
-    TPD_INFO("lcd init code calc checksum:%04x\n", initcode_checksum);
+    TPD_DEBUG("lcd init code calc checksum:%04x\n", initcode_checksum);
     if (initcode_checksum != ((u16)((u16)buf[0] << 8) + buf[1])) {
-        TPD_INFO("Initial Code checksum fail\n");
+        TPD_DEBUG("Initial Code checksum fail\n");
         return -EINVAL;
     }
 
     ret = focal_cal_lcdinitcode_ecc(buf, &initcode_ecc);
     if (ret < 0) {
-        TPD_INFO("lcd init code ecc calculate fail\n");
+        TPD_DEBUG("lcd init code ecc calculate fail\n");
         return ret;
     }
-    TPD_INFO("lcd init code cal ecc:%04x\n", initcode_ecc);
+    TPD_DEBUG("lcd init code cal ecc:%04x\n", initcode_ecc);
     if(initcode_ecc != ((u16)((u16)buf[4] << 8) + buf[5])) {
-        TPD_INFO("Initial Code ecc check fail\n");
+        TPD_DEBUG("Initial Code ecc check fail\n");
         return -EINVAL;
     }
 
@@ -1558,17 +1558,17 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
     bool inbootloader = false;
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
 
-    TPD_INFO("[UPGRADE]**********send 0xAA and 0x55 to FW, start upgrade**********\n");
+    TPD_DEBUG("[UPGRADE]**********send 0xAA and 0x55 to FW, start upgrade**********\n");
     i_ret = focal_start_fw_upgrade(chip_info);
     if (i_ret < 0) {
-        TPD_INFO( "[UPGRADE]: send upgrade cmd to FW error!!\n");
+        TPD_DEBUG( "[UPGRADE]: send upgrade cmd to FW error!!\n");
         return i_ret;
     }
 
-    TPD_INFO("[UPGRADE]**********check if run in bootloader mode**********\n");
+    TPD_DEBUG("[UPGRADE]**********check if run in bootloader mode**********\n");
     inbootloader = focal_check_run_state(chip_info, FTS_RUN_IN_BOOTLOADER);
     if (!inbootloader) {
-        TPD_INFO( "[UPGRADE]: not run in bootloader, upgrade fail!!\n");
+        TPD_DEBUG( "[UPGRADE]: not run in bootloader, upgrade fail!!\n");
         return -EIO;
     }
 
@@ -1587,10 +1587,10 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 4);
 
     /*erase the app erea in flash*/
-    TPD_INFO("[UPGRADE]**********start earse flash area**********\n");
+    TPD_DEBUG("[UPGRADE]**********start earse flash area**********\n");
     i_ret = focal_erase_flash(chip_info);
     if (i_ret < 0) {
-        TPD_INFO( "[UPGRADE]: erase flash error!!\n");
+        TPD_DEBUG( "[UPGRADE]: erase flash error!!\n");
         return i_ret;
     }
 
@@ -1600,7 +1600,7 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
     packet_number = (dw_lenth) / FTS_PACKET_LENGTH;
     packet_buf[0] = FTS_FW_WRITE_CMD;
 
-    TPD_INFO("[UPGRADE]**********start write fw to flash**********\n");
+    TPD_DEBUG("[UPGRADE]**********start write fw to flash**********\n");
     for (j = 0; j < packet_number; j++) {
         temp = 0x5000 + j * FTS_PACKET_LENGTH;
         packet_buf[1] = (u8) (temp >> 16);
@@ -1627,7 +1627,7 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
 
             if (i > 15) {
                 msleep(1);
-                TPD_INFO("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
+                TPD_DEBUG("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
             }
             //msleep(1);
             focal_upgrade_delay(10000);
@@ -1660,7 +1660,7 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
 
             if (i > 15) {
                 msleep(1);
-                TPD_INFO("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
+                TPD_DEBUG("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
             }
             //msleep(1);
             focal_upgrade_delay(10000);
@@ -1671,7 +1671,7 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
 
     /*********Step 6: read out checksum***********************/
     /*send the opration head */
-    TPD_INFO("[UPGRADE]**********start read checksum**********\n");
+    TPD_DEBUG("[UPGRADE]**********start read checksum**********\n");
     auc_i2c_write_buf[0] = 0x64;
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 1);
     msleep(300);
@@ -1712,17 +1712,17 @@ static int focal_upgrade_use_buf(void *chip_data, u8 *pbt_buf, u32 dw_lenth)
     auc_i2c_write_buf[0] = 0x66;
     touch_i2c_read(chip_info->client, auc_i2c_write_buf, 1, reg_val, 1);
     if (reg_val[0] != upgrade_ecc) {
-        TPD_INFO("[UPGRADE]: ecc error! FW=%02x upgrade_ecc=%02x!!\n",reg_val[0],upgrade_ecc);
+        TPD_DEBUG("[UPGRADE]: ecc error! FW=%02x upgrade_ecc=%02x!!\n",reg_val[0],upgrade_ecc);
         return -EIO;
     }
-    TPD_INFO("[UPGRADE]: checksum %x %x!!\n",reg_val[0],upgrade_ecc);
+    TPD_DEBUG("[UPGRADE]: checksum %x %x!!\n",reg_val[0],upgrade_ecc);
 
-    TPD_INFO("[UPGRADE]: reset the new FW!!\n");
+    TPD_DEBUG("[UPGRADE]: reset the new FW!!\n");
     auc_i2c_write_buf[0] = 0x07;    //FTS_REG_RESET_FW
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 1);
     msleep(1000);
 
-    TPD_INFO("[UPGRADE]**********end of fw upgrade sucess**********\n");
+    TPD_DEBUG("[UPGRADE]**********end of fw upgrade sucess**********\n");
     return 0;
 }
 
@@ -1741,28 +1741,28 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
     int i_ret;
     struct chip_data_ft8006 *chip_info = (struct chip_data_ft8006 *)chip_data;
 
-    TPD_INFO("[UPGRADE]**********send 0xAA and 0x55 to FW, start upgrade**********\n");
+    TPD_DEBUG("[UPGRADE]**********send 0xAA and 0x55 to FW, start upgrade**********\n");
     i_ret = focal_start_fw_upgrade(chip_info);
     if (i_ret < 0) {
-        TPD_INFO( "[UPGRADE]: send upgrade cmd to FW error!!\n");
+        TPD_DEBUG( "[UPGRADE]: send upgrade cmd to FW error!!\n");
     }
 
-    TPD_INFO("[UPGRADE]**********check if run in bootloader mode**********\n");
+    TPD_DEBUG("[UPGRADE]**********check if run in bootloader mode**********\n");
     inbootloader = focal_check_run_state(chip_info, FTS_RUN_IN_BOOTLOADER);
     if (!inbootloader) {
-        TPD_INFO( "[UPGRADE]: not run in bootloader, upgrade fail!!\n");
+        TPD_DEBUG( "[UPGRADE]: not run in bootloader, upgrade fail!!\n");
         return -EIO;
     }
 
     i_ret = focal_read_replace_3gamma(chip_info->client, pbt_buf);
     if(i_ret < 0) {
-        TPD_INFO("replace 3-gamma fail, not upgrade lcd init code\n");
+        TPD_DEBUG("replace 3-gamma fail, not upgrade lcd init code\n");
         return i_ret;
     }
 
     i_ret = focal_check_initialCode_valid(chip_info->client, pbt_buf);
     if(i_ret < 0) {
-        TPD_INFO("initial code invalid, not upgrade lcd init code");
+        TPD_DEBUG("initial code invalid, not upgrade lcd init code");
         return i_ret;
     }
 
@@ -1772,7 +1772,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 2);
 
     /*Step 4:erase app and panel paramenter area*/
-    TPD_INFO("[UPGRADE]**********erase app and panel paramenter area**********\n");
+    TPD_DEBUG("[UPGRADE]**********erase app and panel paramenter area**********\n");
     auc_i2c_write_buf[0] = chip_info->reg_info.FTS_ERASE_APP_REG;
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 1);
     msleep(1000);
@@ -1786,7 +1786,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
         }
         msleep(50);
     }
-    TPD_INFO("[UPGRADE]: erase app area reg_val[0] = %x reg_val[1] = %x!!\n", reg_val[0], reg_val[1]);
+    TPD_DEBUG("[UPGRADE]: erase app area reg_val[0] = %x reg_val[1] = %x!!\n", reg_val[0], reg_val[1]);
 
     auc_i2c_write_buf[0] = 0xB0;
     auc_i2c_write_buf[1] = 0;
@@ -1796,7 +1796,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
 
     /*write FW to ctpm flash*/
     upgrade_ecc = 0;
-    TPD_INFO("[UPGRADE]**********write fw to lcd flash area**********\n");
+    TPD_DEBUG("[UPGRADE]**********write fw to lcd flash area**********\n");
     temp = 0;
     packet_number = (dw_lenth) / FTS_PACKET_LENGTH;
     packet_buf[0] = FTS_FW_WRITE_CMD;
@@ -1825,7 +1825,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
 
             if (i > 15) {
                 msleep(1);
-                TPD_INFO("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
+                TPD_DEBUG("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
             }
             focal_upgrade_delay(10000);
         }
@@ -1855,7 +1855,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
 
             if (i > 15) {
                 msleep(1);
-                TPD_INFO("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
+                TPD_DEBUG("[UPGRADE]: write flash: host : %x status : %x!!\n", (j + 0x1000 + (0x5000/FTS_PACKET_LENGTH)), (((reg_val[0]) << 8) | reg_val[1]));
             }
             focal_upgrade_delay(10000);
         }
@@ -1865,7 +1865,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
 
     /*********Step 6: read out checksum***********************/
     /*send the opration head */
-    TPD_INFO("[UPGRADE]: read out checksum!!\n");
+    TPD_DEBUG("[UPGRADE]: read out checksum!!\n");
     auc_i2c_write_buf[0] = 0x64;
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 1);
     msleep(300);
@@ -1887,7 +1887,7 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
         touch_i2c_read(chip_info->client, auc_i2c_write_buf, 1, reg_val, 2);
 
         if (0xF0==reg_val[0] && 0x55==reg_val[1]) {
-            TPD_INFO("[UPGRADE]: reg_val[0]=%02x reg_val[0]=%02x!!\n", reg_val[0], reg_val[1]);
+            TPD_DEBUG("[UPGRADE]: reg_val[0]=%02x reg_val[0]=%02x!!\n", reg_val[0], reg_val[1]);
             break;
         }
         msleep(1);
@@ -1895,12 +1895,12 @@ static int focal_lcd_cfg_upgrade_use_buf(void *chip_data, u8* pbt_buf, u32 dw_le
     auc_i2c_write_buf[0] = 0x66;
     touch_i2c_read(chip_info->client, auc_i2c_write_buf, 1, reg_val, 1);
     if (reg_val[0] != upgrade_ecc) {
-        TPD_INFO("[UPGRADE]: ecc error! FW=%02x upgrade_ecc=%02x!!\n",reg_val[0],upgrade_ecc);
+        TPD_DEBUG("[UPGRADE]: ecc error! FW=%02x upgrade_ecc=%02x!!\n",reg_val[0],upgrade_ecc);
         return -EIO;
     }
-    TPD_INFO("[UPGRADE]: checksum %x %x!!\n",reg_val[0],upgrade_ecc);
+    TPD_DEBUG("[UPGRADE]: checksum %x %x!!\n",reg_val[0],upgrade_ecc);
 
-    TPD_INFO("[UPGRADE]: reset the new FW!!\n");
+    TPD_DEBUG("[UPGRADE]: reset the new FW!!\n");
     auc_i2c_write_buf[0] = 0x07;    //FTS_REG_RESET_FW
     touch_i2c_write(chip_info->client, auc_i2c_write_buf, 1);
     msleep(1000);
@@ -1978,7 +1978,7 @@ static void focal_set_grip_handle(void *chip_data, int para_num, char *buf)
         break;
 
     default:
-        TPD_INFO("this grip setting not support\n");
+        TPD_DEBUG("this grip setting not support\n");
     }
 }
 
@@ -2021,7 +2021,7 @@ static void focal_delta_read(struct seq_file *s, void *chip_data)
 
     raw_data = kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-        TPD_INFO("raw_data kzalloc error\n");
+        TPD_DEBUG("raw_data kzalloc error\n");
         focal_esd_check_enable(chip_info, true);    //allowed esd check
         return;
     }
@@ -2072,7 +2072,7 @@ static void focal_baseline_read(struct seq_file *s, void *chip_data)
 
     baseline_data = kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!baseline_data) {
-        TPD_INFO("baseline_data kzalloc error\n");
+        TPD_DEBUG("baseline_data kzalloc error\n");
         focal_esd_check_enable(chip_info, true);    //allowed esd check
         return;
     }
@@ -2168,7 +2168,7 @@ static void focal_cb_read(struct seq_file *s, void *chip_data)
     focal_esd_check_enable(chip_info, false); //no allowed esd check
     cb_data = kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!cb_data) {
-        TPD_INFO("cb_data kzalloc error\n");
+        TPD_DEBUG("cb_data kzalloc error\n");
         focal_esd_check_enable(chip_info, true);
         return;
     }
@@ -2231,12 +2231,12 @@ static int focal_tp_probe(struct i2c_client *client, const struct i2c_device_id 
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     /* 1. alloc chip info */
     chip_info = kzalloc(sizeof(struct chip_data_ft8006), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -2245,7 +2245,7 @@ static int focal_tp_probe(struct i2c_client *client, const struct i2c_device_id 
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -2280,7 +2280,7 @@ static int focal_tp_probe(struct i2c_client *client, const struct i2c_device_id 
     //reset esd handle time interval
     if (ts->esd_handle_support) {
         ts->esd_info.esd_work_time = HZ; // change esd check interval to 1s
-        TPD_INFO("%s:change esd handle time to %d s\n", __func__, ts->esd_info.esd_work_time/HZ);
+        TPD_DEBUG("%s:change esd handle time to %d s\n", __func__, ts->esd_info.esd_work_time/HZ);
     }
 
     /* 6. collect data for supurious_fp_touch */
@@ -2296,7 +2296,7 @@ static int focal_tp_probe(struct i2c_client *client, const struct i2c_device_id 
     /* 8. create sys info file */
     focal_create_sysfs(client);
 
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_register_driver:
@@ -2308,7 +2308,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -2316,7 +2316,7 @@ static int focal_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -2326,7 +2326,7 @@ static int focal_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -2336,7 +2336,7 @@ static int focal_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2378,13 +2378,13 @@ static struct i2c_driver tp_i2c_driver =
 /***********************Start of module init and exit****************************/
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&tp_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

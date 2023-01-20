@@ -209,7 +209,7 @@ int32_t nvt_i2c_write(struct i2c_client *client, uint16_t address, uint8_t *buf,
     client->addr = address;
     ret = touch_i2c_write(client, buf, len);
     if (ret < 0) {
-        TPD_INFO("%s %d failed\n", __func__, address);
+        TPD_DEBUG("%s %d failed\n", __func__, address);
     }
     client->addr = addr_cpy;
 
@@ -224,7 +224,7 @@ int32_t nvt_i2c_read(struct i2c_client *client, uint16_t address, uint8_t *buf, 
     client->addr = address;
     ret = touch_i2c_read(client, &buf[0], 1, &buf[1], len - 1);
     if (ret < 0) {
-        TPD_INFO("%s %d failed\n", __func__, address);
+        TPD_DEBUG("%s %d failed\n", __func__, address);
     }
     client->addr = addr_cpy;
 
@@ -243,7 +243,7 @@ static void nvt_bootloader_reset(struct chip_data_nt36525 *chip_info)
     buf[1] = 0x69;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
     if (ret < 0) {
-        TPD_INFO("write bootloader reset cmds failed!\n");
+        TPD_DEBUG("write bootloader reset cmds failed!\n");
     }
 
     // need 35ms delay after bootloader reset
@@ -260,7 +260,7 @@ static void nvt_sw_reset_idle(struct chip_data_nt36525 *chip_info)
     buf[1]=0xA5;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
     if (ret < 0) {
-        TPD_INFO("write reset idle cmds failed!\n");
+        TPD_DEBUG("write reset idle cmds failed!\n");
     }
 
     msleep(15);
@@ -299,9 +299,9 @@ static int8_t nvt_check_chip_ver_trim(struct chip_data_nt36525 *chip_info)
         buf[6] = 0x00;
         ret |= nvt_i2c_read(chip_info->client, I2C_BLDR_Address, buf, 7);
         if (ret < 0) {
-            TPD_INFO("write or read failed in %s \n", __func__);
+            TPD_DEBUG("write or read failed in %s \n", __func__);
         }
-        TPD_INFO("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
+        TPD_DEBUG("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
             buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]);
 
         // compare read chip id on supported list
@@ -321,7 +321,7 @@ static int8_t nvt_check_chip_ver_trim(struct chip_data_nt36525 *chip_info)
             }
 
             if (found_nvt_chip) {
-                TPD_INFO("This is NVT touch IC\n");
+                TPD_DEBUG("This is NVT touch IC\n");
                 chip_info->mmap = trim_id_table[list].mmap;
                 chip_info->carrier_system = trim_id_table[list].carrier_system;
                 ret = 0;
@@ -365,7 +365,7 @@ int32_t nvt_check_fw_reset_state(struct chip_data_nt36525 *chip_info, RST_COMPLE
 
         retry++;
         if(unlikely(retry > 100)) {
-            TPD_INFO("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n", retry, buf[1], buf[2], buf[3], buf[4], buf[5]);
+            TPD_DEBUG("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n", retry, buf[1], buf[2], buf[3], buf[4], buf[5]);
             ret = -1;
             break;
         }
@@ -391,12 +391,12 @@ int32_t nvt_read_pid(struct chip_data_nt36525 *chip_info)
     buf[2] = 0x00;
     ret = nvt_i2c_read(chip_info->client, I2C_FW_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("read pid failed\n");
+        TPD_DEBUG("read pid failed\n");
     } else {
         chip_info->nvt_pid = (buf[2] << 8) + buf[1];
     }
 
-    TPD_INFO("PID=%04X\n", chip_info->nvt_pid);
+    TPD_DEBUG("PID=%04X\n", chip_info->nvt_pid);
 
     return ret;
 }
@@ -426,15 +426,15 @@ info_retry:
 
     //---clear x_num, y_num if fw info is broken---
     if ((buf[1] + buf[2]) != 0xFF) {
-        TPD_INFO("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n", buf[1], buf[2]);
+        TPD_DEBUG("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n", buf[1], buf[2]);
         chip_info->fw_ver = 0;
 
         if(retry_count < 3) {
             retry_count++;
-            TPD_INFO("%s retry_count=%d\n", __func__, retry_count);
+            TPD_DEBUG("%s retry_count=%d\n", __func__, retry_count);
             goto info_retry;
         } else {
-            TPD_INFO("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
+            TPD_DEBUG("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
             ret = -1;
         }
     } else {
@@ -463,11 +463,11 @@ static int nvt_enter_sleep(struct chip_data_nt36525 *chip_info, bool config)
         buf[1] = 0x11;
         ret = nvt_i2c_write(chip_info->client, I2C_FW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("%s: enter sleep mode failed!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode failed!\n", __func__);
             return -1;
         } else {
             chip_info->is_sleep_writed = true;
-            TPD_INFO("%s: enter sleep mode sucess!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode sucess!\n", __func__);
         }
     }
 
@@ -479,12 +479,12 @@ static int nvt_reset(void *chip_data)
     int ret = -1;
     struct chip_data_nt36525 *chip_info = (struct chip_data_nt36525 *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
 
     nvt_bootloader_reset(chip_info);
     ret = nvt_check_fw_reset_state(chip_info, RESET_STATE_INIT);
     if (ret < 0) {
-        TPD_INFO("%s: check reset state(INIT) failed\n", __func__);
+        TPD_DEBUG("%s: check reset state(INIT) failed\n", __func__);
     } else {
         chip_info->is_sleep_writed = false;
     }
@@ -520,10 +520,10 @@ static int8_t nvt_cmd_store(struct chip_data_nt36525 *chip_info, uint8_t u8Cmd)
     }
 
     if (unlikely(i == retry)) {
-        TPD_INFO("send Cmd 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, buf[1]);
+        TPD_DEBUG("send Cmd 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, buf[1]);
         return -1;
     } else {
-        TPD_INFO("send Cmd 0x%02X success, tried %d times\n", u8Cmd, i);
+        TPD_DEBUG("send Cmd 0x%02X success, tried %d times\n", u8Cmd, i);
     }
 
     return 0;
@@ -533,7 +533,7 @@ static int nvt_enable_black_gesture(struct chip_data_nt36525 *chip_info, bool en
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (enable) {
         if (chip_info->is_sleep_writed) {
@@ -552,7 +552,7 @@ static int nvt_enable_edge_limit(struct chip_data_nt36525 *chip_info, bool enabl
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (chip_info->is_sleep_writed) {
         nvt_reset(chip_info);
@@ -571,7 +571,7 @@ static int nvt_enable_charge_mode(struct chip_data_nt36525 *chip_info, bool enab
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (chip_info->is_sleep_writed) {
         nvt_reset(chip_info);
@@ -597,7 +597,7 @@ int32_t Resume_PD(struct chip_data_nt36525 *chip_info)
     buf[1] = 0xAB;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
     if (ret < 0) {
-        TPD_INFO("Write Resume Command Enable error!\n");
+        TPD_DEBUG("Write Resume Command Enable error!\n");
         return ret;
     }
 
@@ -609,7 +609,7 @@ int32_t Resume_PD(struct chip_data_nt36525 *chip_info)
         buf[1] = 0x00;
         ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Check 0xAA (Resume Command) error!\n");
+            TPD_DEBUG("Check 0xAA (Resume Command) error!\n");
             return ret;
         }
         if (buf[1] == 0xAA) {
@@ -617,13 +617,13 @@ int32_t Resume_PD(struct chip_data_nt36525 *chip_info)
         }
         retry++;
         if (unlikely(retry > 20)) {
-            TPD_INFO("Check 0xAA (Resume Command) error!! status=0x%02X\n", buf[1]);
+            TPD_DEBUG("Check 0xAA (Resume Command) error!! status=0x%02X\n", buf[1]);
             return -1;
         }
     }
     msleep(10);
 
-    TPD_INFO("Resume PD OK\n");
+    TPD_DEBUG("Resume PD OK\n");
     return 0;
 }
 
@@ -641,7 +641,7 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
     int32_t retry = 0;
 
     if (Resume_PD(chip_info)) {
-        TPD_INFO("Resume PD error!!\n");
+        TPD_DEBUG("Resume PD error!!\n");
         return -1;
     }
 
@@ -667,7 +667,7 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
             buf[6] = (len_in_blk - 1) & 0xFF;
             ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 7);
             if (ret < 0) {
-                TPD_INFO("write Fast Read Command error!\n");
+                TPD_DEBUG("write Fast Read Command error!\n");
                 return ret;
             }
             // Check 0xAA (Fast Read Command)
@@ -678,7 +678,7 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
                 buf[1] = 0x00;
                 ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
                 if (ret < 0) {
-                    TPD_INFO("Check 0xAA (Fast Read Command) error!\n");
+                    TPD_DEBUG("Check 0xAA (Fast Read Command) error!\n");
                     return ret;
                 }
                 if (buf[1] == 0xAA) {
@@ -686,7 +686,7 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
                 }
                 retry++;
                 if (unlikely(retry > 5)) {
-                    TPD_INFO("Check 0xAA (Fast Read Command) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
+                    TPD_DEBUG("Check 0xAA (Fast Read Command) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
                     return -1;
                 }
             }
@@ -696,7 +696,7 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
             buf[2] = (XDATA_Addr >> 8) & 0xFF;
             ret = nvt_i2c_write(chip_info->client, I2C_BLDR_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Read Checksum (write addr high byte & middle byte) error!\n");
+                TPD_DEBUG("Read Checksum (write addr high byte & middle byte) error!\n");
                 return ret;
             }
             // Read Checksum
@@ -705,21 +705,21 @@ int32_t Check_CheckSum(struct chip_data_nt36525 *chip_info, const struct firmwar
             buf[2] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_BLDR_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Read Checksum error!!(%d)\n", ret);
+                TPD_DEBUG("Read Checksum error!!(%d)\n", ret);
                 return ret;
             }
 
             RD_Filechksum[i] = (uint16_t)((buf[2] << 8) | buf[1]);
-			TPD_INFO("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
+			TPD_DEBUG("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
             if (WR_Filechksum[i] != RD_Filechksum[i]) {
-                TPD_INFO("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
-                TPD_INFO("firmware checksum not match!!\n");
+                TPD_DEBUG("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
+                TPD_DEBUG("firmware checksum not match!!\n");
                 return 0;
             }
         }
     }
 
-    TPD_INFO("firmware checksum match!\n");
+    TPD_DEBUG("firmware checksum match!\n");
     return 1;
 }
 
@@ -734,7 +734,7 @@ int32_t Check_FW_Ver(struct chip_data_nt36525 *chip_info, const struct firmware 
     buf[2] = (chip_info->mmap->EVENT_BUF_ADDR >> 8) & 0xFF;
     ret = nvt_i2c_write(chip_info->client, I2C_BLDR_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("%s: i2c write error!\n", __func__);
+        TPD_DEBUG("%s: i2c write error!\n", __func__);
         return ret;
     }
 
@@ -744,17 +744,17 @@ int32_t Check_FW_Ver(struct chip_data_nt36525 *chip_info, const struct firmware 
     buf[2] = 0x00;
     ret = nvt_i2c_read(chip_info->client, I2C_BLDR_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("%s: i2c read error!\n", __func__);
+        TPD_DEBUG("%s: i2c read error!\n", __func__);
         return ret;
     }
 
-    TPD_INFO("IC FW Ver = 0x%02X, FW Ver Bar = 0x%02X\n", buf[1], buf[2]);
-    TPD_INFO("Bin FW Ver = 0x%02X, FW ver Bar = 0x%02X\n",
+    TPD_DEBUG("IC FW Ver = 0x%02X, FW Ver Bar = 0x%02X\n", buf[1], buf[2]);
+    TPD_DEBUG("Bin FW Ver = 0x%02X, FW ver Bar = 0x%02X\n",
             fw->data[FW_BIN_VER_OFFSET], fw->data[FW_BIN_VER_BAR_OFFSET]);
 
     // check IC FW_VER + FW_VER_BAR equals 0xFF or not, need to update if not
     if ((buf[1] + buf[2]) != 0xFF) {
-        TPD_INFO("IC FW_VER + FW_VER_BAR not equals to 0xFF!\n");
+        TPD_DEBUG("IC FW_VER + FW_VER_BAR not equals to 0xFF!\n");
         return 0;
     }
 
@@ -780,7 +780,7 @@ int32_t Init_BootLoader(struct chip_data_nt36525 *chip_info)
     buf[2] = I2C_FW_Address;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("Inittial Flash Block error!!\n");
+        TPD_DEBUG("Inittial Flash Block error!!\n");
         return ret;
     }
 
@@ -792,7 +792,7 @@ int32_t Init_BootLoader(struct chip_data_nt36525 *chip_info)
         buf[1] = 0x00;
         ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Check 0xAA (Inittial Flash Block) error!!\n");
+            TPD_DEBUG("Check 0xAA (Inittial Flash Block) error!!\n");
             return ret;
         }
         if (buf[1] == 0xAA) {
@@ -800,12 +800,12 @@ int32_t Init_BootLoader(struct chip_data_nt36525 *chip_info)
         }
         retry++;
         if (unlikely(retry > 20)) {
-            TPD_INFO("Check 0xAA (Inittial Flash Block) error!! status=0x%02X\n", buf[1]);
+            TPD_DEBUG("Check 0xAA (Inittial Flash Block) error!! status=0x%02X\n", buf[1]);
             return -1;
         }
     }
 
-    TPD_INFO("Init OK \n");
+    TPD_DEBUG("Init OK \n");
     msleep(20);
 
     return 0;
@@ -825,7 +825,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
     buf[1] = 0x06;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
     if (ret < 0) {
-        TPD_INFO("Write Enable (for Write Status Register) error!\n");
+        TPD_DEBUG("Write Enable (for Write Status Register) error!\n");
         return ret;
     }
     // Check 0xAA (Write Enable)
@@ -836,7 +836,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[1] = 0x00;
         ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Check 0xAA (Write Enable for Write Status Register) error!!\n");
+            TPD_DEBUG("Check 0xAA (Write Enable for Write Status Register) error!!\n");
             return ret;
         }
         if (buf[1] == 0xAA) {
@@ -844,7 +844,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         }
         retry++;
         if (unlikely(retry > 20)) {
-            TPD_INFO("Check 0xAA (Write Enable for Write Status Register) error! status=0x%02X\n", buf[1]);
+            TPD_DEBUG("Check 0xAA (Write Enable for Write Status Register) error! status=0x%02X\n", buf[1]);
             return -1;
         }
     }
@@ -855,7 +855,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
     buf[2] = 0x00;
     ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("Write Status Register error!\n");
+        TPD_DEBUG("Write Status Register error!\n");
         return ret;
     }
     // Check 0xAA (Write Status Register)
@@ -866,7 +866,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[1] = 0x00;
         ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Check 0xAA (Write Status Register) error!!\n");
+            TPD_DEBUG("Check 0xAA (Write Status Register) error!!\n");
             return ret;
         }
         if (buf[1] == 0xAA) {
@@ -874,7 +874,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         }
         retry++;
         if (unlikely(retry > 20)) {
-            TPD_INFO("Check 0xAA (Write Status Register) error! status=0x%02X\n", buf[1]);
+            TPD_DEBUG("Check 0xAA (Write Status Register) error! status=0x%02X\n", buf[1]);
             return -1;
         }
     }
@@ -887,7 +887,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[1] = 0x05;
         ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Read Status (for Write Status Register) error!!(%d)\n", ret);
+            TPD_DEBUG("Read Status (for Write Status Register) error!!(%d)\n", ret);
             return ret;
         }
 
@@ -897,7 +897,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[2] = 0x00;
         ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 3);
         if (ret < 0) {
-            TPD_INFO("Check 0xAA (Read Status for Write Status Register) error!\n");
+            TPD_DEBUG("Check 0xAA (Read Status for Write Status Register) error!\n");
             return ret;
         }
         if ((buf[1] == 0xAA) && (buf[2] == 0x00)) {
@@ -905,7 +905,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         }
         retry++;
         if (unlikely(retry > 100)) {
-            TPD_INFO("Check 0xAA (Read Status for Write Status Register) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
+            TPD_DEBUG("Check 0xAA (Read Status for Write Status Register) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
             return -1;
         }
     }
@@ -921,7 +921,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[1] = 0x06;
         ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Write Enable error!!(%d)\n", i);
+            TPD_DEBUG("Write Enable error!!(%d)\n", i);
             return ret;
         }
         // Check 0xAA (Write Enable)
@@ -932,7 +932,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             buf[1] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Check 0xAA (Write Enable) error!!(%d)\n", i);
+                TPD_DEBUG("Check 0xAA (Write Enable) error!!(%d)\n", i);
                 return ret;
             }
             if (buf[1] == 0xAA) {
@@ -940,7 +940,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             }
             retry++;
             if (unlikely(retry > 20)) {
-                TPD_INFO("Check 0xAA (Write Enable) error!! status=0x%02X\n", buf[1]);
+                TPD_DEBUG("Check 0xAA (Write Enable) error!! status=0x%02X\n", buf[1]);
                 return -1;
             }
         }
@@ -955,7 +955,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
         buf[4] = (Flash_Address & 0xFF);
         ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 5);
         if (ret < 0) {
-            TPD_INFO("Sector Erase error!!(%d)\n", i);
+            TPD_DEBUG("Sector Erase error!!(%d)\n", i);
             return ret;
         }
         // Check 0xAA (Sector Erase)
@@ -966,7 +966,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             buf[1] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Check 0xAA (Sector Erase) error!\n");
+                TPD_DEBUG("Check 0xAA (Sector Erase) error!\n");
                 return ret;
             }
             if (buf[1] == 0xAA) {
@@ -974,7 +974,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             }
             retry++;
             if (unlikely(retry > 20)) {
-                TPD_INFO("Check 0xAA (Sector Erase) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
+                TPD_DEBUG("Check 0xAA (Sector Erase) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
                 return -1;
             }
         }
@@ -987,7 +987,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             buf[1] = 0x05;
             ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Read Status error!!(%d)\n", i);
+                TPD_DEBUG("Read Status error!!(%d)\n", i);
                 return ret;
             }
 
@@ -997,7 +997,7 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             buf[2] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Check 0xAA (Read Status) error!!(%d)\n", i);
+                TPD_DEBUG("Check 0xAA (Read Status) error!!(%d)\n", i);
                 return ret;
             }
             if ((buf[1] == 0xAA) && (buf[2] == 0x00)) {
@@ -1005,13 +1005,13 @@ int32_t Erase_Flash(struct chip_data_nt36525 *chip_info, uint32_t fw_len)
             }
             retry++;
             if (unlikely(retry > 100)) {
-                TPD_INFO("Check 0xAA (Read Status) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
+                TPD_DEBUG("Check 0xAA (Read Status) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
                 return -1;
             }
         }
     }
 
-    TPD_INFO("Erase OK \n");
+    TPD_DEBUG("Erase OK \n");
     return 0;
 }
 
@@ -1032,7 +1032,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
     buf[2] = (XDATA_Addr >> 8) & 0xFF;
     ret = nvt_i2c_write(chip_info->client, I2C_BLDR_Address, buf, 3);
     if (ret < 0) {
-        TPD_INFO("change I2C buffer index error!!\n");
+        TPD_DEBUG("change I2C buffer index error!!\n");
         return ret;
     }
 
@@ -1049,7 +1049,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
         buf[1] = 0x06;
         ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("Write Enable error!\n");
+            TPD_DEBUG("Write Enable error!\n");
             return ret;
         }
         // Check 0xAA (Write Enable)
@@ -1060,7 +1060,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             buf[1] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Check 0xAA (Write Enable) error!\n");
+                TPD_DEBUG("Check 0xAA (Write Enable) error!\n");
                 return ret;
             }
             if (buf[1] == 0xAA) {
@@ -1068,7 +1068,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             }
             retry++;
             if (unlikely(retry > 20)) {
-                TPD_INFO("Check 0xAA (Write Enable) error! status=0x%02X\n", buf[1]);
+                TPD_DEBUG("Check 0xAA (Write Enable) error! status=0x%02X\n", buf[1]);
                 return -1;
             }
         }
@@ -1081,7 +1081,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             }
             ret = nvt_i2c_write(chip_info->client, I2C_BLDR_Address, buf, 33);
             if (ret < 0) {
-                TPD_INFO("Write Page error!, j=%d\n", j);
+                TPD_DEBUG("Write Page error!, j=%d\n", j);
                 return ret;
             }
         }
@@ -1106,7 +1106,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
         buf[7] = tmpvalue;
         ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 8);
         if (ret < 0) {
-            TPD_INFO("Page Program error!, i=%d\n", i);
+            TPD_DEBUG("Page Program error!, i=%d\n", i);
             return ret;
         }
         // Check 0xAA (Page Program)
@@ -1117,7 +1117,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             buf[1] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Page Program error!\n");
+                TPD_DEBUG("Page Program error!\n");
                 return ret;
             }
             if (buf[1] == 0xAA || buf[1] == 0xEA) {
@@ -1125,12 +1125,12 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             }
             retry++;
             if (unlikely(retry > 20)) {
-                TPD_INFO("Check 0xAA (Page Program) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
+                TPD_DEBUG("Check 0xAA (Page Program) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
                 return -1;
             }
         }
         if (buf[1] == 0xEA) {
-            TPD_INFO("Page Program error! i=%d\n", i);
+            TPD_DEBUG("Page Program error! i=%d\n", i);
             return -3;
         }
 
@@ -1142,7 +1142,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             buf[1] = 0x05;
             ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 2);
             if (ret < 0) {
-                TPD_INFO("Read Status error!\n");
+                TPD_DEBUG("Read Status error!\n");
                 return ret;
             }
 
@@ -1152,7 +1152,7 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             buf[2] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Check 0xAA (Read Status) error!\n");
+                TPD_DEBUG("Check 0xAA (Read Status) error!\n");
                 return ret;
             }
             if (((buf[1] == 0xAA) && (buf[2] == 0x00)) || (buf[1] == 0xEA)) {
@@ -1160,20 +1160,20 @@ int32_t Write_Flash(struct chip_data_nt36525 *chip_info, const struct firmware *
             }
             retry++;
             if (unlikely(retry > 100)) {
-                TPD_INFO("Check 0xAA (Read Status) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
+                TPD_DEBUG("Check 0xAA (Read Status) failed, buf[1]=0x%02X, buf[2]=0x%02X, retry=%d\n", buf[1], buf[2], retry);
                 return -1;
             }
         }
         if (buf[1] == 0xEA) {
-            TPD_INFO("Page Program error! i=%d\n", i);
+            TPD_DEBUG("Page Program error! i=%d\n", i);
             return -4;
         }
 
         TPD_DEBUG("Programming...%2d%%\n", ((i * 100) / count));
     }
 
-    TPD_INFO("Programming...%2d%%\n", 100);
-    TPD_INFO("Program OK         \n");
+    TPD_DEBUG("Programming...%2d%%\n", 100);
+    TPD_DEBUG("Program OK         \n");
     return 0;
 }
 
@@ -1210,7 +1210,7 @@ int32_t Verify_Flash(struct chip_data_nt36525 *chip_info, const struct firmware 
             buf[6] = (len_in_blk - 1) & 0xFF;
             ret = nvt_i2c_write(chip_info->client, I2C_HW_Address, buf, 7);
             if (ret < 0) {
-                TPD_INFO("Fast Read Command error!\n");
+                TPD_DEBUG("Fast Read Command error!\n");
                 return ret;
             }
             // Check 0xAA (Fast Read Command)
@@ -1221,7 +1221,7 @@ int32_t Verify_Flash(struct chip_data_nt36525 *chip_info, const struct firmware 
                 buf[1] = 0x00;
                 ret = nvt_i2c_read(chip_info->client, I2C_HW_Address, buf, 2);
                 if (ret < 0) {
-                    TPD_INFO("Check 0xAA (Fast Read Command) error!\n");
+                    TPD_DEBUG("Check 0xAA (Fast Read Command) error!\n");
                     return ret;
                 }
                 if (buf[1] == 0xAA) {
@@ -1229,7 +1229,7 @@ int32_t Verify_Flash(struct chip_data_nt36525 *chip_info, const struct firmware 
                 }
                 retry++;
                 if (unlikely(retry > 5)) {
-                    TPD_INFO("Check 0xAA (Fast Read Command) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
+                    TPD_DEBUG("Check 0xAA (Fast Read Command) failed, buf[1]=0x%02X, retry=%d\n", buf[1], retry);
                     return -1;
                 }
             }
@@ -1239,7 +1239,7 @@ int32_t Verify_Flash(struct chip_data_nt36525 *chip_info, const struct firmware 
             buf[2] = (XDATA_Addr >> 8) & 0xFF;
             ret = nvt_i2c_write(chip_info->client, I2C_BLDR_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Read Checksum (write addr high byte & middle byte) error!\n");
+                TPD_DEBUG("Read Checksum (write addr high byte & middle byte) error!\n");
                 return ret;
             }
             // Read Checksum
@@ -1248,20 +1248,20 @@ int32_t Verify_Flash(struct chip_data_nt36525 *chip_info, const struct firmware 
             buf[2] = 0x00;
             ret = nvt_i2c_read(chip_info->client, I2C_BLDR_Address, buf, 3);
             if (ret < 0) {
-                TPD_INFO("Read Checksum error!\n");
+                TPD_DEBUG("Read Checksum error!\n");
                 return ret;
             }
 
             RD_Filechksum[i] = (uint16_t)((buf[2] << 8) | buf[1]);
             if (WR_Filechksum[i] != RD_Filechksum[i]) {
-                TPD_INFO("Verify Fail%d!\n", i);
-                TPD_INFO("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
+                TPD_DEBUG("Verify Fail%d!\n", i);
+                TPD_DEBUG("RD_Filechksum[%d]=0x%04X, WR_Filechksum[%d]=0x%04X\n", i, RD_Filechksum[i], i, WR_Filechksum[i]);
                 return -1;
             }
         }
     }
 
-    TPD_INFO("Verify OK \n");
+    TPD_DEBUG("Verify OK \n");
     return 0;
 }
 /****** End of other functions that work for oplus_touchpanel_operations callbacks*************/
@@ -1272,7 +1272,7 @@ static int nvt_ftm_process(void *chip_data)
     int ret = -1;
     struct chip_data_nt36525 *chip_info = (struct chip_data_nt36525 *)chip_data;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     ret = nvt_get_chip_info(chip_info);
     if (!ret) {
         nvt_bootloader_reset(chip_info);
@@ -1296,7 +1296,7 @@ static int nvt_get_vendor(void *chip_data, struct panel_info *panel_data)
         panel_data->fw_name[len-1] = 'n';
     }
     chip_info->tp_type = panel_data->tp_type;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -1309,7 +1309,7 @@ static int nvt_get_chip_info(void *chip_data)
     //---check chip version trim---
     ret = nvt_check_chip_ver_trim(chip_info);
     if (ret) {
-        TPD_INFO("chip is not identified\n");
+        TPD_DEBUG("chip is not identified\n");
         ret = -EINVAL;
     }
 
@@ -1332,7 +1332,7 @@ static fw_check_state nvt_fw_check(void *chip_data, struct resolution_info *reso
     ret = nvt_check_fw_reset_state(chip_info, RESET_STATE_INIT);
     ret |= nvt_get_fw_info(chip_info);
     if (ret < 0) {
-        TPD_INFO("%s: get fw info failed\n", __func__);
+        TPD_DEBUG("%s: get fw info failed\n", __func__);
         return FW_ABNORMAL;
     } else {
         panel_data->TP_FW = chip_info->fw_ver;
@@ -1356,20 +1356,20 @@ static fw_update_state nvt_fw_update(void *chip_data, const struct firmware *fw,
     fw_update_state update_state = FW_NO_NEED_UPDATE;
     struct chip_data_nt36525 *chip_info = (struct chip_data_nt36525 *)chip_data;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return FW_NO_NEED_UPDATE;
     }
 
     if (fw->size != FW_BIN_SIZE) {
-        TPD_INFO("bin file size not match\n");
+        TPD_DEBUG("bin file size not match\n");
         return FW_NO_NEED_UPDATE;
     }
 
     if (*(fw->data + FW_BIN_VER_OFFSET) + *(fw->data + FW_BIN_VER_BAR_OFFSET) != 0xFF) {
-        TPD_INFO("bin file FW_VER(0x%02x) + FW_VER_BAR(0x%02x) should be 0xFF\n", *(fw->data+FW_BIN_VER_OFFSET), *(fw->data+FW_BIN_VER_BAR_OFFSET));
+        TPD_DEBUG("bin file FW_VER(0x%02x) + FW_VER_BAR(0x%02x) should be 0xFF\n", *(fw->data+FW_BIN_VER_OFFSET), *(fw->data+FW_BIN_VER_BAR_OFFSET));
         return FW_NO_NEED_UPDATE;
     }
 
@@ -1377,55 +1377,55 @@ static fw_update_state nvt_fw_update(void *chip_data, const struct firmware *fw,
 
     nvt_sw_reset_idle(chip_info);
     if (!force) {
-        TPD_INFO("no force update!\n");
+        TPD_DEBUG("no force update!\n");
         ret = Check_CheckSum(chip_info, fw);//-1:error, 0:not match, 1:match
         if (((ret == 0) && (Check_FW_Ver(chip_info, fw) == 1)) || (ret == 1)) {
-            TPD_INFO("no need update!\n");
+            TPD_DEBUG("no need update!\n");
             goto OUT;
         }
     }
 
     // Step 1 : initial bootloader
-    TPD_INFO("Init BootLoader start\n");
+    TPD_DEBUG("Init BootLoader start\n");
     ret = Init_BootLoader(chip_info);
     if (ret) {
-        TPD_INFO("Init BootLoader failed, exit!\n");
+        TPD_DEBUG("Init BootLoader failed, exit!\n");
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
 
     // Step 2 : Resume PD
-    TPD_INFO("Resume PD start\n");
+    TPD_DEBUG("Resume PD start\n");
     ret = Resume_PD(chip_info);
     if (ret) {
-        TPD_INFO("Resume PD failed, exit!\n");
+        TPD_DEBUG("Resume PD failed, exit!\n");
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
 
     // Step 3 : Erase
-    TPD_INFO("Erase Flash start\n");
+    TPD_DEBUG("Erase Flash start\n");
     ret = Erase_Flash(chip_info, fw->size);
     if (ret) {
-        TPD_INFO("Erase Flash failed, exit!\n");
+        TPD_DEBUG("Erase Flash failed, exit!\n");
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
 
     // Step 4 : Program
-    TPD_INFO("Write Flash start\n");
+    TPD_DEBUG("Write Flash start\n");
     ret = Write_Flash(chip_info, fw);
     if (ret) {
-        TPD_INFO("Write Flash failed, exit!\n");
+        TPD_DEBUG("Write Flash failed, exit!\n");
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
 
     // Step 5 : Verify
-    TPD_INFO("Verify Flash start\n");
+    TPD_DEBUG("Verify Flash start\n");
     ret = Verify_Flash(chip_info, fw);
     if (ret) {
-        TPD_INFO("Verify Flash failed, exit!\n");
+        TPD_DEBUG("Verify Flash failed, exit!\n");
         update_state = FW_UPDATE_ERROR;
         goto OUT;
     }
@@ -1437,7 +1437,7 @@ OUT:
     nvt_bootloader_reset(chip_info);
     nvt_check_fw_reset_state(chip_info, RESET_STATE_INIT);
 
-    TPD_INFO("update firmware state: %s\n", (update_state == FW_UPDATE_SUCCESS)? "update success!":\
+    TPD_DEBUG("update firmware state: %s\n", (update_state == FW_UPDATE_SUCCESS)? "update success!":\
                                             (update_state == FW_UPDATE_ERROR)? "update failed!": "no need update!");
     return update_state;
 }
@@ -1470,7 +1470,7 @@ static int nvt_get_touch_points(void *chip_data, struct point_info *points, int 
     memset(buf, 0, sizeof(buf));
     ret = nvt_i2c_read(chip_info->client, I2C_FW_Address, buf, POINT_DATA_LEN + 1);
     if (ret < 0) {
-        TPD_INFO("read touch data failed\n");
+        TPD_DEBUG("read touch data failed\n");
         return -1;
     }
 
@@ -1531,12 +1531,12 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info * gesture)
     memset(point_data, 0, sizeof(point_data));
     ret = nvt_i2c_read(chip_info->client, I2C_FW_Address, point_data, POINT_DATA_LEN + 1);
     if (ret < 0) {
-        TPD_INFO("%s: read gesture data failed\n", __func__);
+        TPD_DEBUG("%s: read gesture data failed\n", __func__);
         return -1;
     }
 
     if (nvt_fw_recovery(point_data)) {  //receive 0x77
-        TPD_INFO("receive all 0x77, no gesture interrupts\n");
+        TPD_DEBUG("receive all 0x77, no gesture interrupts\n");
         return 0;
     }
 
@@ -1545,7 +1545,7 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info * gesture)
     if ((gesture_id == 30) && (func_type == 1)) {
         gesture_id = (uint8_t)point_data[3];
     } else if (gesture_id > 30) {
-        TPD_INFO("invalid gesture id= %d, no gesture event\n", gesture_id);
+        TPD_DEBUG("invalid gesture id= %d, no gesture event\n", gesture_id);
         return 0;
     }
     switch (gesture_id)     //judge gesture type
@@ -1691,7 +1691,7 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info * gesture)
             break;
     }
 
-    TPD_INFO("%s, gesture_id: 0x%x, func_type: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
+    TPD_DEBUG("%s, gesture_id: 0x%x, func_type: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
                 __func__, gesture_id, func_type, gesture->gesture_type, gesture->clockwise, \
                 gesture->Point_start.x, gesture->Point_start.y, \
                 gesture->Point_end.x, gesture->Point_end.y, \
@@ -1716,14 +1716,14 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_SLEEP:
             ret = nvt_enter_sleep(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: nvt enter sleep failed\n", __func__);
+                TPD_DEBUG("%s: nvt enter sleep failed\n", __func__);
             }
             break;
 
         case MODE_GESTURE:
             ret = nvt_enable_black_gesture(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: nvt enable gesture failed.\n", __func__);
+                TPD_DEBUG("%s: nvt enable gesture failed.\n", __func__);
                 return ret;
             }
             break;
@@ -1731,7 +1731,7 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = nvt_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: nvt enable edg limit failed.\n", __func__);
+                TPD_DEBUG("%s: nvt enable edg limit failed.\n", __func__);
                 return ret;
             }
             break;
@@ -1739,12 +1739,12 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_CHARGE:
             ret = nvt_enable_charge_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
             }
             break;
 
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -1783,13 +1783,13 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     int32_t *lpwg_diff_rawdata_P = NULL, *lpwg_diff_rawdata_N = NULL;
 
     if (nvt_switch_FreqHopEnDis(chip_info, FREQ_HOP_DISABLE)) {
-        TPD_INFO("switch frequency hopping disable failed!\n");
+        TPD_DEBUG("switch frequency hopping disable failed!\n");
         sprintf(message, "1 error, switch frequency hopping disable failed!\n");
         return;
     }
 
     if (nvt_check_fw_reset_state(chip_info, RESET_STATE_NORMAL_RUN)) {
-        TPD_INFO("check fw reset state failed!\n");
+        TPD_DEBUG("check fw reset state failed!\n");
         sprintf(message, "1 error, check fw reset state failed!\n");
         return;
     }
@@ -1798,7 +1798,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
 
     //---Enter Test Mode---
     if (nvt_clear_fw_status(chip_info)) {
-        TPD_INFO("clear fw status failed!\n");
+        TPD_DEBUG("clear fw status failed!\n");
         sprintf(message, "1 error, clear fw status failed!\n");
         return;
     }
@@ -1806,18 +1806,18 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     nvt_change_mode(chip_info, TEST_MODE_2);
 
     if (nvt_check_fw_status(chip_info)) {
-        TPD_INFO("check fw status failed!\n");
+        TPD_DEBUG("check fw status failed!\n");
         sprintf(message, "1 error, clear fw status failed!\n");
         return;
     }
 
     if (nvt_get_fw_info(chip_info)) {
-        TPD_INFO("get fw info failed!\n");
+        TPD_DEBUG("get fw info failed!\n");
         sprintf(message, "1 error, get fw info failed!\n");
         return;
     }
 
-    TPD_INFO("malloc raw_data space\n");
+    TPD_DEBUG("malloc raw_data space\n");
     buf_len = tx_num * rx_num * sizeof(int32_t);
     raw_data = kzalloc(buf_len, GFP_KERNEL);
     raw_data_n = kzalloc(buf_len, GFP_KERNEL);
@@ -1846,7 +1846,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     sys_mkdir("/sdcard/TpTestReport/screenOff", 0666);
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         err_cnt++;
         sprintf(buf, "Open log file '%s' failed.\n", data_buf);
         goto OUT;
@@ -1858,7 +1858,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     lpwg_diff_rawdata_N = (int32_t *)(fw->data + ph->array_LPWG_Diff_N_offset);
 
     //---FW Rawdata Test---
-    TPD_INFO("LPWG mode FW Rawdata Test \n");
+    TPD_DEBUG("LPWG mode FW Rawdata Test \n");
     memset(raw_data, 0, buf_len);
     if (nvt_get_fw_pipe(chip_info) == 0)
         nvt_read_mdata(chip_info, chip_info->mmap->RAW_PIPE0_ADDR, raw_data, buf_len);
@@ -1875,7 +1875,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_LPWG_Rawdata_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_LPWG_Rawdata_N)) {
-                    TPD_INFO("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Rawdata[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data[iArrayIndex], ph->config_Lmt_LPWG_Rawdata_N, ph->config_Lmt_LPWG_Rawdata_P);
@@ -1898,7 +1898,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data[iArrayIndex] > lpwg_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < lpwg_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Rawdata[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data[iArrayIndex], lpwg_rawdata_N[iArrayIndex], lpwg_rawdata_P[iArrayIndex]);
@@ -1917,16 +1917,16 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     nvt_change_mode(chip_info, NORMAL_MODE);
 
     //---Noise Test---
-    TPD_INFO("LPWG mode FW Noise Test \n");
+    TPD_DEBUG("LPWG mode FW Noise Test \n");
     memset(raw_data, 0, buf_len);  //store max
     memset(raw_data_n, 0, buf_len); //store min
     if (nvt_read_fw_noise(chip_info, ph->config_Diff_Test_Frame, raw_data, raw_data_n, buf_len) != 0) {
-        TPD_INFO("LPWG mode read Noise data failed!\n");    // 1: ERROR
+        TPD_DEBUG("LPWG mode read Noise data failed!\n");    // 1: ERROR
         sprintf(buf, "LPWG mode read Noise data failed!\n");
         err_cnt++;
         goto OUT;
     }
-    TPD_INFO("LPWG Noise RawData_Diff_Max:\n");
+    TPD_DEBUG("LPWG Noise RawData_Diff_Max:\n");
     store_to_file(fd, "LPWG Noise RawData_Diff_Max:\n");
     if ((ph->config_Lmt_LPWG_Diff_P != 0) && (ph->config_Lmt_LPWG_Diff_N != 0)) {
         for (j = 0; j < rx_num; j++) {
@@ -1938,7 +1938,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_LPWG_Diff_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_LPWG_Diff_N)) {
-                    TPD_INFO("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Noise RawData_Diff_Max[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data[iArrayIndex], ph->config_Lmt_LPWG_Diff_N, ph->config_Lmt_LPWG_Diff_P);
@@ -1951,7 +1951,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
             }
             TPD_DEBUG_NTAG("\n");
         }
-        TPD_INFO("LPWG Noise RawData_Diff_Min:\n");
+        TPD_DEBUG("LPWG Noise RawData_Diff_Min:\n");
         store_to_file(fd, "LPWG Noise RawData_Diff_Min:\n");
         for (j = 0; j < rx_num; j++) {
             for (i = 0; i < tx_num; i++) {
@@ -1962,7 +1962,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data_n[iArrayIndex] > ph->config_Lmt_LPWG_Diff_P) \
                         || (raw_data_n[iArrayIndex] < ph->config_Lmt_LPWG_Diff_N)) {
-                    TPD_INFO("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data_n[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data_n[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Noise RawData_Diff_Min[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data_n[iArrayIndex], ph->config_Lmt_LPWG_Diff_N, ph->config_Lmt_LPWG_Diff_P);
@@ -1985,7 +1985,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data[iArrayIndex] > lpwg_diff_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < lpwg_diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Noise RawData_Diff_Max[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data[iArrayIndex], lpwg_diff_rawdata_N[iArrayIndex], lpwg_diff_rawdata_P[iArrayIndex]);
@@ -1998,7 +1998,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
             }
             TPD_DEBUG_NTAG("\n");
         }
-        TPD_INFO("LPWG Noise RawData_Diff_Min:\n");
+        TPD_DEBUG("LPWG Noise RawData_Diff_Min:\n");
         store_to_file(fd, "LPWG Noise RawData_Diff_Min:\n");
         for (j = 0; j < rx_num; j++) {
             for (i = 0; i < tx_num; i++) {
@@ -2009,7 +2009,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                 }
                 if((raw_data_n[iArrayIndex] > lpwg_diff_rawdata_P[iArrayIndex]) \
                         || (raw_data_n[iArrayIndex] < lpwg_diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data_n[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data_n[iArrayIndex]);
                     if (!err_cnt) {
                         sprintf(buf, "LPWG Noise RawData_Diff_Min[%d][%d] = %d[%d %d]\n",
                             i, j, raw_data_n[iArrayIndex], lpwg_diff_rawdata_N[iArrayIndex], lpwg_diff_rawdata_P[iArrayIndex]);
@@ -2037,7 +2037,7 @@ KFREE_OUT:
     if (raw_data_n)
         kfree(raw_data_n);
     sprintf(message, "%d errors. %s", err_cnt, buf);
-    TPD_INFO("%d errors. %s\n", err_cnt, buf);
+    TPD_DEBUG("%d errors. %s\n", err_cnt, buf);
 }
 
 static bool nvt_fw_recovery(uint8_t *point_data)
@@ -2071,13 +2071,13 @@ static int nvt_esd_handle(void *chip_data)
     struct chip_data_nt36525 *chip_info = (struct chip_data_nt36525 *)chip_data;
     unsigned int timer = jiffies_to_msecs(jiffies - chip_info->irq_timer);
 
-    //TPD_INFO("esd_check = %d (retry %d)\n", chip_info->esd_check_enabled, chip_info->esd_retry);    //DEBUG
+    //TPD_DEBUG("esd_check = %d (retry %d)\n", chip_info->esd_check_enabled, chip_info->esd_retry);    //DEBUG
 
     // if (chip_info->esd_retry >= 5)
         // nvt_esd_check_enable(chip_info, false);
 
     if ((timer > NVT_TOUCH_ESD_CHECK_PERIOD) && chip_info->esd_check_enabled) {
-        TPD_INFO("do ESD recovery, timer = %d, retry = %d\n", timer, chip_info->esd_retry);
+        TPD_DEBUG("do ESD recovery, timer = %d, retry = %d\n", timer, chip_info->esd_retry);
         /* do esd recovery, bootloader reset */
         tp_touch_btnkey_release();
         nvt_bootloader_reset(chip_info);
@@ -2147,7 +2147,7 @@ static int32_t nvt_clear_fw_status(struct chip_data_nt36525 *chip_info)
     }
 
     if (i >= retry) {
-        TPD_INFO("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
+        TPD_DEBUG("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
         return -1;
     } else {
         return 0;
@@ -2196,7 +2196,7 @@ static int32_t nvt_check_fw_status(struct chip_data_nt36525 *chip_info)
         buf[1] = 0x00;
         ret |= nvt_i2c_read(chip_info->client, I2C_FW_Address, buf, 2);
         if (ret < 0) {
-            TPD_INFO("%s write or read failed\n", __func__);
+            TPD_DEBUG("%s write or read failed\n", __func__);
         }
 
         if ((buf[1] & 0xF0) == 0xA0)
@@ -2206,7 +2206,7 @@ static int32_t nvt_check_fw_status(struct chip_data_nt36525 *chip_info)
     }
 
     if (i >= retry) {
-        TPD_INFO("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
+        TPD_DEBUG("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
         return -1;
     } else {
         return 0;
@@ -2229,7 +2229,7 @@ static uint8_t nvt_get_fw_pipe(struct chip_data_nt36525 *chip_info)
     buf[1] = 0x00;
     ret |= nvt_i2c_read(chip_info->client, I2C_FW_Address, buf, 2);
     if (ret < 0) {
-        TPD_INFO("%s: read or write failed\n", __func__);
+        TPD_DEBUG("%s: read or write failed\n", __func__);
     }
 
     return (buf[1] & 0x01);
@@ -2254,14 +2254,14 @@ static void nvt_read_mdata(struct chip_data_nt36525 *chip_info, uint32_t xdata_a
     residual_len = (head_addr + dummy_len + data_len) % XDATA_SECTOR_SIZE;
 
     if (xdata_len/sizeof(int32_t) < data_len/2) {
-        TPD_INFO("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
+        TPD_DEBUG("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
         return;
     }
 
     //malloc buffer space
     xdata_tmp = kzalloc(2048 ,GFP_KERNEL);
     if (xdata_tmp == NULL) {
-        TPD_INFO("%s malloc memory failed\n", __func__);
+        TPD_DEBUG("%s malloc memory failed\n", __func__);
         return;
     }
     //printk("head_addr=0x%05X, dummy_len=0x%05X, data_len=0x%05X, residual_len=0x%05X\n", head_addr, dummy_len, data_len, residual_len);
@@ -2334,38 +2334,38 @@ static void nvt_data_read(struct seq_file *s, struct chip_data_nt36525 *chip_inf
     int32_t *xdata = NULL;
     int32_t buf_len = 0;
 
-    TPD_INFO("nvt clear fw status start\n");
+    TPD_DEBUG("nvt clear fw status start\n");
     ret = nvt_clear_fw_status(chip_info);
     if (ret < 0) {
-        TPD_INFO("clear_fw_status error, return\n");
+        TPD_DEBUG("clear_fw_status error, return\n");
         return;
     }
 
     nvt_change_mode(chip_info, TEST_MODE_2);
 
-    TPD_INFO("nvt check fw status start\n");
+    TPD_DEBUG("nvt check fw status start\n");
     ret = nvt_check_fw_status(chip_info);
     if (ret < 0) {
-        TPD_INFO("check_fw_status error, return\n");
+        TPD_DEBUG("check_fw_status error, return\n");
         return;
     }
 
-    TPD_INFO("nvt get fw info start");
+    TPD_DEBUG("nvt get fw info start");
     ret = nvt_get_fw_info(chip_info);
     if (ret < 0) {
-        TPD_INFO("get_fw_info error, return\n");
+        TPD_DEBUG("get_fw_info error, return\n");
         return;
     }
 
     buf_len = chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM*sizeof(int32_t);
     xdata = kzalloc(buf_len, GFP_KERNEL);
     if (!xdata) {
-        TPD_INFO("%s, malloc memory failed\n", __func__);
+        TPD_DEBUG("%s, malloc memory failed\n", __func__);
         return;
     }
 
     pipe = nvt_get_fw_pipe(chip_info);
-    TPD_INFO("nvt_get_fw_pipe:%d\n", pipe);
+    TPD_DEBUG("nvt_get_fw_pipe:%d\n", pipe);
     switch (read_type) {
         case NVT_RAWDATA:
             seq_printf(s, "raw_data:\n");
@@ -2391,7 +2391,7 @@ static void nvt_data_read(struct seq_file *s, struct chip_data_nt36525 *chip_inf
     }
 
     nvt_change_mode(chip_info, NORMAL_MODE);
-    TPD_INFO("change normal mode end\n");
+    TPD_DEBUG("change normal mode end\n");
 
     //print all data
     for (i = 0; i < chip_info->hw_res->RX_NUM; i++) {
@@ -2490,7 +2490,7 @@ static int8_t nvt_switch_FreqHopEnDis(struct chip_data_nt36525 *chip_info, uint8
     }
 
     if (unlikely(retry == 20)) {
-        TPD_INFO("switch FreqHopEnDis 0x%02X failed, buf[1]=0x%02X\n", FreqHopEnDis, buf[1]);
+        TPD_DEBUG("switch FreqHopEnDis 0x%02X failed, buf[1]=0x%02X\n", FreqHopEnDis, buf[1]);
         ret = -1;
     }
 
@@ -2530,7 +2530,7 @@ static void nvt_enable_noise_collect(struct chip_data_nt36525 *chip_info, int32_
     buf[4] = 0x00;
     ret |= nvt_i2c_write(chip_info->client, I2C_FW_Address, buf, 5);
     if (ret < 0) {
-        TPD_INFO("%s failed\n", __func__);
+        TPD_DEBUG("%s failed\n", __func__);
     }
 }
 
@@ -2559,7 +2559,7 @@ static int32_t nvt_polling_hand_shake_status(struct chip_data_nt36525 *chip_info
     }
 
     if (i >= retry) {
-        TPD_INFO("polling hand shake status failed, buf[1]=0x%02X\n", buf[1]);
+        TPD_DEBUG("polling hand shake status failed, buf[1]=0x%02X\n", buf[1]);
         return -1;
     } else {
         return 0;
@@ -2574,7 +2574,7 @@ static int32_t nvt_read_fw_noise(struct chip_data_nt36525 *chip_info, int32_t co
     int32_t frame_num = 0;
 
     if (xdata_len/sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw nosie buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw nosie buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -2586,7 +2586,7 @@ static int32_t nvt_read_fw_noise(struct chip_data_nt36525 *chip_info, int32_t co
     frame_num = config_Diff_Test_Frame / 10;
     if (frame_num <= 0)
         frame_num = 1;
-    TPD_INFO("%s: frame_num=%d\n", __func__, frame_num);
+    TPD_DEBUG("%s: frame_num=%d\n", __func__, frame_num);
     nvt_enable_noise_collect(chip_info, frame_num);
     // need wait PS_Config_Diff_Test_Frame * 8.3ms
     msleep(frame_num * 83);
@@ -2636,7 +2636,7 @@ static void nvt_enable_doze_noise_collect(struct chip_data_nt36525 *chip_info, i
     buf[4] = 0x00;
     ret |= nvt_i2c_write(chip_info->client, I2C_FW_Address, buf, 5);
     if (ret < 0) {
-        TPD_INFO("%s failed\n", __func__);
+        TPD_DEBUG("%s failed\n", __func__);
     }
 }
 
@@ -2650,7 +2650,7 @@ static int32_t nvt_read_doze_fw_noise(struct chip_data_nt36525 *chip_info, int32
     int32_t frame_num = 0;
 
     if (xdata_len/sizeof(int32_t) < rx_num * doze_X_Channel) {
-        TPD_INFO("read doze nosie buffer(%d) less than data size(%d)\n", xdata_len, rx_num * doze_X_Channel);
+        TPD_DEBUG("read doze nosie buffer(%d) less than data size(%d)\n", xdata_len, rx_num * doze_X_Channel);
         return -1;
     }
 
@@ -2662,7 +2662,7 @@ static int32_t nvt_read_doze_fw_noise(struct chip_data_nt36525 *chip_info, int32
     frame_num = config_Doze_Noise_Test_Frame / 10;
     if (frame_num <= 0)
         frame_num = 1;
-    TPD_INFO("%s: frame_num=%d\n", __func__, frame_num);
+    TPD_DEBUG("%s: frame_num=%d\n", __func__, frame_num);
     nvt_enable_doze_noise_collect(chip_info, frame_num);
     // need wait PS_Config_Doze_Noise_Test_Frame * 16.7ms
     msleep(frame_num * 250);
@@ -2716,7 +2716,7 @@ static int32_t nvt_read_doze_baseline(struct chip_data_nt36525 *chip_info, int32
     //    return -EAGAIN;
     //}
     if (xdata_len/sizeof(int32_t) < rm_num * doze_X_Channel) {
-        TPD_INFO("read doze baseline buffer(%d) less than data size(%d)\n", xdata_len, rm_num * doze_X_Channel);
+        TPD_DEBUG("read doze baseline buffer(%d) less than data size(%d)\n", xdata_len, rm_num * doze_X_Channel);
         return -1;
     }
 
@@ -2776,7 +2776,7 @@ static int32_t nvt_read_fw_short(struct chip_data_nt36525 *chip_info, int32_t *x
     int32_t iArrayIndex = 0;
 
     if (xdata_len/sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw short buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw short buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -2793,7 +2793,7 @@ static int32_t nvt_read_fw_short(struct chip_data_nt36525 *chip_info, int32_t *x
 
     rawdata_buf = (uint8_t *)kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2, GFP_KERNEL);
     if (!rawdata_buf) {
-        TPD_INFO("kzalloc for rawdata_buf failed!\n");
+        TPD_DEBUG("kzalloc for rawdata_buf failed!\n");
         return -ENOMEM;
     }
 
@@ -2859,7 +2859,7 @@ static int32_t nvt_read_fw_open(struct chip_data_nt36525 *chip_info, int32_t *xd
     uint8_t buf[128] = {0};
 
     if (xdata_len/sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw open buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw open buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -2876,7 +2876,7 @@ static int32_t nvt_read_fw_open(struct chip_data_nt36525 *chip_info, int32_t *xd
 
     rawdata_buf = (uint8_t *)kzalloc(tx_num * rx_num * 2, GFP_KERNEL);
     if (!rawdata_buf) {
-        TPD_INFO("kzalloc for rawdata_buf failed!\n");
+        TPD_DEBUG("kzalloc for rawdata_buf failed!\n");
         return -ENOMEM;
     }
 
@@ -2930,14 +2930,14 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     int32_t *doze_diff_rawdata_P = NULL, *doze_diff_rawdata_N = NULL;
 
     if (nvt_switch_FreqHopEnDis(chip_info, FREQ_HOP_DISABLE)) {
-        TPD_INFO("switch frequency hopping disable failed!\n");
+        TPD_DEBUG("switch frequency hopping disable failed!\n");
         store_to_file(nvt_testdata->fd, "switch frequency hopping disable failed!\n");
         seq_printf(s, "switch frequency hopping disable failed!\n");
         return;
     }
 
     if (nvt_check_fw_reset_state(chip_info, RESET_STATE_NORMAL_RUN)) {
-        TPD_INFO("check fw reset state failed!\n");
+        TPD_DEBUG("check fw reset state failed!\n");
         store_to_file(nvt_testdata->fd, "check fw reset state failed!\n");
         seq_printf(s, "check fw reset state failed!\n");
         return;
@@ -2946,9 +2946,9 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     msleep(100);
 
     //---Enter Test Mode---
-    TPD_INFO("enter test mode\n");
+    TPD_DEBUG("enter test mode\n");
     if (nvt_clear_fw_status(chip_info)) {
-        TPD_INFO("clear fw status failed!\n");
+        TPD_DEBUG("clear fw status failed!\n");
         store_to_file(nvt_testdata->fd, "clear fw status failed!\n");
         seq_printf(s, "clear fw status failed!\n");
         return;
@@ -2957,20 +2957,20 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     nvt_change_mode(chip_info, MP_MODE_CC);
 
     if (nvt_check_fw_status(chip_info)) {
-        TPD_INFO("check fw status failed!\n");
+        TPD_DEBUG("check fw status failed!\n");
         store_to_file(nvt_testdata->fd, "check fw status failed!\n");
         seq_printf(s, "check fw status failed!\n");
         return;
     }
 
     if (nvt_get_fw_info(chip_info)) {
-        TPD_INFO("get fw info failed!\n");
+        TPD_DEBUG("get fw info failed!\n");
         store_to_file(nvt_testdata->fd, "get fw info failed!\n");
         seq_printf(s, "get fw info failed!\n");
         return;
     }
 
-    TPD_INFO("malloc raw_data space\n");
+    TPD_DEBUG("malloc raw_data space\n");
     buf_len = nvt_testdata->TX_NUM * nvt_testdata->RX_NUM * sizeof(int32_t);
     raw_data = kzalloc(buf_len, GFP_KERNEL);
     raw_data_n = kzalloc(buf_len, GFP_KERNEL);
@@ -2999,7 +2999,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     doze_diff_rawdata_N = (int32_t *)(nvt_testdata->fw->data + ph->array_Doze_Diff_N_offset);
 
     //---FW Rawdata Test---
-    TPD_INFO("FW Rawdata Test \n");
+    TPD_DEBUG("FW Rawdata Test \n");
     memset(raw_data, 0, buf_len);
     nvt_read_mdata(chip_info, chip_info->mmap->BASELINE_ADDR, raw_data, buf_len);
     store_to_file(nvt_testdata->fd, "rawData:\n");
@@ -3011,7 +3011,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
             }
             if((raw_data[iArrayIndex] > fw_rawdata_P[iArrayIndex]) \
                     || (raw_data[iArrayIndex] < fw_rawdata_N[iArrayIndex])) {
-                TPD_INFO("rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
+                TPD_DEBUG("rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
                 if (!err_cnt) {
                     seq_printf(s, "rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
                 }
@@ -3023,7 +3023,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
         }
     }
 
-    TPD_INFO("FW cc data test \n");
+    TPD_DEBUG("FW cc data test \n");
     memset(raw_data, 0, buf_len);
     if (nvt_get_fw_pipe(chip_info) == 0)
         nvt_read_mdata(chip_info, chip_info->mmap->DIFF_PIPE1_ADDR, raw_data, buf_len);
@@ -3039,7 +3039,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_FW_CC_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_FW_CC_N)) {
-                    TPD_INFO("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
+                    TPD_DEBUG("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
                     if (!err_cnt) {
                         seq_printf(s, "cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
                     }
@@ -3059,7 +3059,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > cc_data_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < cc_data_N[iArrayIndex])) {
-                    TPD_INFO("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
+                    TPD_DEBUG("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
                     }
@@ -3076,11 +3076,11 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     nvt_change_mode(chip_info, NORMAL_MODE);
 
     //---Noise Test---
-    TPD_INFO("FW Noise Test \n");
+    TPD_DEBUG("FW Noise Test \n");
     memset(raw_data, 0, buf_len);  //store max
     memset(raw_data_n, 0, buf_len); //store min
     if (nvt_read_fw_noise(chip_info, ph->config_Diff_Test_Frame, raw_data, raw_data_n, buf_len) != 0) {
-        TPD_INFO("read Noise data failed!\n");
+        TPD_DEBUG("read Noise data failed!\n");
         store_to_file(nvt_testdata->fd, "read Noise data failed!\n");
         seq_printf(s, "read Noise data failed!\n");
         err_cnt++;
@@ -3096,7 +3096,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_FW_Diff_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_FW_Diff_N)) {
-                    TPD_INFO("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
+                    TPD_DEBUG("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     }
@@ -3116,7 +3116,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data_n[iArrayIndex] > ph->config_Lmt_FW_Diff_P) \
                         || (raw_data_n[iArrayIndex] < ph->config_Lmt_FW_Diff_N)) {
-                    TPD_INFO("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
+                    TPD_DEBUG("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     }
@@ -3136,7 +3136,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > diff_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     }
@@ -3156,7 +3156,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data_n[iArrayIndex] > diff_rawdata_P[iArrayIndex]) \
                         || (raw_data_n[iArrayIndex] < diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     }
@@ -3170,11 +3170,11 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Noise Test---
-    TPD_INFO("Doze FW Noise Test \n");
+    TPD_DEBUG("Doze FW Noise Test \n");
     memset(raw_data, 0, buf_len);  //store max
     memset(raw_data_n, 0, buf_len); //store min
     if (nvt_read_doze_fw_noise(chip_info, ph->config_Doze_Noise_Test_Frame, ph->doze_X_Channel, raw_data, raw_data_n, buf_len) != 0) {
-        TPD_INFO("read Doze Noise data failed!\n");
+        TPD_DEBUG("read Doze Noise data failed!\n");
         store_to_file(nvt_testdata->fd, "read Doze Noise data failed!\n");
         seq_printf(s, "read Doze Noise data failed!\n");
         err_cnt++;
@@ -3190,7 +3190,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_Doze_Diff_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_Doze_Diff_N)) {
-                    TPD_INFO("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     }
@@ -3210,7 +3210,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data_n[iArrayIndex] > ph->config_Lmt_Doze_Diff_P) \
                         || (raw_data_n[iArrayIndex] < ph->config_Lmt_Doze_Diff_N)) {
-                    TPD_INFO("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     }
@@ -3230,7 +3230,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > doze_diff_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < doze_diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     }
@@ -3250,7 +3250,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data_n[iArrayIndex] > doze_diff_rawdata_P[iArrayIndex]) \
                         || (raw_data_n[iArrayIndex] < doze_diff_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data_n[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     }
@@ -3264,10 +3264,10 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Doze FW Rawdata Test---
-    TPD_INFO("Doze FW Rawdata Test \n");
+    TPD_DEBUG("Doze FW Rawdata Test \n");
     memset(raw_data, 0, buf_len);
     if(nvt_read_doze_baseline(chip_info, ph->doze_X_Channel, raw_data, buf_len) != 0) {
-        TPD_INFO("read Doze FW Rawdata failed!\n");
+        TPD_DEBUG("read Doze FW Rawdata failed!\n");
         store_to_file(nvt_testdata->fd, "read Doze FW Rawdata failed!\n");
         seq_printf(s, "read Doze FW Rawdata failed!\n");
         err_cnt++;
@@ -3283,7 +3283,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_Doze_Rawdata_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_Doze_Rawdata_N)) {
-                    TPD_INFO("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
+                    TPD_DEBUG("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
                     }
@@ -3303,7 +3303,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > doze_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < doze_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
                     }
@@ -3317,10 +3317,10 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //--Short Test---
-    TPD_INFO("FW Short Test \n");
+    TPD_DEBUG("FW Short Test \n");
     memset(raw_data, 0, buf_len);
     if (nvt_read_fw_short(chip_info, raw_data, buf_len) != 0) {
-        TPD_INFO("read Short test data failed!\n");
+        TPD_DEBUG("read Short test data failed!\n");
         store_to_file(nvt_testdata->fd, "read Short test data failed!\n");
         seq_printf(s, "read Short test data failed!\n");
         err_cnt++;
@@ -3336,7 +3336,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > ph->config_Lmt_Short_Rawdata_P) \
                         || (raw_data[iArrayIndex] < ph->config_Lmt_Short_Rawdata_N)) {
-                    TPD_INFO("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
+                    TPD_DEBUG("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
                     if (!err_cnt) {
                         seq_printf(s, "Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
                     }
@@ -3356,7 +3356,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                 }
                 if((raw_data[iArrayIndex] > short_rawdata_P[iArrayIndex]) \
                         || (raw_data[iArrayIndex] < short_rawdata_N[iArrayIndex])) {
-                    TPD_INFO("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
                     }
@@ -3370,10 +3370,10 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Open Test---
-    TPD_INFO("FW Open Test \n");
+    TPD_DEBUG("FW Open Test \n");
     memset(raw_data, 0, buf_len);
     if (nvt_read_fw_open(chip_info, raw_data, buf_len) != 0) {
-        TPD_INFO("read Open test data failed!\n");
+        TPD_DEBUG("read Open test data failed!\n");
         store_to_file(nvt_testdata->fd, "read Open test data failed!\n");
         seq_printf(s, "read Open test data failed!\n");
         err_cnt++;
@@ -3388,7 +3388,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
             }
             if((raw_data[iArrayIndex] > open_rawdata_P[iArrayIndex]) \
                     || (raw_data[iArrayIndex] < open_rawdata_N[iArrayIndex])) {
-                TPD_INFO("Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
+                TPD_DEBUG("Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
                 if (!err_cnt) {
                     seq_printf(s, "Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
                 }
@@ -3410,7 +3410,7 @@ OUT:
 
     seq_printf(s, "FW:0x%llx\n", nvt_testdata->TP_FW);
     seq_printf(s, "%d error(s). %s\n", err_cnt, err_cnt?"":"All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", err_cnt, err_cnt?"":"All test passed.");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", err_cnt, err_cnt?"":"All test passed.");
 }
 
 static struct nvt_proc_operations nvt_proc_ops = {
@@ -3425,12 +3425,12 @@ static int nvt_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     /* 1. alloc chip info */
     chip_info = kzalloc(sizeof(struct chip_data_nt36525), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -3439,7 +3439,7 @@ static int nvt_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -3471,14 +3471,14 @@ static int nvt_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     if (ts->esd_handle_support) {
         chip_info->esd_check_enabled = false;
         ts->esd_info.esd_work_time = msecs_to_jiffies(NVT_TOUCH_ESD_CHECK_PERIOD); // change esd check interval to 1.5s
-        TPD_INFO("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
+        TPD_DEBUG("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
     }
 
     /* 7. create nvt test files */
     nvt_flash_proc_init(ts, "NVTflash");
     nvt_create_proc(ts, &nvt_proc_ops);
 
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_register_driver:
@@ -3490,7 +3490,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -3498,7 +3498,7 @@ static int nvt_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -3508,7 +3508,7 @@ static int nvt_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -3518,7 +3518,7 @@ static int nvt_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -3560,13 +3560,13 @@ static struct i2c_driver tp_i2c_driver =
 /***********************Start of module init and exit****************************/
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
        return -1;
 
     if (i2c_add_driver(&tp_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

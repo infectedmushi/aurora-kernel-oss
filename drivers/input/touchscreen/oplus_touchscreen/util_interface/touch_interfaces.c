@@ -27,6 +27,11 @@
 
 #define TPD_DEVICE "touch_interface"
 #define TPD_INFO(a, arg...)  pr_err("[TP]"TPD_DEVICE ": " a, ##arg)
+#define TPD_DEBUG(a, arg...)\
+    do{\
+        if (LEVEL_DEBUG == tp_debug)\
+            pr_err("[TP]"TPD_DEVICE ": " a, ##arg);\
+    }while(0)
 
 static bool register_is_16bit = 0;
 static struct mutex i2c_mutex;
@@ -60,7 +65,7 @@ int touch_i2c_continue_read(struct i2c_client *client, unsigned short length, un
         msleep(20);
     }
     if (retry == MAX_I2C_RETRY_TIME) {
-        TPD_INFO("%s: I2C read over retry limit\n", __func__);
+        TPD_DEBUG("%s: I2C read over retry limit\n", __func__);
         retval = -EIO;
         if (ts->health_monitor_v2_support) {
 			ts->monitor_data_v2.bus_buf = msg.buf;
@@ -143,7 +148,7 @@ int touch_i2c_read_block(struct i2c_client *client, u16 addr, unsigned short len
     if (!buffer) {
         buffer = kzalloc(2, GFP_KERNEL | GFP_DMA);
         if (!buffer) {
-            TPD_INFO("kzalloc buffer failed.\n");
+            TPD_DEBUG("kzalloc buffer failed.\n");
             mutex_unlock(&i2c_mutex);
             return -ENOMEM;
         }
@@ -155,17 +160,17 @@ int touch_i2c_read_block(struct i2c_client *client, u16 addr, unsigned short len
         if (read_buf_size < length) {
             if (read_buf) {
                 kfree(read_buf);
-                TPD_INFO("read block_1, free once.\n");
+                TPD_DEBUG("read block_1, free once.\n");
             }
             read_buf = kzalloc(length, GFP_KERNEL | GFP_DMA);
             if (!read_buf) {
                 read_buf_size = 0;
-                TPD_INFO("read block_1, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
+                TPD_DEBUG("read block_1, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
                 mutex_unlock(&i2c_mutex);
                 return -ENOMEM;
             }
             read_buf_size = length;
-            TPD_INFO("read block_1, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
+            TPD_DEBUG("read block_1, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
         } else {
             memset(read_buf, 0, length);
         }
@@ -175,23 +180,23 @@ int touch_i2c_read_block(struct i2c_client *client, u16 addr, unsigned short len
             read_buf = kzalloc(FIX_I2C_LENGTH, GFP_KERNEL | GFP_DMA);
             if (!read_buf) {
                 read_buf_size = 0;
-                TPD_INFO("read block_2, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
+                TPD_DEBUG("read block_2, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
                 mutex_unlock(&i2c_mutex);
                 return -ENOMEM;
             }
             read_buf_size = FIX_I2C_LENGTH;
-            TPD_INFO("read block_2, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
+            TPD_DEBUG("read block_2, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
         } else {
             if (!read_buf) {
                 read_buf = kzalloc(FIX_I2C_LENGTH, GFP_KERNEL | GFP_DMA);
                 if (!read_buf) {
                     read_buf_size = 0;
-                    TPD_INFO("read block_3, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
+                    TPD_DEBUG("read block_3, kzalloc failed(len:%d, buf_size:%d).\n", length, read_buf_size);
                     mutex_unlock(&i2c_mutex);
                     return -ENOMEM;
                 }
                 read_buf_size = FIX_I2C_LENGTH;
-                TPD_INFO("read block_3, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
+                TPD_DEBUG("read block_3, kzalloc success(len:%d, buf_size:%d).\n", length, read_buf_size);
             } else {
                 memset(read_buf, 0, length);
             }
@@ -224,7 +229,7 @@ int touch_i2c_read_block(struct i2c_client *client, u16 addr, unsigned short len
         msleep(20);
     }
     if (retry == MAX_I2C_RETRY_TIME) {
-        TPD_INFO("%s: I2C read over retry limit\n", __func__);
+        TPD_DEBUG("%s: I2C read over retry limit\n", __func__);
         retval = -EIO;
         if (ts->health_monitor_v2_support) {
 			ts->monitor_data_v2.bus_buf = msg[0].buf;
@@ -268,7 +273,7 @@ int touch_i2c_continue_write(struct i2c_client *client, unsigned short length, u
         msleep(20);
     }
     if (retry == MAX_I2C_RETRY_TIME) {
-        TPD_INFO("%s: I2C write over retry limit\n", __func__);
+        TPD_DEBUG("%s: I2C write over retry limit\n", __func__);
         retval = -EIO;
         if (ts->health_monitor_v2_support) {
 			ts->monitor_data_v2.bus_buf = msg.buf;
@@ -325,7 +330,7 @@ int touch_i2c_write_block(struct i2c_client *client, u16 addr, unsigned short le
         msleep(20);
     }
     if (retry == MAX_I2C_RETRY_TIME) {
-        TPD_INFO("%s: I2C write over retry limit\n", __func__);
+        TPD_DEBUG("%s: I2C write over retry limit\n", __func__);
         retval = -EIO;
         if (ts->health_monitor_v2_support) {
 			ts->monitor_data_v2.bus_buf = msg[0].buf;
@@ -361,17 +366,17 @@ int touch_i2c_write_block(struct i2c_client *client, u16 addr, unsigned short le
         if (write_buf_size < total_length) {
             if (write_buf) {
                 kfree(write_buf);
-                TPD_INFO("write block_1, free once.\n");
+                TPD_DEBUG("write block_1, free once.\n");
             }
             write_buf = kzalloc(total_length, GFP_KERNEL | GFP_DMA);
             if (!write_buf) {
                 write_buf_size = 0;
-                TPD_INFO("write block_1, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+                TPD_DEBUG("write block_1, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
                 mutex_unlock(&i2c_mutex);
                 return -ENOMEM;
             }
             write_buf_size = total_length;
-            TPD_INFO("write block_1, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+            TPD_DEBUG("write block_1, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
         } else {
             memset(write_buf, 0, total_length);
         }
@@ -381,23 +386,23 @@ int touch_i2c_write_block(struct i2c_client *client, u16 addr, unsigned short le
             write_buf = kzalloc(FIX_I2C_LENGTH, GFP_KERNEL | GFP_DMA);
             if (!write_buf) {
                 write_buf_size = 0;
-                TPD_INFO("write block_2, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+                TPD_DEBUG("write block_2, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
                 mutex_unlock(&i2c_mutex);
                 return -ENOMEM;
             }
             write_buf_size = FIX_I2C_LENGTH;
-            TPD_INFO("write block_2, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+            TPD_DEBUG("write block_2, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
         } else {
             if (!write_buf) {
                 write_buf = kzalloc(FIX_I2C_LENGTH, GFP_KERNEL | GFP_DMA);
                 if (!write_buf) {
                     write_buf_size = 0;
-                    TPD_INFO("write block_3, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+                    TPD_DEBUG("write block_3, kzalloc failed(len:%d, buf_size:%d).\n", total_length, write_buf_size);
                     mutex_unlock(&i2c_mutex);
                     return -ENOMEM;
                 }
                 write_buf_size = FIX_I2C_LENGTH;
-                TPD_INFO("write block_3, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
+                TPD_DEBUG("write block_3, kzalloc success(len:%d, buf_size:%d).\n", total_length, write_buf_size);
             } else {
                 memset(write_buf, 0, total_length);
             }
@@ -431,7 +436,7 @@ int touch_i2c_write_block(struct i2c_client *client, u16 addr, unsigned short le
         msleep(20);
     }
     if (retry == MAX_I2C_RETRY_TIME) {
-        TPD_INFO("%s: I2C write over retry limit\n", __func__);
+        TPD_DEBUG("%s: I2C write over retry limit\n", __func__);
         retval = -EIO;
         if (ts->health_monitor_v2_support) {
 			ts->monitor_data_v2.bus_buf = msg[0].buf;
@@ -537,7 +542,7 @@ int touch_i2c_write_word(struct i2c_client *client, unsigned short addr, unsigne
     unsigned char buf[2] = {data & 0xff, (data >> 8) & 0xff};
 
     if (!client) {
-        TPD_INFO("%s: no client.\n", __func__);
+        TPD_DEBUG("%s: no client.\n", __func__);
         return -EINVAL;
     }
 
@@ -567,7 +572,7 @@ int touch_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char
 
     mutex_lock(&i2c_mutex);
     if (client == NULL) {
-        TPD_INFO("%s: i2c_client == NULL!\n", __func__);
+        TPD_DEBUG("%s: i2c_client == NULL!\n", __func__);
         mutex_unlock(&i2c_mutex);
         return -1;
     }
@@ -618,7 +623,7 @@ int touch_i2c_read(struct i2c_client *client, char *writebuf, int writelen, char
         }
 
         if (retry == MAX_I2C_RETRY_TIME) {
-            TPD_INFO("%s: i2c_transfer(read) over retry limit\n", __func__);
+            TPD_DEBUG("%s: i2c_transfer(read) over retry limit\n", __func__);
             retval = -EIO;
         }
 
@@ -652,7 +657,7 @@ int touch_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
 
     mutex_lock(&i2c_mutex);
     if (client == NULL) {
-        TPD_INFO("%s: i2c_client == NULL!", __func__);
+        TPD_DEBUG("%s: i2c_client == NULL!", __func__);
         mutex_unlock(&i2c_mutex);
         return -1;
     }
@@ -675,7 +680,7 @@ int touch_i2c_write(struct i2c_client *client, char *writebuf, int writelen)
             msleep(20);
         }
         if (retry == MAX_I2C_RETRY_TIME) {
-            TPD_INFO("%s: i2c_transfer(write) over retry limit\n", __func__);
+            TPD_DEBUG("%s: i2c_transfer(write) over retry limit\n", __func__);
             retval = -EIO;
         }
     }
@@ -841,7 +846,7 @@ int32_t CTP_SPI_READ(struct spi_device *client, uint8_t *buf, uint16_t len)
     }
 
     if (unlikely(retries == 5)) {
-        TPD_INFO("read error, ret=%d\n", ret);
+        TPD_DEBUG("read error, ret=%d\n", ret);
         ret = -EIO;
     } else {
         memcpy((buf + 1), (rbuf + 2), (len - 1));
@@ -871,7 +876,7 @@ int32_t CTP_SPI_WRITE(struct spi_device *client, uint8_t *buf, uint16_t len)
     }
 
     if (unlikely(retries == 5)) {
-        TPD_INFO("error, ret=%d\n", ret);
+        TPD_DEBUG("error, ret=%d\n", ret);
         ret = -EIO;
     }
 
@@ -897,7 +902,7 @@ int spi_write_firmware(struct spi_device *client, u8 *fw, u32 *len_array, u8 arr
 
     t = kzalloc(sizeof(struct spi_transfer)*array_len, GFP_KERNEL | GFP_DMA);
     if (!t) {
-        TPD_INFO("error, no mem!");
+        TPD_DEBUG("error, no mem!");
         return -ENOMEM;
     }
 
@@ -910,7 +915,7 @@ int spi_write_firmware(struct spi_device *client, u8 *fw, u32 *len_array, u8 arr
         t[i].tx_buf = buf;
         t[i].cs_change = 1;
         spi_message_add_tail(&t[i], &m);
-        //TPD_INFO("i=%d, len=%d, buf[0]=%x\n", i, len_array[i], buf[0]);
+        //TPD_DEBUG("i=%d, len=%d, buf[0]=%x\n", i, len_array[i], buf[0]);
         buf = buf + len_array[i];
     }
 
@@ -922,7 +927,7 @@ int spi_write_firmware(struct spi_device *client, u8 *fw, u32 *len_array, u8 arr
         retry++;
     }
     if (unlikely(retry == 5)) {
-        TPD_INFO("error, ret=%d\n", ret);
+        TPD_DEBUG("error, ret=%d\n", ret);
     }
     kfree(t);
     return ret;

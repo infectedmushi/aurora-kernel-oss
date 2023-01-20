@@ -32,6 +32,11 @@
 #endif
 
 #define TPD_INFO(a, arg...)  pr_err("[TP]"TPD_DEVICE ": " a, ##arg)
+#define TPD_DEBUG(a, arg...)\
+    do{\
+        if (LEVEL_DEBUG == tp_debug)\
+            pr_err("[TP]"TPD_DEVICE ": " a, ##arg);\
+    }while(0)
 
 static inline void *tp_kzalloc(size_t size, gfp_t flags)
 {
@@ -40,7 +45,7 @@ static inline void *tp_kzalloc(size_t size, gfp_t flags)
 	p = kzalloc(size, flags);
 
 	if (!p) {
-		TPD_INFO("%s: Failed to allocate memory\n", __func__);
+		TPD_DEBUG("%s: Failed to allocate memory\n", __func__);
 		/*add for health monitor*/
 	}
 
@@ -56,7 +61,7 @@ static inline int tp_memcpy(void *dest, unsigned int dest_size,
 	}
 
 	if (count > dest_size || count > src_size) {
-		TPD_INFO("%s: src_size = %d, dest_size = %d, count = %d\n",
+		TPD_DEBUG("%s: src_size = %d, dest_size = %d, count = %d\n",
 			 __func__, src_size, dest_size, count);
 		return -EINVAL;
 	}
@@ -79,7 +84,7 @@ static int tp_olc_raise_exception(tp_excep_type excep_tpye, void *summary, unsig
 	struct exception_info *exp_info = NULL;
 	int ret = -1;
 
-	TPD_INFO("%s:enter,type:%d\n", __func__ , excep_tpye);
+	TPD_DEBUG("%s:enter,type:%d\n", __func__ , excep_tpye);
 
 	exp_info = tp_kzalloc(sizeof(struct exception_info), GFP_KERNEL);
 
@@ -88,7 +93,7 @@ static int tp_olc_raise_exception(tp_excep_type excep_tpye, void *summary, unsig
 	}
 
 	if (excep_tpye > 0xfff) {
-		TPD_INFO("%s: excep_tpye:%d is beyond 0xfff\n", __func__ , excep_tpye);
+		TPD_DEBUG("%s: excep_tpye:%d is beyond 0xfff\n", __func__ , excep_tpye);
 		goto free_exp;
 	}
 	exp_info->time = 0;
@@ -107,7 +112,7 @@ static int tp_olc_raise_exception(tp_excep_type excep_tpye, void *summary, unsig
 
 	ret = olc_raise_exception(exp_info);
 	if (ret) {
-		TPD_INFO("%s: raise fail, ret:%d\n", __func__ , ret);
+		TPD_DEBUG("%s: raise fail, ret:%d\n", __func__ , ret);
 	}
 
 free_exp:

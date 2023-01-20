@@ -23,7 +23,7 @@ static int dma_alloc(struct core_i2c_data *i2c)
 		i2c->client->dev.coherent_dma_mask = DMA_BIT_MASK(32);
 		ilitek_dma_va = (u8 *) dma_alloc_coherent(&i2c->client->dev, DMA_VA_BUFFER, &ilitek_dma_pa, GFP_KERNEL);
 		if (ERR_ALLOC_MEM(ilitek_dma_va)) {
-			TPD_INFO("Allocate DMA I2C Buffer failed\n");
+			TPD_DEBUG("Allocate DMA I2C Buffer failed\n");
 			return -ENOMEM;
 		}
 
@@ -32,7 +32,7 @@ static int dma_alloc(struct core_i2c_data *i2c)
 		return 0;
 	}
 
-	TPD_INFO("i2c->client is NULL, return fail\n");
+	TPD_DEBUG("i2c->client is NULL, return fail\n");
 	return -ENODEV;
 }
 
@@ -44,7 +44,7 @@ static void dma_free(void)
 		ilitek_dma_va = NULL;
 		ilitek_dma_pa = 0;
 
-		TPD_INFO("Succeed to free DMA buffer\n");
+		TPD_DEBUG("Succeed to free DMA buffer\n");
 	}
 }
 #endif /* I2C_DMA */
@@ -84,7 +84,7 @@ int core_i2c_write(uint8_t nSlaveId, uint8_t *pBuf, uint16_t nSize)
 			check_sum = cal_fr_checksum(pBuf, nSize);
 			txbuf = (uint8_t*)kcalloc(nSize + 1, sizeof(uint8_t), GFP_KERNEL);
 			if (ERR_ALLOC_MEM(txbuf)) {
-				TPD_INFO("Failed to allocate CSV mem\n");
+				TPD_DEBUG("Failed to allocate CSV mem\n");
 				res = -ENOMEM;
 				goto out;
 			}
@@ -101,7 +101,7 @@ int core_i2c_write(uint8_t nSlaveId, uint8_t *pBuf, uint16_t nSize)
 			res = 0;
 		} else {
 			res = -EIO;
-			TPD_INFO("I2C Write Error, res = %d\n", res);
+			TPD_DEBUG("I2C Write Error, res = %d\n", res);
 			goto out;
 		}
 	}
@@ -138,7 +138,7 @@ int core_i2c_read(uint8_t nSlaveId, uint8_t *pBuf, uint16_t nSize)
 
 	if (i2c_transfer(core_i2c->client->adapter, msgs, 1) < 0) {
 		res = -EIO;
-		TPD_INFO("I2C Read Error, res = %d\n", res);
+		TPD_DEBUG("I2C Read Error, res = %d\n", res);
 		goto out;
 	}
 #ifdef I2C_DMA
@@ -182,7 +182,7 @@ int core_i2c_segmental_read(uint8_t nSlaveId, uint8_t *pBuf, uint16_t nSize)
 
 		if (i2c_transfer(core_i2c->client->adapter, msgs, 1) < 0) {
 			res = -EIO;
-			TPD_INFO("I2C Read Error, res = %d\n", res);
+			TPD_DEBUG("I2C Read Error, res = %d\n", res);
 			goto out;
 		}
 	}
@@ -196,7 +196,7 @@ int core_i2c_init(struct i2c_client *client)
 {
 	core_i2c = kmalloc(sizeof(*core_i2c), GFP_KERNEL);
 	if (ERR_ALLOC_MEM(core_i2c)) {
-		TPD_INFO("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_i2c));
+		TPD_DEBUG("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_i2c));
 		core_i2c_remove();
 		return -ENOMEM;
 	}
@@ -206,7 +206,7 @@ int core_i2c_init(struct i2c_client *client)
 
 #ifdef I2C_DMA
 	if (dma_alloc(core_i2c->client) < 0) {
-		TPD_INFO("Failed to alllocate DMA mem %ld\n", PTR_ERR(core_i2c));
+		TPD_DEBUG("Failed to alllocate DMA mem %ld\n", PTR_ERR(core_i2c));
 		return -ENOMEM;
 	}
 #endif /* I2C_DMA */
@@ -218,7 +218,7 @@ EXPORT_SYMBOL(core_i2c_init);
 
 void core_i2c_remove(void)
 {
-	TPD_INFO("Remove core-i2c members\n");
+	TPD_DEBUG("Remove core-i2c members\n");
 
 #ifdef I2C_DMA
 	dma_free();
@@ -237,7 +237,7 @@ int ilitek_core_spi_write_then_read(struct spi_device *spi, uint8_t * txbuf,
 	int retry = 2;
 	while(retry--) {
 		if (spi_write_then_read(spi, txbuf, w_len, rxbuf, r_len) < 0) {
-			TPD_INFO("spi Write Error, retry = %d\n", retry);
+			TPD_DEBUG("spi Write Error, retry = %d\n", retry);
 			msleep(20);
 		}
 		else {
@@ -268,18 +268,18 @@ int core_Rx_check(uint16_t check)
 		txbuf[4] = 0x2;
 		if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 5, txbuf, 0) < 0) {
 			size = -EIO;
-			TPD_INFO("spi Write Error, res = %d\n", size);
+			TPD_DEBUG("spi Write Error, res = %d\n", size);
             return size;
 		}
 		txbuf[0] = SPI_READ;
 		if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 1, rxbuf, 4) < 0) {
 			size = -EIO;
-			TPD_INFO("spi Write Error, res = %d\n", size);
+			TPD_DEBUG("spi Write Error, res = %d\n", size);
             return size;
 		}
 		status = (rxbuf[2] << 8) + rxbuf[3];
 		size = (rxbuf[0] << 8) + rxbuf[1];
-		//TPD_INFO("count:%d,status =0x%x size: = %d\n", i, status, size);
+		//TPD_DEBUG("count:%d,status =0x%x size: = %d\n", i, status, size);
 		if(status == check)
 			return size;
 		mdelay(1);
@@ -311,17 +311,17 @@ int core_Tx_unlock_check(void)
 		txbuf[4] = 0x2;
 		if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 5, txbuf, 0) < 0) {
 			res = -EIO;
-			TPD_INFO("spi Write Error, res = %d\n", res);
+			TPD_DEBUG("spi Write Error, res = %d\n", res);
             return res;
 		}
 		txbuf[0] = SPI_READ;
 		if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 1, rxbuf, 4) < 0) {
 			res = -EIO;
-			TPD_INFO("spi Write Error, res = %d\n", res);
+			TPD_DEBUG("spi Write Error, res = %d\n", res);
             return res;
 		}
 		unlock = (rxbuf[2] << 8) + rxbuf[3];
-		//TPD_INFO("count:%d,unlock =0x%x\n", i, unlock);
+		//TPD_DEBUG("count:%d,unlock =0x%x\n", i, unlock);
 		if(unlock == 0x9881)
 			return res;
 		mdelay(1);
@@ -340,14 +340,14 @@ int core_ice_mode_read_9881H11(uint8_t *data, uint32_t size)
 	txbuf[4] = 0x2;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 5, txbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		return res;
 	}
 	//read data
 	txbuf[0] = SPI_READ;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 1, data, size) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		return res;
 	}
 	//write data lock
@@ -362,7 +362,7 @@ int core_ice_mode_read_9881H11(uint8_t *data, uint32_t size)
 	txbuf[8] = (char)0x81;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 9, txbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 	}
 	return res;
 }
@@ -375,7 +375,7 @@ int core_ice_mode_write_9881H11(uint8_t *data, uint32_t size)
 	uint8_t *txbuf;
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*size+9, GFP_KERNEL);
 	if (ERR_ALLOC_MEM(txbuf)) {
-		TPD_INFO("Failed to allocate mem\n");
+		TPD_DEBUG("Failed to allocate mem\n");
 		res = -ENOMEM;
 		goto out;
 	}
@@ -397,7 +397,7 @@ int core_ice_mode_write_9881H11(uint8_t *data, uint32_t size)
 	}
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, wsize + 5, txbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		goto out;
 	}
 	//write data lock
@@ -412,7 +412,7 @@ int core_ice_mode_write_9881H11(uint8_t *data, uint32_t size)
 	txbuf[8] = (char)0xA5;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 9, txbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 	}
 out:
 	kfree(txbuf);
@@ -428,10 +428,10 @@ int core_ice_mode_disable_9881H11(void)
 	txbuf[2] = 0x62;
 	txbuf[3] = 0x10;
 	txbuf[4] = 0x18;
-	//TPD_INFO("FW ICE Mode disable\n");
+	//TPD_DEBUG("FW ICE Mode disable\n");
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 5, txbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 	}
 	return res;
 }
@@ -448,18 +448,18 @@ int core_ice_mode_enable_9881H11(void)
 	txbuf[4] = 0x18;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 1, rxbuf, 1) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		return res;
 	}
 	//check recover data
 	if(rxbuf[0] == 0x82)
 	{
-		TPD_INFO("recover data rxbuf:0x%x\n", rxbuf[0]);
+		TPD_DEBUG("recover data rxbuf:0x%x\n", rxbuf[0]);
 		return CHECK_RECOVER;
 	}
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 5, rxbuf, 0) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 	}
 	return res;
 }
@@ -475,7 +475,7 @@ int core_spi_check_read_size(void)
 	size = core_Rx_check(0x5AA5); 
 	if (size < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+		TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
 		goto out;
 	}
 	return size;
@@ -488,12 +488,12 @@ int core_spi_read_data_after_checksize(uint8_t *pBuf, uint16_t nSize)
 	int res = 0;
 	if (core_ice_mode_read_9881H11(pBuf, nSize) < 0) {
 		res = -EIO;
-		TPD_INFO("spi read Error, res = %d\n", res);
+		TPD_DEBUG("spi read Error, res = %d\n", res);
 		goto out;
 	}
 	if (core_ice_mode_disable_9881H11() < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+		TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
 		goto out;
 	}
 out:
@@ -511,21 +511,21 @@ int core_spi_read_9881H11(uint8_t *pBuf, uint16_t nSize)
 	size = core_Rx_check(0x5AA5); 
 	if (size < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+		TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
 		goto out;
 	}
 	if (size > nSize) {
-		TPD_INFO("check read size > nSize  size = %d, nSize = %d\n", size, nSize);
+		TPD_DEBUG("check read size > nSize  size = %d, nSize = %d\n", size, nSize);
         size = nSize;
 	}
 	if (core_ice_mode_read_9881H11(pBuf, size) < 0) {
 		res = -EIO;
-		TPD_INFO("spi read Error, res = %d\n", res);
+		TPD_DEBUG("spi read Error, res = %d\n", res);
 		goto out;
 	}
 	if (core_ice_mode_disable_9881H11() < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+		TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
 		goto out;
 	}
 	out:
@@ -538,16 +538,16 @@ int core_spi_rx_check_test(void)
 	int size = 0;
 	res = core_ice_mode_enable_9881H11();
 	if (res < 0) {
-		TPD_INFO("ice mode enable error\n");
+		TPD_DEBUG("ice mode enable error\n");
 	}
 	size = core_Rx_check(0x5AA5); 
 	if (size < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+		TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
 	}
 	if (core_ice_mode_disable_9881H11() < 0) {
 		res = -EIO;
-		TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+		TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
 	}
 	return res;
 }
@@ -558,7 +558,7 @@ int core_spi_write_9881H11(uint8_t *pBuf, uint16_t nSize)
 	uint8_t *txbuf;
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*nSize+5, GFP_KERNEL);
 	if (ERR_ALLOC_MEM(txbuf)) {
-		TPD_INFO("Failed to allocate mem\n");
+		TPD_DEBUG("Failed to allocate mem\n");
 		res = -ENOMEM;
 		goto out;
 	}
@@ -568,13 +568,13 @@ int core_spi_write_9881H11(uint8_t *pBuf, uint16_t nSize)
 	}
 	if (core_ice_mode_write_9881H11(pBuf, nSize) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		goto out;
 	}
 	if(core_Tx_unlock_check() < 0)
 	{
 		res = -ETXTBSY;
-		TPD_INFO("check TX unlock Fail, res = %d\n", res);		
+		TPD_DEBUG("check TX unlock Fail, res = %d\n", res);		
 	}
 	out:
 	kfree(txbuf);
@@ -586,7 +586,7 @@ int core_spi_write(uint8_t *pBuf, uint16_t nSize)
 	uint8_t *txbuf;
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*nSize+1, GFP_KERNEL);
 	if (ERR_ALLOC_MEM(txbuf)) {
-		TPD_INFO("Failed to allocate mem\n");
+		TPD_DEBUG("Failed to allocate mem\n");
 		res = -ENOMEM;
 		goto out;
 	}
@@ -606,7 +606,7 @@ int core_spi_write(uint8_t *pBuf, uint16_t nSize)
 			res = 0;
 		} else {
 			res = -EIO;
-			TPD_INFO("spi Write Error, res = %d\n", res);
+			TPD_DEBUG("spi Write Error, res = %d\n", res);
 			goto out;
 		}
 	}
@@ -632,7 +632,7 @@ int core_spi_read(uint8_t *pBuf, uint16_t nSize)
 			res = 0;
 		} else {
 			res = -EIO;
-			TPD_INFO("spi Read Error, res = %d\n", res);
+			TPD_DEBUG("spi Read Error, res = %d\n", res);
 			goto out;
 		}
 	}
@@ -649,7 +649,7 @@ int core_spi_check_header(uint8_t *data, uint32_t size)
 	txbuf[0] = 0x82;
 	if (ilitek_core_spi_write_then_read(core_spi->spi, txbuf, 1, rxbuf, 1) < 0) {
 		res = -EIO;
-		TPD_INFO("spi Write Error, res = %d\n", res);
+		TPD_DEBUG("spi Write Error, res = %d\n", res);
 		return res;
 	}
 	data[0] = rxbuf[0];
@@ -657,7 +657,7 @@ int core_spi_check_header(uint8_t *data, uint32_t size)
 	//check recover data
 	if(rxbuf[0] == 0x82)
 	{
-		TPD_INFO("recover data rxbuf:0x%x\n", rxbuf[0]);
+		TPD_DEBUG("recover data rxbuf:0x%x\n", rxbuf[0]);
 		return CHECK_RECOVER;
 	}
 	return 0;
@@ -670,7 +670,7 @@ int core_spi_init(struct spi_device *spi)
 
 	core_spi = kmalloc(sizeof(*core_spi), GFP_KERNEL);
 	if (ERR_ALLOC_MEM(core_spi)) {
-		TPD_INFO("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_spi));
+		TPD_DEBUG("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_spi));
 		core_spi_remove();
 		return -ENOMEM;
 	}
@@ -678,13 +678,13 @@ int core_spi_init(struct spi_device *spi)
 	core_spi->spi = spi;
 	spi->mode = SPI_MODE_0;
 	spi->bits_per_word = 8;
-	TPD_INFO("\n");
+	TPD_DEBUG("\n");
 	ret = spi_setup(spi);
 	if (ret < 0){
-		TPD_INFO("ERR: fail to setup spi\n");
+		TPD_DEBUG("ERR: fail to setup spi\n");
 		return -ENODEV;
 	}
-	TPD_INFO("%s:name=%s,bus_num=%d,cs=%d,mode=%d,speed=%d\n",__func__,spi->modalias,
+	TPD_DEBUG("%s:name=%s,bus_num=%d,cs=%d,mode=%d,speed=%d\n",__func__,spi->modalias,
 	 spi->master->bus_num, spi->chip_select, spi->mode, spi->max_speed_hz);	
 	return 0;
 }
@@ -692,7 +692,7 @@ EXPORT_SYMBOL(core_spi_init);
 
 void core_spi_remove(void)
 {
-	TPD_INFO("Remove core-spi members\n");
+	TPD_DEBUG("Remove core-spi members\n");
 	ipio_kfree((void **)&core_spi);
 }
 EXPORT_SYMBOL(core_spi_remove);

@@ -36,15 +36,15 @@ void himax_limit_read(struct seq_file *s, struct touchpanel_data *ts)
     int i;
     int j;
 
-    TPD_INFO("%s: Entering\n", __func__);
+    TPD_DEBUG("%s: Entering\n", __func__);
     syna_ops = (struct himax_proc_operations *)ts->private_data;
     limit_data = kzalloc(sizeof(struct hx_limit_data), GFP_KERNEL);
     if (!limit_data) {
-        TPD_INFO("limit_data allocat fail!\n");
+        TPD_DEBUG("limit_data allocat fail!\n");
         goto FAIL_ALLOC_MEM;
     }
     if (!syna_ops->fp_hx_limit_get){
-        TPD_INFO("%s:Doesn't support!\n", __func__);
+        TPD_DEBUG("%s:Doesn't support!\n", __func__);
         goto FAIL_FUNC;
     } else {
         syna_ops->fp_hx_limit_get(ts, limit_data);
@@ -52,7 +52,7 @@ void himax_limit_read(struct seq_file *s, struct touchpanel_data *ts)
     if (limit_data != NULL) {
         for (i = 0 ; i < limit_data->item_size; i++) {
             seq_printf(s, "%s:\n",limit_data->item_name[i]);
-            TPD_INFO("%s: [%d]Size of =%d\n", __func__, i, (int)sizeof(limit_data->item_name[i]));
+            TPD_DEBUG("%s: [%d]Size of =%d\n", __func__, i, (int)sizeof(limit_data->item_name[i]));
 
                 for (j = 0 ; j < limit_data->rawdata_size; j++) {
                     if (j % ( ts->hw_res.RX_NUM) == 0)
@@ -63,7 +63,7 @@ void himax_limit_read(struct seq_file *s, struct touchpanel_data *ts)
         }
     }
     seq_printf(s, "\n");
-    TPD_INFO("%s: END PRINT!\n", __func__);
+    TPD_DEBUG("%s: END PRINT!\n", __func__);
 FAIL_FUNC:
     if (limit_data != NULL) {
         for (i = 0 ; i < limit_data->item_size; i++) {
@@ -73,7 +73,7 @@ FAIL_FUNC:
         kfree(limit_data);
     }
 FAIL_ALLOC_MEM:
-    TPD_INFO("%s: End\n", __func__);
+    TPD_DEBUG("%s: End\n", __func__);
 }
 
 //proc/touchpanel/baseline_test
@@ -148,7 +148,7 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         set_fs(old_fs);
     }
 
@@ -219,7 +219,7 @@ static ssize_t himax_proc_register_read(struct file *file, char *buff, size_t le
 
     if (!syna_ops->himax_proc_register_read) {
         if(copy_to_user(buff, "Not support auto-test proc node\n", strlen("Not support auto-test proc node\n")))
-                TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+                TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -243,7 +243,7 @@ static ssize_t himax_proc_register_write(struct file *file, const char *buff, si
         return 0;
 
     if (!syna_ops->himax_proc_register_write) {
-            TPD_INFO("Not support auto-test proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support auto-test proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -275,7 +275,7 @@ static ssize_t himax_proc_diag_read(struct file *file, char *buff, size_t len, l
 
     if (!syna_ops->himax_proc_diag_read) {
         if(copy_to_user(buff, "Not support auto-test proc node\n", strlen("Not support auto-test proc node\n")))
-                TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+                TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -297,7 +297,7 @@ static ssize_t himax_proc_diag_write(struct file *file, const char *buff, size_t
         return 0;
 
     if (!syna_ops->himax_proc_diag_write) {
-            TPD_INFO("Not support auto-test proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support auto-test proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -327,7 +327,7 @@ static ssize_t himax_proc_DD_debug_read(struct file *file, char *buff, size_t le
 
     if (!syna_ops->himax_proc_DD_debug_read) {
         if(copy_to_user(buff, "Not support auto-test proc node\n", strlen("Not support auto-test proc node\n")))
-                TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+                TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -349,7 +349,7 @@ static ssize_t himax_proc_DD_debug_write(struct file *file, const char *buff, si
         return 0;
 
     if (!syna_ops->himax_proc_DD_debug_write) {
-            TPD_INFO("Not support dd proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support dd proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -378,7 +378,7 @@ static ssize_t himax_proc_FW_debug_read(struct file *file, char *buff, size_t le
         return 0;
 
     if (!syna_ops->himax_proc_FW_debug_read) {
-            TPD_INFO("Not support fw proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support fw proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -406,7 +406,7 @@ static ssize_t himax_proc_reset_write(struct file *file, const char *buff, size_
         return 0;
 
     if (!syna_ops->himax_proc_reset_write) {
-            TPD_INFO("Not support reset proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support reset proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -434,7 +434,7 @@ static ssize_t himax_proc_sense_on_off_write(struct file *file, const char *buff
         return 0;
 
     if (!syna_ops->himax_proc_sense_on_off_write) {
-            TPD_INFO("Not support senseonoff proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support senseonoff proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -462,7 +462,7 @@ static ssize_t himax_proc_vendor_read(struct file *file, char *buff, size_t len,
         return 0;
 
     if (!syna_ops->himax_proc_vendor_read) {
-            TPD_INFO("Not support fw proc node %s %d\n",__func__,__LINE__);
+            TPD_DEBUG("Not support fw proc node %s %d\n",__func__,__LINE__);
         return 0;
     }
 
@@ -487,63 +487,63 @@ int himax_create_proc(struct touchpanel_data *ts, struct himax_proc_operations *
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &tp_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files:/proc/touchpanel/debug_info/himax
     prEntry_himax = proc_mkdir("himax", ts->prEntry_debug_tp);
     if (prEntry_himax == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create /proc/touchpanel/debug_info/himax proc entry\n", __func__);
+        TPD_DEBUG("%s: Couldn't create /proc/touchpanel/debug_info/himax proc entry\n", __func__);
     }
 
    //proc files: /proc/touchpanel/debug_info/himax/register
     prEntry_tmp = proc_create_data("register", 0666, prEntry_himax, &himax_proc_register_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/diag
     prEntry_tmp = proc_create_data("diag", 0666, prEntry_himax, &himax_proc_diag_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/dd
     prEntry_tmp = proc_create_data("dd", 0666, prEntry_himax, &himax_proc_dd_debug_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/fw
     prEntry_tmp = proc_create_data("fw", 0666, prEntry_himax, &himax_proc_fw_debug_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/reset
     prEntry_tmp = proc_create_data("reset", 0666, prEntry_himax, &himax_proc_reset_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/senseonoff
     prEntry_tmp = proc_create_data("senseonoff", 0666, prEntry_himax, &himax_proc_sense_on_off_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     //proc files: /proc/touchpanel/debug_info/himax/vendor
     prEntry_tmp = proc_create_data("vendor", 0666, prEntry_himax, &himax_proc_vendor_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     return ret;

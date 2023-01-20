@@ -534,7 +534,7 @@ static inline int syna_tcm_realloc_mem(struct syna_tcm_hcd *tcm_hcd,
 
         buffer->buf = kmalloc(size, GFP_KERNEL);
         if (!(buffer->buf)) {
-            TPD_INFO("%s: Failed to allocate memory\n",
+            TPD_DEBUG("%s: Failed to allocate memory\n",
                     __func__);
             kfree(temp);
             buffer->buf_size = 0;
@@ -547,7 +547,7 @@ static inline int syna_tcm_realloc_mem(struct syna_tcm_hcd *tcm_hcd,
                 buffer->buf_size,
                 buffer->buf_size);
         if (retval < 0) {
-            TPD_INFO("%s: Failed to copy data\n", __func__);
+            TPD_DEBUG("%s: Failed to copy data\n", __func__);
             kfree(temp);
             kfree(buffer->buf);
             buffer->buf_size = 0;
@@ -568,7 +568,7 @@ static inline int syna_tcm_alloc_mem(struct syna_tcm_hcd *tcm_hcd,
         kfree(buffer->buf);
         buffer->buf = kmalloc(size, GFP_KERNEL);
         if (!(buffer->buf)) {
-            TPD_INFO("%s: Failed to allocate memory, size %d\n",__func__, size);
+            TPD_DEBUG("%s: Failed to allocate memory, size %d\n",__func__, size);
             buffer->buf_size = 0;
             buffer->data_length = 0;
             return -ENOMEM;

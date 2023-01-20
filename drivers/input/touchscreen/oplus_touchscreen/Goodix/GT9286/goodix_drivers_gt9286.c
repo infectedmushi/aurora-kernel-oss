@@ -52,7 +52,7 @@ static int goodix_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 * b
     int ret = -1;
 
     if (len > 16) {
-        TPD_INFO("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
+        TPD_DEBUG("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
         return ret;
     }
 
@@ -74,7 +74,7 @@ static int goodix_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 * b
         return 0;
     }
 
-    TPD_INFO("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
+    TPD_DEBUG("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
 
     return 1;
 }
@@ -128,12 +128,12 @@ static int goodix_recall_check(struct i2c_client* client, u8 *chk_src, u16 addr,
 
         ret = touch_i2c_read_block(client, addr + compared_len, len, rd_buf);
         if (ret < 0) {
-            TPD_INFO("recall i2c error, exit!\n");
+            TPD_DEBUG("recall i2c error, exit!\n");
             return ret;
         }
 
         if (memcmp(rd_buf, &chk_src[compared_len], len)) {
-            TPD_INFO("Recall frame not equal(addr: 0x%04X)\n", addr + compared_len);
+            TPD_DEBUG("Recall frame not equal(addr: 0x%04X)\n", addr + compared_len);
             return -1;
         }
 
@@ -152,7 +152,7 @@ static int goodix_recall_check(struct i2c_client* client, u8 *chk_src, u16 addr,
 //{
 //    int ret = 0;
 //    ret = upmu_get_rgs_chrdet();
-//    TPD_INFO("%s get usb status %d\n", __func__, ret);
+//    TPD_DEBUG("%s get usb status %d\n", __func__, ret);
 //    return ret;
 //}
 //#else
@@ -181,7 +181,7 @@ static s32 goodix_send_cmd(void *chip_data, u8 cmd, u8 data)
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_CMD + 1, 2, &buffer[1]);
     ret |= touch_i2c_write_byte(chip_info->client, chip_info->reg_info.GTP_REG_CMD, buffer[0]);
     if (ret < 0) {
-        TPD_INFO("send cmd failed, ret: %d\n", ret);
+        TPD_DEBUG("send cmd failed, ret: %d\n", ret);
     } else {
         ret = 0;
     }
@@ -202,7 +202,7 @@ static int goodix_clear_irq(void *chip_data)
     if (!gt1x_rawdiff_mode) {
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 0);
         if (ret < 0) {
-            TPD_INFO("I2C write end_cmd  error!\n");
+            TPD_DEBUG("I2C write end_cmd  error!\n");
         }
     }
 
@@ -268,7 +268,7 @@ static int clockWise(uint8_t *buf, int n)
             count++;
     }
 
-    TPD_INFO("ClockWise count = %d\n", count);
+    TPD_DEBUG("ClockWise count = %d\n", count);
 
     if (count > 0)
         return 1;
@@ -278,7 +278,7 @@ static int clockWise(uint8_t *buf, int n)
 
 static void goodix_esd_check_enable(struct chip_data_gt9286 *chip_info, bool enable)
 {
-    TPD_INFO("%s %s\n", __func__, enable ? "enable" : "disable");
+    TPD_DEBUG("%s %s\n", __func__, enable ? "enable" : "disable");
     /* enable/disable esd check flag */
     chip_info->esd_check_enabled = enable;
     /* update interrupt timer */
@@ -295,7 +295,7 @@ static int goodix_enter_sleep(struct chip_data_gt9286 *chip_info, bool config)
         while (retry++ < 3) {
             if (!goodix_send_cmd(chip_info, GTP_CMD_SLEEP, 0)) {
                 chip_info->halt_status = true;
-                TPD_INFO("enter sleep mode!\n");
+                TPD_DEBUG("enter sleep mode!\n");
                 return 0;
             }
             msleep(10);
@@ -303,7 +303,7 @@ static int goodix_enter_sleep(struct chip_data_gt9286 *chip_info, bool config)
     }
 
     if (retry >= 3) {
-        TPD_INFO("Enter sleep mode failed.\n");
+        TPD_DEBUG("Enter sleep mode failed.\n");
     }
 
     return -1;
@@ -316,13 +316,13 @@ static int goodix_enter_doze(struct chip_data_gt9286 *chip_info)
     while (retry++ < 5) {
         if (!goodix_send_cmd(chip_info, GTP_CMD_GESTURE, 0)) {
             chip_info->halt_status = true;
-            TPD_INFO("enter doze mode!\n");
+            TPD_DEBUG("enter doze mode!\n");
             return 0;
         }
         msleep(10);
     }
 
-    TPD_INFO("enter doze mode failed.\n");
+    TPD_DEBUG("enter doze mode failed.\n");
     return -1;
 }
 
@@ -331,7 +331,7 @@ static int goodix_enable_edge_limit(struct chip_data_gt9286 *chip_info, bool ena
     int ret = -1;
     static bool edge_limit_last_status = 1;
 
-    TPD_INFO("%s, edge limit enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, edge limit enable = %d\n", __func__, enable);
 
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_ENABLE_EDGE, 0);
@@ -349,7 +349,7 @@ static int goodix_enable_charge_mode(struct chip_data_gt9286 *chip_info, bool en
 {
     int ret = -1;
 
-    TPD_INFO("%s, charge mode enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, charge mode enable = %d\n", __func__, enable);
 
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_CHARGER_ON, 0);
@@ -368,7 +368,7 @@ static int goodix_set_reset_status(struct chip_data_gt9286 *chip_info)
 
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_CMD + 1, 3, &value[1]);
     if (ret < 0) {
-        TPD_INFO("%s: TP set_reset_status failed\n", __func__);
+        TPD_DEBUG("%s: TP set_reset_status failed\n", __func__);
         return ret;
     }
 
@@ -401,10 +401,10 @@ static s32 goodix_read_version(struct chip_data_gt9286 *chip_info, struct panel_
                     IS_NUM_OR_CHAR(buf[0]) && IS_NUM_OR_CHAR(buf[1]) && IS_NUM_OR_CHAR(buf[2]) && buf[10] != 0xFF) {    /*sensor id == 0xFF, retry */
                 break;
             } else {
-                TPD_INFO("product version data is error\n");
+                TPD_DEBUG("product version data is error\n");
             }
         } else {
-            TPD_INFO("Read product version from 0x8140 failed\n");
+            TPD_DEBUG("Read product version from 0x8140 failed\n");
         }
 
         TPD_DEBUG("Read product version retry = %d\n", retry);
@@ -414,7 +414,7 @@ static s32 goodix_read_version(struct chip_data_gt9286 *chip_info, struct panel_
     if (retry <= 0) {
         if (ver_info)
             ver_info->sensor_id = 0;
-        TPD_INFO("Maybe the firmware of ic is error\n");
+        TPD_DEBUG("Maybe the firmware of ic is error\n");
         //return -1;
     }
 
@@ -424,12 +424,12 @@ static s32 goodix_read_version(struct chip_data_gt9286 *chip_info, struct panel_
     sensor_id = buf[10] & 0x0F;
     match_opt = (buf[10] >> 4) & 0x0F;
 
-    TPD_INFO("goodix fw VERSION:GT%s(Product)_%06X(Patch)_%04X(Mask)_%02X(SensorID)\n", product_id, patch_id, mask_id >> 8, sensor_id);
+    TPD_DEBUG("goodix fw VERSION:GT%s(Product)_%06X(Patch)_%04X(Mask)_%02X(SensorID)\n", product_id, patch_id, mask_id >> 8, sensor_id);
 
     if (panel_data->manufacture_info.version) {
         snprintf(&(panel_data->manufacture_info.version[8]), MAX_DEVICE_VERSION_LENGTH - 6, "%6x", patch_id);//MAX_DEVICE_VERSION_LENGTH = 16
     }
-    TPD_INFO("%s\n", panel_data->manufacture_info.version);
+    TPD_DEBUG("%s\n", panel_data->manufacture_info.version);
 
     if (ver_info != NULL) {
         ver_info->mask_id = mask_id;
@@ -453,7 +453,7 @@ static s32 goodix_send_config(struct chip_data_gt9286 *chip_info, u8 * config, i
         checksum += (config[i] << 8) + config[i + 1];
     }
     if (!checksum) {
-        TPD_INFO("invalid config, all of the bytes is zero!\n");
+        TPD_DEBUG("invalid config, all of the bytes is zero!\n");
         return -1;
     }
 
@@ -467,12 +467,12 @@ static s32 goodix_send_config(struct chip_data_gt9286 *chip_info, u8 * config, i
         ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_CONFIG_DATA, cfg_len, config);
         if (ret == cfg_len) {
             msleep(200);    /* at least 200ms, wait for storing config into flash. */
-            TPD_INFO("%s: Send config successfully!\n", __func__);
+            TPD_DEBUG("%s: Send config successfully!\n", __func__);
             return 0;
         }
     }
 
-    TPD_INFO("Send config failed!\n");
+    TPD_DEBUG("Send config failed!\n");
 
     return ret;
 }
@@ -487,7 +487,7 @@ static int goodix_init_panel(struct chip_data_gt9286 *chip_info)
     TPD_DEBUG("config sizeof(chip_info->goodix_config) is %d\n", chip_info->config_info.goodix_config_len);
 
     if (chip_info->config_info.goodix_config_len < GTP_CONFIG_MIN_LENGTH || chip_info->config_info.goodix_config_len > GTP_CONFIG_MAX_LENGTH) {
-        TPD_INFO("Config is INVALID! You need to check you header file CFG_GROUP section!\n");
+        TPD_DEBUG("Config is INVALID! You need to check you header file CFG_GROUP section!\n");
         return -1;
     }
 
@@ -509,7 +509,7 @@ static int goodix_init_panel(struct chip_data_gt9286 *chip_info)
         chip_info->config_info.goodix_config[TRIGGER_LOCATION] = (chip_info->config_info.goodix_config[TRIGGER_LOCATION] & 0xFC) | chip_info->config_info.goodix_int_type;
     }
 
-    TPD_INFO("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x, WAKEUP_LEVEL = %d\n",
+    TPD_DEBUG("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x, WAKEUP_LEVEL = %d\n",
             chip_info->config_info.goodix_abs_x_max, chip_info->config_info.goodix_abs_y_max,
             chip_info->config_info.goodix_int_type, chip_info->config_info.goodix_wakeup_level);
 
@@ -524,27 +524,27 @@ static s32 goodix_request_event_handler(struct chip_data_gt9286 *chip_info)
     u8 rqst_data = 0;
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_RQST, 1, &rqst_data);
     if (ret < 0) {
-        TPD_INFO("%s: i2c transfer error.\n", __func__);
+        TPD_DEBUG("%s: i2c transfer error.\n", __func__);
         return -1;
     }
 
-    TPD_INFO("%s: request state:0x%02x.\n", __func__, rqst_data);
+    TPD_DEBUG("%s: request state:0x%02x.\n", __func__, rqst_data);
 
     switch (rqst_data & 0x0F) {
         case GTP_RQST_CONFIG:
-            TPD_INFO("Request Config.\n");
+            TPD_DEBUG("Request Config.\n");
             ret = goodix_send_config(chip_info, chip_info->config_info.goodix_config, chip_info->config_info.goodix_config_len);
             if (ret) {
-                TPD_INFO("Send goodix_config error.\n");
+                TPD_DEBUG("Send goodix_config error.\n");
             } else {
-                TPD_INFO("Send goodix_config success.\n");
+                TPD_DEBUG("Send goodix_config success.\n");
                 rqst_data = GTP_RQST_RESPONDED;
                 ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_RQST, 1, &rqst_data);
             }
             break;
 
         case GTP_RQST_RESET:
-            TPD_INFO("%s: Request Reset.\n", __func__);
+            TPD_DEBUG("%s: Request Reset.\n", __func__);
             goodix_reset(chip_info);
             //  gt1x_reset_guitar();
             rqst_data = GTP_RQST_RESPONDED;
@@ -552,11 +552,11 @@ static s32 goodix_request_event_handler(struct chip_data_gt9286 *chip_info)
             break;
 
         case GTP_RQST_BAK_REF:
-            TPD_INFO("%s: Request Ref.\n", __func__);
+            TPD_DEBUG("%s: Request Ref.\n", __func__);
             break;
 
         case GTP_RQST_MAIN_CLOCK:
-            TPD_INFO("%s: Request main clock.\n", __func__);
+            TPD_DEBUG("%s: Request main clock.\n", __func__);
             break;
 
         default:
@@ -598,13 +598,13 @@ static int goodix_reset(void *chip_data)
     int ret = -1;
     struct chip_data_gt9286 *chip_info = (struct chip_data_gt9286 *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
 
     goodix_reset_via_gpio(chip_info);
     ret = goodix_set_reset_status(chip_info);
     
     if (ret < 0) {
-        TPD_INFO("goodix set reset status failed\n");
+        TPD_DEBUG("goodix set reset status failed\n");
         return ret;
     }
 
@@ -628,11 +628,11 @@ static int goodix_check_firmware_data(struct chip_data_gt9286 *chip_info)
     int i;
     int offset;
 
-    TPD_INFO("%s enter.\n", __func__);
+    TPD_DEBUG("%s enter.\n", __func__);
 
     // compare file length with the length field in the firmware header
     if (chip_info->update_info.fw_length < FW_HEAD_SIZE) {
-        TPD_INFO("firmware error, (file length: %d) too short\n", chip_info->update_info.fw_length);
+        TPD_DEBUG("firmware error, (file length: %d) too short\n", chip_info->update_info.fw_length);
         return -1;
     }
 
@@ -642,7 +642,7 @@ static int goodix_check_firmware_data(struct chip_data_gt9286 *chip_info)
     }
 
     if (getU32(p) + 6 != chip_info->update_info.fw_length) {
-        TPD_INFO("firmware error, (file actual length: %d, header define length: %d)\n", chip_info->update_info.fw_length, getU32(p));
+        TPD_DEBUG("firmware error, (file actual length: %d, header define length: %d)\n", chip_info->update_info.fw_length, getU32(p));
         return -1;
     }
     // check firmware's checksum
@@ -656,7 +656,7 @@ static int goodix_check_firmware_data(struct chip_data_gt9286 *chip_info)
         actual_checksum += p[0];
     }
 
-    TPD_INFO("firmware actual checksum: 0x%04X, header define checksum: 0x%04X\n", actual_checksum, checksum_in_header);
+    TPD_DEBUG("firmware actual checksum: 0x%04X, header define checksum: 0x%04X\n", actual_checksum, checksum_in_header);
 
     if (actual_checksum != checksum_in_header) {
         return -1;
@@ -683,11 +683,11 @@ static int goodix_check_firmware_data(struct chip_data_gt9286 *chip_info)
     }
 
     // print update information
-    TPD_INFO("Firmware length: %d\n", chip_info->update_info.fw_length);
-    TPD_INFO("Firmware product: GT%s\n", chip_info->update_info.firmware->pid);
-    TPD_INFO("Firmware patch: %02X%02X%02X\n", chip_info->update_info.firmware->version[0], chip_info->update_info.firmware->version[1], chip_info->update_info.firmware->version[2]);
-    TPD_INFO("Firmware chip: 0x%02X\n", chip_info->update_info.firmware->chip_type);
-    TPD_INFO("Subsystem count: %d\n", chip_info->update_info.firmware->subsystem_count);
+    TPD_DEBUG("Firmware length: %d\n", chip_info->update_info.fw_length);
+    TPD_DEBUG("Firmware product: GT%s\n", chip_info->update_info.firmware->pid);
+    TPD_DEBUG("Firmware patch: %02X%02X%02X\n", chip_info->update_info.firmware->version[0], chip_info->update_info.firmware->version[1], chip_info->update_info.firmware->version[2]);
+    TPD_DEBUG("Firmware chip: 0x%02X\n", chip_info->update_info.firmware->chip_type);
+    TPD_DEBUG("Subsystem count: %d\n", chip_info->update_info.firmware->subsystem_count);
     for (i = 0; i < chip_info->update_info.firmware->subsystem_count; i++) {
         TPD_DEBUG("------------------------------------------\n");
         TPD_DEBUG("Subsystem: %d\n", i);
@@ -697,7 +697,7 @@ static int goodix_check_firmware_data(struct chip_data_gt9286 *chip_info)
         TPD_DEBUG("Offset: %d\n", chip_info->update_info.firmware->subsystem[i].offset);
     }
 
-    TPD_INFO("%s end.\n", __func__);
+    TPD_DEBUG("%s end.\n", __func__);
 
     return 0;
 }
@@ -714,13 +714,13 @@ static int __goodix_hold_ss51_dsp_20(struct chip_data_gt9286 *chip_info)
         buf[0] = 0x0C;
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info._rRW_MISCTL__SWRST_B0_, buf[0]);
         if (ret < 0) {
-            TPD_INFO("Hold ss51 & dsp I2C error, retry:%d\n", retry);
+            TPD_DEBUG("Hold ss51 & dsp I2C error, retry:%d\n", retry);
             continue;
         }
         // Confirm hold
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info._rRW_MISCTL__SWRST_B0_);
         if (ret < 0) {
-            TPD_INFO("Hold ss51 & dsp I2C error, retry:%d\n", retry);
+            TPD_DEBUG("Hold ss51 & dsp I2C error, retry:%d\n", retry);
             continue;
         }
         if (0x0C == ret) {
@@ -730,15 +730,15 @@ static int __goodix_hold_ss51_dsp_20(struct chip_data_gt9286 *chip_info)
                 break;
             }
         }
-        TPD_INFO("Hold ss51 & dsp confirm 0x4180 failed, value:%d\n", buf[0]);
+        TPD_DEBUG("Hold ss51 & dsp confirm 0x4180 failed, value:%d\n", buf[0]);
     }
 
     if (retry >= 30) {
-        TPD_INFO("Hold ss51&dsp failed!\n");
+        TPD_DEBUG("Hold ss51&dsp failed!\n");
         return -1;
     }
 
-    TPD_INFO("Hold ss51&dsp successfully.\n");
+    TPD_DEBUG("Hold ss51&dsp successfully.\n");
 
     return 0;
 }
@@ -765,35 +765,35 @@ static int goodix_hold_ss51_dsp(struct chip_data_gt9286 *chip_info)
     buffer[0] = 0x00;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__DSP_MCU_PWR_, buffer, 1);
     if (ret) {
-        TPD_INFO("enabel dsp & mcu power fail!\n");
+        TPD_DEBUG("enabel dsp & mcu power fail!\n");
         return ret;
     }
     // disable watchdog
     buffer[0] = 0x00;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__TMR0_EN, buffer, 1);
     if (ret) {
-        TPD_INFO("disable wdt fail!\n");
+        TPD_DEBUG("disable wdt fail!\n");
         return ret;
     }
     // clear cache
     buffer[0] = 0x00;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__CACHE_EN, buffer, 1);
     if (ret) {
-        TPD_INFO("clear cache fail!\n");
+        TPD_DEBUG("clear cache fail!\n");
         return ret;
     }
     // soft reset
     buffer[0] = 0x01;
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info._bWO_MISCTL__CPU_SWRST_PULSE, 1, buffer);
     if (ret < 0) {
-        TPD_INFO("software reset fail!\n");
+        TPD_DEBUG("software reset fail!\n");
         return ret;
     }
     // set scramble
     buffer[0] = 0x00;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._rRW_MISCTL__BOOT_OPT_B0_, buffer, 1);
     if (ret) {
-        TPD_INFO("set scramble fail!\n");
+        TPD_DEBUG("set scramble fail!\n");
         return ret;
     }
 
@@ -826,28 +826,28 @@ static int goodix_run_ss51_isp(struct chip_data_gt9286 *chip_info, u8 * ss51_isp
     buffer[0] = 0x04;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__SRAM_BANK, buffer, 1);
     if (ret) {
-        TPD_INFO("select bank4 fail.\n");
+        TPD_DEBUG("select bank4 fail.\n");
         return ret;
     }
     // enable patch area access
     buffer[0] = 0x01;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__PATCH_AREA_EN_, buffer, 1);
     if (ret) {
-        TPD_INFO("enable patch area access fail!\n");
+        TPD_DEBUG("enable patch area access fail!\n");
         return ret;
     }
 
-    TPD_INFO("ss51_isp length: %d, checksum: 0x%04X\n", length, goodix_calc_checksum(ss51_isp, length));
+    TPD_DEBUG("ss51_isp length: %d, checksum: 0x%04X\n", length, goodix_calc_checksum(ss51_isp, length));
     // load ss51 isp
     ret = touch_i2c_write_block(chip_info->client, 0xC000, length, ss51_isp);
     if (ret < 0) {
-        TPD_INFO("load ss51 isp fail!\n");
+        TPD_DEBUG("load ss51 isp fail!\n");
         return ret;
     }
     // recall compare
     ret = goodix_recall_check(chip_info->client, ss51_isp, 0xC000, length);
     if (ret) {
-        TPD_INFO("recall check ss51 isp fail!\n");
+        TPD_DEBUG("recall check ss51 isp fail!\n");
         return ret;
     }
 
@@ -858,21 +858,21 @@ static int goodix_run_ss51_isp(struct chip_data_gt9286 *chip_info, u8 * ss51_isp
     buffer[0] = 0x00;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._bRW_MISCTL__PATCH_AREA_EN_, buffer, 1);
     if (ret) {
-        TPD_INFO("disable patch area access fail!\n");
+        TPD_DEBUG("disable patch area access fail!\n");
         return ret;
     }
     // set 0x8006
     memset(buffer, 0x55, 8);
     ret = goodix_i2c_write_with_readback(chip_info->client, 0x8006, buffer, 8);
     if (ret) {
-        TPD_INFO("set 0x8006[0~7] 0x55 fail!\n");
+        TPD_DEBUG("set 0x8006[0~7] 0x55 fail!\n");
         return ret;
     }
     // release ss51
     buffer[0] = 0x08;
     ret = goodix_i2c_write_with_readback(chip_info->client, chip_info->reg_info._rRW_MISCTL__SWRST_B0_, buffer, 1);
     if (ret) {
-        TPD_INFO("release ss51 fail!\n");
+        TPD_DEBUG("release ss51 fail!\n");
         return ret;
     }
 
@@ -880,11 +880,11 @@ static int goodix_run_ss51_isp(struct chip_data_gt9286 *chip_info, u8 * ss51_isp
     // check run state
     ret = touch_i2c_read_block(chip_info->client, 0x8006, 2, buffer);
     if (ret < 0) {
-        TPD_INFO("read 0x8006 fail!\n");
+        TPD_DEBUG("read 0x8006 fail!\n");
         return ret;
     }
     if (!(buffer[0] == 0xAA && buffer[1] == 0xBB)) {
-        TPD_INFO("ERROR: isp is not running! 0x8006: %02X %02X\n", buffer[0], buffer[1]);
+        TPD_DEBUG("ERROR: isp is not running! 0x8006: %02X %02X\n", buffer[0], buffer[1]);
         return -1;
     }
 
@@ -903,25 +903,25 @@ static int goodix_error_erase(struct chip_data_gt9286 *chip_info)
     int retry = 5;
     u8 *fw = NULL;
 
-    TPD_INFO("Erase flash area of ss51.\n");
+    TPD_DEBUG("Erase flash area of ss51.\n");
 
     goodix_reset(chip_info);
 
     fw = goodix_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset,
             chip_info->update_info.firmware->subsystem[0].length);
     if (fw == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         return -1;
     }
     ret = goodix_run_ss51_isp(chip_info, fw, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         return -1;
     }
 
     fw = kmalloc(1024 * 4, GFP_KERNEL);
     if (!fw) {
-        TPD_INFO("error when alloc mem.\n");
+        TPD_DEBUG("error when alloc mem.\n");
         return -1;
     }
 
@@ -944,13 +944,13 @@ static int goodix_error_erase(struct chip_data_gt9286 *chip_info)
 
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8100, buffer, 4);
         if (ret) {
-            TPD_INFO("write length & address fail!\n");
+            TPD_DEBUG("write length & address fail!\n");
             continue;
         }
 
         ret = touch_i2c_write_block(chip_info->client, 0x8100 + 4, block_len, fw);
         if (ret < 0) {
-            TPD_INFO("write fw data fail!\n");
+            TPD_DEBUG("write fw data fail!\n");
             continue;
         }
 
@@ -963,14 +963,14 @@ static int goodix_error_erase(struct chip_data_gt9286 *chip_info)
         buffer[1] = (checksum & 0xFF);
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8100 + 4 + block_len, buffer, 2);
         if (ret) {
-            TPD_INFO("write checksum fail!\n");
+            TPD_DEBUG("write checksum fail!\n");
             continue;
         }
 
         buffer[0] = 0;
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8022, buffer, 1);
         if (ret) {
-            TPD_INFO("clear control flag fail!\n");
+            TPD_DEBUG("clear control flag fail!\n");
             continue;
         }
 
@@ -978,7 +978,7 @@ static int goodix_error_erase(struct chip_data_gt9286 *chip_info)
         buffer[1] = FW_SECTION_TYPE_SS51_PATCH;
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8020, buffer, 2);
         if (ret) {
-            TPD_INFO("write subsystem type fail!\n");
+            TPD_DEBUG("write subsystem type fail!\n");
             continue;
         }
         burn_state = -1;
@@ -995,14 +995,14 @@ static int goodix_error_erase(struct chip_data_gt9286 *chip_info)
                 TPD_DEBUG("burning.....\n");
                 continue;
             } else if (buffer[0] == 0xDD) {
-                TPD_INFO("checksum error!\n");
+                TPD_DEBUG("checksum error!\n");
                 break;
             } else if (buffer[0] == 0xBB) {
-                TPD_INFO("burning success.\n");
+                TPD_DEBUG("burning success.\n");
                 burn_state = 0;
                 break;
             } else if (buffer[0] == 0xCC) {
-                TPD_INFO("burning failed!\n");
+                TPD_DEBUG("burning failed!\n");
                 break;
             } else {
                 TPD_DEBUG("unknown state!(0x8022: 0x%02X)\n", buffer[0]);
@@ -1033,14 +1033,14 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
     int retry = 5;
     u8 *fw;
 
-    TPD_INFO("Subsystem: %d, Length: %d, Address: 0x%08X\n", subsystem->type, subsystem->length, subsystem->address);
+    TPD_DEBUG("Subsystem: %d, Length: %d, Address: 0x%08X\n", subsystem->type, subsystem->length, subsystem->address);
 
     while (length > 0 && retry > 0) {
         retry--;
 
         block_len = length > 4096 ? 4096 : length;
 
-        TPD_INFO("Burn block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + burn_len);
+        TPD_DEBUG("Burn block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + burn_len);
         fw = goodix_get_fw_data(chip_info, subsystem->offset + burn_len, block_len);
         if (fw == NULL) {
             return -1;
@@ -1061,7 +1061,7 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
 
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8100, buffer, 4);
         if (ret) {
-            TPD_INFO("write length & address fail!\n");
+            TPD_DEBUG("write length & address fail!\n");
             continue;
         }
 
@@ -1069,13 +1069,13 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
         for (k = 0; k < pack_num; k++) {
             ret = touch_i2c_write_block(chip_info->client, 0x8100 + 4 + 2048*k, 2048, fw + 2048*k);
             if (ret < 0) {
-                TPD_INFO("the %d pack, write fw data fail!\n", k);
+                TPD_DEBUG("the %d pack, write fw data fail!\n", k);
             }
         }
         if (block_len%2048) {
             ret = touch_i2c_write_block(chip_info->client, 0x8100 + 4 + 2048*k, block_len%2048, fw + 2048*k);
             if (ret < 0) {
-                TPD_INFO("the last pack, write fw data fail!\n");
+                TPD_DEBUG("the last pack, write fw data fail!\n");
             }
         }
 
@@ -1083,14 +1083,14 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
         buffer[1] = (checksum & 0xFF);
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8100 + 4 + block_len, buffer, 2);
         if (ret) {
-            TPD_INFO("write checksum fail!\n");
+            TPD_DEBUG("write checksum fail!\n");
             continue;
         }
 
         buffer[0] = 0;
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8022, buffer, 1);
         if (ret) {
-            TPD_INFO("clear control flag fail!\n");
+            TPD_DEBUG("clear control flag fail!\n");
             continue;
         }
 
@@ -1098,7 +1098,7 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
         buffer[1] = subsystem->type;
         ret = goodix_i2c_write_with_readback(chip_info->client, 0x8020, buffer, 2);
         if (ret) {
-            TPD_INFO("write subsystem type fail!\n");
+            TPD_DEBUG("write subsystem type fail!\n");
             continue;
         }
         burn_state = -1;
@@ -1125,14 +1125,14 @@ static int goodix_burn_subsystem(struct chip_data_gt9286 *chip_info, struct fw_s
                 TPD_DEBUG("burning.....\n");
                 continue;
             } else if (buffer[0] == 0xDD) {
-                TPD_INFO("checksum error!\n");
+                TPD_DEBUG("checksum error!\n");
                 break;
             } else if (buffer[0] == 0xBB) {
-                TPD_INFO("burning success.\n");
+                TPD_DEBUG("burning success.\n");
                 burn_state = 0;
                 break;
             } else if (buffer[0] == 0xCC) {
-                TPD_INFO("burning failed!\n");
+                TPD_DEBUG("burning failed!\n");
                 break;
             } else {
                 TPD_DEBUG("unknown state!(0x8022: 0x%02X)\n", buffer[0]);
@@ -1159,7 +1159,7 @@ static int goodix_read_flash(struct i2c_client* client, u32 addr, int length)
     u8 buffer[4];
     u16 read_addr = (addr >> 8);
 
-    TPD_INFO("Read flash: 0x%04X, length: %d\n", addr, length);
+    TPD_DEBUG("Read flash: 0x%04X, length: %d\n", addr, length);
 
     buffer[0] = 0;
     ret = goodix_i2c_write_with_readback(client, 0x8022, buffer, 1);
@@ -1174,7 +1174,7 @@ static int goodix_read_flash(struct i2c_client* client, u32 addr, int length)
     buffer[1] = 0xAA;
     ret |= touch_i2c_write_block(client, 0x8020, 2, buffer);
     if (ret < 0) {
-        TPD_INFO("Error occured.\n");
+        TPD_DEBUG("Error occured.\n");
         return ret;
     }
 
@@ -1187,12 +1187,12 @@ static int goodix_read_flash(struct i2c_client* client, u32 addr, int length)
             continue;
         }
         if (buffer[0] == 0xBB) {
-            TPD_INFO("Read success(addr: 0x%04X, length: %d)\n", addr, length);
+            TPD_DEBUG("Read success(addr: 0x%04X, length: %d)\n", addr, length);
             break;
         }
     }
     if (wait_time == 0) {
-        TPD_INFO("Read Flash FAIL!\n");
+        TPD_DEBUG("Read Flash FAIL!\n");
         return -1;
     }
 
@@ -1208,12 +1208,12 @@ static int goodix_check_subsystem_in_flash(struct chip_data_gt9286 *chip_info, s
     int check_state = 0;
     u8 *fw;
 
-    TPD_INFO("Subsystem: %d, Length: %d, Address: 0x%08X", subsystem->type, subsystem->length, subsystem->address);
+    TPD_DEBUG("Subsystem: %d, Length: %d, Address: 0x%08X", subsystem->type, subsystem->length, subsystem->address);
 
     while (length > 0) {
         block_len = length > 4096 ? 4096 : length;
 
-        TPD_INFO("Check block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + checked_len);
+        TPD_DEBUG("Check block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + checked_len);
         fw = goodix_get_fw_data(chip_info, subsystem->offset + checked_len, block_len);
         if (fw == NULL) {
             return -1;
@@ -1225,7 +1225,7 @@ static int goodix_check_subsystem_in_flash(struct chip_data_gt9286 *chip_info, s
 
         ret = goodix_recall_check(chip_info->client, fw, 0x8100, block_len);
         if (ret) {
-            TPD_INFO("Block in flash is broken!\n");
+            TPD_DEBUG("Block in flash is broken!\n");
             check_state |= ret;
         }
 
@@ -1234,9 +1234,9 @@ static int goodix_check_subsystem_in_flash(struct chip_data_gt9286 *chip_info, s
     }
 
     if (check_state) {
-        TPD_INFO("Subsystem in flash is broken!\n");
+        TPD_DEBUG("Subsystem in flash is broken!\n");
     } else {
-        TPD_INFO("Subsystem in flash is correct!\n");
+        TPD_DEBUG("Subsystem in flash is correct!\n");
     }
     return check_state;
 }
@@ -1252,7 +1252,7 @@ static void goodix_finger_protect_data_get(struct chip_data_gt9286 *chip_info)
     chip_info->spuri_fp_touch_raw_data = kzalloc(TX_NUM * RX_NUM * sizeof(u16), GFP_KERNEL);
     addr = chip_info->reg_info.GTP_REG_RAWDATA;
 
-    TPD_INFO("%s start\n", __func__);
+    TPD_DEBUG("%s start\n", __func__);
     gt1x_rawdiff_mode = 1;
     goodix_send_cmd(chip_info, 1, 0);
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 0);
@@ -1260,22 +1260,22 @@ static void goodix_finger_protect_data_get(struct chip_data_gt9286 *chip_info)
     //wait for data ready
     while(i++ < 10) {
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, raw_data);
-        TPD_INFO("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
+        TPD_DEBUG("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
         if((ret > 0) && ((raw_data[0] & 0x80) == 0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(5);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
     ret = touch_i2c_read_block(chip_info->client, addr, TX_NUM * RX_NUM * 2, raw_data);
 
     for(i = 0; i < RX_NUM; i++) {
-        //TPD_INFO("[%2d] ", i);
+        //TPD_DEBUG("[%2d] ", i);
         for(j = 0; j < TX_NUM; j++) {
             chip_info->spuri_fp_touch_raw_data[i * TX_NUM + j] = (s16)(raw_data[i * TX_NUM * 2 + j * 2] << 8) + raw_data[i * TX_NUM * 2 + j * 2 + 1];
             //printk("%d ",chip_info->spuri_fp_touch_raw_data[i * TX_NUM + j]);
@@ -1298,7 +1298,7 @@ static int goodix_ftm_process(void *chip_data)
 {
     struct chip_data_gt9286 *chip_info = (struct chip_data_gt9286 *)chip_data;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     tp_powercontrol_2v8(chip_info->hw_res, false);
 
     return 0;
@@ -1320,7 +1320,7 @@ static int goodix_get_vendor(void *chip_data, struct panel_info *panel_data)
     chip_info->tp_type = panel_data->tp_type;
     strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -1400,7 +1400,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
         goodix_i2c_read_dbl_check(chip_info->client, chip_info->reg_info.GTP_REG_FW_CHK_SUBSYS, &reg_val[1], 1);
 
         if (reg_val[0] != 0xBE || reg_val[1] == 0xAA) {
-            TPD_INFO("Check fw status failed: reg[0x41E4] = 0x%2X, reg[0x5095] = 0x%2X!\n", reg_val[0], reg_val[1]);
+            TPD_DEBUG("Check fw status failed: reg[0x41E4] = 0x%2X, reg[0x5095] = 0x%2X!\n", reg_val[0], reg_val[1]);
         } else {
             break;
         }
@@ -1411,7 +1411,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
 
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.GTP_REG_CONFIG_DATA);
     if (ret < 0) {
-        TPD_INFO("%s: read config version failed, need update firmware!\n", __func__);
+        TPD_DEBUG("%s: read config version failed, need update firmware!\n", __func__);
         return FW_ABNORMAL;
     } else {
         panel_data->TP_FW = ret & 0x7F; /*bit0-6 is fw version*/
@@ -1420,10 +1420,10 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
     ret = goodix_read_version(chip_info, panel_data);
     ret = goodix_init_panel(chip_info);
     if (ret != 0) {
-        TPD_INFO("%s: init panel failed\n", __func__);
+        TPD_DEBUG("%s: init panel failed\n", __func__);
     }
 
-    TPD_INFO("%s: goodix config version = 0x%x \n", __func__, panel_data->TP_FW);
+    TPD_DEBUG("%s: goodix config version = 0x%x \n", __func__, panel_data->TP_FW);
     return FW_NORMAL;
 }
 
@@ -1438,10 +1438,10 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     struct chip_data_gt9286 *chip_info = (struct chip_data_gt9286 *)chip_data;
     struct goodix_version_info ver_info = chip_info->ver_info;
 
-    TPD_INFO("%s enter!\n", __func__);
+    TPD_DEBUG("%s enter!\n", __func__);
 
     if (chip_info->update_info.status != UPDATE_STATUS_IDLE) {
-        TPD_INFO("Update process is running!\n");
+        TPD_DEBUG("Update process is running!\n");
         return FW_NO_NEED_UPDATE;
     }
     chip_info->update_info.status = UPDATE_STATUS_RUNNING;
@@ -1453,14 +1453,14 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     chip_info->update_info.firmware = (struct fw_info *)kzalloc(sizeof(struct fw_info), GFP_KERNEL);
     if (chip_info->update_info.firmware == NULL) {
-        TPD_INFO("Alloc %zu bytes memory fail.\n", sizeof(struct fw_info));
+        TPD_DEBUG("Alloc %zu bytes memory fail.\n", sizeof(struct fw_info));
 
         return FW_NO_NEED_UPDATE;
     }
 
     chip_info->update_info.buffer = (u8 *) kzalloc(1024 * 4, GFP_KERNEL);
     if (chip_info->update_info.buffer == NULL) {
-        TPD_INFO("Alloc %d bytes memory fail.\n", 1024 * 4);
+        TPD_DEBUG("Alloc %d bytes memory fail.\n", 1024 * 4);
         kfree(chip_info->update_info.firmware);
         return FW_NO_NEED_UPDATE;
     }
@@ -1469,7 +1469,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     ret = goodix_check_firmware_data(chip_info);
     if (ret < 0) {
         chip_info->update_info.status = UPDATE_STATUS_ABORT;
-         TPD_INFO("goodix_check_firmware_data fail\n");
+         TPD_DEBUG("goodix_check_firmware_data fail\n");
         goto no_update_exit;
     }
 
@@ -1481,7 +1481,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
         goodix_i2c_read_dbl_check(chip_info->client, chip_info->reg_info.GTP_REG_FW_CHK_SUBSYS, &reg_val[1], 1);
 
         if (reg_val[0] != 0xBE || reg_val[1] == 0xAA) {
-            TPD_INFO("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
+            TPD_DEBUG("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
         } else {
             break;
         }
@@ -1498,12 +1498,12 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
         fw_ver_info.product_id[4] = 0;
 
         if (memcmp(fw_ver_info.product_id, ver_info.product_id, 4)) {
-            TPD_INFO("Product id is not match!\n");
+            TPD_DEBUG("Product id is not match!\n");
             goto no_update_exit;
         }
 
         if ((fw_ver_info.mask_id & 0xFFFFFF00) != (ver_info.mask_id & 0xFFFFFF00)) {
-            TPD_INFO("Mask id is not match!\n");
+            TPD_DEBUG("Mask id is not match!\n");
             goto no_update_exit;
         }
 
@@ -1517,7 +1517,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     p = goodix_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset, chip_info->update_info.firmware->subsystem[0].length);
     if (p == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         chip_info->update_info.status = UPDATE_STATUS_ABORT;
         goto update_exit;
     }
@@ -1525,7 +1525,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     chip_info->update_info.progress++;
     ret = goodix_run_ss51_isp(chip_info, p, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         goto update_exit;
     }
 
@@ -1534,13 +1534,13 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     msleep(800);
 
     for (i = 1; i < chip_info->update_info.firmware->subsystem_count; i++) {
-        TPD_INFO("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
-        TPD_INFO("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
-        TPD_INFO("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
+        TPD_DEBUG("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
+        TPD_DEBUG("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
+        TPD_DEBUG("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
 
         ret = goodix_burn_subsystem(chip_info, &(chip_info->update_info.firmware->subsystem[i]));
         if (ret) {
-            TPD_INFO("burn subsystem fail!\n");
+            TPD_DEBUG("burn subsystem fail!\n");
             goto update_exit;
         }
         chip_info->update_info.progress++;
@@ -1550,23 +1550,23 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     p = goodix_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset, chip_info->update_info.firmware->subsystem[0].length);
     if (p == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         goto update_exit;
     }
     chip_info->update_info.progress++;
 
     ret = goodix_run_ss51_isp(chip_info, p, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         goto update_exit;
     }
     chip_info->update_info.progress++;
 
-    TPD_INFO("Reset guitar & check firmware in flash.\n");
+    TPD_DEBUG("Reset guitar & check firmware in flash.\n");
     for (i = 1; i < chip_info->update_info.firmware->subsystem_count; i++) {
-        TPD_INFO("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
-        TPD_INFO("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
-        TPD_INFO("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
+        TPD_DEBUG("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
+        TPD_DEBUG("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
+        TPD_DEBUG("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
 
         ret = goodix_check_subsystem_in_flash(chip_info, &(chip_info->update_info.firmware->subsystem[i]));
         if (ret) {
@@ -1576,7 +1576,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     }
     chip_info->update_info.progress++;
 
-    TPD_INFO("%s end.\n", __func__);
+    TPD_DEBUG("%s end.\n", __func__);
 
 update_exit:
     goodix_esd_check_enable(chip_info, true);
@@ -1586,11 +1586,11 @@ update_exit:
 
     if (ret) {
         chip_info->update_info.progress = 2 * chip_info->update_info.max_progress;
-        TPD_INFO("Update firmware failed!\n");
+        TPD_DEBUG("Update firmware failed!\n");
         return FW_UPDATE_ERROR;
     } else {
         goodix_init_panel(chip_info);   //after update, need send config again
-        TPD_INFO("Update firmware succeefully!\n");
+        TPD_DEBUG("Update firmware succeefully!\n");
         return FW_UPDATE_SUCCESS;
     }
 
@@ -1619,7 +1619,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
     memset(chip_info->touch_data, 0, MAX_GT_IRQ_DATA_LENGTH);
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR);
     if (ret < 0) {
-        TPD_INFO("%s: i2c transfer error!\n", __func__);
+        TPD_DEBUG("%s: i2c transfer error!\n", __func__);
         return IRQ_EXCEPTION;
     }
 
@@ -1637,7 +1637,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR + 1, \
                                                     8 * touch_num + 2, &chip_info->touch_data[1]); //read out point data
     if (ret < 0) {
-        TPD_INFO("read touch point data from coor_addr failed!\n");
+        TPD_DEBUG("read touch point data from coor_addr failed!\n");
         return IRQ_IGNORE;
     }
 
@@ -1654,7 +1654,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
             check_sum += chip_info->touch_data[i];
         }
         if (check_sum) {
-            TPD_INFO("second checksum error: %x\n", check_sum);
+            TPD_DEBUG("second checksum error: %x\n", check_sum);
             goto IGNORE_CLEAR_IRQ;
         }
     }
@@ -1715,7 +1715,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_WAKEUP_GESTURE, 2, doze_buf);
     if (ret < 0) {
-        TPD_INFO("%s: read gesture info i2c faild\n", __func__);
+        TPD_DEBUG("%s: read gesture info i2c faild\n", __func__);
         return -1;
     }
 
@@ -1731,7 +1731,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_GESTURE_COOR, point_num * 4, point_data);
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.GTP_REG_WAKEUP_GESTURE, 0x00);  //clear gesture int
     if (ret < 0) {
-        TPD_INFO("%s: read gesture data i2c faild\n", __func__);
+        TPD_DEBUG("%s: read gesture data i2c faild\n", __func__);
         return -1;
     }
 
@@ -1881,7 +1881,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
             break;
     }
 
-    TPD_INFO("%s: gesture_id = 0x%x, gesture_type = %d, clockWise = %d, point:(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)\n",
+    TPD_DEBUG("%s: gesture_id = 0x%x, gesture_type = %d, clockWise = %d, point:(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)\n",
         __func__, gesture_id, gesture->gesture_type, gesture->clockwise,
         gesture->Point_start.x, gesture->Point_start.y, gesture->Point_end.x, gesture->Point_end.y,
         gesture->Point_1st.x, gesture->Point_1st.y, gesture->Point_2nd.x, gesture->Point_2nd.y,
@@ -1909,7 +1909,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_SLEEP:
             ret = goodix_enter_sleep(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: goodix enter sleep failed\n", __func__);
+                TPD_DEBUG("%s: goodix enter sleep failed\n", __func__);
             }
             break;
 
@@ -1917,7 +1917,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
             if (flag) {
                 ret = goodix_enter_doze(chip_info);
                 if (ret < 0) {
-                    TPD_INFO("%s: goodix enter doze failed\n", __func__);
+                    TPD_DEBUG("%s: goodix enter doze failed\n", __func__);
                 }
             }
             break;
@@ -1925,7 +1925,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = goodix_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: goodix enable:(%d) edge limit failed.\n", __func__, flag);
+                TPD_DEBUG("%s: goodix enable:(%d) edge limit failed.\n", __func__, flag);
                 return ret;
             }
             break;
@@ -1933,7 +1933,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_CHARGE:
             ret = goodix_enable_charge_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
             }
             break;
 
@@ -1942,7 +1942,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
             break;
 
         default:
-            TPD_INFO("%s: mode %d not support.\n", __func__, mode);
+            TPD_DEBUG("%s: mode %d not support.\n", __func__, mode);
     }
 
     return ret;
@@ -1956,13 +1956,13 @@ static int goodix_esd_handle(void *chip_data)
     struct chip_data_gt9286 *chip_info = (struct chip_data_gt9286 *)chip_data;
 
     if (!chip_info->esd_check_enabled) {
-        TPD_INFO("goodix_esd_handle close\n");
+        TPD_DEBUG("goodix_esd_handle close\n");
         return 0;
     }
 
     for (i = 0; i < 3; i++) {
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_CMD, 4, esd_buf);
-        TPD_INFO("[Esd]0x8040 = 0x%02X, 0x8043 = 0x%02X goodix_rawdiff_mode = %d\n", esd_buf[0], esd_buf[3], gt1x_rawdiff_mode);
+        TPD_DEBUG("[Esd]0x8040 = 0x%02X, 0x8043 = 0x%02X goodix_rawdiff_mode = %d\n", esd_buf[0], esd_buf[3], gt1x_rawdiff_mode);
         if ((ret > 0) && esd_buf[0] != 0xAA && esd_buf[3] == 0xAA) {
             break;
         }
@@ -1979,7 +1979,7 @@ static int goodix_esd_handle(void *chip_data)
             goodix_send_cmd(chip_info, GTP_CMD_ESD, 0);
         }
     } else {
-        TPD_INFO("IC works abnormally! Process esd reset.");
+        TPD_DEBUG("IC works abnormally! Process esd reset.");
 
         memset(esd_buf, 0x01, sizeof(esd_buf));
         touch_i2c_write_block(chip_info->client, 0x4226, sizeof(esd_buf), esd_buf);
@@ -2005,7 +2005,7 @@ static int goodix_esd_handle(void *chip_data)
         }
 
         enable_irq(chip_info->client->irq);
-        TPD_INFO("Goodix esd reset over.");
+        TPD_DEBUG("Goodix esd reset over.");
         return -1;
     }
 
@@ -2041,10 +2041,10 @@ static void goodix_enable_game_mode(struct chip_data_gt9286 *chip_info, bool ena
     int ret = 0;
     if(enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_ENTER_GAME_MODE, 0);
-        TPD_INFO("%s: GTP_CMD_ENTER_GAME_MODE\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_ENTER_GAME_MODE\n", __func__);
     } else {
         ret = goodix_send_cmd(chip_info, GTP_CMD_EXIT_GAME_MODE, 0);
-        TPD_INFO("%s: GTP_CMD_EXIT_GAME_MODE\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_EXIT_GAME_MODE\n", __func__);
     }
 }
 
@@ -2081,7 +2081,7 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
     kernel_buf = kzalloc(4096,GFP_KERNEL);
     if(kernel_buf == NULL)
     {
-        TPD_INFO("%s kmalloc error\n", __func__);
+        TPD_DEBUG("%s kmalloc error\n", __func__);
         return ;
     }
     switch (debug_type) {
@@ -2099,20 +2099,20 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
     goodix_send_cmd(chip_info, 1, 0);
     msleep(20);
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 0);
-    TPD_INFO("%d,%s\n", __LINE__, __func__);
+    TPD_DEBUG("%d,%s\n", __LINE__, __func__);
 
     //wait for data ready
     while(i++ < 10) {
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, kernel_buf);
-        TPD_INFO("ret = %d \t kernel_buf = %d\n", ret, kernel_buf[0]);
+        TPD_DEBUG("ret = %d \t kernel_buf = %d\n", ret, kernel_buf[0]);
         if((ret > 0) && ((kernel_buf[0] & 0x80)==0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(20);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
@@ -2266,10 +2266,10 @@ static void goodix_main_register_read(struct seq_file *s, void *chip_data)
                 IS_NUM_OR_CHAR(buf[0]) && IS_NUM_OR_CHAR(buf[1]) && IS_NUM_OR_CHAR(buf[2]) && buf[10] != 0xFF) {    /*sensor id == 0xFF, retry */
                 break;
             } else {
-                TPD_INFO("product version data is error\n");
+                TPD_DEBUG("product version data is error\n");
             }
         } else {
-            TPD_INFO("Read product version from 0x8140 failed\n");
+            TPD_DEBUG("Read product version from 0x8140 failed\n");
         }
 
         TPD_DEBUG("Read product version retry = %d\n", retry);
@@ -2279,7 +2279,7 @@ static void goodix_main_register_read(struct seq_file *s, void *chip_data)
     if (retry <= 0) {
         if (ver_info)
             ver_info->sensor_id = 0;
-        TPD_INFO("Maybe the firmware of ic is error\n");
+        TPD_DEBUG("Maybe the firmware of ic is error\n");
     }
 
     patch_id = (u32) ((buf[4] << 16) | (buf[5] << 8) | buf[6]);
@@ -2316,7 +2316,7 @@ static void goodix_config_info_read(struct seq_file *s, void *chip_data)
     seq_printf(s, "\n");
     seq_printf(s, "==== Goodix config read from chip====\n");
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_CONFIG_DATA, GTP_CONFIG_MAX_LENGTH, temp_data);
-    TPD_INFO("I2C TRANSFER: %d", ret);
+    TPD_DEBUG("I2C TRANSFER: %d", ret);
 
     for(i = 0; i < GTP_CONFIG_MAX_LENGTH; i++) {
         seq_printf(s, "0x%02X, ", temp_data[i]);
@@ -2351,11 +2351,11 @@ static size_t goodix_water_protect_mode_read(struct file *file, char *buf, size_
         send_flag = true;
         temp_buf = kzalloc(len,GFP_KERNEL);
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.GTP_REG_WATER_PROTECT_QUERY);
-        TPD_INFO("%s:%d read GTP_REG_WATER_PROTECT_QUERY = 0x%x\n", __func__, __LINE__, ret);
+        TPD_DEBUG("%s:%d read GTP_REG_WATER_PROTECT_QUERY = 0x%x\n", __func__, __LINE__, ret);
 
         ret = snprintf(temp_buf, len, "[%s]water_protect_mode = 0x%x \n", TPD_DEVICE, ret);
         if (copy_to_user(buf, temp_buf, ret))
-            TPD_INFO("%s:%d ok\n", __func__, __LINE__);
+            TPD_DEBUG("%s:%d ok\n", __func__, __LINE__);
 
         kfree(temp_buf);
     } else {
@@ -2371,9 +2371,9 @@ static size_t goodix_water_protect_mode_write(struct file *file, const char *buf
     struct touchpanel_data *ts = PDE_DATA(file_inode(file));
     struct chip_data_gt9286 *chip_info = (struct chip_data_gt9286 *)ts->chip_data;
 
-    TPD_INFO("%s:%d\n",__func__,__LINE__);
+    TPD_DEBUG("%s:%d\n",__func__,__LINE__);
     if (len >= 20) {
-        TPD_INFO("%s: no command exceeds 20 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 20 chars.\n", __func__);
         return -EFAULT;
     }
 
@@ -2383,10 +2383,10 @@ static size_t goodix_water_protect_mode_write(struct file *file, const char *buf
 
     if(buf_tmp[0] == '1') {
         ret = goodix_send_cmd(chip_info, GTP_CMD_ENTER_WATER_PROTECT, 0);
-        TPD_INFO("%s: GTP_CMD_ENTER_WATER_PROTECT\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_ENTER_WATER_PROTECT\n", __func__);
     } else {
         ret = goodix_send_cmd(chip_info, GTP_CMD_EXIT_WATER_PROTECT, 0);
-        TPD_INFO("%s: GTP_CMD_EXIT_WATER_PROTECT\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_EXIT_WATER_PROTECT\n", __func__);
     }
 
     return len;
@@ -2407,17 +2407,17 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     int ret = -1;
     bool read_cfg_from_dts = false;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (tp_register_times > 0) {
-        TPD_INFO("TP driver have success loaded %d times, exit\n", tp_register_times);
+        TPD_DEBUG("TP driver have success loaded %d times, exit\n", tp_register_times);
         return -1;
     }
 
     /* 1. Alloc chip_info */
     chip_info = kzalloc(sizeof(struct chip_data_gt9286), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -2426,7 +2426,7 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -2434,7 +2434,7 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     /* 3. alloc touch data space */
     chip_info->touch_data = kzalloc(MAX_GT_IRQ_DATA_LENGTH, GFP_KERNEL);
     if (chip_info->touch_data == NULL) {
-        TPD_INFO("touch_data kzalloc error\n");
+        TPD_DEBUG("touch_data kzalloc error\n");
         goto err_touch_data_alloc;
     }
 
@@ -2458,10 +2458,10 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
         ret = of_property_read_u8_array(ts->dev->of_node, "goodix,gtp_cfg_group",
                                         GTP_CFG_GROUP_SAMSUNG, sizeof(GTP_CFG_GROUP_SAMSUNG));
         if (ret) {
-            TPD_INFO("read goodix cfg group from dts error\n");
+            TPD_DEBUG("read goodix cfg group from dts error\n");
             goto err_touch_data_alloc;
         } else {
-            TPD_INFO("read goodix cfg group from dts ok\n");
+            TPD_DEBUG("read goodix cfg group from dts ok\n");
         }
     }
 
@@ -2486,7 +2486,7 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
 
     goodix_esd_check_enable(chip_info, true);
 
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_touch_data_alloc:
@@ -2502,7 +2502,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -2510,7 +2510,7 @@ static int goodix_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -2520,7 +2520,7 @@ static int goodix_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -2530,7 +2530,7 @@ static int goodix_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2571,10 +2571,10 @@ static struct i2c_driver tp_i2c_driver = {
 /***********************Start of module init and exit****************************/
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (i2c_add_driver(&tp_i2c_driver) != 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
 

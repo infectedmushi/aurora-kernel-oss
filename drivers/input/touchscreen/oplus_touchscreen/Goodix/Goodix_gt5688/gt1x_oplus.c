@@ -70,13 +70,13 @@ static int gesture_enter_doze(struct i2c_client *client)
 
     while (retry++ < 5) {
         if (!gt1x_send_cmd(client, 0x08, 0)) {
-            TPD_INFO("Working in doze mode!\n");
+            TPD_DEBUG("Working in doze mode!\n");
             return 0;
         }
         msleep(10);
     }
 
-    TPD_INFO("Send doze cmd failed.\n");
+    TPD_DEBUG("Send doze cmd failed.\n");
     return -1;
 }
 
@@ -88,13 +88,13 @@ static s32 gt1x_enter_sleep(struct chip_data_gt5688 *chip_info)
     mdelay(5);
     while (retry++ < 3) {
         if (!gt1x_send_cmd(chip_info->client, GTP_CMD_SLEEP, 0)) {
-            TPD_INFO("Enter sleep mode!\n");
+            TPD_DEBUG("Enter sleep mode!\n");
             return 0;
         }
         msleep(10);
     }
 
-    TPD_INFO("Enter sleep mode failed.\n");
+    TPD_DEBUG("Enter sleep mode failed.\n");
 
     return -1;
 }
@@ -106,11 +106,11 @@ static int gpio_set_int_level(struct hw_resource *hw_res, bool level)
     if (level) {
         ret = pinctrl_select_state(hw_res->pinctrl, hw_res->pin_set_high);
         if (ret)
-            TPD_INFO("cannot set pin to high state");
+            TPD_DEBUG("cannot set pin to high state");
     } else {
         ret = pinctrl_select_state(hw_res->pinctrl, hw_res->pin_set_low);
         if (ret)
-            TPD_INFO("cannot set pin to low state");
+            TPD_DEBUG("cannot set pin to low state");
     }
 
     return ret;
@@ -122,7 +122,7 @@ static int gpio_set_int_nopull(struct hw_resource *hw_res)
 
     ret = pinctrl_select_state(hw_res->pinctrl, hw_res->pin_set_nopull);
     if (ret)
-        TPD_INFO("cannot set pin to input state");
+        TPD_DEBUG("cannot set pin to input state");
 
     return ret;
 }
@@ -167,7 +167,7 @@ static int goodix_reset(void *chip_data)
     int ret = 0;
     struct chip_data_gt5688 *chip_info = (struct chip_data_gt5688 *)chip_data;
 
-    TPD_INFO("%s reset happened!\n", __func__);
+    TPD_DEBUG("%s reset happened!\n", __func__);
     gt1x_select_addr(chip_info->client, chip_info->hw_res);
     msleep(50);
     ret = gt1x_set_reset_status(chip_info->client);
@@ -194,7 +194,7 @@ static s32 gt1x_send_cfg(struct i2c_client *client, u8 * config, int cfg_len)
         checksum += (config[i] << 8) + config[i + 1];
     }
     if (!checksum) {
-        TPD_INFO("Invalid config, all of the bytes is zero!\n");
+        TPD_DEBUG("Invalid config, all of the bytes is zero!\n");
         return -1;
     }
 
@@ -213,7 +213,7 @@ static s32 gt1x_send_cfg(struct i2c_client *client, u8 * config, int cfg_len)
         }
     }
 
-    TPD_INFO("Send config failed!\n");
+    TPD_DEBUG("Send config failed!\n");
 
     return ret;
 }
@@ -265,7 +265,7 @@ static int gt1x_init_panel(struct chip_data_gt5688 *chip_info, cfg_config cfg_co
     TPD_DEBUG("cfg_config %d sizeof(chip_info->gt1x_config) is %d\n", cfg_config, chip_info->config_info.gt1x_cfg_length);
 
     if (chip_info->config_info.gt1x_cfg_length < GTP_CONFIG_MIN_LENGTH || chip_info->config_info.gt1x_cfg_length > GTP_CONFIG_MAX_LENGTH) {
-        TPD_INFO("Config is INVALID! You need to check you header file CFG_GROUP section!\n");
+        TPD_DEBUG("Config is INVALID! You need to check you header file CFG_GROUP section!\n");
         return -1;
     }
 
@@ -287,7 +287,7 @@ static int gt1x_init_panel(struct chip_data_gt5688 *chip_info, cfg_config cfg_co
         chip_info->config_info.gt1x_config[TRIGGER_LOC] = (chip_info->config_info.gt1x_config[TRIGGER_LOC] & 0xFC) | chip_info->config_info.gt1x_int_type;
     }
 
-    TPD_INFO("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x, WAKEUP_LEVEL = %d\n",
+    TPD_DEBUG("X_MAX = %d, Y_MAX = %d, TRIGGER = 0x%02x, WAKEUP_LEVEL = %d\n",
             chip_info->config_info.gt1x_abs_x_max, chip_info->config_info.gt1x_abs_y_max,
             chip_info->config_info.gt1x_int_type, chip_info->config_info.gt1x_wakeup_level);
 
@@ -306,7 +306,7 @@ s32 gt1x_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 * buffer, s3
     int ret = -1;
 
     if (len > 16) {
-        TPD_INFO("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
+        TPD_DEBUG("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
         return ret;
     }
 
@@ -328,7 +328,7 @@ s32 gt1x_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 * buffer, s3
         return 0;
     }
 
-    TPD_INFO("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
+    TPD_DEBUG("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
 
     return 1;
 }
@@ -380,10 +380,10 @@ static s32 gt1x_read_version(struct chip_data_gt5688 *chip_info)
                     IS_NUM_OR_CHAR(buf[0]) && IS_NUM_OR_CHAR(buf[1]) && IS_NUM_OR_CHAR(buf[2]) && buf[10] != 0xFF) {    /*sensor id == 0xFF, retry */
                 break;
             } else {
-                TPD_INFO("Read version failed!(checksum error)\n");
+                TPD_DEBUG("Read version failed!(checksum error)\n");
             }
         } else {
-            TPD_INFO("Read version failed!\n");
+            TPD_DEBUG("Read version failed!\n");
         }
 
         TPD_DEBUG("Read version retry = %d\n", retry);
@@ -393,7 +393,7 @@ static s32 gt1x_read_version(struct chip_data_gt5688 *chip_info)
     if (retry <= 0) {
         if (ver_info)
             ver_info->sensor_id = 0;
-        TPD_INFO("Maybe the firmware of ic is error\n");
+        TPD_DEBUG("Maybe the firmware of ic is error\n");
         //return -1;
     }
 
@@ -403,7 +403,7 @@ static s32 gt1x_read_version(struct chip_data_gt5688 *chip_info)
     sensor_id = buf[10] & 0x0F;
     match_opt = (buf[10] >> 4) & 0x0F;
 
-    TPD_INFO("IC VERSION:GT%s(Product)_%06X(Patch)_%04X(Mask)_%02X(SensorID)\n", product_id, patch_id, mask_id >> 8, sensor_id);
+    TPD_DEBUG("IC VERSION:GT%s(Product)_%06X(Patch)_%04X(Mask)_%02X(SensorID)\n", product_id, patch_id, mask_id >> 8, sensor_id);
 
     if (ver_info != NULL) {
         ver_info->mask_id = mask_id;
@@ -436,7 +436,7 @@ static int gt1x_read_flash(struct i2c_client* client, u32 addr, int length)
     u8 buffer[4];
     u16 read_addr = (addr >> 8);
 
-    TPD_INFO("Read flash: 0x%04X, length: %d\n", addr, length);
+    TPD_DEBUG("Read flash: 0x%04X, length: %d\n", addr, length);
 
     buffer[0] = 0;
     ret = gt1x_i2c_write_with_readback(client, 0x8022, buffer, 1);
@@ -451,7 +451,7 @@ static int gt1x_read_flash(struct i2c_client* client, u32 addr, int length)
     buffer[1] = 0xAA;
     ret |= touch_i2c_write_block(client, 0x8020, 2, buffer);
     if (ret < 0) {
-        TPD_INFO("Error occured.\n");
+        TPD_DEBUG("Error occured.\n");
         return ret;
     }
 
@@ -464,12 +464,12 @@ static int gt1x_read_flash(struct i2c_client* client, u32 addr, int length)
             continue;
         }
         if (buffer[0] == 0xBB) {
-            TPD_INFO("Read success(addr: 0x%04X, length: %d)\n", addr, length);
+            TPD_DEBUG("Read success(addr: 0x%04X, length: %d)\n", addr, length);
             break;
         }
     }
     if (wait_time == 0) {
-        TPD_INFO("Read Flash FAIL!\n");
+        TPD_DEBUG("Read Flash FAIL!\n");
         return -1;
     }
 
@@ -488,12 +488,12 @@ static int gt1x_recall_check(struct i2c_client* client, u8 * chk_src, u16 start_
 
         ret = touch_i2c_read_block(client, start_addr + compared_length, len, rd_buf);
         if (ret < 0) {
-            TPD_INFO("recall i2c error, exit!\n");
+            TPD_DEBUG("recall i2c error, exit!\n");
             return ret;
         }
 
         if (memcmp(rd_buf, &chk_src[compared_length], len)) {
-            TPD_INFO("Recall frame not equal(addr: 0x%04X)\n", start_addr + compared_length);
+            TPD_DEBUG("Recall frame not equal(addr: 0x%04X)\n", start_addr + compared_length);
             return -1;
         }
 
@@ -543,13 +543,13 @@ static int __gt1x_hold_ss51_dsp_20(struct i2c_client* client)
         buf[0] = 0x0C;
         ret = touch_i2c_write_byte(client, _rRW_MISCTL__SWRST_B0_, buf[0]);
         if (ret < 0) {
-            TPD_INFO("Hold ss51 & dsp I2C error, retry:%d\n", retry);
+            TPD_DEBUG("Hold ss51 & dsp I2C error, retry:%d\n", retry);
             continue;
         }
         // Confirm hold
         ret = touch_i2c_read_byte(client, _rRW_MISCTL__SWRST_B0_);
         if (ret < 0) {
-            TPD_INFO("Hold ss51 & dsp I2C error, retry:%d\n", retry);
+            TPD_DEBUG("Hold ss51 & dsp I2C error, retry:%d\n", retry);
             continue;
         }
         if (0x0C == ret) {
@@ -559,15 +559,15 @@ static int __gt1x_hold_ss51_dsp_20(struct i2c_client* client)
                 break;
             }
         }
-        TPD_INFO("Hold ss51 & dsp confirm 0x4180 failed, value:%d\n", buf[0]);
+        TPD_DEBUG("Hold ss51 & dsp confirm 0x4180 failed, value:%d\n", buf[0]);
     }
 
     if (retry >= 30) {
-        TPD_INFO("Hold ss51&dsp failed!\n");
+        TPD_DEBUG("Hold ss51&dsp failed!\n");
         return -1;
     }
 
-    TPD_INFO("Hold ss51&dsp successfully.\n");
+    TPD_DEBUG("Hold ss51&dsp successfully.\n");
 
     return 0;
 }
@@ -596,35 +596,35 @@ static int gt1x_hold_ss51_dsp(struct i2c_client* client)
     buffer[0] = 0x00;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__DSP_MCU_PWR_, buffer, 1);
     if (ret) {
-        TPD_INFO("enabel dsp & mcu power fail!\n");
+        TPD_DEBUG("enabel dsp & mcu power fail!\n");
         return ret;
     }
     // disable watchdog
     buffer[0] = 0x00;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__TMR0_EN, buffer, 1);
     if (ret) {
-        TPD_INFO("disable wdt fail!\n");
+        TPD_DEBUG("disable wdt fail!\n");
         return ret;
     }
     // clear cache
     buffer[0] = 0x00;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__CACHE_EN, buffer, 1);
     if (ret) {
-        TPD_INFO("clear cache fail!\n");
+        TPD_DEBUG("clear cache fail!\n");
         return ret;
     }
     // soft reset
     buffer[0] = 0x01;
     ret = touch_i2c_write_block(client, _bWO_MISCTL__CPU_SWRST_PULSE, 1, buffer);
     if (ret < 0) {
-        TPD_INFO("software reset fail!\n");
+        TPD_DEBUG("software reset fail!\n");
         return ret;
     }
     // set scramble
     buffer[0] = 0x00;
     ret = gt1x_i2c_write_with_readback(client, _rRW_MISCTL__BOOT_OPT_B0_, buffer, 1);
     if (ret) {
-        TPD_INFO("set scramble fail!\n");
+        TPD_DEBUG("set scramble fail!\n");
         return ret;
     }
 
@@ -644,28 +644,28 @@ static int gt1x_run_ss51_isp(struct i2c_client* client, u8 * ss51_isp, int lengt
     buffer[0] = 0x04;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__SRAM_BANK, buffer, 1);
     if (ret) {
-        TPD_INFO("select bank4 fail.\n");
+        TPD_DEBUG("select bank4 fail.\n");
         return ret;
     }
     // enable patch area access
     buffer[0] = 0x01;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__PATCH_AREA_EN_, buffer, 1);
     if (ret) {
-        TPD_INFO("enable patch area access fail!\n");
+        TPD_DEBUG("enable patch area access fail!\n");
         return ret;
     }
 
-    TPD_INFO("ss51_isp length: %d, checksum: 0x%04X\n", length, gt1x_calc_checksum(ss51_isp, length));
+    TPD_DEBUG("ss51_isp length: %d, checksum: 0x%04X\n", length, gt1x_calc_checksum(ss51_isp, length));
     // load ss51 isp
     ret = touch_i2c_write_block(client, 0xC000, length, ss51_isp);
     if (ret < 0) {
-        TPD_INFO("load ss51 isp fail!\n");
+        TPD_DEBUG("load ss51 isp fail!\n");
         return ret;
     }
     // recall compare
     ret = gt1x_recall_check(client, ss51_isp, 0xC000, length);
     if (ret) {
-        TPD_INFO("recall check ss51 isp fail!\n");
+        TPD_DEBUG("recall check ss51 isp fail!\n");
         return ret;
     }
 
@@ -676,21 +676,21 @@ static int gt1x_run_ss51_isp(struct i2c_client* client, u8 * ss51_isp, int lengt
     buffer[0] = 0x00;
     ret = gt1x_i2c_write_with_readback(client, _bRW_MISCTL__PATCH_AREA_EN_, buffer, 1);
     if (ret) {
-        TPD_INFO("disable patch area access fail!\n");
+        TPD_DEBUG("disable patch area access fail!\n");
         return ret;
     }
     // set 0x8006
     memset(buffer, 0x55, 8);
     ret = gt1x_i2c_write_with_readback(client, 0x8006, buffer, 8);
     if (ret) {
-        TPD_INFO("set 0x8006[0~7] 0x55 fail!\n");
+        TPD_DEBUG("set 0x8006[0~7] 0x55 fail!\n");
         return ret;
     }
     // release ss51
     buffer[0] = 0x08;
     ret = gt1x_i2c_write_with_readback(client, _rRW_MISCTL__SWRST_B0_, buffer, 1);
     if (ret) {
-        TPD_INFO("release ss51 fail!\n");
+        TPD_DEBUG("release ss51 fail!\n");
         return ret;
     }
 
@@ -698,11 +698,11 @@ static int gt1x_run_ss51_isp(struct i2c_client* client, u8 * ss51_isp, int lengt
     // check run state
     ret = touch_i2c_read_block(client, 0x8006, 2, buffer);
     if (ret < 0) {
-        TPD_INFO("read 0x8006 fail!\n");
+        TPD_DEBUG("read 0x8006 fail!\n");
         return ret;
     }
     if (!(buffer[0] == 0xAA && buffer[1] == 0xBB)) {
-        TPD_INFO("ERROR: isp is not running! 0x8006: %02X %02X\n", buffer[0], buffer[1]);
+        TPD_DEBUG("ERROR: isp is not running! 0x8006: %02X %02X\n", buffer[0], buffer[1]);
         return -1;
     }
 
@@ -721,26 +721,26 @@ static int gt1x_error_erase(struct chip_data_gt5688 *chip_info)
     int retry = 5;
     u8 *fw = NULL;
 
-    TPD_INFO("Erase flash area of ss51.\n");
+    TPD_DEBUG("Erase flash area of ss51.\n");
 
     goodix_reset(chip_info);
 
     fw = gt1x_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset,
             chip_info->update_info.firmware->subsystem[0].length);
     if (fw == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         return -1;
     }
     gt1x_select_addr(chip_info->client, chip_info->hw_res);
     ret = gt1x_run_ss51_isp(chip_info->client, fw, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         return -1;
     }
 
     fw = kmalloc(1024 * 4, GFP_KERNEL);
     if (!fw) {
-        TPD_INFO("error when alloc mem.\n");
+        TPD_DEBUG("error when alloc mem.\n");
         return -1;
     }
 
@@ -763,13 +763,13 @@ static int gt1x_error_erase(struct chip_data_gt5688 *chip_info)
 
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8100, buffer, 4);
         if (ret) {
-            TPD_INFO("write length & address fail!\n");
+            TPD_DEBUG("write length & address fail!\n");
             continue;
         }
 
         ret = touch_i2c_write_block(chip_info->client, 0x8100 + 4, block_len, fw);
         if (ret < 0) {
-            TPD_INFO("write fw data fail!\n");
+            TPD_DEBUG("write fw data fail!\n");
             continue;
         }
 
@@ -782,14 +782,14 @@ static int gt1x_error_erase(struct chip_data_gt5688 *chip_info)
         buffer[1] = (checksum & 0xFF);
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8100 + 4 + block_len, buffer, 2);
         if (ret) {
-            TPD_INFO("write checksum fail!\n");
+            TPD_DEBUG("write checksum fail!\n");
             continue;
         }
 
         buffer[0] = 0;
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8022, buffer, 1);
         if (ret) {
-            TPD_INFO("clear control flag fail!\n");
+            TPD_DEBUG("clear control flag fail!\n");
             continue;
         }
 
@@ -797,7 +797,7 @@ static int gt1x_error_erase(struct chip_data_gt5688 *chip_info)
         buffer[1] = FW_SECTION_TYPE_SS51_PATCH;
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8020, buffer, 2);
         if (ret) {
-            TPD_INFO("write subsystem type fail!\n");
+            TPD_DEBUG("write subsystem type fail!\n");
             continue;
         }
         burn_state = -1;
@@ -814,14 +814,14 @@ static int gt1x_error_erase(struct chip_data_gt5688 *chip_info)
                 TPD_DEBUG("burning.....\n");
                 continue;
             } else if (buffer[0] == 0xDD) {
-                TPD_INFO("checksum error!\n");
+                TPD_DEBUG("checksum error!\n");
                 break;
             } else if (buffer[0] == 0xBB) {
-                TPD_INFO("burning success.\n");
+                TPD_DEBUG("burning success.\n");
                 burn_state = 0;
                 break;
             } else if (buffer[0] == 0xCC) {
-                TPD_INFO("burning failed!\n");
+                TPD_DEBUG("burning failed!\n");
                 break;
             } else {
                 TPD_DEBUG("unknown state!(0x8022: 0x%02X)\n", buffer[0]);
@@ -851,14 +851,14 @@ static int gt1x_burn_subsystem(struct chip_data_gt5688 *chip_info, struct fw_sub
     int retry = 5;
     u8 *fw;
 
-    TPD_INFO("Subsystem: %d, Length: %d, Address: 0x%08X\n", subsystem->type, subsystem->length, subsystem->address);
+    TPD_DEBUG("Subsystem: %d, Length: %d, Address: 0x%08X\n", subsystem->type, subsystem->length, subsystem->address);
 
     while (length > 0 && retry > 0) {
         retry--;
 
         block_len = length > 1024 * 4 ? 1024 * 4 : length;
 
-        TPD_INFO("Burn block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + burn_len);
+        TPD_DEBUG("Burn block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + burn_len);
         fw = gt1x_get_fw_data(chip_info, subsystem->offset + burn_len, block_len);
         if (fw == NULL) {
             return -1;
@@ -879,13 +879,13 @@ static int gt1x_burn_subsystem(struct chip_data_gt5688 *chip_info, struct fw_sub
 
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8100, buffer, 4);
         if (ret) {
-            TPD_INFO("write length & address fail!\n");
+            TPD_DEBUG("write length & address fail!\n");
             continue;
         }
 
         ret = touch_i2c_write_block(chip_info->client, 0x8100 + 4, block_len, fw);
         if (ret < 0) {
-            TPD_INFO("write fw data fail!\n");
+            TPD_DEBUG("write fw data fail!\n");
             continue;
         }
 
@@ -893,14 +893,14 @@ static int gt1x_burn_subsystem(struct chip_data_gt5688 *chip_info, struct fw_sub
         buffer[1] = (checksum & 0xFF);
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8100 + 4 + block_len, buffer, 2);
         if (ret) {
-            TPD_INFO("write checksum fail!\n");
+            TPD_DEBUG("write checksum fail!\n");
             continue;
         }
 
         buffer[0] = 0;
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8022, buffer, 1);
         if (ret) {
-            TPD_INFO("clear control flag fail!\n");
+            TPD_DEBUG("clear control flag fail!\n");
             continue;
         }
 
@@ -908,7 +908,7 @@ static int gt1x_burn_subsystem(struct chip_data_gt5688 *chip_info, struct fw_sub
         buffer[1] = subsystem->type;
         ret = gt1x_i2c_write_with_readback(chip_info->client, 0x8020, buffer, 2);
         if (ret) {
-            TPD_INFO("write subsystem type fail!\n");
+            TPD_DEBUG("write subsystem type fail!\n");
             continue;
         }
         burn_state = -1;
@@ -935,14 +935,14 @@ static int gt1x_burn_subsystem(struct chip_data_gt5688 *chip_info, struct fw_sub
                 TPD_DEBUG("burning.....\n");
                 continue;
             } else if (buffer[0] == 0xDD) {
-                TPD_INFO("checksum error!\n");
+                TPD_DEBUG("checksum error!\n");
                 break;
             } else if (buffer[0] == 0xBB) {
-                TPD_INFO("burning success.\n");
+                TPD_DEBUG("burning success.\n");
                 burn_state = 0;
                 break;
             } else if (buffer[0] == 0xCC) {
-                TPD_INFO("burning failed!\n");
+                TPD_DEBUG("burning failed!\n");
                 break;
             } else {
                 TPD_DEBUG("unknown state!(0x8022: 0x%02X)\n", buffer[0]);
@@ -972,12 +972,12 @@ static int gt1x_check_subsystem_in_flash(struct chip_data_gt5688 *chip_info, str
     int retry = 5;
     u8 *fw;
 
-    TPD_INFO("Subsystem: %d, Length: %d, Address: 0x%08X", subsystem->type, subsystem->length, subsystem->address);
+    TPD_DEBUG("Subsystem: %d, Length: %d, Address: 0x%08X", subsystem->type, subsystem->length, subsystem->address);
 
     while (length > 0) {
         block_len = length > 1024 * 4 ? 1024 * 4 : length;
 
-        TPD_INFO("Check block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + checked_len);
+        TPD_DEBUG("Check block ==> length: %d, address: 0x%08X\n", block_len, subsystem->address + checked_len);
         fw = gt1x_get_fw_data(chip_info, subsystem->offset + checked_len, block_len);
         if (fw == NULL) {
             return -1;
@@ -989,7 +989,7 @@ static int gt1x_check_subsystem_in_flash(struct chip_data_gt5688 *chip_info, str
 
         ret = gt1x_recall_check(chip_info->client, fw, 0x8100, block_len);
         if (ret) {
-            TPD_INFO("Block in flash is broken!\n");
+            TPD_DEBUG("Block in flash is broken!\n");
             check_state |= ret;
         }
 
@@ -999,9 +999,9 @@ static int gt1x_check_subsystem_in_flash(struct chip_data_gt5688 *chip_info, str
     }
 
     if (check_state) {
-        TPD_INFO("Subsystem in flash is broken!\n");
+        TPD_DEBUG("Subsystem in flash is broken!\n");
     } else {
-        TPD_INFO("Subsystem in flash is correct!\n");
+        TPD_DEBUG("Subsystem in flash is correct!\n");
     }
     return check_state;
 }
@@ -1015,11 +1015,11 @@ static int gt1x_check_firmware_data(struct chip_data_gt5688 *chip_info)
     int i;
     int offset;
 
-    TPD_INFO("%s enter.\n", __func__);
+    TPD_DEBUG("%s enter.\n", __func__);
 
     // compare file length with the length field in the firmware header
     if (chip_info->update_info.fw_length < FW_HEAD_SIZE) {
-        TPD_INFO("Bad firmware!(file length: %d)\n", chip_info->update_info.fw_length);
+        TPD_DEBUG("Bad firmware!(file length: %d)\n", chip_info->update_info.fw_length);
         return -1;
     }
 
@@ -1029,7 +1029,7 @@ static int gt1x_check_firmware_data(struct chip_data_gt5688 *chip_info)
     }
 
     if (getU32(p) + 6 != chip_info->update_info.fw_length) {
-        TPD_INFO("Bad firmware!(file length: %d, header define: %d)\n", chip_info->update_info.fw_length, getU32(p));
+        TPD_DEBUG("Bad firmware!(file length: %d, header define: %d)\n", chip_info->update_info.fw_length, getU32(p));
         return -1;
     }
     // check firmware's checksum
@@ -1043,7 +1043,7 @@ static int gt1x_check_firmware_data(struct chip_data_gt5688 *chip_info)
         checksum += p[0];
     }
 
-    TPD_INFO("firmware checksum: 0x%04X, firmware image define: 0x%04X\n", checksum, checksum_in_firmware_image);
+    TPD_DEBUG("firmware checksum: 0x%04X, firmware image define: 0x%04X\n", checksum, checksum_in_firmware_image);
 
     if (checksum != checksum_in_firmware_image) {
         return -1;
@@ -1070,11 +1070,11 @@ static int gt1x_check_firmware_data(struct chip_data_gt5688 *chip_info)
     }
 
     // print update information
-    TPD_INFO("Firmware length: %d\n", chip_info->update_info.fw_length);
-    TPD_INFO("Firmware product: GT%s\n", chip_info->update_info.firmware->pid);
-    TPD_INFO("Firmware patch: %02X%02X%02X\n", chip_info->update_info.firmware->version[0], chip_info->update_info.firmware->version[1], chip_info->update_info.firmware->version[2]);
-    TPD_INFO("Firmware chip: 0x%02X\n", chip_info->update_info.firmware->chip_type);
-    TPD_INFO("Subsystem count: %d\n", chip_info->update_info.firmware->subsystem_count);
+    TPD_DEBUG("Firmware length: %d\n", chip_info->update_info.fw_length);
+    TPD_DEBUG("Firmware product: GT%s\n", chip_info->update_info.firmware->pid);
+    TPD_DEBUG("Firmware patch: %02X%02X%02X\n", chip_info->update_info.firmware->version[0], chip_info->update_info.firmware->version[1], chip_info->update_info.firmware->version[2]);
+    TPD_DEBUG("Firmware chip: 0x%02X\n", chip_info->update_info.firmware->chip_type);
+    TPD_DEBUG("Subsystem count: %d\n", chip_info->update_info.firmware->subsystem_count);
     for (i = 0; i < chip_info->update_info.firmware->subsystem_count; i++) {
         TPD_DEBUG("------------------------------------------\n");
         TPD_DEBUG("Subsystem: %d\n", i);
@@ -1084,7 +1084,7 @@ static int gt1x_check_firmware_data(struct chip_data_gt5688 *chip_info)
         TPD_DEBUG("Offset: %d\n", chip_info->update_info.firmware->subsystem[i].offset);
     }
 
-    TPD_INFO("%s end.\n", __func__);
+    TPD_DEBUG("%s end.\n", __func__);
 
     return 0;
 }
@@ -1096,42 +1096,42 @@ s32 gt1x_request_event_handler(struct chip_data_gt5688 *chip_info)
     u8 noise_data = 0;
     ret = touch_i2c_read_block(chip_info->client, GTP_REG_RQST, 1, &rqst_data);
     if (ret < 0) {
-        TPD_INFO("I2C transfer error. errno:%d\n", ret);
+        TPD_DEBUG("I2C transfer error. errno:%d\n", ret);
         return -1;
     }
 
-    TPD_INFO("Request state:0x%02x.\n", rqst_data);
+    TPD_DEBUG("Request state:0x%02x.\n", rqst_data);
 
     switch (rqst_data & 0x0F) {
         case GTP_RQST_CONFIG:
-            TPD_INFO("Request Config.\n");
+            TPD_DEBUG("Request Config.\n");
             ret = gt1x_send_cfg(chip_info->client, chip_info->config_info.gt1x_config, chip_info->config_info.gt1x_cfg_length);
             if (ret) {
-                TPD_INFO("Send gt1x_config error.\n");
+                TPD_DEBUG("Send gt1x_config error.\n");
             } else {
-                TPD_INFO("Send gt1x_config success.\n");
+                TPD_DEBUG("Send gt1x_config success.\n");
                 rqst_data = GTP_RQST_RESPONDED;
                 ret = touch_i2c_write_block(chip_info->client, GTP_REG_RQST, 1, &rqst_data);
             }
             break;
 
         case GTP_RQST_RESET:
-            TPD_INFO("Request Reset.\n");
+            TPD_DEBUG("Request Reset.\n");
             //  gt1x_reset_guitar();
             rqst_data = GTP_RQST_RESPONDED;
             ret = touch_i2c_write_block(chip_info->client, GTP_REG_RQST, 1, &rqst_data);
             break;
 
         case GTP_RQST_BAK_REF:
-            TPD_INFO("Request Ref.\n");
+            TPD_DEBUG("Request Ref.\n");
             break;
 
         case GTP_RQST_MAIN_CLOCK:
-            TPD_INFO("Request main clock.\n");
+            TPD_DEBUG("Request main clock.\n");
             break;
 
         case GTP_RQST_IDLE:
-            TPD_INFO("Idle, invalid request.\n");
+            TPD_DEBUG("Idle, invalid request.\n");
             return 0;
         default:
             break;
@@ -1140,21 +1140,21 @@ s32 gt1x_request_event_handler(struct chip_data_gt5688 *chip_info)
     //noise
     ret = touch_i2c_read_block(chip_info->client, GTP_NOISE_DETECT_REG, 1, &noise_data);
     if (ret < 0) {
-        TPD_INFO("I2C transfer error. errno:%d\n", ret);
+        TPD_DEBUG("I2C transfer error. errno:%d\n", ret);
         return -1;
     }
 
-    TPD_INFO("randy:noise_data = 0x%x\n", noise_data);
+    TPD_DEBUG("randy:noise_data = 0x%x\n", noise_data);
 
     if ((noise_data & 0x20) == 0x20) {
-        TPD_INFO("Send Noise config!\n");
+        TPD_DEBUG("Send Noise config!\n");
         if ((gt1x_init_panel(chip_info, CFG_NOISE)) != 0) {
-            TPD_INFO("Send Noise config failed.\n");
+            TPD_DEBUG("Send Noise config failed.\n");
         }
     } else if ((noise_data & 0x40) == 0x40) {
         TPD_DEBUG("Send normal config!\n");
         if ((gt1x_init_panel(chip_info, CFG_NORMAL)) != 0) {
-            TPD_INFO("Send normal config failed.\n");
+            TPD_DEBUG("Send normal config failed.\n");
         }
     }
 
@@ -1172,7 +1172,7 @@ static void goodix_finger_protect_data_get(struct chip_data_gt5688 *chip_info)
     chip_info->spuri_fp_touch_raw_data = kzalloc(TX_NUM * RX_NUM * sizeof(u16), GFP_KERNEL);
     addr = GTP_REG_RAWDATA;
 
-    TPD_INFO("%s start\n", __func__);
+    TPD_DEBUG("%s start\n", __func__);
     gt1x_rawdiff_mode = 1;
     gt1x_send_cmd(chip_info->client, 1, 0);
     touch_i2c_write_byte(chip_info->client, GTP_READ_COOR_ADDR, 0);
@@ -1180,22 +1180,22 @@ static void goodix_finger_protect_data_get(struct chip_data_gt5688 *chip_info)
     //wait for data ready
     while(i++ < 10) {
         ret = touch_i2c_read_block(chip_info->client, GTP_READ_COOR_ADDR, 1, raw_data);
-        TPD_INFO("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
+        TPD_DEBUG("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
         if(ret && ((raw_data[0] & 0x80) == 0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(5);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
     ret = touch_i2c_read_block(chip_info->client, addr, TX_NUM * RX_NUM * 2, raw_data);
 
     for(i = 0; i < RX_NUM; i++) {
-        //TPD_INFO("[%2d] ", i);
+        //TPD_DEBUG("[%2d] ", i);
         for(j = 0; j < TX_NUM; j++) {
             chip_info->spuri_fp_touch_raw_data[i * TX_NUM + j] = (s16)(raw_data[i * TX_NUM * 2 + j * 2] << 8) + raw_data[i * TX_NUM * 2 + j * 2 + 1];
             //printk("%d ",chip_info->spuri_fp_touch_raw_data[i * TX_NUM + j]);
@@ -1222,14 +1222,14 @@ static int goodix_get_chip_info(void *chip_data)
     /* read version information */
     ret = gt1x_read_version(chip_info);
     if (ret != 0) {
-        TPD_INFO("Get verision failed!\n");
+        TPD_DEBUG("Get verision failed!\n");
         return ret;
     }
 
     /* send config data */
     ret = gt1x_init_panel(chip_info, CFG_NORMAL);
     if (ret != 0) {
-        TPD_INFO("Init panel failed.\n");
+        TPD_DEBUG("Init panel failed.\n");
         return ret;
     }
 
@@ -1253,7 +1253,7 @@ static int goodix_power_control(void *chip_data, bool enable)
             return -1;
 
         /*if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
-            TPD_INFO("Set the reset_gpio.\n");
+            TPD_DEBUG("Set the reset_gpio.\n");
             gpio_direction_output(chip_info->hw_res->reset_gpio, 1);
         }*/
 
@@ -1280,7 +1280,7 @@ static int goodix_ftm_process(void *chip_data)
 {
     struct chip_data_gt5688 *chip_info = (struct chip_data_gt5688 *)chip_data;
 
-    TPD_INFO("FTM regulator_disable is called\n");
+    TPD_DEBUG("FTM regulator_disable is called\n");
     tp_powercontrol_2v8(chip_info->hw_res, false);
 
     return 0;
@@ -1310,7 +1310,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
         gt1x_i2c_read_dbl_check(chip_info->client, GTP_REG_FW_CHK_SUBSYS, &reg_val[1], 1);
 
         if (reg_val[0] != 0xBE || reg_val[1] == 0xAA) {
-            TPD_INFO("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
+            TPD_DEBUG("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
         } else {
             break;
         }
@@ -1325,7 +1325,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
     if (panel_data->manufacture_info.version)
         strlcpy(&panel_data->manufacture_info.version[8], fw_id, MAX_DEVICE_VERSION_LENGTH - 8);
 
-    TPD_INFO("%s: TP_FW = 0x%x \n", __func__, panel_data->TP_FW);
+    TPD_DEBUG("%s: TP_FW = 0x%x \n", __func__, panel_data->TP_FW);
 
     return FW_NORMAL;
 }
@@ -1344,10 +1344,10 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     struct chip_data_gt5688 *chip_info = (struct chip_data_gt5688 *)chip_data;
     struct gt1x_version_info ver_info = chip_info->ver_info;
 
-    TPD_INFO("%s enter!\n", __func__);
+    TPD_DEBUG("%s enter!\n", __func__);
 
     if (chip_info->update_info.status != UPDATE_STATUS_IDLE) {
-        TPD_INFO("Update process is running!\n");
+        TPD_DEBUG("Update process is running!\n");
         return FW_NO_NEED_UPDATE;
     }
     chip_info->update_info.status = UPDATE_STATUS_RUNNING;
@@ -1359,14 +1359,14 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     chip_info->update_info.firmware = (struct fw_info *)kzalloc(sizeof(struct fw_info), GFP_KERNEL);
     if (chip_info->update_info.firmware == NULL) {
-        TPD_INFO("Alloc %zu bytes memory fail.\n", sizeof(struct fw_info));
+        TPD_DEBUG("Alloc %zu bytes memory fail.\n", sizeof(struct fw_info));
 
         return FW_NO_NEED_UPDATE;
     }
 
     chip_info->update_info.buffer = (u8 *) kzalloc(1024 * 4, GFP_KERNEL);
     if (chip_info->update_info.buffer == NULL) {
-        TPD_INFO("Alloc %d bytes memory fail.\n", 1024 * 4);
+        TPD_DEBUG("Alloc %d bytes memory fail.\n", 1024 * 4);
         kfree(chip_info->update_info.firmware);
         return FW_NO_NEED_UPDATE;
     }
@@ -1374,7 +1374,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     ret = gt1x_check_firmware_data(chip_info);
     if (ret < 0) {
         chip_info->update_info.status = UPDATE_STATUS_ABORT;
-         TPD_INFO("gt1x_check_firmware_data fail\n");
+         TPD_DEBUG("gt1x_check_firmware_data fail\n");
         goto gt1x_no_update_exit;
     }
 
@@ -1386,7 +1386,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
         gt1x_i2c_read_dbl_check(chip_info->client, GTP_REG_FW_CHK_SUBSYS, &reg_val[1], 1);
 
         if (reg_val[0] != 0xBE || reg_val[1] == 0xAA) {
-            TPD_INFO("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
+            TPD_DEBUG("Check fw status reg not pass, reg[0x814E] = 0x%2X, reg[0x5095] = 0x%2X!, retry = %d\n", reg_val[0], reg_val[1], retry);
         } else {
             break;
         }
@@ -1403,12 +1403,12 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
         fw_ver_info.product_id[4] = 0;
 
         if (memcmp(fw_ver_info.product_id, ver_info.product_id, 4)) {
-            TPD_INFO("Product id is not match!\n");
+            TPD_DEBUG("Product id is not match!\n");
             goto gt1x_no_update_exit;
         }
 
         if ((fw_ver_info.mask_id & 0xFFFFFF00) != (ver_info.mask_id & 0xFFFFFF00)) {
-            TPD_INFO("Mask id is not match!\n");
+            TPD_DEBUG("Mask id is not match!\n");
             goto gt1x_no_update_exit;
         }
 
@@ -1422,7 +1422,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     p = gt1x_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset, chip_info->update_info.firmware->subsystem[0].length);
     if (p == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         chip_info->update_info.status = UPDATE_STATUS_ABORT;
         goto gt1x_update_exit;
     }
@@ -1431,7 +1431,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     gt1x_select_addr(chip_info->client, chip_info->hw_res);
     ret = gt1x_run_ss51_isp(chip_info->client, p, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         goto gt1x_update_exit;
     }
 
@@ -1440,13 +1440,13 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     msleep(800);
 
     for (i = 1; i < chip_info->update_info.firmware->subsystem_count; i++) {
-        TPD_INFO("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
-        TPD_INFO("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
-        TPD_INFO("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
+        TPD_DEBUG("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
+        TPD_DEBUG("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
+        TPD_DEBUG("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
 
         ret = gt1x_burn_subsystem(chip_info, &(chip_info->update_info.firmware->subsystem[i]));
         if (ret) {
-            TPD_INFO("burn subsystem fail!\n");
+            TPD_DEBUG("burn subsystem fail!\n");
             goto gt1x_update_exit;
         }
         chip_info->update_info.progress++;
@@ -1456,7 +1456,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
 
     p = gt1x_get_fw_data(chip_info, chip_info->update_info.firmware->subsystem[0].offset, chip_info->update_info.firmware->subsystem[0].length);
     if (p == NULL) {
-        TPD_INFO("get isp fail\n");
+        TPD_DEBUG("get isp fail\n");
         goto gt1x_update_exit;
     }
     chip_info->update_info.progress++;
@@ -1464,16 +1464,16 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     gt1x_select_addr(chip_info->client, chip_info->hw_res);
     ret = gt1x_run_ss51_isp(chip_info->client, p, chip_info->update_info.firmware->subsystem[0].length);
     if (ret) {
-        TPD_INFO("run isp fail\n");
+        TPD_DEBUG("run isp fail\n");
         goto gt1x_update_exit;
     }
     chip_info->update_info.progress++;
 
-    TPD_INFO("Reset guitar & check firmware in flash.\n");
+    TPD_DEBUG("Reset guitar & check firmware in flash.\n");
     for (i = 1; i < chip_info->update_info.firmware->subsystem_count; i++) {
-        TPD_INFO("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
-        TPD_INFO("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
-        TPD_INFO("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
+        TPD_DEBUG("subsystem: %d\n", chip_info->update_info.firmware->subsystem[i].type);
+        TPD_DEBUG("Length: %d\n", chip_info->update_info.firmware->subsystem[i].length);
+        TPD_DEBUG("Address: %d\n", chip_info->update_info.firmware->subsystem[i].address);
 
         ret = gt1x_check_subsystem_in_flash(chip_info, &(chip_info->update_info.firmware->subsystem[i]));
         if (ret) {
@@ -1483,7 +1483,7 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     }
     chip_info->update_info.progress++;
 
-    TPD_INFO("%s end.\n", __func__);
+    TPD_DEBUG("%s end.\n", __func__);
 
 gt1x_update_exit:
     kfree(chip_info->update_info.buffer);
@@ -1492,14 +1492,14 @@ gt1x_update_exit:
 
     if (ret) {
         chip_info->update_info.progress = 2 * chip_info->update_info.max_progress;
-        TPD_INFO("Update firmware failed!\n");
+        TPD_DEBUG("Update firmware failed!\n");
         return FW_UPDATE_ERROR;
     } else {
         if (!retry){  // when firmware check fail , it need to init panel again.
             /* send config data */
             gt1x_init_panel(chip_info, CFG_NORMAL);
         }
-        TPD_INFO("Update firmware succeefully!\n");
+        TPD_DEBUG("Update firmware succeefully!\n");
         return FW_UPDATE_SUCCESS;
     }
 
@@ -1517,7 +1517,7 @@ static int goodix_clear_irq(struct i2c_client*client)
     if (!gt1x_rawdiff_mode) {
         ret = touch_i2c_write_byte(client, GTP_READ_COOR_ADDR, 0);
         if (ret < 0) {
-            TPD_INFO("I2C write end_cmd  error!\n");
+            TPD_DEBUG("I2C write end_cmd  error!\n");
         }
     }
 
@@ -1544,7 +1544,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
     memset(chip_info->touch_data, 0, MAX_GT_IRQ_DATA_LENGTH);
     ret = touch_i2c_read_byte(chip_info->client, GTP_READ_COOR_ADDR);
     if (ret < 0) {
-        TPD_INFO("I2C transfer error!\n");
+        TPD_DEBUG("I2C transfer error!\n");
         trigger_event = 0;
 
         return IRQ_EXCEPTION;
@@ -1569,7 +1569,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
      */
     ret = touch_i2c_read_block(chip_info->client, (GTP_READ_COOR_ADDR + 1), 8 * touch_num + 2, &chip_info->touch_data[1]);
     if (ret < 0) {
-        TPD_INFO("read coor_addr failed!\n");
+        TPD_DEBUG("read coor_addr failed!\n");
         return IRQ_IGNORE;
     }
     /* cacl checksum */
@@ -1586,7 +1586,7 @@ static u8 goodix_trigger_reason(void *chip_data, int gesture_enable, int is_susp
             check_sum += chip_info->touch_data[i];
         }
         if (check_sum) {
-            TPD_INFO("Checksum error[%x]\n", check_sum);
+            TPD_DEBUG("Checksum error[%x]\n", check_sum);
             goto IGNORE_CLEAR_IRQ;
         }
     }
@@ -1640,7 +1640,7 @@ static int goodix_get_touch_points(void *chip_data, struct point_info *points, i
 
     touch_num = chip_info->touch_data[0] & 0x0F;
     if (touch_num > max_num) {
-        TPD_INFO("Illegal finger number!");
+        TPD_DEBUG("Illegal finger number!");
         goto END_TOUCH;
     }
     if (touch_num == 0) { //Up event
@@ -1714,7 +1714,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
     ret = touch_i2c_read_block(client, GTP_REG_WAKEUP_GESTURE, 2, doze_buf);
     TPD_DEBUG("0x814C = 0x%02X, ret = %d\n", doze_buf[0], ret);
     if (ret < 0) {
-        TPD_INFO("Read Gesture info i2c faild\n");
+        TPD_DEBUG("Read Gesture info i2c faild\n");
         return -1;
     }
 
@@ -1729,7 +1729,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
 
         ret = touch_i2c_read_block(client, GTP_REG_WAKEUP_GESTURE_DETAIL, coordinate_size*4, coordinate_single);
         touch_i2c_write_byte(client, GTP_REG_WAKEUP_GESTURE, 0x00);
-        TPD_INFO("clear irq\n");
+        TPD_DEBUG("clear irq\n");
         switch (doze_buf[0]) {
             case DTAP_DETECT:
                 gesture->gesture_type  = DouTap;
@@ -1789,7 +1789,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
                     Point_input[i].x = coordinate_single[j]   | (coordinate_single[j + 1] << 8);
                     Point_input[i].y = coordinate_single[j + 2] | (coordinate_single[j + 3] << 8);
                     j = j + 4;
-                    //TPD_INFO("Point_input[%d].x = %d, Point_input[%d].y = %d\n", i, Point_input[i].x, i, Point_input[i].y);
+                    //TPD_DEBUG("Point_input[%d].x = %d, Point_input[%d].y = %d\n", i, Point_input[i].x, i, Point_input[i].y);
                 }
 
                 gesture->clockwise = ClockWise(&Point_input[0], coordinate_size - 2);
@@ -1897,7 +1897,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info * gestur
                 break;
         }
 
-        TPD_INFO("%s, gesture_sign = 0x%x, gesture_type = %d | %d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d\n",
+        TPD_DEBUG("%s, gesture_sign = 0x%x, gesture_type = %d | %d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d:%d,%d\n",
             __func__, doze_buf[0], gesture->gesture_type,
             gesture->Point_start.x, gesture->Point_start.y, gesture->Point_end.x, gesture->Point_end.y,
             gesture->Point_1st.x, gesture->Point_1st.y, gesture->Point_2nd.x, gesture->Point_2nd.y,
@@ -1912,7 +1912,7 @@ static int goodix_enable_edge_limit(struct chip_data_gt5688 *chip_info, bool ena
 {
     int ret = -1;
 
-    TPD_INFO("%s, edge limit enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, edge limit enable = %d\n", __func__, enable);
 
     if (enable) {
         ret = gt1x_send_cmd(chip_info->client, GOODIX_ENABLE_EDGE, 0);
@@ -1969,18 +1969,18 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = goodix_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: goodix enable edge limit failed.\n", __func__);
+                TPD_DEBUG("%s: goodix enable edge limit failed.\n", __func__);
                 return ret;
             }
             break;
         case MODE_CHARGE:
             ret = goodix_set_charger_state(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: set charger state failed %d\n", __func__, flag);
+                TPD_DEBUG("%s: set charger state failed %d\n", __func__, flag);
             }
             break;
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -1999,7 +1999,7 @@ static int goodix_esd_handle(void *chip_data)
         if (ret && esd_buf[0] != 0xAA && esd_buf[3] == 0xAA) {
             break;
         }
-        TPD_INFO("[Esd]0x8040 = 0x%02X, 0x8043 = 0x%02X gt1x_rawdiff_mode = %d\n", esd_buf[0], esd_buf[3], gt1x_rawdiff_mode);
+        TPD_DEBUG("[Esd]0x8040 = 0x%02X, 0x8043 = 0x%02X gt1x_rawdiff_mode = %d\n", esd_buf[0], esd_buf[3], gt1x_rawdiff_mode);
         msleep(50);
     }
 
@@ -2013,7 +2013,7 @@ static int goodix_esd_handle(void *chip_data)
             gt1x_send_cmd(chip_info->client, GTP_CMD_ESD, 0);
         }
     } else {
-        TPD_INFO("IC works abnormally! Process esd reset.");
+        TPD_DEBUG("IC works abnormally! Process esd reset.");
 
         memset(esd_buf, 0x01, sizeof(esd_buf));
         touch_i2c_write_block(chip_info->client, 0x4226, sizeof(esd_buf), esd_buf);
@@ -2040,7 +2040,7 @@ static int goodix_esd_handle(void *chip_data)
 
         enable_irq(chip_info->client->irq);
 
-        TPD_INFO("Goodix esd reset over.");
+        TPD_DEBUG("Goodix esd reset over.");
         return -1;
     }
 
@@ -2060,7 +2060,7 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
     kernel_buf = kzalloc(4096,GFP_KERNEL);
     if(kernel_buf == NULL)
     {
-        TPD_INFO("%s kmalloc error\n", __func__);
+        TPD_DEBUG("%s kmalloc error\n", __func__);
         return ;
     }
     switch (debug_type) {
@@ -2078,20 +2078,20 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
     gt1x_send_cmd(client, 1, 0);
     msleep(20);
     touch_i2c_write_byte(client, GTP_READ_COOR_ADDR, 0);
-    TPD_INFO("%d,%s\n", __LINE__, __func__);
+    TPD_DEBUG("%d,%s\n", __LINE__, __func__);
 
     //wait for data ready
     while(i++ < 10) {
         ret = touch_i2c_read_block(client, GTP_READ_COOR_ADDR, 1, kernel_buf);
-        TPD_INFO("ret = %d \t kernel_buf = %d\n", ret, kernel_buf[0]);
+        TPD_DEBUG("ret = %d \t kernel_buf = %d\n", ret, kernel_buf[0]);
         if(ret && ((kernel_buf[0] & 0x80)==0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(20);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
@@ -2132,7 +2132,7 @@ static void goodix_config_info_read(struct seq_file *s, void *chip_data)
     seq_printf(s, "\n");
     seq_printf(s, "==== GT1X config read from chip====\n");
     ret = touch_i2c_read_block(client, GTP_REG_CONFIG_DATA, GTP_CONFIG_MAX_LENGTH, temp_data);
-    TPD_INFO("I2C TRANSFER: %d", ret);
+    TPD_DEBUG("I2C TRANSFER: %d", ret);
 
     for(i = 0; i < GTP_CONFIG_MAX_LENGTH; i++) {
         seq_printf(s, "0x%02X, ", temp_data[i]);
@@ -2166,7 +2166,7 @@ fp_touch_state goodix_spurious_fp_check(void *chip_data)
     TX_NUM = chip_info->hw_res->TX_NUM;
     RX_NUM = chip_info->hw_res->RX_NUM;
 
-    TPD_INFO("%s start!\n", __func__);
+    TPD_DEBUG("%s start!\n", __func__);
     disable_irq_nosync(chip_info->client->irq);
     goodix_reset(chip_info);
     gt1x_rawdiff_mode = 1;
@@ -2176,36 +2176,36 @@ fp_touch_state goodix_spurious_fp_check(void *chip_data)
     //wait for data ready
     while(i++ < 10) {
         ret = touch_i2c_read_block(chip_info->client, GTP_READ_COOR_ADDR, 1, raw_data);
-        TPD_INFO("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
+        TPD_DEBUG("ret = %d \t kernel_buf = %d\n", ret, raw_data[0]);
         if(ret && ((raw_data[0] & 0x80) == 0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(5);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
     ret = touch_i2c_read_block(chip_info->client, addr, TX_NUM * RX_NUM * 2, raw_data);
 
     for(i = RX_NUM - SPURIOUS_FP_RX_NUM; i < RX_NUM - 1; i++) {
-        TPD_INFO("[%d]:", i);
+        TPD_DEBUG("[%d]:", i);
         for(j = 1; j < TX_NUM - 1; j++) {
             raw_data_get = (s16)(raw_data [i * TX_NUM * 2 + j * 2] << 8) + raw_data [i * TX_NUM * 2 + j * 2 + 1];
             raw_data_base = chip_info->spuri_fp_touch_raw_data[i * TX_NUM + j];
             delta_data = raw_data_get - raw_data_base;
             printk("%d ",delta_data);
             if(delta_data + 90 < 0) {
-                TPD_INFO("delta_data too large, delta_data = %d\n", delta_data);
+                TPD_DEBUG("delta_data too large, delta_data = %d\n", delta_data);
                 error_count++;
             }
         }
         printk("\n");
         if(error_count > 2) {
             fp_touch_state = FINGER_PROTECT_TOUCH_DOWN;
-            TPD_INFO("finger protect trigger!report_finger_protect = %d\n", fp_touch_state);
+            TPD_DEBUG("finger protect trigger!report_finger_protect = %d\n", fp_touch_state);
             error_count = 0;
             break;
         } else {
@@ -2372,11 +2372,11 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
     struct chip_data_gt5688 *chip_info;
     struct touchpanel_data *ts = NULL;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     //step1:Alloc chip_info
     chip_info = kzalloc(sizeof(struct chip_data_gt5688), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -2385,7 +2385,7 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
     //step2:Alloc common ts
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -2394,7 +2394,7 @@ static int gt1x_ts_probe(struct i2c_client *client, const struct i2c_device_id *
     chip_info->touch_data = kzalloc(MAX_GT_IRQ_DATA_LENGTH, GFP_KERNEL);
     if (chip_info->touch_data == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("chip_info->touch_data kzalloc error\n");
+        TPD_DEBUG("chip_info->touch_data kzalloc error\n");
         goto touch_data_malloc_failed;
     }
 
@@ -2445,7 +2445,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
 
     return ret;
 }
@@ -2459,7 +2459,7 @@ static int gt1x_pm_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -2474,7 +2474,7 @@ static int gt1x_pm_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2505,7 +2505,7 @@ static int gt1x_ts_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -2527,12 +2527,12 @@ static struct i2c_driver gt1x_ts_driver = {
 
 static int __init gt1x_ts_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     tp_judge_ic_match("gt5688");
 
     if (i2c_add_driver(&gt1x_ts_driver) != 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
 

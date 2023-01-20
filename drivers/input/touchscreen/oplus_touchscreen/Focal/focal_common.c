@@ -87,7 +87,7 @@ static int hex_to_str(char *hex, int iHexLen, char *ch, int *iChLen)
         return -1;
     }
 
-    TPD_INFO("iHexLen: %d in function:%s!!\n", iHexLen, __func__);
+    TPD_DEBUG("iHexLen: %d in function:%s!!\n", iHexLen, __func__);
 
     if (iHexLen % 2 == 1) {
         return -2;
@@ -110,7 +110,7 @@ static int hex_to_str(char *hex, int iHexLen, char *ch, int *iChLen)
     }
     ch[iCharLen] = '\0';
     *iChLen = iCharLen;
-    TPD_INFO("iCharLen: %d, iChLen: %d in function:%s!!\n", iCharLen, *iChLen, __func__);
+    TPD_DEBUG("iCharLen: %d, iChLen: %d in function:%s!!\n", iCharLen, *iChLen, __func__);
     return 0;
 }
 
@@ -164,12 +164,12 @@ static ssize_t focal_irq_store(struct device *dev, struct device_attribute *attr
         if (ts) {
             enable_irq(ts->irq);
         }
-        TPD_INFO("[EX-FUN]enable irq\n");
+        TPD_DEBUG("[EX-FUN]enable irq\n");
     } else if ((strcmp(buf, "0")  == 0) || (strcmp(buf, "off") == 0)) {
         if (ts) {
             disable_irq_nosync(ts->irq);
         }
-        TPD_INFO("[EX-FUN]disable irq\n");
+        TPD_DEBUG("[EX-FUN]disable irq\n");
     }
     return count;
 }
@@ -247,7 +247,7 @@ static ssize_t focal_rw_reg_store(struct device *dev, struct device_attribute *a
     memset(valbuf, 0, sizeof(valbuf));
     num_read_chars = count - 1;
     if ((num_read_chars != 2) && (num_read_chars != 4)) {
-        TPD_INFO("please input 2 or 4 character\n");
+        TPD_DEBUG("please input 2 or 4 character\n");
         goto error_return;
     }
 
@@ -267,7 +267,7 @@ static ssize_t focal_rw_reg_store(struct device *dev, struct device_attribute *a
     }
 
     if (0 != retval) {
-        TPD_INFO("%s() - ERROR: Could not convert the given input to a number. The given input was: %s\n", __func__, buf);
+        TPD_DEBUG("%s() - ERROR: Could not convert the given input to a number. The given input was: %s\n", __func__, buf);
         goto error_return;
     }
 
@@ -286,10 +286,10 @@ static ssize_t focal_rw_reg_store(struct device *dev, struct device_attribute *a
         regaddr = wmreg;
         regvalue = touch_i2c_read_byte(ts->client, regaddr);
         if (regvalue < 0)  {
-            TPD_INFO("Could not read the register(0x%02x)\n", regaddr);
+            TPD_DEBUG("Could not read the register(0x%02x)\n", regaddr);
             g_rwreg_result.result = -1;
         } else {
-            TPD_INFO("the register(0x%02x) is 0x%02x\n", regaddr, regvalue);
+            TPD_DEBUG("the register(0x%02x) is 0x%02x\n", regaddr, regvalue);
             g_rwreg_result.value = regvalue;
             g_rwreg_result.result = 0;
         }
@@ -302,10 +302,10 @@ static ssize_t focal_rw_reg_store(struct device *dev, struct device_attribute *a
         g_rwreg_result.value = regvalue;
         g_rwreg_result.result = touch_i2c_write_byte(ts->client, regaddr, regvalue);
         if (g_rwreg_result.result < 0) {
-            TPD_INFO("Could not write the register(0x%02x)\n", regaddr);
+            TPD_DEBUG("Could not write the register(0x%02x)\n", regaddr);
 
         } else {
-            TPD_INFO("Write 0x%02x into register(0x%02x) successful\n", regvalue, regaddr);
+            TPD_DEBUG("Write 0x%02x into register(0x%02x) successful\n", regvalue, regaddr);
             g_rwreg_result.result = 0;
         }
     }
@@ -326,7 +326,7 @@ static ssize_t focal_esdcheck_store(struct device *dev, struct device_attribute 
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s:esd store(%s)", __func__, buf);
+    TPD_DEBUG("%s:esd store(%s)", __func__, buf);
     if (ts->esd_handle_support) {
         if ((memcmp(buf, "1", 1)  == 0) || (memcmp(buf, "on", 2) == 0)) {
             esd_handle_switch(&ts->esd_info, true);
@@ -417,11 +417,11 @@ int focal_create_sysfs(struct i2c_client *client)
     int err = -1;
     err = sysfs_create_group(&client->dev.kobj, &focal_attribute_group);
     if (0 != err) {
-        TPD_INFO("[EX]: sysfs_create_group() failed!\n");
+        TPD_DEBUG("[EX]: sysfs_create_group() failed!\n");
         sysfs_remove_group(&client->dev.kobj, &focal_attribute_group);
         return -EIO;
     } else {
-        TPD_INFO("[EX]: sysfs_create_group() succeeded!\n");
+        TPD_DEBUG("[EX]: sysfs_create_group() succeeded!\n");
     }
     return err;
 }
@@ -433,12 +433,12 @@ int focal_create_sysfs_spi(struct spi_device *spi)
 	err = sysfs_create_group(&spi->dev.kobj, &focal_attribute_group);
 
 	if (0 != err) {
-		TPD_INFO("[EX]: sysfs_create_group() failed!\n");
+		TPD_DEBUG("[EX]: sysfs_create_group() failed!\n");
 		sysfs_remove_group(&spi->dev.kobj, &focal_attribute_group);
 		return -EIO;
 
 	} else {
-		TPD_INFO("[EX]: sysfs_create_group() succeeded!\n");
+		TPD_DEBUG("[EX]: sysfs_create_group() succeeded!\n");
 	}
 
 	return err;
@@ -466,7 +466,7 @@ static ssize_t focal_debug_write(struct file *filp, const char __user *buff, siz
     focal_debug_ops = (struct focal_debug_func *)ts->private_data;
 
     if (copy_from_user(&writebuf, buff, buflen)) {
-        TPD_INFO("[APK]: copy from user error!\n");
+        TPD_DEBUG("[APK]: copy from user error!\n");
         return -EFAULT;
     }
     writebuf[WRITE_BUF_SIZE - 1] = '\0';
@@ -476,7 +476,7 @@ static ssize_t focal_debug_write(struct file *filp, const char __user *buff, siz
     proc_operate_mode = writebuf[0];
     switch (proc_operate_mode) {
     case PROC_SET_TEST_FLAG:
-        TPD_INFO("[APK]: PROC_SET_TEST_FLAG = %x!\n", writebuf[1]);
+        TPD_DEBUG("[APK]: PROC_SET_TEST_FLAG = %x!\n", writebuf[1]);
         if (ts->esd_handle_support && !ts->is_suspended) {
             if (writebuf[1] == 1) {
                 esd_handle_switch(&ts->esd_info, false);
@@ -489,21 +489,21 @@ static ssize_t focal_debug_write(struct file *filp, const char __user *buff, siz
         writelen = 1;
         ret = touch_i2c_write(ts->client, writebuf + 1, writelen);
         if (ret < 0) {
-            TPD_INFO("[APK]: write iic error!\n");
+            TPD_DEBUG("[APK]: write iic error!\n");
         }
         break;
     case PROC_WRITE_REGISTER:
         writelen = 2;
         ret = touch_i2c_write(ts->client, writebuf + 1, writelen);
         if (ret < 0) {
-            TPD_INFO("[APK]: write iic error!\n");
+            TPD_DEBUG("[APK]: write iic error!\n");
         }
         break;
     case PROC_HW_RESET:
         snprintf(tmp, sizeof(tmp), "%s", (char *)writebuf + 1);
         tmp[buflen - 1] = '\0';
         if (strncmp(tmp, "focal_driver", 12) == 0) {
-            TPD_INFO("Begin HW Reset\n");
+            TPD_DEBUG("Begin HW Reset\n");
             if (focal_debug_ops && focal_debug_ops->reset) {
                 focal_debug_ops->reset(ts->chip_data, 1);
             }
@@ -515,7 +515,7 @@ static ssize_t focal_debug_write(struct file *filp, const char __user *buff, siz
         if (writelen > 0) {
             ret = touch_i2c_write(ts->client, writebuf + 1, writelen);
             if (ret < 0) {
-                TPD_INFO("[APK]: write iic error!\n");
+                TPD_DEBUG("[APK]: write iic error!\n");
             }
         }
         break;
@@ -565,7 +565,7 @@ static ssize_t focal_debug_read(struct file *filp, char __user *buff, size_t cou
                     focal_debug_ops->esd_check_enable(ts->chip_data, true);
                 }
             }
-            TPD_INFO("[APK]: read i2c error!\n");
+            TPD_DEBUG("[APK]: read i2c error!\n");
             mutex_unlock(&ts->mutex);
             return ret;
         }
@@ -580,7 +580,7 @@ static ssize_t focal_debug_read(struct file *filp, char __user *buff, size_t cou
                     focal_debug_ops->esd_check_enable(ts->chip_data, true);
                 }
             }
-            TPD_INFO("[APK]: read iic error!\n");
+            TPD_DEBUG("[APK]: read iic error!\n");
             mutex_unlock(&ts->mutex);
             return ret;
         }
@@ -602,7 +602,7 @@ static ssize_t focal_debug_read(struct file *filp, char __user *buff, size_t cou
     }
 
     if (copy_to_user(buff, buf, num_read_chars)) {
-        TPD_INFO("[APK]: copy to user error!\n");
+        TPD_DEBUG("[APK]: copy to user error!\n");
         return -EFAULT;
     }
 
@@ -643,7 +643,7 @@ static ssize_t proc_grip_control_write(struct file *file, const char __user *buf
     if (ts->is_suspended == 0) {
         ret = ts->ts_ops->mode_switch(ts->chip_data, MODE_EDGE, ts->limit_edge);
         if (ret < 0) {
-            TPD_INFO("%s, Touchpanel operate mode switch failed\n", __func__);
+            TPD_DEBUG("%s, Touchpanel operate mode switch failed\n", __func__);
         }
     }
     mutex_unlock(&ts->mutex);
@@ -664,13 +664,13 @@ int focal_create_apk_debug_channel(struct touchpanel_data *ts)
     focal_proc_entry = proc_create_data("ftxxxx-debug", 0777, NULL, &focal_proc_fops, ts);
     if (NULL == focal_proc_entry) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry!\n", __func__);
+        TPD_DEBUG("%s: Couldn't create proc entry!\n", __func__);
     }
 
     focal_proc_entry = proc_create_data("grip_handle", 0222, ts->prEntry_tp, &proc_grip_control_ops, ts);
     if (NULL == focal_proc_entry) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create grip handle proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create grip handle proc entry, %d\n", __func__, __LINE__);
     }
 
     return ret;
@@ -695,14 +695,14 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     focal_debug_ops = (struct focal_debug_func *)ts->private_data;
 
     if (buflen <= 1) {
-        TPD_INFO("apk proc wirte count(%d) fail", buflen);
+        TPD_DEBUG("apk proc wirte count(%d) fail", buflen);
         return -EINVAL;
     }
 
     if (buflen > PROC_BUF_SIZE) {
         writebuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
         if (NULL == writebuf) {
-            TPD_INFO("apk proc wirte buf zalloc fail");
+            TPD_DEBUG("apk proc wirte buf zalloc fail");
             return -ENOMEM;
         }
     } else {
@@ -710,7 +710,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     }
 
     if (copy_from_user(writebuf, buff, buflen)) {
-        TPD_INFO("[APK]: copy from user error!!");
+        TPD_DEBUG("[APK]: copy from user error!!");
         ret = -EFAULT;
         goto proc_write_err;
     }
@@ -734,7 +734,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     case PROC_WRITE_REGISTER:
         ret = touch_i2c_write_byte(ts->client, writebuf[1], writebuf[2]);
         if (ret < 0) {
-            TPD_INFO("PROC_WRITE_REGISTER write error");
+            TPD_DEBUG("PROC_WRITE_REGISTER write error");
             goto proc_write_err;
         }
         break;
@@ -743,7 +743,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
         writelen = buflen - 1;
         ret = touch_i2c_write(ts->client, writebuf + 1, writelen);
         if (ret < 0) {
-            TPD_INFO("PROC_READ_DATA write error");
+            TPD_DEBUG("PROC_READ_DATA write error");
             goto proc_write_err;
         }
 
@@ -753,7 +753,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
         writelen = buflen - 1;
         ret = touch_i2c_write(ts->client, writebuf + 1, writelen);
         if (ret < 0) {
-            TPD_INFO("PROC_WRITE_DATA write error");
+            TPD_DEBUG("PROC_WRITE_DATA write error");
             goto proc_write_err;
         }
         break;
@@ -762,7 +762,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
         snprintf(tmp, PROC_BUF_SIZE, "%s", (char *)writebuf + 1);
         tmp[((buflen - 1) > (PROC_BUF_SIZE - 1)) ? (PROC_BUF_SIZE - 1) : (buflen - 1)] = '\0';
         if (strncmp(tmp, "focal_driver", 12) == 0) {
-            TPD_INFO("APK execute HW Reset");
+            TPD_DEBUG("APK execute HW Reset");
             if (ts->ts_ops->reset_gpio_control) {
                 ts->ts_ops->reset_gpio_control(ts->chip_data, 0);
                 msleep(1);
@@ -807,14 +807,14 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
    focal_debug_ops = (struct focal_debug_func *)ts->private_data;
 
     if (buflen <= 0) {
-        TPD_INFO("apk proc read count(%d) fail", buflen);
+        TPD_DEBUG("apk proc read count(%d) fail", buflen);
         return -EINVAL;
     }
 
     if (buflen > PROC_BUF_SIZE) {
         readbuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
         if (NULL == readbuf) {
-            TPD_INFO("apk proc wirte buf zalloc fail");
+            TPD_DEBUG("apk proc wirte buf zalloc fail");
             return -ENOMEM;
         }
     } else {
@@ -832,7 +832,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
         num_read_chars = 1;
         ret = touch_i2c_read(ts->client, &proc.cmd[0], 1, &readbuf[0], num_read_chars);
         if (ret < 0) {
-            TPD_INFO("PROC_READ_REGISTER read error");
+            TPD_DEBUG("PROC_READ_REGISTER read error");
             goto proc_read_err;
         }
         break;
@@ -843,7 +843,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
         num_read_chars = buflen;
         ret = touch_i2c_read(ts->client, NULL, 0, readbuf, num_read_chars);
         if (ret < 0) {
-            TPD_INFO("PROC_READ_DATA read error");
+            TPD_DEBUG("PROC_READ_DATA read error");
             goto proc_read_err;
         }
         break;
@@ -858,7 +858,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
     ret = num_read_chars;
 proc_read_err:
     if (copy_to_user(buff, readbuf, num_read_chars)) {
-        TPD_INFO("copy to user error");
+        TPD_DEBUG("copy to user error");
         ret = -EFAULT;
     }
 
@@ -932,7 +932,7 @@ static int fts_auto_test_read_func(struct seq_file *s, void *v)
     //step3:request test limit data from userspace
     ret = request_real_test_limit(ts,&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "No limit IMG\n");
         mutex_unlock(&ts->mutex);
         if (ts->int_mode == BANNABLE) {
@@ -981,7 +981,7 @@ static int fts_auto_test_read_func(struct seq_file *s, void *v)
         }
     }
     ts->in_test_process = false;
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return 0;
 }
 
@@ -1007,12 +1007,12 @@ int fts_create_proc(struct touchpanel_data *ts, struct fts_proc_operations *syna
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &fts_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     proc.proc_entry = proc_create_data(PROC_NAME, 0777, NULL, &ftxxxx_proc_fops, ts);
     if (NULL == proc.proc_entry) {
-        TPD_INFO("create proc entry fail");
+        TPD_DEBUG("create proc entry fail");
         return -ENOMEM;
     }
 
@@ -1041,7 +1041,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
 
     ret = request_real_test_limit(ts,&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "Request failed, Check the path\n");
         return;
     }
@@ -1049,7 +1049,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
     ph = (struct auto_test_header *)(fw->data);
     p_item_offset = (uint32_t *)(fw->data + LEN_TEST_ITEM_FIELD);
 	if ((ph->magic1 != LIMIT_HEADER_MAGIC_1) || (ph->magic2 != LIMIT_HEADER_MAGIC_2)) {
-        TPD_INFO("limit image is not generated by oplus\n");
+        TPD_DEBUG("limit image is not generated by oplus\n");
         seq_printf(s, "limit image is not generated by oplus\n");
         release_firmware(fw);
         return;
@@ -1060,21 +1060,21 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
             item_cnt++;
         }
     }
-    TPD_INFO("%s: total test item = %d \n", __func__, item_cnt);
+    TPD_DEBUG("%s: total test item = %d \n", __func__, item_cnt);
     if (!item_cnt) {
-        TPD_INFO("limit image has no test item\n");
+        TPD_DEBUG("limit image has no test item\n");
         seq_printf(s, "limit image has no test item\n");
     }
 
     for (m = 0; m < item_cnt; m++) {
-        TPD_INFO("common debug d: p_item_offset[%d] = 0x%x \n", m, p_item_offset[m]);
+        TPD_DEBUG("common debug d: p_item_offset[%d] = 0x%x \n", m, p_item_offset[m]);
         item_head = (struct auto_test_item_header *)(fw->data + p_item_offset[m]);
         if (item_head->item_magic != Limit_ItemMagic && item_head->item_magic != Limit_ItemMagic_V2) {
-            TPD_INFO("item: %d limit data has some problem\n", item_head->item_bit);
+            TPD_DEBUG("item: %d limit data has some problem\n", item_head->item_bit);
             seq_printf(s, "item: %d limit data has some problem\n", item_head->item_bit);
             continue;
         }
-        TPD_INFO("item %d[size %d, limit type %d, para num %d] :\n", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
+        TPD_DEBUG("item %d[size %d, limit type %d, para num %d] :\n", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
         seq_printf(s, "item %d[size %d, limit type %d, para num %d] :\n", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
         if (item_head->item_limit_type == LIMIT_TYPE_NO_DATA) {
             seq_printf(s, "no limit data\n");
@@ -1088,7 +1088,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
             } else if(item_head->item_bit == TYPE_PANEL_DIFFER_DATA) {
                 seq_printf(s, "TYPE_PANEL_DIFFER_DATA: \n");
             }
-            TPD_INFO("top data [%d]: \n", m);
+            TPD_DEBUG("top data [%d]: \n", m);
             seq_printf(s, "top data: \n");
             p_data32 = (int32_t *)(fw->data + item_head->top_limit_offset);
             if (p_data32) {
@@ -1108,7 +1108,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
                     TPD_DEBUG("%d, ", p_data32[i]);
                 }
             } else {
-                TPD_INFO("%s: screen on, p_data32 is NULL \n", __func__);
+                TPD_DEBUG("%s: screen on, p_data32 is NULL \n", __func__);
             }
         }
         if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_RX_TX_DATA) {
@@ -1117,10 +1117,10 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
             } else if(item_head->item_bit == TYPE_SCAP_RAW_DATA) {
                 seq_printf(s, "TYPE_OPEN_RAWDATA: \n");
             }
-            TPD_INFO("top data [%d]: \n", m);
+            TPD_DEBUG("top data [%d]: \n", m);
             seq_printf(s, "water proof mode: \n");
             p_data32 = (int32_t *)(fw->data + item_head->top_limit_offset);
-            TPD_INFO("size 1: %d * %d = %d \n", NUM_MODE, num_panel_node, (NUM_MODE * num_panel_node));
+            TPD_DEBUG("size 1: %d * %d = %d \n", NUM_MODE, num_panel_node, (NUM_MODE * num_panel_node));
             if (p_data32) {
                 for (i = 0 ; i < num_channel; i++) {
                     if (i % num_panel_node == 0)
@@ -1130,7 +1130,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
                 }
                 seq_printf(s, "\nNormal mode: \n");
                 p_data32 = (int32_t *)(fw->data + item_head->floor_limit_offset);
-                TPD_INFO("size 2: %d * %d = %d \n", NUM_MODE, num_panel_node, (NUM_MODE * num_panel_node));
+                TPD_DEBUG("size 2: %d * %d = %d \n", NUM_MODE, num_panel_node, (NUM_MODE * num_panel_node));
                 for (i = 0 ; i < num_channel; i++) {
                     if (i % num_panel_node == 0) {
                         seq_printf(s, "\n[%2d] ", (i / num_panel_node));
@@ -1139,7 +1139,7 @@ void ft_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
                     TPD_DEBUG("%d, ", p_data32[i]);
                 }
             } else {
-                TPD_INFO("%s: screen off, p_data32 is NULL \n", __func__);
+                TPD_DEBUG("%s: screen off, p_data32 is NULL \n", __func__);
             }
         }
         p_data32 = (int32_t *)(fw->data + p_item_offset[m] + sizeof(struct auto_test_item_header));

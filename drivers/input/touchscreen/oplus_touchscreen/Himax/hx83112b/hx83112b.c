@@ -81,7 +81,7 @@ void hx83112b_flash_write_burst(struct i2c_client *client, uint8_t * reg_byte, u
     }
 
     if (touch_i2c_write_block(client, 0x00, 8, data_byte) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 }
@@ -100,7 +100,7 @@ void hx83112b_flash_write_burst_length(struct i2c_client *client, uint8_t *reg_b
     }
 
     if (touch_i2c_write_block(client, 0x00, length + 4, data_byte) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 }
@@ -111,13 +111,13 @@ void hx83112b_burst_enable(struct i2c_client *client, uint8_t auto_add_4_byte)
     tmp_data[0] = 0x31;
 
     if (touch_i2c_write_block(client, 0x13, 1, tmp_data) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 
     tmp_data[0] = (0x10 | auto_add_4_byte);
     if (touch_i2c_write_block(client, 0x0D, 1, tmp_data) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
     /*isBusrtOn = true;*/
@@ -129,7 +129,7 @@ void hx83112b_register_read(struct i2c_client *client, uint8_t *read_addr, int r
     int ret;
     if(hx83112b_cfg_flag == false) {
         if(read_length>256) {
-            TPD_INFO("%s: read len over 256!\n", __func__);
+            TPD_DEBUG("%s: read len over 256!\n", __func__);
             return;
         }
         if (read_length > 4) {
@@ -144,18 +144,18 @@ void hx83112b_register_read(struct i2c_client *client, uint8_t *read_addr, int r
         tmp_data[3] = read_addr[3];
         ret = touch_i2c_write_block(client, 0x00, 4, tmp_data);
         if (ret < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         tmp_data[0] = 0x00;
         ret = touch_i2c_write_block(client, 0x0C, 1, tmp_data);
         if (ret < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
 
         if (touch_i2c_read_block(client, 0x08, read_length, read_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         if (read_length > 4) {
@@ -163,11 +163,11 @@ void hx83112b_register_read(struct i2c_client *client, uint8_t *read_addr, int r
         }
     } else if(hx83112b_cfg_flag == true) {
         if(touch_i2c_read_block(client, read_addr[0], read_length, read_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
     } else {
-        TPD_INFO("%s: hx83112b_cfg_flag = %d, value is wrong!\n", __func__,hx83112b_cfg_flag);
+        TPD_DEBUG("%s: hx83112b_cfg_flag = %d, value is wrong!\n", __func__,hx83112b_cfg_flag);
         return;
     }
 }
@@ -189,11 +189,11 @@ void hx83112b_register_write(struct i2c_client *client, uint8_t *write_addr, int
         }
     } else if(hx83112b_cfg_flag == true) {
         if(touch_i2c_write_block(client, write_addr[0], write_length, write_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
     } else {
-        TPD_INFO("%s: hx83112b_cfg_flag = %d, value is wrong!\n", __func__,hx83112b_cfg_flag);
+        TPD_DEBUG("%s: hx83112b_cfg_flag = %d, value is wrong!\n", __func__,hx83112b_cfg_flag);
         return;
     }
 }
@@ -210,7 +210,7 @@ bool hx83112b_sense_off(struct i2c_client *client)
         //===========================================
         tmp_data[0] = 0x27;
         if (touch_i2c_write_block(client, 0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //===========================================
@@ -218,7 +218,7 @@ bool hx83112b_sense_off(struct i2c_client *client)
         //===========================================
         tmp_data[0] = 0x95;
         if (touch_i2c_write_block(client, 0x32, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
 
@@ -231,7 +231,7 @@ bool hx83112b_sense_off(struct i2c_client *client)
         tmp_addr[0] = 0xA8;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
 
-        TPD_INFO("%s: Check enter_save_mode data[0]=%X \n", __func__,tmp_data[0]);
+        TPD_DEBUG("%s: Check enter_save_mode data[0]=%X \n", __func__,tmp_data[0]);
 
         if (tmp_data[0] == 0x0C) {
             //=====================================
@@ -291,7 +291,7 @@ void hx83112b_interface_on(struct i2c_client *client)
 
     //Read a dummy register to wake up I2C.
     if ( touch_i2c_read_block(client, 0x08, 4, tmp_data) < 0) { // to knock I2C
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 
@@ -301,7 +301,7 @@ void hx83112b_interface_on(struct i2c_client *client)
         //===========================================
         tmp_data[0] = 0x31;
         if (touch_i2c_write_block(client, 0x13, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         //===========================================
@@ -310,7 +310,7 @@ void hx83112b_interface_on(struct i2c_client *client)
         //===========================================
         tmp_data[0] = (0x10);
         if (touch_i2c_write_block(client, 0x0D, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
 
@@ -326,7 +326,7 @@ void hx83112b_interface_on(struct i2c_client *client)
     } while (++cnt < 10);
 
     if (cnt > 0) {
-        TPD_INFO("%s:Polling burst mode: %d times", __func__,cnt);
+        TPD_DEBUG("%s:Polling burst mode: %d times", __func__,cnt);
     }
 }
 
@@ -335,7 +335,7 @@ void hx83112b_diag_register_set(struct i2c_client *client, uint8_t diag_command)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("diag_command = %d\n", diag_command );
+    TPD_DEBUG("diag_command = %d\n", diag_command );
 
     hx83112b_interface_on(client);
 
@@ -350,7 +350,7 @@ void hx83112b_diag_register_set(struct i2c_client *client, uint8_t diag_command)
     hx83112b_flash_write_burst(client, tmp_addr, tmp_data);
 
     hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-    TPD_INFO("%s: tmp_data[3]=0x%02X,tmp_data[2]=0x%02X,tmp_data[1]=0x%02X,tmp_data[0]=0x%02X!\n",
+    TPD_DEBUG("%s: tmp_data[3]=0x%02X,tmp_data[2]=0x%02X,tmp_data[1]=0x%02X,tmp_data[0]=0x%02X!\n",
              __func__,tmp_data[3],tmp_data[2],tmp_data[1],tmp_data[0]);
 
 }
@@ -421,12 +421,12 @@ bool hx83112b_wait_wip(struct i2c_client *client, int Timing)
         retry_cnt++;
 
         if (in_buffer[0] != 0x00 || in_buffer[1] != 0x00 || in_buffer[2] != 0x00 || in_buffer[3] != 0x00) {
-            TPD_INFO("%s:Wait wip retry_cnt:%d, buffer[0]=%d, buffer[1]=%d, buffer[2]=%d, buffer[3]=%d \n", __func__,
+            TPD_DEBUG("%s:Wait wip retry_cnt:%d, buffer[0]=%d, buffer[1]=%d, buffer[2]=%d, buffer[3]=%d \n", __func__,
               retry_cnt,in_buffer[0],in_buffer[1],in_buffer[2],in_buffer[3]);
         }
 
         if (retry_cnt > 100) {
-            TPD_INFO("%s: Wait wip error!\n", __func__);
+            TPD_DEBUG("%s: Wait wip error!\n", __func__);
             return false;
         }
         msleep(Timing);
@@ -441,7 +441,7 @@ void hx83112b_sense_on(struct i2c_client *client, uint8_t FlashMode)
     uint8_t tmp_data[4];
     int retry = 0;
 
-    TPD_INFO("Enter %s  \n", __func__);
+    TPD_DEBUG("Enter %s  \n", __func__);
 
     hx83112b_interface_on(client);
 
@@ -471,11 +471,11 @@ void hx83112b_sense_on(struct i2c_client *client, uint8_t FlashMode)
             tmp_addr[0] = 0xE4;
             hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
 
-            TPD_INFO("%s:Read status from IC = %X,%X\n", __func__, tmp_data[0],tmp_data[1]);
+            TPD_DEBUG("%s:Read status from IC = %X,%X\n", __func__, tmp_data[0],tmp_data[1]);
         } while((tmp_data[1] != 0x01 || tmp_data[0] != 0x00) && retry++ < 5);
 
         if (retry >= 5) {
-            TPD_INFO("%s: Fail:\n", __func__);
+            TPD_DEBUG("%s: Fail:\n", __func__);
 
             //===AHBI2C_SystemReset==========
             tmp_addr[3] = 0x90;
@@ -488,15 +488,15 @@ void hx83112b_sense_on(struct i2c_client *client, uint8_t FlashMode)
             tmp_data[0] = 0x55;
             hx83112b_register_write(client, tmp_addr, 4, tmp_data, false);
         } else {
-            TPD_INFO("%s:OK and Read status from IC = %X,%X\n", __func__, tmp_data[0],tmp_data[1]);
+            TPD_DEBUG("%s:OK and Read status from IC = %X,%X\n", __func__, tmp_data[0],tmp_data[1]);
 
             /* reset code*/
             tmp_data[0] = 0x00;
             if (touch_i2c_write_block(client, 0x31, 1, tmp_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
             }
             if (touch_i2c_write_block(client, 0x32, 1, tmp_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
             }
 
             tmp_addr[3] = 0x90;
@@ -528,7 +528,7 @@ bool hx83112b_ic_package_check(struct i2c_client *client)
         tmp_addr[0] = 0xD0;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
 
-        TPD_INFO("%s:Read driver IC ID = %X,%X,%X\n", __func__, tmp_data[3],tmp_data[2],tmp_data[1]);
+        TPD_DEBUG("%s:Read driver IC ID = %X,%X,%X\n", __func__, tmp_data[3],tmp_data[2],tmp_data[1]);
         if ((tmp_data[3] == 0x83) && (tmp_data[2] == 0x11) && ((tmp_data[1] == 0x2a)||(tmp_data[1] == 0x2b))) {
             HX83112B_IC_TYPE = HX_83112A_SERIES_PWON;
             HX83112B_IC_CHECKSUM = HX_TP_BIN_CHECKSUM_CRC;
@@ -553,12 +553,12 @@ bool hx83112b_ic_package_check(struct i2c_client *client)
             g_i_CID_MAJ = i_CTPM_FW[HX83112B_CID_VER_MAJ_FLASH_ADDR];
             g_i_CID_MIN = i_CTPM_FW[HX83112B_CID_VER_MIN_FLASH_ADDR];
 #endif
-            TPD_INFO("Himax IC package 83112_in\n");
+            TPD_DEBUG("Himax IC package 83112_in\n");
             ret_data = true;
             break;
         } else {
             ret_data = false;
-            TPD_INFO("%s:Read driver ID register Fail:\n", __func__);
+            TPD_DEBUG("%s:Read driver ID register Fail:\n", __func__);
         }
     }
 
@@ -571,7 +571,7 @@ void hx83112b_power_on_init(struct i2c_client *client)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s:  client->addr = %d\n", __func__, client->addr );
+    TPD_DEBUG("%s:  client->addr = %d\n", __func__, client->addr );
     //hx83112b_touch_information(client);
 
     /*RawOut select initial*/
@@ -611,23 +611,23 @@ void hx83112b_read_FW_ver(struct i2c_client *client)
 
        if((data[3]==0x00 && data[2]==0x00 && data[1]==0x3A && data[0]==0xA3)
             || (data2[3]==0x00 && data2[2]==0x00 && data2[1]==0x72 && data2[0]==0xC0)) {
-           TPD_INFO("reload OK! \n");
+           TPD_DEBUG("reload OK! \n");
            reload_status = 1;
            break;
        } else if(retry == 0) {
-           TPD_INFO("reload 20 times! fail \n");
-           //TPD_INFO("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
-           //TPD_INFO("%s : data2[0]=0x%2.2X,data2[1]=0x%2.2X,data2[2]=0x%2.2X,data2[3]=0x%2.2X\n",__func__,data2[0],data2[1],data2[2],data2[3]);
+           TPD_DEBUG("reload 20 times! fail \n");
+           //TPD_DEBUG("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
+           //TPD_DEBUG("%s : data2[0]=0x%2.2X,data2[1]=0x%2.2X,data2[2]=0x%2.2X,data2[3]=0x%2.2X\n",__func__,data2[0],data2[1],data2[2],data2[3]);
            return;
        } else {
            retry --;
            msleep(10);
-           TPD_INFO("reload fail ,delay 10ms retry=%d\n",retry);
+           TPD_DEBUG("reload fail ,delay 10ms retry=%d\n",retry);
        }
     }
-    TPD_INFO("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
-    TPD_INFO("%s : data2[0]=0x%2.2X,data2[1]=0x%2.2X,data2[2]=0x%2.2X,data2[3]=0x%2.2X\n",__func__,data2[0],data2[1],data2[2],data[3]);
-    TPD_INFO("reload_status=%d\n",reload_status);
+    TPD_DEBUG("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
+    TPD_DEBUG("%s : data2[0]=0x%2.2X,data2[1]=0x%2.2X,data2[2]=0x%2.2X,data2[3]=0x%2.2X\n",__func__,data2[0],data2[1],data2[2],data[3]);
+    TPD_DEBUG("reload_status=%d\n",reload_status);
 
     hx83112b_sense_off(client);
 
@@ -642,8 +642,8 @@ void hx83112b_read_FW_ver(struct i2c_client *client)
     hx83112b_register_read(client, cmd, 4, data, false);
 
 
-    TPD_INFO("PANEL_VER : %X \n", data[0]);
-    TPD_INFO("FW_VER : %X \n", data[1] << 8 | data[2]);
+    TPD_DEBUG("PANEL_VER : %X \n", data[0]);
+    TPD_DEBUG("FW_VER : %X \n", data[1] << 8 | data[2]);
 
     cmd[3] = 0x10;
     cmd[2] = 0x00;
@@ -651,9 +651,9 @@ void hx83112b_read_FW_ver(struct i2c_client *client)
     cmd[0] = 0x84;
     hx83112b_register_read(client, cmd, 4, data, false);
 
-    TPD_INFO("CFG_VER : %X \n", data[2] << 8 | data[3]);
-    TPD_INFO("TOUCH_VER : %X \n", data[2]);
-    TPD_INFO("DISPLAY_VER : %X \n", data[3]);
+    TPD_DEBUG("CFG_VER : %X \n", data[2] << 8 | data[3]);
+    TPD_DEBUG("TOUCH_VER : %X \n", data[2]);
+    TPD_DEBUG("DISPLAY_VER : %X \n", data[3]);
 
     cmd[3] = 0x10;
     cmd[2] = 0x00;
@@ -661,7 +661,7 @@ void hx83112b_read_FW_ver(struct i2c_client *client)
     cmd[0] = 0x00;
     hx83112b_register_read(client, cmd, 4, data, false);
 
-    TPD_INFO("CID_VER : %X \n",( data[2] << 8 | data[3]) );
+    TPD_DEBUG("CID_VER : %X \n",( data[2] << 8 | data[3]) );
     return;
 }
 
@@ -678,7 +678,7 @@ void hx83112b_read_OPLUS_FW_ver(struct i2c_client *client)
     hx83112b_register_read(client, cmd, 4, data, false);
 
 
-    TPD_INFO("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
+    TPD_DEBUG("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
 
     return;
 }
@@ -723,7 +723,7 @@ uint32_t hx83112b_hw_check_CRC(struct i2c_client *client, uint8_t *start_addr, i
             tmp_addr[1] = 0x00;
             tmp_addr[0] = 0x18;
             hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-            TPD_INFO("%s: tmp_data[3]=%X, tmp_data[2]=%X, tmp_data[1]=%X, tmp_data[0]=%X  \n", __func__, tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
+            TPD_DEBUG("%s: tmp_data[3]=%X, tmp_data[2]=%X, tmp_data[1]=%X, tmp_data[0]=%X  \n", __func__, tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
             result = ((tmp_data[3] << 24) + (tmp_data[2] << 16) + (tmp_data[1] << 8) + tmp_data[0]);
             break;
         }
@@ -801,8 +801,8 @@ int hx83112b_report_data_init(int max_touch_point, int tx_num, int rx_num)
     } else {
         hx83112b_touch_data->rawdata_frame_size = (tx_num * rx_num + tx_num + rx_num) / hx83112b_touch_data->rawdata_size + 1;
     }
-    TPD_INFO("%s: rawdata_frame_size = %d ",__func__,hx83112b_touch_data->rawdata_frame_size);
-    TPD_INFO("%s: max_touch_point:%d,hx_raw_cnt_max:%d,hx_raw_cnt_rmd:%d,g_hx_rawdata_size:%d,hx83112b_touch_data->touch_info_size:%d\n",
+    TPD_DEBUG("%s: rawdata_frame_size = %d ",__func__,hx83112b_touch_data->rawdata_frame_size);
+    TPD_DEBUG("%s: max_touch_point:%d,hx_raw_cnt_max:%d,hx_raw_cnt_rmd:%d,g_hx_rawdata_size:%d,hx83112b_touch_data->touch_info_size:%d\n",
              __func__, max_touch_point, hx83112b_touch_data->raw_cnt_max, hx83112b_touch_data->raw_cnt_rmd, hx83112b_touch_data->rawdata_size, hx83112b_touch_data->touch_info_size);
 
     hx83112b_touch_data->hx_coord_buf = kzalloc(sizeof(uint8_t)*(hx83112b_touch_data->touch_info_size),GFP_KERNEL);
@@ -840,7 +840,7 @@ mem_alloc_fail:
     kfree(hx83112b_touch_data->hx_event_buf);
 //#endif
 
-    TPD_INFO("%s: Memory allocate fail!\n",__func__);
+    TPD_DEBUG("%s: Memory allocate fail!\n",__func__);
     return MEM_ALLOC_FAIL;
 
 }
@@ -852,7 +852,7 @@ bool hx83112b_read_event_stack(struct i2c_client *client, uint8_t *buf, uint8_t 
     //  AHB_I2C Burst Read Off
     cmd[0] = 0x00;
     if (touch_i2c_write_block(client, 0x11, 1, cmd) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return 0;
     }
 
@@ -861,7 +861,7 @@ bool hx83112b_read_event_stack(struct i2c_client *client, uint8_t *buf, uint8_t 
     //  AHB_I2C Burst Read On
     cmd[0] = 0x01;
     if (touch_i2c_write_block(client, 0x11, 1, cmd) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return 0;
     }
     return 1;
@@ -875,10 +875,10 @@ int hx83112b_ic_esd_recovery(int hx_esd_event, int hx_zero_event, int length)
         goto checksum_fail;
     } else if (hx_zero_event == length) {
         hx83112b_zero_event_count++;
-        TPD_INFO("[HIMAX TP MSG]: ALL Zero event is %d times.\n", hx83112b_zero_event_count);
+        TPD_DEBUG("[HIMAX TP MSG]: ALL Zero event is %d times.\n", hx83112b_zero_event_count);
         if (hx83112b_zero_event_count > 5) {
             hx83112b_zero_event_count = 0;
-            TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL Zero.\n");
+            TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL Zero.\n");
             goto checksum_fail;
         }
         goto err_workqueue_out;
@@ -894,15 +894,15 @@ static int hx83112b_resetgpio_set(struct hw_resource *hw_res, bool on)
 {
     int ret = 0;
     if (gpio_is_valid(hw_res->reset_gpio)) {
-        TPD_INFO("Set the reset_gpio on=%d \n", on);
+        TPD_DEBUG("Set the reset_gpio on=%d \n", on);
         ret = gpio_direction_output(hw_res->reset_gpio, on);
         if (ret) {
-            TPD_INFO("Set the reset_gpio on=%d fail\n", on);
+            TPD_DEBUG("Set the reset_gpio on=%d fail\n", on);
         } else {
             HX83112B_RESET_STATE=on;
         }
         msleep(RESET_TO_NORMAL_TIME);
-        TPD_INFO("%s hw_res->reset_gpio = %d\n", __func__, hw_res->reset_gpio);
+        TPD_DEBUG("%s hw_res->reset_gpio = %d\n", __func__, hw_res->reset_gpio);
     }
 
     return ret;
@@ -910,7 +910,7 @@ static int hx83112b_resetgpio_set(struct hw_resource *hw_res, bool on)
 
 void hx83112b_esd_hw_reset(struct chip_data_hx83112b * chip_info)
 {
-    TPD_INFO("START_Himax TP: ESD - Reset\n");
+    TPD_DEBUG("START_Himax TP: ESD - Reset\n");
     HX83112B_ESD_RESET_ACTIVATE = 1;
 
     //hx83112b_int_enable(chip_info->client->irq, 0);
@@ -920,7 +920,7 @@ void hx83112b_esd_hw_reset(struct chip_data_hx83112b * chip_info)
 
     hx83112b_resetgpio_set(chip_info->hw_res, true); // reset gpio
     //hx83112b_int_enable(chip_info->client->irq, 1);
-    TPD_INFO("%s: ESD reset finished\n", __func__);
+    TPD_DEBUG("%s: ESD reset finished\n", __func__);
 }
 
 
@@ -948,9 +948,9 @@ int hx83112b_checksum_cal(struct chip_data_hx83112b * chip_info, uint8_t *buf,in
         length = (GEST_PTLG_ID_LEN+GEST_PTLG_HDR_LEN);
     }
     else {
-        TPD_INFO("%s, Neither Normal Nor SMWP error!\n",__func__);
+        TPD_DEBUG("%s, Neither Normal Nor SMWP error!\n",__func__);
     }
-    //TPD_INFO("Now status=%d,length=%d\n",ts_status,length);
+    //TPD_DEBUG("Now status=%d,length=%d\n",ts_status,length);
     for (loop_i = 0; loop_i < length; loop_i++) {
         check_sum_cal+=buf[loop_i];
         //#ifdef HX_ESD_RECOVERY
@@ -975,15 +975,15 @@ int hx83112b_checksum_cal(struct chip_data_hx83112b * chip_info, uint8_t *buf,in
             if(hx_EB_event == length) {
                 hx_esd_event = length;
                 hx83112b_EB_event_flag ++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xEB.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xEB.\n");
             } else if(hx_EC_event == length) {
                 hx_esd_event = length;
                 hx83112b_EC_event_flag ++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xEC.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xEC.\n");
             } else if(hx_ED_event == length) {
                 hx_esd_event = length;
                 hx83112b_ED_event_flag ++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xED.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xED.\n");
             } else {
                 hx_esd_event = 0;
             }
@@ -1002,28 +1002,28 @@ int hx83112b_checksum_cal(struct chip_data_hx83112b * chip_info, uint8_t *buf,in
             } else if(shaking_ret == ERR_WORK_OUT) {
                 goto err_workqueue_out;
             } else {
-                //TPD_INFO("I2C running. Nothing to be done!\n");
+                //TPD_DEBUG("I2C running. Nothing to be done!\n");
                 goto workqueue_out;
             }
         } else if (HX83112B_ESD_RESET_ACTIVATE) {
             /* drop 1st interrupts after chip reset */
             HX83112B_ESD_RESET_ACTIVATE = 0;
-            TPD_INFO("[HX83112B_ESD_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
+            TPD_DEBUG("[HX83112B_ESD_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
             goto checksum_fail;
         } else if (HX83112B_HW_RESET_ACTIVATE) {
             /* drop 1st interrupts after chip reset */
             HX83112B_HW_RESET_ACTIVATE = 0;
-            TPD_INFO("[HX83112B_HW_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
+            TPD_DEBUG("[HX83112B_HW_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
             goto ready_to_serve;
         }
     }
 //#endif
     if ((check_sum_cal % 0x100 != 0) ) {
-        TPD_INFO("[HIMAX TP MSG] checksum fail : check_sum_cal: 0x%02X\n", check_sum_cal);
+        TPD_DEBUG("[HIMAX TP MSG] checksum fail : check_sum_cal: 0x%02X\n", check_sum_cal);
         goto checksum_fail;
     }
 
-    /* TPD_INFO("%s:End\n",__func__); */
+    /* TPD_DEBUG("%s:End\n",__func__); */
     return NO_ERR;
 
 ready_to_serve:
@@ -1051,14 +1051,14 @@ void hx83112b_log_touch_data(uint8_t *buf,struct hx83112b_report_data *hx83112b_
 
     for (loop_i = 0; loop_i < print_size; loop_i+=8) {
         if ((loop_i + 7) >= print_size) {
-            TPD_INFO("%s: over flow\n",__func__);
+            TPD_DEBUG("%s: over flow\n",__func__);
             break;
         }
-        TPD_INFO("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i, buf[loop_i], loop_i + 1, buf[loop_i + 1]);
-        TPD_INFO("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 2, buf[loop_i + 2], loop_i + 3, buf[loop_i + 3]);
-        TPD_INFO("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 4, buf[loop_i + 4], loop_i + 5, buf[loop_i + 5]);
-        TPD_INFO("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 6, buf[loop_i + 6], loop_i + 7, buf[loop_i + 7]);
-        TPD_INFO("\n");
+        TPD_DEBUG("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i, buf[loop_i], loop_i + 1, buf[loop_i + 1]);
+        TPD_DEBUG("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 2, buf[loop_i + 2], loop_i + 3, buf[loop_i + 3]);
+        TPD_DEBUG("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 4, buf[loop_i + 4], loop_i + 5, buf[loop_i + 5]);
+        TPD_DEBUG("P %2d = 0x%2.2X P %2d = 0x%2.2X ", loop_i + 6, buf[loop_i + 6], loop_i + 7, buf[loop_i + 7]);
+        TPD_DEBUG("\n");
     }
 }
 
@@ -1069,9 +1069,9 @@ void hx83112b_idle_mode(struct i2c_client *client,int disable)
     uint8_t tmp_data[4];
     uint8_t switch_cmd = 0x00;
 
-    TPD_INFO("%s:entering\n",__func__);
+    TPD_DEBUG("%s:entering\n",__func__);
     do {
-        TPD_INFO("%s,now %d times\n!",__func__,retry);
+        TPD_DEBUG("%s,now %d times\n!",__func__,retry);
 
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
@@ -1088,13 +1088,13 @@ void hx83112b_idle_mode(struct i2c_client *client,int disable)
         hx83112b_flash_write_burst(client, tmp_addr, tmp_data);
 
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s:After turn ON/OFF IDLE Mode [0] = 0x%02X,[1] = 0x%02X,[2] = 0x%02X,[3] = 0x%02X\n", __func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
+        TPD_DEBUG("%s:After turn ON/OFF IDLE Mode [0] = 0x%02X,[1] = 0x%02X,[2] = 0x%02X,[3] = 0x%02X\n", __func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
 
         retry--;
         msleep(10);
     } while((tmp_data[0] != switch_cmd) && retry > 0);
 
-    TPD_INFO("%s: setting OK!\n",__func__);
+    TPD_DEBUG("%s: setting OK!\n",__func__);
 
 }
 
@@ -1104,7 +1104,7 @@ void hx83112b_reload_disable(struct i2c_client *client,int on)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s:entering\n",__func__);
+    TPD_DEBUG("%s:entering\n",__func__);
 
     if (on) {/*reload disable*/
         tmp_addr[3] = 0x10; tmp_addr[2] = 0x00; tmp_addr[1] = 0x7F; tmp_addr[0] = 0x00;
@@ -1116,7 +1116,7 @@ void hx83112b_reload_disable(struct i2c_client *client,int on)
 
     hx83112b_flash_write_burst(client, tmp_addr, tmp_data);
 
-    TPD_INFO("%s: setting OK!\n",__func__);
+    TPD_DEBUG("%s: setting OK!\n",__func__);
 }
 
 int hx83112b_get_rawdata(struct chip_data_hx83112b *chip_info, uint32_t *RAW, uint32_t datalen)
@@ -1209,7 +1209,7 @@ int hx83112b_get_rawdata(struct chip_data_hx83112b *chip_info, uint32_t *RAW, ui
                 hx83112b_register_read(chip_info->client, tmp_addr, max_i2c_size, &tmp_rawdata[i*max_i2c_size], false);
                 total_size_temp = total_size_temp - max_i2c_size;
             } else {
-                //TPD_INFO("last total_size_temp=%d\n",total_size_temp);
+                //TPD_DEBUG("last total_size_temp=%d\n",total_size_temp);
                 hx83112b_register_read(chip_info->client, tmp_addr, total_size_temp % max_i2c_size, &tmp_rawdata[i*max_i2c_size], false);
             }
 
@@ -1267,7 +1267,7 @@ int hx83112b_get_rawdata(struct chip_data_hx83112b *chip_info, uint32_t *RAW, ui
         printk("\n");
     }
 
-    TPD_INFO("Max = %5d, Min = %5d \n", Max_DATA, Min_DATA);
+    TPD_DEBUG("Max = %5d, Min = %5d \n", Max_DATA, Min_DATA);
 #endif
 
     kfree(tmp_rawdata);
@@ -1317,7 +1317,7 @@ void hx83112b_switch_data_type(struct i2c_client *client, uint8_t checktype)
             datatype = DATA_LPWUG_IDLE_NOISE;
             break;
         default:
-            TPD_INFO("Wrong type=%d\n",checktype);
+            TPD_DEBUG("Wrong type=%d\n",checktype);
             break;
     }
     hx83112b_diag_register_set(client, datatype);
@@ -1327,7 +1327,7 @@ int hx83112b_switch_mode(struct i2c_client *client,int mode)
 {
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
-    TPD_INFO("%s: Entering\n",__func__);
+    TPD_DEBUG("%s: Entering\n",__func__);
 
     //Stop Handshaking
     tmp_addr[3] = 0x10;
@@ -1406,7 +1406,7 @@ int hx83112b_switch_mode(struct i2c_client *client,int mode)
     }
     hx83112b_flash_write_burst_length(client, tmp_addr, tmp_data, 4);
 
-    TPD_INFO("%s: End of setting!\n",__func__);
+    TPD_DEBUG("%s: End of setting!\n",__func__);
 
     return 0;
 
@@ -1504,7 +1504,7 @@ uint32_t hx83112b_check_mode(struct i2c_client *client, uint8_t checktype)
         wait_pwd[1] = PWD_LPWUG_IDLE_END;
         break;
     default:
-        TPD_INFO("Wrong type=%d\n",checktype);
+        TPD_DEBUG("Wrong type=%d\n",checktype);
         break;
     }
 
@@ -1513,10 +1513,10 @@ uint32_t hx83112b_check_mode(struct i2c_client *client, uint8_t checktype)
     tmp_addr[1] = 0x7F;
     tmp_addr[0] = 0x04;
     hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-    TPD_INFO("%s: hx83112b_wait_sorting_mode, tmp_data[0]=%x,tmp_data[1]=%x\n", __func__, tmp_data[0],tmp_data[1]);
+    TPD_DEBUG("%s: hx83112b_wait_sorting_mode, tmp_data[0]=%x,tmp_data[1]=%x\n", __func__, tmp_data[0],tmp_data[1]);
 
     if (wait_pwd[0] == tmp_data[0] && wait_pwd[1] == tmp_data[1]) {
-        TPD_INFO("Change to mode=%s\n",hx83112b_inspection_mode[checktype]);
+        TPD_DEBUG("Change to mode=%s\n",hx83112b_inspection_mode[checktype]);
         return 0;
     }
     else
@@ -1534,7 +1534,7 @@ void hx83112b_get_noise_base(struct i2c_client *client)
     tmp_addr[0] = 0x8C;
     hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
 
-    TPD_INFO("tmp_data[0]=0x%x tmp_data[1]=0x%x tmp_data[2]=0x%x tmp_data[3]=0x%x\n",
+    TPD_DEBUG("tmp_data[0]=0x%x tmp_data[1]=0x%x tmp_data[2]=0x%x tmp_data[3]=0x%x\n",
               tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
     NOISEMAX = tmp_data[3]*(NOISE_P/256);
@@ -1584,7 +1584,7 @@ uint32_t hx83112b_wait_sorting_mode(struct i2c_client *client, uint8_t checktype
             wait_pwd[1] = PWD_LPWUG_IDLE_END;
             break;
         default:
-            TPD_INFO("Wrong type=%d\n",checktype);
+            TPD_DEBUG("Wrong type=%d\n",checktype);
         break;
     }
 
@@ -1594,7 +1594,7 @@ uint32_t hx83112b_wait_sorting_mode(struct i2c_client *client, uint8_t checktype
         tmp_addr[1] = 0x7F;
         tmp_addr[0] = 0x04;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: hx83112b_wait_sorting_mode, tmp_data[0]=%x,tmp_data[1]=%x\n", __func__, tmp_data[0],tmp_data[1]);
+        TPD_DEBUG("%s: hx83112b_wait_sorting_mode, tmp_data[0]=%x,tmp_data[1]=%x\n", __func__, tmp_data[0],tmp_data[1]);
 
         if (wait_pwd[0] == tmp_data[0] && wait_pwd[1] == tmp_data[1]) {
             return 0;
@@ -1604,22 +1604,22 @@ uint32_t hx83112b_wait_sorting_mode(struct i2c_client *client, uint8_t checktype
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xA8;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000A8, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
+        TPD_DEBUG("%s: 0x900000A8, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
 
         tmp_addr[3] = 0x90;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xE4;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000E4, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
+        TPD_DEBUG("%s: 0x900000E4, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
 
         tmp_addr[3] = 0x90;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xF8;
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000F8, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
-        TPD_INFO("Now retry %d times!\n",count++);
+        TPD_DEBUG("%s: 0x900000F8, tmp_data[0]=%x,tmp_data[1]=%x,tmp_data[2]=%x,tmp_data[3]=%x \n", __func__, tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
+        TPD_DEBUG("Now retry %d times!\n",count++);
         msleep(50);
     } while (count < 200);
 
@@ -1646,7 +1646,7 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
     //uint16_t* pInspectGridData = &gInspectGridData[0];
     //uint16_t* pInspectNoiseData = &gInspectNoiseData[0];
     if (hx83112b_check_mode(chip_info->client,checktype)) {
-        TPD_INFO("Need Change Mode ,target=%s",hx83112b_inspection_mode[checktype]);
+        TPD_DEBUG("Need Change Mode ,target=%s",hx83112b_inspection_mode[checktype]);
 
         hx83112b_sense_off(chip_info->client);
 
@@ -1658,10 +1658,10 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
             hx83112b_set_N_frame(chip_info->client, NOISEFRAME, checktype);
             hx83112b_get_noise_base(chip_info->client);
         } else if (checktype == HIMAX_INSPECTION_DOZE_RAWDATA || checktype == HIMAX_INSPECTION_DOZE_NOISE) {
-            TPD_INFO("N frame = %d\n",10);
+            TPD_DEBUG("N frame = %d\n",10);
             hx83112b_set_N_frame(chip_info->client, 10, checktype);
         } else if(checktype >= HIMAX_INSPECTION_LPWUG_RAWDATA) {
-            TPD_INFO("N frame = %d\n",1);
+            TPD_DEBUG("N frame = %d\n",1);
             hx83112b_set_N_frame(chip_info->client, 1, checktype);
         } else {
         hx83112b_set_N_frame(chip_info->client, 2, checktype);
@@ -1672,7 +1672,7 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
 
     ret = hx83112b_wait_sorting_mode(chip_info->client, checktype);
     if (ret) {
-        TPD_INFO("%s: hx83112b_wait_sorting_mode FAIL\n", __func__);
+        TPD_DEBUG("%s: hx83112b_wait_sorting_mode FAIL\n", __func__);
         return ret;
         }
     }
@@ -1681,7 +1681,7 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
 
     ret = hx83112b_get_rawdata(chip_info, RAW, datalen);
     if (ret) {
-        TPD_INFO("%s: hx83112b_get_rawdata FAIL\n", __func__);
+        TPD_DEBUG("%s: hx83112b_get_rawdata FAIL\n", __func__);
         return ret;
     }
 
@@ -1696,11 +1696,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > OPENMAX || RAW[i] < OPENMIN) {
-                    TPD_INFO("%s: open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: open test FAIL\n", __func__);
                     return RET_ERR;
                 }
             }
-            TPD_INFO("%s: open test PASS\n", __func__);
+            TPD_DEBUG("%s: open test PASS\n", __func__);
             break;
 
         case HIMAX_INSPECTION_MICRO_OPEN:
@@ -1709,12 +1709,12 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                 continue;
             }
                 if (RAW[i] > M_OPENMAX || RAW[i] < M_OPENMIN) {
-                    TPD_INFO("%s: micro open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: micro open test FAIL\n", __func__);
                     return RET_ERR;
                 }
             }
-            TPD_INFO("M_OPENMAX = %d,M_OPENMIN = %d\n",M_OPENMAX, M_OPENMIN);
-            TPD_INFO("%s: micro open test PASS\n", __func__);
+            TPD_DEBUG("M_OPENMAX = %d,M_OPENMIN = %d\n",M_OPENMAX, M_OPENMIN);
+            TPD_DEBUG("%s: micro open test PASS\n", __func__);
             break;
 
         case HIMAX_INSPECTION_SHORT:
@@ -1723,11 +1723,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                 continue;
             }
                 if (RAW[i] > SHORTMAX || RAW[i] < SHORTMIN) {
-                    TPD_INFO("%s: short test FAIL\n", __func__);
+                    TPD_DEBUG("%s: short test FAIL\n", __func__);
                         return RET_ERR;
                 }
             }
-            TPD_INFO("%s: short test PASS\n", __func__);
+            TPD_DEBUG("%s: short test PASS\n", __func__);
             break;
 
         case HIMAX_INSPECTION_RAWDATA:
@@ -1736,11 +1736,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                 continue;
             }
                 if (RAW[i] > RAWMAX || RAW[i] < RAWMIN) {
-                    TPD_INFO("%s: rawdata test FAIL\n", __func__);
+                    TPD_DEBUG("%s: rawdata test FAIL\n", __func__);
                     return RET_ERR;
                 }
             }
-            TPD_INFO("%s: rawdata test PASS\n", __func__);
+            TPD_DEBUG("%s: rawdata test PASS\n", __func__);
             break;
 
         case HIMAX_INSPECTION_NOISE:
@@ -1749,19 +1749,19 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > NOISEMAX) {
-                    TPD_INFO("%s: noise test FAIL\n", __func__);
+                    TPD_DEBUG("%s: noise test FAIL\n", __func__);
                     return RET_ERR;
                 }
             }
-            TPD_INFO("%s: noise test PASS\n", __func__);
+            TPD_DEBUG("%s: noise test PASS\n", __func__);
 
 #ifdef RAWDATA_NOISE
-            TPD_INFO("[MP_RAW_TEST_RAW]\n");
+            TPD_DEBUG("[MP_RAW_TEST_RAW]\n");
 
             hx83112b_switch_data_type(chip_info->client, HIMAX_INSPECTION_RAWDATA);
             ret = hx83112b_get_rawdata(chip_info, RAW, datalen);
             if (ret == RET_ERR) {
-                TPD_INFO("%s: hx83112b_get_rawdata FAIL\n", __func__);
+                TPD_DEBUG("%s: hx83112b_get_rawdata FAIL\n", __func__);
                 return RET_ERR;
             }
 
@@ -1784,11 +1784,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > LPWUG_RAWDATA_MAX || RAW[i] < LPWUG_RAWDATA_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
                         return THP_AFE_INSPECT_ERAW;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_RAWDATA PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_RAWDATA PASS\n", __func__);
             break;
         case HIMAX_INSPECTION_LPWUG_NOISE:
             for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -1796,11 +1796,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > LPWUG_NOISE_MAX || RAW[i] < LPWUG_NOISE_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
                         return THP_AFE_INSPECT_ENOISE;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE PASS\n", __func__);
             break;
         case HIMAX_INSPECTION_DOZE_RAWDATA:
             for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -1808,11 +1808,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > DOZE_RAWDATA_MAX || RAW[i] < DOZE_RAWDATA_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_DOZE_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_DOZE_RAWDATA FAIL\n", __func__);
                         return THP_AFE_INSPECT_ERAW;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_DOZE_RAWDATA PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_DOZE_RAWDATA PASS\n", __func__);
             break;
         case HIMAX_INSPECTION_DOZE_NOISE:
             for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -1820,11 +1820,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > DOZE_NOISE_MAX || RAW[i] < DOZE_NOISE_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_DOZE_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_DOZE_NOISE FAIL\n", __func__);
                         return THP_AFE_INSPECT_ENOISE;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_DOZE_NOISE PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_DOZE_NOISE PASS\n", __func__);
             break;
         case HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA:
             for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -1832,11 +1832,11 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > LPWUG_IDLE_RAWDATA_MAX || RAW[i] < LPWUG_IDLE_RAWDATA_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
                         return THP_AFE_INSPECT_ERAW;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA PASS\n", __func__);
             break;
         case HIMAX_INSPECTION_LPWUG_IDLE_NOISE:
             for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -1844,15 +1844,15 @@ int hx83112b_mpTestFunc(struct chip_data_hx83112b *chip_info, uint8_t checktype,
                     continue;
                 }
                 if (RAW[i] > LPWUG_IDLE_NOISE_MAX || RAW[i] < LPWUG_IDLE_NOISE_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
                         return THP_AFE_INSPECT_ENOISE;
                 }
             }
-            TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE PASS\n", __func__);
+            TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE PASS\n", __func__);
             break;
 
         default:
-            TPD_INFO("Wrong type=%d\n",checktype);
+            TPD_DEBUG("Wrong type=%d\n",checktype);
         break;
     }
 
@@ -1866,42 +1866,42 @@ static void hx83112b_black_screen_test(void *chip_data, char *message)
     char buf[128] = {0};
     struct chip_data_hx83112b *chip_info = (struct chip_data_hx83112b *)chip_data;
 
-    TPD_INFO("%s\n", __func__);
+    TPD_DEBUG("%s\n", __func__);
 
     //6. LPWUG RAWDATA
-    TPD_INFO("[MP_LPWUG_TEST_RAW]\n");
+    TPD_DEBUG("[MP_LPWUG_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_RAWDATA, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM)+chip_info->hw_res->TX_NUM+chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "6. MP_LPWUG_TEST_RAW: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     error_num += error;
 
     //7. LPWUG NOISE
-    TPD_INFO("[MP_LPWUG_TEST_NOISE]\n");
+    TPD_DEBUG("[MP_LPWUG_TEST_NOISE]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_NOISE, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM)+chip_info->hw_res->TX_NUM+chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "7. MP_LPWUG_TEST_NOISE: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     error_num += error;
 
     //8. LPWUG IDLE RAWDATA
-    TPD_INFO("[MP_LPWUG_IDLE_TEST_RAW]\n");
+    TPD_DEBUG("[MP_LPWUG_IDLE_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM)+chip_info->hw_res->TX_NUM+chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "8. MP_LPWUG_IDLE_TEST_RAW: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     error_num += error;
 
     //9. LPWUG IDLE RAWDATA
-    TPD_INFO("[MP_LPWUG_IDLE_TEST_NOISE]\n");
+    TPD_DEBUG("[MP_LPWUG_IDLE_TEST_NOISE]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_IDLE_NOISE, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM)+chip_info->hw_res->TX_NUM+chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "9. MP_LPWUG_IDLE_TEST_NOISE: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     error_num += error;
 
     sprintf(message, "%d errors. %s", error_num, error_num ? "" : "All test passed.");
-    TPD_INFO("%d errors. %s\n", error_num, error_num ? "" : "All test passed."); 
+    TPD_DEBUG("%d errors. %s\n", error_num, error_num ? "" : "All test passed."); 
 
     hx83112b_sense_off(chip_info->client);
     hx83112b_set_N_frame(chip_info->client, 1, HIMAX_INSPECTION_NOISE);
@@ -1920,47 +1920,47 @@ int hx83112b_chip_self_test(struct seq_file *s, struct chip_data_hx83112b *chip_
     uint8_t back_data[4];
     uint8_t retry_cnt = 0;
 
-    TPD_INFO("%s:Entring\n", __func__);
+    TPD_DEBUG("%s:Entring\n", __func__);
 
     //1. Open Test
-    TPD_INFO("[MP_OPEN_TEST_RAW]\n");
+    TPD_DEBUG("[MP_OPEN_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_OPEN, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "1. Open Test: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     error_num += error;
 
     //2. Micro-Open Test
-    TPD_INFO("[MP_MICRO_OPEN_TEST_RAW]\n");
+    TPD_DEBUG("[MP_MICRO_OPEN_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_MICRO_OPEN, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "2. Micro Open Test: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     error_num += error;
 
     //3. Short Test
-    TPD_INFO("[MP_SHORT_TEST_RAW]\n");
+    TPD_DEBUG("[MP_SHORT_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_SHORT, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "3. Short Test: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     error_num += error;
 
 #ifndef RAWDATA_NOISE
     //4. RawData Test
-    TPD_INFO("[MP_RAW_TEST_RAW]\n");
+    TPD_DEBUG("[MP_RAW_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_RAWDATA, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM)+chip_info->hw_res->TX_NUM+chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "4. Raw data Test: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     error_num += error;
 #endif
 
     //5. Noise Test
-    TPD_INFO("[MP_NOISE_TEST_RAW]\n");
+    TPD_DEBUG("[MP_NOISE_TEST_RAW]\n");
     error = hx83112b_mpTestFunc(chip_info, HIMAX_INSPECTION_NOISE, (chip_info->hw_res->TX_NUM*chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
     snprintf(buf, 128, "5. Noise Test: %s\n", error ? "Error" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     error_num += error;
 
@@ -1982,12 +1982,12 @@ int hx83112b_chip_self_test(struct seq_file *s, struct chip_data_hx83112b *chip_
         back_data[1] = 0XA5;
         back_data[0] = 0X5A;
         hx83112b_register_read(chip_info->client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: tmp_data[0]=0x%22X, retry_cnt=%d \n", __func__, tmp_data[0], retry_cnt);
+        TPD_DEBUG("%s: tmp_data[0]=0x%22X, retry_cnt=%d \n", __func__, tmp_data[0], retry_cnt);
         retry_cnt++;
     }
 	while((tmp_data[3] != back_data[3] || tmp_data[2] != back_data[2] || tmp_data[1] != back_data[1]  || tmp_data[0] != back_data[0] ) && retry_cnt < HIMAX_REG_RETRY_TIMES);
 
-    TPD_INFO("%s:End", __func__);
+    TPD_DEBUG("%s:End", __func__);
     return error_num;
 }
 
@@ -2009,7 +2009,7 @@ void hx83112b_init_psl(struct i2c_client *client) //power saving level
     tmp_data[0] = 0x00;
     hx83112b_register_write(client, tmp_addr, 4, tmp_data, false);
 
-    TPD_INFO("%s: power saving level reset OK!\n",__func__);
+    TPD_DEBUG("%s: power saving level reset OK!\n",__func__);
 }
 
 
@@ -2078,7 +2078,7 @@ void hx83112b_chip_erase(struct i2c_client *client)
     msleep(2000);
 
     if (!hx83112b_wait_wip(client, 100)) {
-        TPD_INFO("%s:83112_Chip_Erase Fail\n", __func__);
+        TPD_DEBUG("%s:83112_Chip_Erase Fail\n", __func__);
     }
 
 }
@@ -2191,7 +2191,7 @@ void hx83112b_flash_programming(struct i2c_client *client, uint8_t *FW_content, 
 
 
         if (touch_i2c_write_block(client, 0x00, 20, buring_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         //=================================
@@ -2217,13 +2217,13 @@ void hx83112b_flash_programming(struct i2c_client *client, uint8_t *FW_content, 
             }
 
             if (touch_i2c_write_block(client, 0x00,program_length+4, buring_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
                 return;
             }
         }
 
         if (!hx83112b_wait_wip(client, 1)) {
-            TPD_INFO("%s:83112_Flash_Programming Fail\n", __func__);
+            TPD_DEBUG("%s:83112_Flash_Programming Fail\n", __func__);
         }
     }
 }
@@ -2239,7 +2239,7 @@ int hx83112b_fts_ctpm_fw_upgrade_with_sys_fs_64k(struct i2c_client *client, unsi
     uint8_t tmp_data[4];
 
     if (len != FW_SIZE_64k) {
-        TPD_INFO("%s: The file size is not 64K bytes\n", __func__);
+        TPD_DEBUG("%s: The file size is not 64K bytes\n", __func__);
         return false;
     }
 
@@ -2328,7 +2328,7 @@ static size_t hx83112b_proc_register_read(struct file *file, char *buf, size_t l
     if (!HX83112B_PROC_SEND_FLAG) {
         temp_buf = kzalloc(len,GFP_KERNEL);
 
-        TPD_INFO("hx83112b_register_show: %02X,%02X,%02X,%02X\n", hx83112b_register_command[3],hx83112b_register_command[2],hx83112b_register_command[1],hx83112b_register_command[0]);
+        TPD_DEBUG("hx83112b_register_show: %02X,%02X,%02X,%02X\n", hx83112b_register_command[3],hx83112b_register_command[2],hx83112b_register_command[1],hx83112b_register_command[0]);
         hx83112b_register_read(ts->client, hx83112b_register_command, 128, data, hx83112b_cfg_flag);
 
         ret += snprintf(temp_buf + ret, len - ret, "command:  %02X,%02X,%02X,%02X\n", hx83112b_register_command[3],hx83112b_register_command[2],hx83112b_register_command[1],hx83112b_register_command[0]);
@@ -2341,7 +2341,7 @@ static size_t hx83112b_proc_register_read(struct file *file, char *buf, size_t l
         }
         ret += snprintf(temp_buf + ret, len - ret, "\n");
         if(copy_to_user(buf, temp_buf, len)) {
-            TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+            TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
         }
         kfree(temp_buf);
         HX83112B_PROC_SEND_FLAG=1;
@@ -2366,7 +2366,7 @@ static size_t hx83112b_proc_register_write(struct file *file, const char *buff, 
     struct touchpanel_data *ts = PDE_DATA(file_inode(file));
 
     if (len >= 80) {
-        TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
         return -EFAULT;
     }
 
@@ -2378,12 +2378,12 @@ static size_t hx83112b_proc_register_write(struct file *file, const char *buff, 
     memset(w_data, 0x0, sizeof(w_data));
     memset(x_pos, 0x0, sizeof(x_pos));
 
-    TPD_INFO("himax %s \n",buf);
+    TPD_DEBUG("himax %s \n",buf);
 
     if ((buf[0] == 'r' || buf[0] == 'w') && buf[1] == ':' && buf[2] == 'x') {
         length = strlen(buf);
 
-        //TPD_INFO("%s: length = %d.\n", __func__,length);
+        //TPD_DEBUG("%s: length = %d.\n", __func__,length);
         for (loop_i = 0; loop_i < length; loop_i++) {//find postion of 'x'
             if(buf[loop_i] == 'x') {
                 x_pos[count] = loop_i;
@@ -2392,7 +2392,7 @@ static size_t hx83112b_proc_register_write(struct file *file, const char *buff, 
         }
 
         data_str = strrchr(buf, 'x');
-        TPD_INFO("%s: %s.\n", __func__,data_str);
+        TPD_DEBUG("%s: %s.\n", __func__,data_str);
         length = strlen(data_str+1) - 1;
 
         if (buf[0] == 'r') {
@@ -2436,14 +2436,14 @@ static size_t hx83112b_proc_register_write(struct file *file, const char *buff, 
                 hx83112b_byte_length = x_pos[1] - x_pos[0] - 2;
                 for (loop_i = 0; loop_i < count; loop_i++) {//parsing addr after 'x'
                     memcpy(buf_tmp, buf + x_pos[loop_i] + 1, hx83112b_byte_length);
-                    //TPD_INFO("%s: buf_tmp = %s\n", __func__,buf_tmp);
+                    //TPD_DEBUG("%s: buf_tmp = %s\n", __func__,buf_tmp);
                     if (!kstrtoul(buf_tmp, 16, &result)) {
                         if(loop_i == 0) {
                             hx83112b_register_command[loop_i] = (uint8_t)(result);
-                            //TPD_INFO("%s: hx83112b_register_command = %X\n", __func__,hx83112b_register_command[0]);
+                            //TPD_DEBUG("%s: hx83112b_register_command = %X\n", __func__,hx83112b_register_command[0]);
                         } else {
                             w_data[loop_i - 1] = (uint8_t)(result);
-                            //TPD_INFO("%s: w_data[%d] = %2X\n", __func__,loop_i - 1,w_data[loop_i - 1]);
+                            //TPD_DEBUG("%s: w_data[%d] = %2X\n", __func__,loop_i - 1,w_data[loop_i - 1]);
                         }
                     }
                 }
@@ -2465,9 +2465,9 @@ void hx83112b_return_event_stack(struct i2c_client *client)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
     do {
-        TPD_INFO("%s,now %d times\n!", __func__, retry);
+        TPD_DEBUG("%s,now %d times\n!", __func__, retry);
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -2484,7 +2484,7 @@ void hx83112b_return_event_stack(struct i2c_client *client)
 
     } while ((tmp_data[1] != 0x00 && tmp_data[0] != 0x00) && retry > 0);
 
-    TPD_INFO("%s: End of setting!\n", __func__);
+    TPD_DEBUG("%s: End of setting!\n", __func__);
 
 }
 /*IC_BASED_END*/
@@ -2499,16 +2499,16 @@ int hx83112b_write_read_reg(struct i2c_client *client,uint8_t *tmp_addr,uint8_t 
 
         msleep(20);
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s:Now tmp_data[0]=0x%02X,[1]=0x%02X,[2]=0x%02X,[3]=0x%02X\n",__func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
+        TPD_DEBUG("%s:Now tmp_data[0]=0x%02X,[1]=0x%02X,[2]=0x%02X,[3]=0x%02X\n",__func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3]);
     }
     while((tmp_data[1] != hb && tmp_data[0] != lb) && cnt++ < 100);
 
     if(cnt >= 99)  {
-        TPD_INFO("hx83112b_write_read_reg ERR Now register 0x%08X : high byte=0x%02X,low byte=0x%02X\n",tmp_addr[3],tmp_data[1],tmp_data[0]);
+        TPD_DEBUG("hx83112b_write_read_reg ERR Now register 0x%08X : high byte=0x%02X,low byte=0x%02X\n",tmp_addr[3],tmp_data[1],tmp_data[0]);
         return -1;
     }
 
-    TPD_INFO("Now register 0x%08X : high byte=0x%02X,low byte=0x%02X\n",tmp_addr[3],tmp_data[1],tmp_data[0]);
+    TPD_DEBUG("Now register 0x%08X : high byte=0x%02X,low byte=0x%02X\n",tmp_addr[3],tmp_data[1],tmp_data[0]);
     return NO_ERR;
 }
 
@@ -2534,7 +2534,7 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
 
     /*1. Read number of MKey R100070E8H to determin data size*/
     m_key_num = 0;
-    //TPD_INFO("%s,m_key_num=%d\n",__func__,m_key_num);
+    //TPD_DEBUG("%s,m_key_num=%d\n",__func__,m_key_num);
     total_size += m_key_num * 2;
 
     /* 2. Start DSRAM Rawdata and Wait Data Ready */
@@ -2548,7 +2548,7 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
     tmp_data[0] = 0xA5;
     fw_run_flag = hx83112b_write_read_reg(client, tmp_addr, tmp_data, 0xA5, 0x5A);
     if (fw_run_flag < 0) {
-        TPD_INFO("%s Data NOT ready => bypass \n", __func__);
+        TPD_DEBUG("%s Data NOT ready => bypass \n", __func__);
         kfree(temp_info_data);
         return;
     }
@@ -2571,7 +2571,7 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
             hx83112b_register_read(client, tmp_addr, max_i2c_size, &temp_info_data[i * max_i2c_size], false);
             total_size_temp = total_size_temp - max_i2c_size;
         } else {
-            //TPD_INFO("last total_size_temp=%d\n",total_size_temp);
+            //TPD_DEBUG("last total_size_temp=%d\n",total_size_temp);
             hx83112b_register_read(client, tmp_addr, total_size_temp % max_i2c_size,
             &temp_info_data[i * max_i2c_size], false);
         }
@@ -2582,9 +2582,9 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
     }
 
     /* 4. FW stop outputing */
-    //TPD_INFO("HX83112B_DSRAM_Flag=%d\n",HX83112B_DSRAM_Flag);
+    //TPD_DEBUG("HX83112B_DSRAM_Flag=%d\n",HX83112B_DSRAM_Flag);
     if (HX83112B_DSRAM_Flag == false) {
-        //TPD_INFO("Return to Event Stack!\n");
+        //TPD_DEBUG("Return to Event Stack!\n");
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -2595,7 +2595,7 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
         tmp_data[0] = 0x00;
         hx83112b_flash_write_burst(client, tmp_addr, tmp_data);
     } else {
-        //TPD_INFO("Continue to SRAM!\n");
+        //TPD_DEBUG("Continue to SRAM!\n");
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -2618,12 +2618,12 @@ void hx83112b_get_DSRAM_data(struct i2c_client *client, uint8_t *info_data, uint
 
     if (check_sum_cal % 0x10000 != 0) {
         memcpy(info_data, &temp_info_data[4], mutual_data_size * sizeof(uint8_t));
-        TPD_INFO("%s check_sum_cal fail=%2x \n", __func__, check_sum_cal);
+        TPD_DEBUG("%s check_sum_cal fail=%2x \n", __func__, check_sum_cal);
         kfree(temp_info_data);
         return;
     } else {
         memcpy(info_data, &temp_info_data[4], mutual_data_size * sizeof(uint8_t));
-        TPD_INFO("%s checksum PASS \n", __func__);
+        TPD_DEBUG("%s checksum PASS \n", __func__);
     }
     kfree(temp_info_data);
 }
@@ -2646,11 +2646,11 @@ void hx83112b_ts_diag_func(struct chip_data_hx83112b *chip_info, int32_t *mutual
 
     dsram_type = hx83112b_diag_command / 10;
 
-    TPD_INFO("%s:Entering hx83112b_diag_command=%d\n!", __func__, hx83112b_diag_command);
+    TPD_DEBUG("%s:Entering hx83112b_diag_command=%d\n!", __func__, hx83112b_diag_command);
 
     if (dsram_type == 8) {
         dsram_type = 1;
-        TPD_INFO("%s Sorting Mode run sram type1 ! \n", __func__);
+        TPD_DEBUG("%s Sorting Mode run sram type1 ! \n", __func__);
     }
 
     hx83112b_burst_enable(chip_info->client, 1);
@@ -2678,8 +2678,8 @@ void hx83112b_diag_parse_raw_data(struct hx83112b_report_data *hx83112b_touch_da
             && hx83112b_touch_data->hx_rawdata_buf[3] == diag_cmd) {
         RawDataLen_word = hx83112b_touch_data->rawdata_size/2;
         index = (hx83112b_touch_data->hx_rawdata_buf[2] - 1) * RawDataLen_word;
-        //TPD_INFO("Header[%d]: %x, %x, %x, %x, mutual: %d, self: %d\n", index, buf[56], buf[57], buf[58], buf[59], mul_num, self_num);
-        //TPD_INFO("RawDataLen=%d , RawDataLen_word=%d , hx_touch_info_size=%d\n", RawDataLen, RawDataLen_word, hx_touch_info_size);
+        //TPD_DEBUG("Header[%d]: %x, %x, %x, %x, mutual: %d, self: %d\n", index, buf[56], buf[57], buf[58], buf[59], mul_num, self_num);
+        //TPD_DEBUG("RawDataLen=%d , RawDataLen_word=%d , hx_touch_info_size=%d\n", RawDataLen, RawDataLen_word, hx_touch_info_size);
         for (i = 0; i < RawDataLen_word; i++) {
             temp1 = index + i;
 
@@ -2712,7 +2712,7 @@ bool hx83112b_diag_check_sum( struct hx83112b_report_data *hx83112b_touch_data )
         check_sum_cal += (hx83112b_touch_data->hx_rawdata_buf[i+1]*256 + hx83112b_touch_data->hx_rawdata_buf[i]);
     }
     if (check_sum_cal % 0x10000 != 0) {
-        TPD_INFO("%s fail=%2X \n", __func__, check_sum_cal);
+        TPD_DEBUG("%s fail=%2X \n", __func__, check_sum_cal);
         return 0;
         //goto bypass_checksum_failed_packet;
     }
@@ -2737,7 +2737,7 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
     memset(receive, 0x00, sizeof(receive));
 
     if (len >= 80) {
-        TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
         return -EFAULT;
     }
     if (copy_from_user(messages, buff, len)) {
@@ -2753,21 +2753,21 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
     storage_type = hx83112b_diag_command / 10;
     rawdata_type = hx83112b_diag_command % 10;
 
-    TPD_INFO(" messages       = %s\n"
+    TPD_DEBUG(" messages       = %s\n"
              " hx83112b_diag_command = 0x%x\n"
              " storage_type   = 0x%x\n"
              " rawdata_type   = 0x%x\n",
              messages, hx83112b_diag_command, storage_type, rawdata_type);
 
     if(hx83112b_diag_command > 0 && rawdata_type == 0) {
-        TPD_INFO("[Himax]hx83112b_diag_command=0x%x ,storage_type=%d, rawdata_type=%d! Maybe no support!\n", hx83112b_diag_command,storage_type,rawdata_type);
+        TPD_DEBUG("[Himax]hx83112b_diag_command=0x%x ,storage_type=%d, rawdata_type=%d! Maybe no support!\n", hx83112b_diag_command,storage_type,rawdata_type);
         hx83112b_diag_command = 0x00;
     } else {
-        TPD_INFO("[Himax]hx83112b_diag_command=0x%x ,storage_type=%d, rawdata_type=%d\n",hx83112b_diag_command,storage_type,rawdata_type);
+        TPD_DEBUG("[Himax]hx83112b_diag_command=0x%x ,storage_type=%d, rawdata_type=%d\n",hx83112b_diag_command,storage_type,rawdata_type);
     }
 
     if (storage_type == 0 && rawdata_type > 0 && rawdata_type < 8) {
-        TPD_INFO("%s,common\n",__func__);
+        TPD_DEBUG("%s,common\n",__func__);
         if (HX83112B_DSRAM_Flag) {
             //(1) Clear DSRAM flag
             HX83112B_DSRAM_Flag = false;
@@ -2780,7 +2780,7 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
         command[0] = hx83112b_diag_command;
         hx83112b_diag_register_set(chip_info->client, command[0]);
     } else if (storage_type > 0 && storage_type < 8 && rawdata_type > 0 && rawdata_type < 8) {
-        TPD_INFO("%s,dsram\n",__func__);
+        TPD_DEBUG("%s,dsram\n",__func__);
 
         //0. set diag flag
         if (HX83112B_DSRAM_Flag) {
@@ -2807,11 +2807,11 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
 
             default:
                 command[0] = 0x00;
-                TPD_INFO("%s: Sram no support this type !\n",__func__);
+                TPD_DEBUG("%s: Sram no support this type !\n",__func__);
             break;
         }
         hx83112b_diag_register_set(chip_info->client, command[0]);
-        TPD_INFO("%s: Start get raw data in DSRAM\n", __func__);
+        TPD_DEBUG("%s: Start get raw data in DSRAM\n", __func__);
         //1. Disable ISR
         disable_irq(chip_info->client->irq);
 
@@ -2820,7 +2820,7 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
     } else {
         //set diag flag
         if(HX83112B_DSRAM_Flag) {
-            TPD_INFO("return and cancel sram thread!\n");
+            TPD_DEBUG("return and cancel sram thread!\n");
             //(1) Clear DSRAM flag
             HX83112B_DSRAM_Flag = false;
             hx83112b_return_event_stack(chip_info->client);
@@ -2828,7 +2828,7 @@ static size_t hx83112b_proc_diag_write(struct file *file, const char *buff, size
         command[0] = 0x00;
         hx83112b_diag_command = 0x00;
         hx83112b_diag_register_set(chip_info->client, command[0]);
-        TPD_INFO("return to normal hx83112b_diag_command=0x%x\n",hx83112b_diag_command);
+        TPD_DEBUG("return to normal hx83112b_diag_command=0x%x\n",hx83112b_diag_command);
     }
     return len;
 }
@@ -2916,7 +2916,7 @@ static size_t hx83112b_proc_diag_read(struct file *file, char *buff, size_t len,
             hx83112b_min_self = 255;
         }
         if (copy_to_user(buff, temp_buf, len)) {
-            TPD_INFO("%s,here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s,here:%d\n", __func__, __LINE__);
         }
         HX83112B_PROC_SEND_FLAG = 1;
 RET_OUT:
@@ -2940,17 +2940,17 @@ uint8_t hx83112b_read_DD_status(struct chip_data_hx83112b *chip_info, uint8_t *h
 	hx83112b_cmd_set[3] = 0xAA;
 	hx83112b_register_write(chip_info->client, cmd_addr, 4, hx83112b_cmd_set, 0);
 
-	TPD_INFO("%s: hx83112b_cmd_set[0] = 0x%02X,hx83112b_cmd_set[1] = 0x%02X,hx83112b_cmd_set[2] = 0x%02X,hx83112b_cmd_set[3] = 0x%02X\n", __func__,hx83112b_cmd_set[0],hx83112b_cmd_set[1],hx83112b_cmd_set[2],hx83112b_cmd_set[3]);
+	TPD_DEBUG("%s: hx83112b_cmd_set[0] = 0x%02X,hx83112b_cmd_set[1] = 0x%02X,hx83112b_cmd_set[2] = 0x%02X,hx83112b_cmd_set[3] = 0x%02X\n", __func__,hx83112b_cmd_set[0],hx83112b_cmd_set[1],hx83112b_cmd_set[2],hx83112b_cmd_set[3]);
 
 	for (cnt = 0; cnt < 100; cnt++) {
 		hx83112b_register_read(chip_info->client, cmd_addr, 4, tmp_data, false);
-		TPD_INFO("%s: tmp_data[0] = 0x%02X,tmp_data[1] = 0x%02X,tmp_data[2] = 0x%02X,tmp_data[3] = 0x%02X, cnt=%d\n", __func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3],cnt);
+		TPD_DEBUG("%s: tmp_data[0] = 0x%02X,tmp_data[1] = 0x%02X,tmp_data[2] = 0x%02X,tmp_data[3] = 0x%02X, cnt=%d\n", __func__,tmp_data[0],tmp_data[1],tmp_data[2],tmp_data[3],cnt);
 		msleep(10);
 		if (tmp_data[3] == 0xBB) {
-			TPD_INFO("%s Data ready goto moving data\n", __func__);
+			TPD_DEBUG("%s Data ready goto moving data\n", __func__);
 			break;
 		} else if(cnt >= 99) {
-			TPD_INFO("%s Data not ready in FW \n", __func__);
+			TPD_DEBUG("%s Data not ready in FW \n", __func__);
 			return FW_NOT_READY;
 		}
 	}
@@ -2986,7 +2986,7 @@ static size_t hx83112b_proc_DD_debug_read(struct file *file, char *buf, size_t l
 		//else
 		ret += snprintf(temp_buf + ret, len - ret, "\n");
 		if (copy_to_user(buf, temp_buf, len))
-			TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+			TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
 		kfree(temp_buf);
 		HX83112B_PROC_SEND_FLAG=1;
 	} else
@@ -3003,7 +3003,7 @@ static size_t hx83112b_proc_DD_debug_write(struct file *file, const char *buff, 
 	char buf_tmp2[4];
 
 	if (len >= 20) {
-		TPD_INFO("%s: no command exceeds 20 chars.\n", __func__);
+		TPD_DEBUG("%s: no command exceeds 20 chars.\n", __func__);
 		return -EFAULT;
 	}
 	if (copy_from_user(buf_tmp, buff, len)) {
@@ -3018,10 +3018,10 @@ static size_t hx83112b_proc_DD_debug_write(struct file *file, const char *buff, 
 			if (!kstrtoul(buf_tmp2, 16, &result))
 				hx83112b_cmd_set[cnt] = (uint8_t)result;
 			else
-				TPD_INFO("String to oul is fail in cnt = %d, buf_tmp2 = %s",cnt, buf_tmp2);
+				TPD_DEBUG("String to oul is fail in cnt = %d, buf_tmp2 = %s",cnt, buf_tmp2);
 			cnt--;
 		}
-		TPD_INFO("hx83112b_cmd_set[2] = %02X, hx83112b_cmd_set[1] = %02X, hx83112b_cmd_set[0] = %02X\n",hx83112b_cmd_set[2],hx83112b_cmd_set[1],hx83112b_cmd_set[0]);
+		TPD_DEBUG("hx83112b_cmd_set[2] = %02X, hx83112b_cmd_set[1] = %02X, hx83112b_cmd_set[0] = %02X\n",hx83112b_cmd_set[2],hx83112b_cmd_set[1],hx83112b_cmd_set[0]);
 	} else
 		hx83112b_mutual_set_flag = 0;
 
@@ -3091,7 +3091,7 @@ static size_t hx83112b_proc_FW_debug_read(struct file *file, char *buf,
 		}
 		ret += snprintf(temp_buf + ret, len - ret, "\n");
 		if (copy_to_user(buf, temp_buf, len))
-			TPD_INFO("%s,here:%d\n",__func__,__LINE__);
+			TPD_DEBUG("%s,here:%d\n",__func__,__LINE__);
 		kfree(temp_buf);
 		HX83112B_PROC_SEND_FLAG=1;
 	} else
@@ -3107,7 +3107,7 @@ static size_t hx83112b_proc_FW_debug_read(struct file *file, char *buf,
  */
 static int hx83112b_enable_interrupt(struct chip_data_hx83112b *chip_info, bool enable)
 {
-     TPD_INFO("%s enter, enable = %d.\n", __func__, enable);
+     TPD_DEBUG("%s enter, enable = %d.\n", __func__, enable);
 
     if (enable) {
         enable_irq(chip_info->client->irq);
@@ -3120,7 +3120,7 @@ static int hx83112b_enable_interrupt(struct chip_data_hx83112b *chip_info, bool 
 static int hx83112b_configuration_init(struct chip_data_hx83112b *chip_info, bool config)
 {
     int ret = 0;
-    TPD_INFO("%s, configuration init = %d\n", __func__, config);
+    TPD_DEBUG("%s, configuration init = %d\n", __func__, config);
     return ret;
 }
 
@@ -3129,14 +3129,14 @@ int hx83112b_ic_reset(struct chip_data_hx83112b *chip_info, uint8_t loadconfig,u
     int ret = 0;
 	HX83112B_HW_RESET_ACTIVATE = 1;
 
-	TPD_INFO("%s,status: loadconfig=%d,int_off=%d\n",__func__,loadconfig,int_off);
+	TPD_DEBUG("%s,status: loadconfig=%d,int_off=%d\n",__func__,loadconfig,int_off);
 
 	if (chip_info->hw_res->reset_gpio) {
 		if (int_off) {
 
             ret = hx83112b_enable_interrupt(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable interrupt failed.\n", __func__);
                 return ret;
             }
         }
@@ -3148,19 +3148,19 @@ int hx83112b_ic_reset(struct chip_data_hx83112b *chip_info, uint8_t loadconfig,u
         if (loadconfig) {
             ret = hx83112b_configuration_init(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b configuration init failed.\n", __func__);
                 return ret;
             }
             ret = hx83112b_configuration_init(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b configuration init failed.\n", __func__);
                 return ret;
             }
 		}
 		if (int_off) {
             ret = hx83112b_enable_interrupt(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable interrupt failed.\n", __func__);
                 return ret;
             }
 		}
@@ -3176,7 +3176,7 @@ static size_t hx83112b_proc_reset_write(struct file *file, const char *buff,
     struct chip_data_hx83112b *chip_info = (struct chip_data_hx83112b *)ts->chip_data;
 
 	if (len >= 12) {
-		TPD_INFO("%s: no command exceeds 12 chars.\n", __func__);
+		TPD_DEBUG("%s: no command exceeds 12 chars.\n", __func__);
 		return -EFAULT;
 	}
 	if (copy_from_user(buf_tmp, buff, len)) {
@@ -3201,7 +3201,7 @@ static size_t hx83112b_proc_sense_on_off_write(struct file *file, const char *bu
     struct chip_data_hx83112b *chip_info = (struct chip_data_hx83112b *)ts->chip_data;
 
 	if (len >= 80) {
-		TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+		TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
 		return -EFAULT;
 	}
 	if (copy_from_user(buf, buff, len)) {
@@ -3210,17 +3210,17 @@ static size_t hx83112b_proc_sense_on_off_write(struct file *file, const char *bu
 
 	if (buf[0] == '0') {
 		hx83112b_sense_off(chip_info->client);
-		TPD_INFO("Sense off \n");
+		TPD_DEBUG("Sense off \n");
 	} else if(buf[0] == '1') {
 		if (buf[1] == 's') {
 			hx83112b_sense_on(chip_info->client, 0x00);
-			TPD_INFO("Sense on re-map on, run sram \n");
+			TPD_DEBUG("Sense on re-map on, run sram \n");
 		} else {
 			hx83112b_sense_on(chip_info->client, 0x01);
-			TPD_INFO("Sense on re-map off, run flash \n");
+			TPD_DEBUG("Sense on re-map off, run flash \n");
 		}
 	} else {
-		TPD_INFO("Do nothing \n");
+		TPD_DEBUG("Do nothing \n");
 	}
 	return len;
 }
@@ -3241,11 +3241,11 @@ static int hx83112b_get_touch_points(void *chip_data, struct point_info *points,
     uint8_t hx_state_info_pos;
 
     if (!hx83112b_touch_data) {
-        TPD_INFO("%s:%d hx83112b_touch_data is NULL\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112b_touch_data is NULL\n", __func__, __LINE__);
     }
 
     if (!hx83112b_touch_data->hx_coord_buf) {
-        TPD_INFO("%s:%d hx83112b_touch_data->hx_coord_buf is NULL\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112b_touch_data->hx_coord_buf is NULL\n", __func__, __LINE__);
         return 0;
     }
 
@@ -3255,7 +3255,7 @@ static int hx83112b_get_touch_points(void *chip_data, struct point_info *points,
     else
         ret = hx83112b_read_event_stack(chip_info->client, buf, hx83112b_touch_data->touch_info_size);
     if (!ret) {
-        TPD_INFO("%s: can't read data from chip in normal!\n", __func__);
+        TPD_DEBUG("%s: can't read data from chip in normal!\n", __func__);
         goto checksum_fail;
     }
     //hx83112b_log_touch_data(buf, hx83112b_touch_data);
@@ -3283,7 +3283,7 @@ static int hx83112b_get_touch_points(void *chip_data, struct point_info *points,
     if (hx83112b_diag_command) {
         mutual_num = chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM;
         self_num = chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM;
-        TPD_INFO("hx83112b_touch_data->touch_all_size= %d hx83112b_touch_data->touch_info_size = %d ,  %d\n",\
+        TPD_DEBUG("hx83112b_touch_data->touch_all_size= %d hx83112b_touch_data->touch_info_size = %d ,  %d\n",\
             hx83112b_touch_data->touch_all_size, hx83112b_touch_data->touch_info_size, hx83112b_touch_data->touch_all_size - hx83112b_touch_data->touch_info_size);
             memcpy(hx83112b_touch_data->hx_rawdata_buf,&buf[hx83112b_touch_data->touch_info_size],hx83112b_touch_data->touch_all_size - hx83112b_touch_data->touch_info_size);
         if (!hx83112b_diag_check_sum(hx83112b_touch_data)) {
@@ -3324,11 +3324,11 @@ workqueue_out:
 static int hx83112b_ftm_process(void *chip_data)
 {
     int ret = -1;
-    TPD_INFO("%s go to sleep in ftm\n",__func__);
+    TPD_DEBUG("%s go to sleep in ftm\n",__func__);
     hx83112b_get_chip_info(chip_data);
     hx83112b_mode_switch(chip_data, MODE_SLEEP, true);
     if (ret < 0) {
-        TPD_INFO("%s, Touchpanel operate mode switch failed\n", __func__);
+        TPD_DEBUG("%s, Touchpanel operate mode switch failed\n", __func__);
     }
     return 0;
 }
@@ -3339,7 +3339,7 @@ static int hx83112b_get_vendor(void *chip_data, struct panel_info *panel_data)
 
     chip_info->tp_type = panel_data->tp_type;
     chip_info->p_tp_fw = &panel_data->TP_FW;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n",
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n",
               chip_info->tp_type, panel_data->test_limit_name, panel_data->fw_name);
     return 0;
 }
@@ -3370,7 +3370,7 @@ static uint32_t hx83112b_get_fw_id(struct chip_data_hx83112b *chip_info)
     TPD_DEBUG("%s : data[0]=0x%2.2X,data[1]=0x%2.2X,data[2]=0x%2.2X,data[3]=0x%2.2X\n",__func__,data[0],data[1],data[2],data[3]);
 
     current_firmware = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-    TPD_INFO("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
+    TPD_DEBUG("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
 
     return current_firmware;
 
@@ -3388,20 +3388,20 @@ static fw_check_state hx83112b_fw_check(void *chip_data, struct resolution_info 
   /*  touch_i2c_read_block(chip_info->client, chip_info->reg_info.F12_2D_CTRL08, 4, buf);
     max_x_ic = ((buf[1] << 8) & 0xffff) | (buf[0] & 0xffff);
     max_y_ic = ((buf[3] << 8) & 0xffff) | (buf[2] & 0xffff);
-    TPD_INFO("max_x = %d, max_y = %d, max_x_ic = %d, max_y_ic = %d\n", resolution_info->max_x, resolution_info->max_y, max_x_ic, max_y_ic);
+    TPD_DEBUG("max_x = %d, max_y = %d, max_x_ic = %d, max_y_ic = %d\n", resolution_info->max_x, resolution_info->max_y, max_x_ic, max_y_ic);
     if ((resolution_info->max_x == 0) ||(resolution_info->max_y == 0)) {
         resolution_info->max_x = max_x_ic;
         resolution_info->max_y = max_y_ic;
     }
 
     bootloader_mode = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F01_RMI_DATA_BASE);
-    TPD_INFO("chip_info->reg_info.F01_RMI_DATA_BASE =  0x%x , bootloader_mode = 0x%x\n", chip_info->reg_info.F01_RMI_DATA_BASE, bootloader_mode);
+    TPD_DEBUG("chip_info->reg_info.F01_RMI_DATA_BASE =  0x%x , bootloader_mode = 0x%x\n", chip_info->reg_info.F01_RMI_DATA_BASE, bootloader_mode);
     bootloader_mode = bootloader_mode & 0xff;
     bootloader_mode = bootloader_mode & 0x40;
-    TPD_INFO("%s, bootloader_mode = 0x%x\n", __func__, bootloader_mode);
+    TPD_DEBUG("%s, bootloader_mode = 0x%x\n", __func__, bootloader_mode);
 
     if ((max_x_ic == 0) || (max_y_ic == 0) || (bootloader_mode == 0x40)) {
-        TPD_INFO("Something terrible wrong, Trying Update the Firmware again\n");
+        TPD_DEBUG("Something terrible wrong, Trying Update the Firmware again\n");
         return FW_ABNORMAL;
     }*/
 
@@ -3428,7 +3428,7 @@ static int hx83112b_reset_for_prepare(void *chip_data)
     //int i2c_error_number = 0;
     //struct chip_data_hx83112b *chip_info = (struct chip_data_hx83112b *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     //hx83112b_resetgpio_set(chip_info->hw_res, true); // reset gpio
 
     return ret;
@@ -3441,7 +3441,7 @@ static void hx83112b_resume_prepare(void *chip_data)
 
 static void hx83112b_exit_esd_mode(void *chip_data)
 {
-    TPD_INFO("exit esd mode ok\n");
+    TPD_DEBUG("exit esd mode ok\n");
     return;
 }
 
@@ -3453,7 +3453,7 @@ static int hx83112b_reset(void *chip_data)
     int ret = -1;
     struct chip_data_hx83112b *chip_info = (struct chip_data_hx83112b *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     clear_view_touchdown_flag(); //clear touch download flag
     hx83112b_resetgpio_set(chip_info->hw_res, true); // reset gpio
 
@@ -3469,26 +3469,26 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     uint8_t tmp_data[4];
     int rtimes = 0;
 
-    TPD_INFO("%s:entering\n",__func__);
+    TPD_DEBUG("%s:entering\n",__func__);
 
     /* 34 -> 11 */
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:1/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:1/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x11;
         if (touch_i2c_write_block(client, 0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0x11 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0x11 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x11);
 
@@ -3496,21 +3496,21 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:2/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:2/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x33;
         if (touch_i2c_write_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x33);
 
@@ -3518,21 +3518,21 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:3/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:3/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x22;
         if (touch_i2c_write_block(client, 0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0x22 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0x22 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x22);
 
@@ -3540,21 +3540,21 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:4/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:4/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0xAA;
         if (touch_i2c_write_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0xAA);
 
@@ -3562,21 +3562,21 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:5/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:5/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x33;
         if (touch_i2c_write_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x33);
 
@@ -3584,25 +3584,25 @@ void hx83112b_ultra_enter(struct i2c_client *client)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:6/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:6/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0xAA;
         if (touch_i2c_write_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (touch_i2c_read_block(client, 0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0xAA);
 
-    TPD_INFO("%s:END\n",__func__);
+    TPD_DEBUG("%s:END\n",__func__);
 }
 
 static int hx83112b_enable_black_gesture(struct chip_data_hx83112b *chip_info, bool enable)
@@ -3610,7 +3610,7 @@ static int hx83112b_enable_black_gesture(struct chip_data_hx83112b *chip_info, b
     struct touchpanel_data *ts = i2c_get_clientdata(chip_info->client);
     int ret = 0;
 
-    TPD_INFO("%s:enable=%d, ts->is_suspended=%d \n", __func__, enable, ts->is_suspended);
+    TPD_DEBUG("%s:enable=%d, ts->is_suspended=%d \n", __func__, enable, ts->is_suspended);
 
     if (ts->is_suspended) {
         if (enable) {
@@ -3621,25 +3621,25 @@ static int hx83112b_enable_black_gesture(struct chip_data_hx83112b *chip_info, b
             /*if (!HX83112B_RESET_STATE) {
                 ret =  hx83112b_resetgpio_set(chip_info->hw_res, true); // reset gpio
                 if (ret < 0) {
-                    TPD_INFO("%s: hx83112b reset gpio failed.\n", __func__);
+                    TPD_DEBUG("%s: hx83112b reset gpio failed.\n", __func__);
                     return ret;
                 }
             }*/
             /*ret = hx83112b_enable_interrupt(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable interrupt failed.\n", __func__);
                 return ret;
             }*/
         } else {
             /*ret = hx83112b_enable_interrupt(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable interrupt failed.\n", __func__);
                 return ret;
             }*/
             /*if (HX83112B_RESET_STATE) {
                 ret =  hx83112b_resetgpio_set(chip_info->hw_res, false); // reset gpio
                 if (ret < 0) {
-                    TPD_INFO("%s: hx83112b reset gpio failed.\n", __func__);
+                    TPD_DEBUG("%s: hx83112b reset gpio failed.\n", __func__);
                     return ret;
                 }
             }*/
@@ -3663,7 +3663,7 @@ static int hx83112b_enable_charge_mode(struct chip_data_hx83112b *chip_info, boo
     int ret = 0;
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
-    TPD_INFO("%s, charge mode enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, charge mode enable = %d\n", __func__, enable);
 
     //Enable:0x10007F38 = 0xA55AA55A
     if(enable)
@@ -3703,7 +3703,7 @@ static int hx83112b_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_NORMAL:
             ret = hx83112b_configuration_init(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b configuration init failed.\n", __func__);
                 return ret;
             }
 
@@ -3713,7 +3713,7 @@ static int hx83112b_mode_switch(void *chip_data, work_mode mode, bool flag)
             /*device control: sleep mode*/
             ret = hx83112b_configuration_init(chip_info, false) ;
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b configuration init failed.\n", __func__);
                 return ret;
             }
 
@@ -3722,7 +3722,7 @@ static int hx83112b_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_GESTURE:
             ret = hx83112b_enable_black_gesture(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable gesture failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable gesture failed.\n", __func__);
                 return ret;
             }
 
@@ -3735,7 +3735,7 @@ static int hx83112b_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = hx83112b_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112b enable edg limit failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112b enable edg limit failed.\n", __func__);
                 return ret;
             }
 
@@ -3744,12 +3744,12 @@ static int hx83112b_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_CHARGE:
             ret = hx83112b_enable_charge_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
             }
             break;
 
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -3800,7 +3800,7 @@ void hx83112b_set_SMWP_enable(struct i2c_client *client, uint8_t SMWP_enable, bo
             back_data[0] = 0x00;
         }
         hx83112b_register_read(client, tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: tmp_data[0]=%d, SMWP_enable=%d, retry_cnt=%d \n", __func__, tmp_data[0],SMWP_enable,retry_cnt);
+        TPD_DEBUG("%s: tmp_data[0]=%d, SMWP_enable=%d, retry_cnt=%d \n", __func__, tmp_data[0],SMWP_enable,retry_cnt);
         retry_cnt++;
     }
     while((tmp_data[3] != back_data[3] || tmp_data[2] != back_data[2] || tmp_data[1] != back_data[1]  || tmp_data[0] != back_data[0] ) && retry_cnt < 10);
@@ -3827,14 +3827,14 @@ static int hx83112b_get_gesture_info(void *chip_data, struct gesture_info * gest
 
     buf = kzalloc(hx83112b_touch_data->event_size*sizeof(uint8_t),GFP_KERNEL);
     if (!buf) {
-       TPD_INFO("%s:%d kzalloc buf error\n", __func__, __LINE__);
+       TPD_DEBUG("%s:%d kzalloc buf error\n", __func__, __LINE__);
        return -1;
     }
 
     hx83112b_burst_enable(chip_info->client, 0);
     if (!hx83112b_read_event_stack(chip_info->client, buf, hx83112b_touch_data->event_size))
     {
-        TPD_INFO("%s: can't read data from chip in gesture!\n", __func__);
+        TPD_DEBUG("%s: can't read data from chip in gesture!\n", __func__);
         kfree(buf);
         return -1;
     }
@@ -3991,7 +3991,7 @@ static int hx83112b_int_pin_test(struct seq_file *s, void *chip_data, struct syn
 {
     int eint_status, eint_count = 0, read_gpio_num = 10;
 
-    TPD_INFO("%s, step 0: begin to check INT-GND short item\n", __func__);
+    TPD_DEBUG("%s, step 0: begin to check INT-GND short item\n", __func__);
     while(read_gpio_num--) {
         msleep(5);
         eint_status = gpio_get_value(syna_testdata->irq_gpio);
@@ -3999,11 +3999,11 @@ static int hx83112b_int_pin_test(struct seq_file *s, void *chip_data, struct syn
             eint_count--;
         else
             eint_count++;
-        TPD_INFO("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
+        TPD_DEBUG("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
     }
-    TPD_INFO("TP EINT PIN direct short! eint_count = %d\n", eint_count);
+    TPD_DEBUG("TP EINT PIN direct short! eint_count = %d\n", eint_count);
     if (eint_count == 10) {
-        TPD_INFO("error :  TP EINT PIN direct short!\n");
+        TPD_DEBUG("error :  TP EINT PIN direct short!\n");
         seq_printf(s, "TP EINT direct stort\n");
         store_to_file(syna_testdata->fd, "eint_status is low, TP EINT direct stort, \n");
         eint_count = 0;
@@ -4026,7 +4026,7 @@ static void hx83112b_auto_test(struct seq_file *s, void *chip_data, struct syna_
 
     seq_printf(s, "imageid = 0x%llx, deviceid = 0x%llx\n", syna_testdata->TP_FW, syna_testdata->TP_FW);
     seq_printf(s, "%d error(s). %s\n", error_count, error_count?"":"All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
 }
 
 static void hx83112b_read_debug_data(struct seq_file *s, void *chip_data, int debug_data_type)
@@ -4057,28 +4057,28 @@ static void hx83112b_read_debug_data(struct seq_file *s, void *chip_data, int de
     switch (debug_data_type) {
         case DEBUG_DATA_BASELINE:
             seq_printf(s, "Baseline data: \n");
-            TPD_INFO("Baseline data: \n");
+            TPD_DEBUG("Baseline data: \n");
         break;
 
         case DEBUG_DATA_RAW:
             seq_printf(s, "Raw data: \n");
-            TPD_INFO("Raw data: \n");
+            TPD_DEBUG("Raw data: \n");
         break;
 
         case DEBUG_DATA_DELTA:
             seq_printf(s, "Delta data: \n");
-            TPD_INFO("Raw data: \n");
+            TPD_DEBUG("Raw data: \n");
         break;
 
         default :
             seq_printf(s, "No this debug datatype \n");
-            TPD_INFO("No this debug datatype \n");
+            TPD_DEBUG("No this debug datatype \n");
             goto RET_OUT;
         break;
     }
 
     hx83112b_diag_register_set(chip_info->client, debug_data_type);
-    TPD_INFO("%s: Start get baseline data in DSRAM\n", __func__);
+    TPD_DEBUG("%s: Start get baseline data in DSRAM\n", __func__);
     HX83112B_DSRAM_Flag = true;
 
     hx83112b_ts_diag_func(chip_info, data_mutual_sram);
@@ -4104,7 +4104,7 @@ static void hx83112b_read_debug_data(struct seq_file *s, void *chip_data, int de
     seq_printf(s, "ChannelEnd");
     seq_printf(s, "\n");
 
-    TPD_INFO("%s,here:%d\n", __func__, __LINE__);
+    TPD_DEBUG("%s,here:%d\n", __func__, __LINE__);
 
 RET_OUT:
     if (data_mutual_sram) {
@@ -4150,11 +4150,11 @@ static fw_update_state hx83112b_fw_update(void *chip_data, const struct firmware
     p_fw_id = fw->data  + 49172;
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return 0;
     }
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     //step 1:fill Fw related header, get all data.
 
@@ -4170,7 +4170,7 @@ static fw_update_state hx83112b_fw_update(void *chip_data, const struct firmware
     cmd[0] = 0x14;
     hx83112b_register_read(chip_info->client, cmd, 4, data, false);
     FIRMWARE_ID = (data[0] << 24)|(data[1] << 16)|(data[2] << 8)|data[3];
-    TPD_INFO("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
+    TPD_DEBUG("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
 
     if (!force) {
         if ((!hx83112b_calculateChecksum(chip_info->client, false)) && (CURRENT_FIRMWARE_ID == FIRMWARE_ID)) {
@@ -4185,10 +4185,10 @@ static fw_update_state hx83112b_fw_update(void *chip_data, const struct firmware
 
 
     //step 4:flash firmware zone
-    TPD_INFO("update-----------------firmware ------------------update!\n");
+    TPD_DEBUG("update-----------------firmware ------------------update!\n");
     hx83112b_fts_ctpm_fw_upgrade_with_sys_fs_64k(chip_info->client, (unsigned char *)fw->data, fw->size, false);
 
-    TPD_INFO("Firmware && configuration flash over\n");
+    TPD_DEBUG("Firmware && configuration flash over\n");
 
     hx83112b_read_OPLUS_FW_ver(chip_info->client);
 
@@ -4256,14 +4256,14 @@ static int hx83112b_tp_probe(struct i2c_client *client, const struct i2c_device_
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
-    TPD_INFO("i2c address = 0x%x ,modify i2c address = 0x20\n", client->addr);
+    TPD_DEBUG("%s  is called\n", __func__);
+    TPD_DEBUG("i2c address = 0x%x ,modify i2c address = 0x20\n", client->addr);
     client->addr = 0x48;
 
     //step1:Alloc chip_info
     chip_info = kzalloc(sizeof(struct chip_data_hx83112b), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -4280,7 +4280,7 @@ static int hx83112b_tp_probe(struct i2c_client *client, const struct i2c_device_
     //step2:Alloc common ts
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto err_register_driver;
     }
     memset(ts, 0, sizeof(*ts));
@@ -4309,7 +4309,7 @@ static int hx83112b_tp_probe(struct i2c_client *client, const struct i2c_device_
 
     if (hx83112b_ic_package_check(client) == false)
     {
-        TPD_INFO("Himax chip doesn NOT EXIST");
+        TPD_DEBUG("Himax chip doesn NOT EXIST");
         goto err_register_driver;
     }
 
@@ -4331,7 +4331,7 @@ static int hx83112b_tp_probe(struct i2c_client *client, const struct i2c_device_
     //step7:create hx83112b related proc files
     himax_create_proc(ts, chip_info->syna_ops);
     enable_irq(client->irq);
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
 
     return 0;
 
@@ -4351,7 +4351,7 @@ err_register_driver:
 
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
 
     return ret;
 }
@@ -4360,7 +4360,7 @@ static int hx83112b_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -4370,7 +4370,7 @@ static int hx83112b_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called gesture_enable =%d\n", __func__, ts->gesture_enable);
+    TPD_DEBUG("%s: is called gesture_enable =%d\n", __func__, ts->gesture_enable);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -4380,12 +4380,12 @@ static int hx83112b_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
    /* if (ts->black_gesture_support) {
         if (ts->gesture_enable == 1) {
-            TPD_INFO("hx83112b_set_SMWP_enable 1\n");
+            TPD_DEBUG("hx83112b_set_SMWP_enable 1\n");
             hx83112b_set_SMWP_enable(ts->client, 1, ts->is_suspended);
         }
     }*/
@@ -4424,13 +4424,13 @@ static struct i2c_driver tp_i2c_driver = {
 
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&tp_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

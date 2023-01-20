@@ -130,7 +130,7 @@ static int check_hex_crc(void)
     }
     else {
         check_fail = true;
-        TPD_INFO("get ap addr len error addr_len = 0x%X\n", addr_len);
+        TPD_DEBUG("get ap addr len error addr_len = 0x%X\n", addr_len);
     }
     TPD_DEBUG("ap block, driver crc = 0x%X, hex ap crc = 0x%X\n", ap_crc, hex_ap_crc);
 
@@ -142,7 +142,7 @@ static int check_hex_crc(void)
     }
     else {
         check_fail = true;
-        TPD_INFO("get dlm addr len error addr_len = 0x%X\n", addr_len);
+        TPD_DEBUG("get dlm addr len error addr_len = 0x%X\n", addr_len);
     }
     TPD_DEBUG("dlm block, driver crc = 0x%X, hex dlm crc = 0x%X\n", dlm_crc, hex_dlm_crc);
 
@@ -154,7 +154,7 @@ static int check_hex_crc(void)
     }
     else {
         check_fail = true;
-        TPD_INFO("get mp addr len error addr_len = 0x%X\n", addr_len);
+        TPD_DEBUG("get mp addr len error addr_len = 0x%X\n", addr_len);
     }
     TPD_DEBUG("mp block, driver crc = 0x%x, hex mp crc = 0x%x\n", mp_crc, hex_mp_crc);
 
@@ -166,17 +166,17 @@ static int check_hex_crc(void)
     }
     else {
         check_fail = true;
-        TPD_INFO("get gesture addr len error addr_len = 0x%X\n", addr_len);
+        TPD_DEBUG("get gesture addr len error addr_len = 0x%X\n", addr_len);
     }
     TPD_DEBUG("gesture block, driver crc = 0x%x, hex gesture crc = 0x%x\n", gesture_crc, hex_gesture_crc);
 
     if ((check_fail) || (ap_crc != hex_ap_crc) || (mp_crc != hex_mp_crc)\
         || (dlm_crc != hex_dlm_crc) || (gesture_crc != hex_gesture_crc)) {
-        TPD_INFO("crc erro use header file data check_fail = %d\n", check_fail);
-        TPD_INFO("ap block, driver crc = 0x%X, hex ap crc = 0x%X\n", ap_crc, hex_ap_crc);
-        TPD_INFO("dlm block, driver crc = 0x%X, hex dlm crc = 0x%X\n", dlm_crc, hex_dlm_crc);
-        TPD_INFO("mp block, driver crc = 0x%x, hex mp crc = 0x%x\n", mp_crc, hex_mp_crc);
-        TPD_INFO("gesture block, driver crc = 0x%x, hex gesture crc = 0x%x\n", gesture_crc, hex_gesture_crc);
+        TPD_DEBUG("crc erro use header file data check_fail = %d\n", check_fail);
+        TPD_DEBUG("ap block, driver crc = 0x%X, hex ap crc = 0x%X\n", ap_crc, hex_ap_crc);
+        TPD_DEBUG("dlm block, driver crc = 0x%X, hex dlm crc = 0x%X\n", dlm_crc, hex_dlm_crc);
+        TPD_DEBUG("mp block, driver crc = 0x%x, hex mp crc = 0x%x\n", mp_crc, hex_mp_crc);
+        TPD_DEBUG("gesture block, driver crc = 0x%x, hex gesture crc = 0x%x\n", gesture_crc, hex_gesture_crc);
         return -1;
     }
     else {
@@ -194,7 +194,7 @@ static int read_download(uint32_t start, uint32_t size, uint8_t *r_buf, uint32_t
 
     buf = (uint8_t*)kmalloc(sizeof(uint8_t) * r_len + 4, GFP_KERNEL);
     if (ERR_ALLOC_MEM(buf)) {
-        TPD_INFO("malloc read_ap_buf error\n");
+        TPD_DEBUG("malloc read_ap_buf error\n");
         return -1;
     }
     memset(buf, 0xFF, (int)sizeof(uint8_t) * r_len + 4);
@@ -207,13 +207,13 @@ static int read_download(uint32_t start, uint32_t size, uint8_t *r_buf, uint32_t
         buf[2] = (char)((addr & 0x0000FF00) >> 8);
         buf[1] = (char)((addr & 0x000000FF));
         if (core_write(core_config->slave_i2c_addr, buf, 4)) {
-            TPD_INFO("Failed to write data via SPI\n");
+            TPD_DEBUG("Failed to write data via SPI\n");
             res = -EIO;
             goto error;
         }
         res = core_read(core_config->slave_i2c_addr, buf, r_len);
         if (res < 0) {
-            TPD_INFO("Failed to read data via SPI\n");
+            TPD_DEBUG("Failed to read data via SPI\n");
             res = -EIO;
             goto error;
         }
@@ -237,7 +237,7 @@ static int write_download(uint32_t start, uint32_t size, uint8_t *w_buf, uint32_
 
     buf = (uint8_t*)kmalloc(sizeof(uint8_t) * w_len + 4, GFP_KERNEL);
     if (ERR_ALLOC_MEM(buf)) {
-        TPD_INFO("malloc read_ap_buf error\n");
+        TPD_DEBUG("malloc read_ap_buf error\n");
         return -1;
     }
     memset(buf, 0xFF, (int)sizeof(uint8_t) * w_len + 4);
@@ -253,7 +253,7 @@ static int write_download(uint32_t start, uint32_t size, uint8_t *w_buf, uint32_
             buf[4 + j] = w_buf[i + j];
 
         if (core_write(core_config->slave_i2c_addr, buf, w_len + 4)) {
-            TPD_INFO("Failed to write data via SPI, address = 0x%X, start_addr = 0x%X, end_addr = 0x%X\n",
+            TPD_DEBUG("Failed to write data via SPI, address = 0x%X, start_addr = 0x%X, end_addr = 0x%X\n",
                 (int)addr, 0, end);
             res = -EIO;
             goto write_error;
@@ -322,9 +322,9 @@ static int host_download_dma_check(int block)
     }
 
     if (count <= 0) {
-        TPD_INFO("BIT0 is busy\n");
+        TPD_DEBUG("BIT0 is busy\n");
         reg_data = core_config_ice_mode_read(0x072100);
-        TPD_INFO("0x072100 reg_data = 0x%X\n", reg_data);
+        TPD_DEBUG("0x072100 reg_data = 0x%X\n", reg_data);
         //return -1;
     }
 
@@ -351,59 +351,59 @@ int host_download(void *chip_data, bool mode)
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
 
     read_ap_buf = (uint8_t*)vmalloc(MAX_AP_FIRMWARE_SIZE);
     if (ERR_ALLOC_MEM(read_ap_buf)) {
-        TPD_INFO("malloc read_ap_buf error\n");
+        TPD_DEBUG("malloc read_ap_buf error\n");
         goto out;
     }
     memset(read_ap_buf, 0xFF, MAX_AP_FIRMWARE_SIZE);
     //create ap buf
     read_dlm_buf = (uint8_t*)vmalloc(MAX_DLM_FIRMWARE_SIZE);
     if (ERR_ALLOC_MEM(read_dlm_buf)) {
-        TPD_INFO("malloc read_dlm_buf error\n");
+        TPD_DEBUG("malloc read_dlm_buf error\n");
         goto out;
     }
     memset(read_dlm_buf, 0xFF, MAX_DLM_FIRMWARE_SIZE);
     //create mp buf
     read_mp_buf = (uint8_t*)vmalloc(MAX_MP_FIRMWARE_SIZE);
     if (ERR_ALLOC_MEM(read_mp_buf)) {
-        TPD_INFO("malloc read_mp_buf error\n");
+        TPD_DEBUG("malloc read_mp_buf error\n");
         goto out;
     }
     memset(read_mp_buf, 0xFF, MAX_MP_FIRMWARE_SIZE);
     //create buf
     buf = (uint8_t*)vmalloc(sizeof(uint8_t)*0x10000+4);
     if (ERR_ALLOC_MEM(buf)) {
-        TPD_INFO("malloc buf error\n");
+        TPD_DEBUG("malloc buf error\n");
         goto out;
     }
     memset(buf, 0xFF, (int)sizeof(uint8_t) * 0x10000+4);
     //create gesture buf
     read_gesture_buf = (uint8_t*)vmalloc(core_gesture->ap_length);
     if (ERR_ALLOC_MEM(read_gesture_buf)) {
-        TPD_INFO("malloc read_gesture_buf error\n");
+        TPD_DEBUG("malloc read_gesture_buf error\n");
         goto out;
     }
     gesture_ap_buf = (uint8_t*)vmalloc(core_gesture->ap_length);
     if (ERR_ALLOC_MEM(gesture_ap_buf)) {
-        TPD_INFO("malloc gesture_ap_buf error\n");
+        TPD_DEBUG("malloc gesture_ap_buf error\n");
         goto out;
     }
     res = core_config_ice_mode_enable();
     if (res < 0) {
-        TPD_INFO("Failed to enter ICE mode, res = %d\n", res);
+        TPD_DEBUG("Failed to enter ICE mode, res = %d\n", res);
         goto out;
     }
 
     res = check_hex_crc();
     if (res < 0) {
-        TPD_INFO("crc erro use header file data\n");
+        TPD_DEBUG("crc erro use header file data\n");
         if (core_firmware_get_h_file_data() < 0) {
-            TPD_INFO("Failed to get h file data\n");
+            TPD_DEBUG("Failed to get h file data\n");
         }
         res = 0;
     }
@@ -417,9 +417,9 @@ int host_download(void *chip_data, bool mode)
     chip_info->irq_timer = jiffies;    //reset esd check trigger base time
 
     memset(gesture_ap_buf, 0xFF, core_gesture->ap_length);
-    TPD_INFO("core_gesture->entry = %d\n", core_gesture->entry);
+    TPD_DEBUG("core_gesture->entry = %d\n", core_gesture->entry);
     memset(read_gesture_buf, 0xFF, core_gesture->ap_length);
-    //TPD_INFO("Upgrade firmware written data into AP code directly\n");
+    //TPD_DEBUG("Upgrade firmware written data into AP code directly\n");
     core_config_ice_mode_write(0x5100C, 0x81, 1);
     core_config_ice_mode_write(0x5100C, 0x98, 1);
     while(retry--) {
@@ -431,7 +431,7 @@ int host_download(void *chip_data, bool mode)
         mdelay(10);
     }
     if (retry <= 0) {
-        TPD_INFO("check wdt close error 0x51018 read 0x%X\n", reg_data);
+        TPD_DEBUG("check wdt close error 0x51018 read 0x%X\n", reg_data);
     }
     core_config_ice_mode_write(0x5100C, 0x00, 1);
 
@@ -442,19 +442,19 @@ int host_download(void *chip_data, bool mode)
         TPD_DEBUG("Writing data into MP code ...\n");
         if(write_download(0, MAX_MP_FIRMWARE_SIZE, mp_fw, SPI_UPGRADE_LEN) < 0)
         {
-            TPD_INFO("SPI Write MP code data error\n");
+            TPD_DEBUG("SPI Write MP code data error\n");
         }
         if(read_download(0, MAX_MP_FIRMWARE_SIZE, read_mp_buf, SPI_UPGRADE_LEN))
         {
-            TPD_INFO("SPI Read MP code data error\n");
+            TPD_DEBUG("SPI Read MP code data error\n");
         }
         if(memcmp(mp_fw, read_mp_buf, MAX_MP_FIRMWARE_SIZE) == 0)
         {
-            TPD_INFO("Check MP Mode upgrade: PASS\n");
+            TPD_DEBUG("Check MP Mode upgrade: PASS\n");
         }
         else
         {
-            TPD_INFO("Check MP Mode upgrade: FAIL\n");
+            TPD_DEBUG("Check MP Mode upgrade: FAIL\n");
             res = UPDATE_FAIL;
             goto out;
         }
@@ -466,22 +466,22 @@ int host_download(void *chip_data, bool mode)
         {
             core_firmware->enter_mode = P5_0_FIRMWARE_GESTURE_MODE;
             /* write hex to the addr of Gesture code */
-            //TPD_INFO("Writing data into Gesture code ...\n");
+            //TPD_DEBUG("Writing data into Gesture code ...\n");
             if(write_download(core_gesture->ap_start_addr, core_gesture->length, gesture_fw, core_gesture->length) < 0)
             {
-                TPD_INFO("SPI Write Gesture code data error\n");
+                TPD_DEBUG("SPI Write Gesture code data error\n");
             }
             if(read_download(core_gesture->ap_start_addr, core_gesture->length, read_gesture_buf, core_gesture->length))
             {
-                TPD_INFO("SPI Read Gesture code data error\n");
+                TPD_DEBUG("SPI Read Gesture code data error\n");
             }
             if(memcmp(gesture_fw, read_gesture_buf, core_gesture->length) == 0)
             {
-                TPD_INFO("Check Gesture Mode upgrade: PASS\n");
+                TPD_DEBUG("Check Gesture Mode upgrade: PASS\n");
             }
             else
             {
-                TPD_INFO("Check Gesture Mode upgrade: FAIL\n");
+                TPD_DEBUG("Check Gesture Mode upgrade: FAIL\n");
                 res = UPDATE_FAIL;
                 goto out;
             }
@@ -490,22 +490,22 @@ int host_download(void *chip_data, bool mode)
             core_firmware->enter_mode = P5_0_FIRMWARE_DEMO_MODE;
             /* write hex to the addr of AP code */
             memcpy(gesture_ap_buf, ap_fw + core_gesture->ap_start_addr, core_gesture->ap_length);
-            //TPD_INFO("Writing data into AP code ...\n");
+            //TPD_DEBUG("Writing data into AP code ...\n");
             if(write_download(core_gesture->ap_start_addr, core_gesture->ap_length, gesture_ap_buf, core_gesture->ap_length) < 0)
             {
-                TPD_INFO("SPI Write AP code data error\n");
+                TPD_DEBUG("SPI Write AP code data error\n");
             }
             if(read_download(core_gesture->ap_start_addr, core_gesture->ap_length, read_ap_buf, core_gesture->ap_length))
             {
-                TPD_INFO("SPI Read AP code data error\n");
+                TPD_DEBUG("SPI Read AP code data error\n");
             }
             if(memcmp(gesture_ap_buf, read_ap_buf, core_gesture->ap_length) == 0)
             {
-                TPD_INFO("Check AP Mode upgrade: PASS\n");
+                TPD_DEBUG("Check AP Mode upgrade: PASS\n");
             }
             else
             {
-                TPD_INFO("Check AP Mode upgrade: FAIL\n");
+                TPD_DEBUG("Check AP Mode upgrade: FAIL\n");
                 res = UPDATE_FAIL;
                 goto out;
             }
@@ -515,16 +515,16 @@ int host_download(void *chip_data, bool mode)
     {
         core_firmware->enter_mode = P5_0_FIRMWARE_DEMO_MODE;
         /* write hex to the addr of AP code */
-        //TPD_INFO("Writing data into AP code ...\n");
+        //TPD_DEBUG("Writing data into AP code ...\n");
         if(write_download(0, MAX_AP_FIRMWARE_SIZE, ap_fw, SPI_UPGRADE_LEN) < 0)
         {
-            TPD_INFO("SPI Write AP code data error\n");
+            TPD_DEBUG("SPI Write AP code data error\n");
         }
         /* write hex to the addr of DLM code */
-        //TPD_INFO("Writing data into DLM code ...\n");
+        //TPD_DEBUG("Writing data into DLM code ...\n");
         if(write_download(DLM_START_ADDRESS, MAX_DLM_FIRMWARE_SIZE, dlm_fw, SPI_UPGRADE_LEN) < 0)
         {
-            TPD_INFO("SPI Write DLM code data error\n");
+            TPD_DEBUG("SPI Write DLM code data error\n");
         }
         /* Check AP/DLM mode Buffer data */
         if (method >= CORE_TYPE_E) {
@@ -534,26 +534,26 @@ int host_download(void *chip_data, bool mode)
             dlm_crc = calc_crc32(0, MAX_DLM_FIRMWARE_SIZE, dlm_fw);
             dlm_dma = host_download_dma_check(1);
 
-            TPD_INFO("AP CRC %s (%x) : (%x)\n",
+            TPD_DEBUG("AP CRC %s (%x) : (%x)\n",
                 (ap_crc != ap_dma ? "Invalid !" : "Correct !"), ap_crc, ap_dma);
 
-            TPD_INFO("DLM CRC %s (%x) : (%x)\n",
+            TPD_DEBUG("DLM CRC %s (%x) : (%x)\n",
                 (dlm_crc != dlm_dma ? "Invalid !" : "Correct !"), dlm_crc, dlm_dma);
 
             if (CHECK_EQUAL(ap_crc, ap_dma) == UPDATE_FAIL ||
                     CHECK_EQUAL(dlm_crc, dlm_dma) == UPDATE_FAIL ) {
-                TPD_INFO("Check AP/DLM Mode upgrade: FAIL read data check\n");
+                TPD_DEBUG("Check AP/DLM Mode upgrade: FAIL read data check\n");
                 res = UPDATE_FAIL;
                 read_download(0, MAX_AP_FIRMWARE_SIZE, read_ap_buf, SPI_UPGRADE_LEN);
                 read_download(DLM_START_ADDRESS, MAX_DLM_FIRMWARE_SIZE, read_dlm_buf, SPI_UPGRADE_LEN);
 
                 if (memcmp(ap_fw, read_ap_buf, MAX_AP_FIRMWARE_SIZE) != 0 ||
                         memcmp(dlm_fw, read_dlm_buf, MAX_DLM_FIRMWARE_SIZE) != 0) {
-                    TPD_INFO("Check AP/DLM Mode upgrade: FAIL\n");
+                    TPD_DEBUG("Check AP/DLM Mode upgrade: FAIL\n");
                     res = UPDATE_FAIL;
                     goto out;
                 } else {
-                    TPD_INFO("Check AP/DLM Mode upgrade: SUCCESS\n");
+                    TPD_DEBUG("Check AP/DLM Mode upgrade: SUCCESS\n");
                     res = 0;
                 }
                 //goto out;
@@ -564,15 +564,15 @@ int host_download(void *chip_data, bool mode)
 
             if (memcmp(ap_fw, read_ap_buf, MAX_AP_FIRMWARE_SIZE) != 0 ||
                     memcmp(dlm_fw, read_dlm_buf, MAX_DLM_FIRMWARE_SIZE) != 0) {
-                TPD_INFO("Check AP/DLM Mode upgrade: FAIL\n");
+                TPD_DEBUG("Check AP/DLM Mode upgrade: FAIL\n");
                 res = UPDATE_FAIL;
                 goto out;
             } else {
-                TPD_INFO("Check AP/DLM Mode upgrade: SUCCESS\n");
+                TPD_DEBUG("Check AP/DLM Mode upgrade: SUCCESS\n");
             }
         }
         if (1 == core_firmware->esd_fail_enter_gesture) {
-            TPD_INFO("set 0x25FF8 = 0xF38A94EF for gesture\n");
+            TPD_DEBUG("set 0x25FF8 = 0xF38A94EF for gesture\n");
             core_config_ice_mode_write(0x25FF8, 0xF38A94EF, 4);
         }
     }
@@ -587,7 +587,7 @@ int host_download(void *chip_data, bool mode)
         mdelay(10);
     }
     if (retry <= 0) {
-        TPD_INFO("check wdt open error 0x51018 read 0x%X retry set\n", reg_data);
+        TPD_DEBUG("check wdt open error 0x51018 read 0x%X retry set\n", reg_data);
         core_config_ice_mode_write(0x5100C, 0x01, 1);
     }
     if(core_gesture->entry != true)
@@ -625,7 +625,7 @@ int core_load_gesture_code(void)
 
     core_gesture->entry = true;
     core_firmware->core_version = (ap_fw[0xFFF4] << 24) + (ap_fw[0xFFF5] << 16) + (ap_fw[0xFFF6] << 8) + ap_fw[0xFFF7];
-    TPD_INFO("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
+    TPD_DEBUG("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
     if (core_firmware->core_version >= 0x01000600) {
         core_gesture->area_section = (ap_fw[0xFFC4 + 3] << 24) + (ap_fw[0xFFC4 + 2] << 16) + (ap_fw[0xFFC4 + 1] << 8) + ap_fw[0xFFC4];
         core_gesture->ap_start_addr = (ap_fw[0xFFC4 + 7] << 24) + (ap_fw[0xFFC4 + 6] << 16) + (ap_fw[0xFFC4 + 5] << 8) + ap_fw[0xFFC4 + 4];
@@ -647,14 +647,14 @@ int core_load_gesture_code(void)
     temp[1] = 0x0A;
     temp[2] = 0x03;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
     //enter gesture cmd lpwg start
     temp[0] = 0x01;
     temp[1] = 0x0A;
     temp[2] = core_gesture->mode + 1;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
     for(i = 0; i < 5; i++)
     {
@@ -662,17 +662,17 @@ int core_load_gesture_code(void)
         temp[1] = 0x0A;
         TPD_DEBUG("write prepare gesture command 0xF6 0x0A \n");
         if ((core_write(core_config->slave_i2c_addr, temp, 2)) < 0) {
-            TPD_INFO("write prepare gesture command error\n");
+            TPD_DEBUG("write prepare gesture command error\n");
         }
         mdelay(i*50);
         temp[0] = 0x01;
         temp[1] = 0x0A;
         temp[2] = 0x05;
         if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-            TPD_INFO("write command error\n");
+            TPD_DEBUG("write command error\n");
         }
         if ((core_read(core_config->slave_i2c_addr, temp, 2)) < 0) {
-            TPD_INFO("Read command error\n");
+            TPD_DEBUG("Read command error\n");
         }
         if(temp[0] == 0x91)
         {
@@ -681,11 +681,11 @@ int core_load_gesture_code(void)
         }
     }
     if(temp[0] != 0x91)
-            TPD_INFO("FW is busy, error\n");
+            TPD_DEBUG("FW is busy, error\n");
 
     //load gesture code
     if (core_config_ice_mode_enable() < 0) {
-        TPD_INFO("Failed to enter ICE mode\n");
+        TPD_DEBUG("Failed to enter ICE mode\n");
         res = -1;
         goto out;
     }
@@ -695,7 +695,7 @@ int core_load_gesture_code(void)
     temp[1] = 0x0A;
     temp[2] = 0x06;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
 out:
     core_fr->isEnableFR = true;
@@ -724,24 +724,24 @@ int core_load_ap_code(void)
     temp[1] = 0x01;
     temp[2] = 0x00;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
     if ((core_read(core_config->slave_i2c_addr, temp, 20)) < 0) {
-        TPD_INFO("Read command error\n");
+        TPD_DEBUG("Read command error\n");
     }
     area = (temp[0] << 24) + (temp[1] << 16) + (temp[2] << 8) + temp[3];
     ap_start_addr = (temp[4] << 24) + (temp[5] << 16) + (temp[6] << 8) + temp[7];
     ap_end_addr = (temp[8] << 24) + (temp[9] << 16) + (temp[10] << 8) + temp[11];
     gesture_start_addr = (temp[12] << 24) + (temp[13] << 16) + (temp[14] << 8) + temp[15];
     gesture_end_addr = (temp[16] << 24) + (temp[17] << 16) + (temp[18] << 8) + temp[19];
-    TPD_INFO("gesture_start_addr = 0x%x, gesture_end_addr = 0x%x\n", gesture_start_addr, gesture_end_addr);
-    TPD_INFO("area = %d, ap_start_addr = 0x%x, ap_end_addr = 0x%x\n", area, ap_start_addr, ap_end_addr);
+    TPD_DEBUG("gesture_start_addr = 0x%x, gesture_end_addr = 0x%x\n", gesture_start_addr, gesture_end_addr);
+    TPD_DEBUG("area = %d, ap_start_addr = 0x%x, ap_end_addr = 0x%x\n", area, ap_start_addr, ap_end_addr);
     //Leave Gesture Cmd LPWG Stop
     temp[0] = 0x01;
     temp[1] = 0x0A;
     temp[2] = 0x00;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
     for(i = 0; i < 20; i++)
     {
@@ -750,23 +750,23 @@ int core_load_ap_code(void)
         temp[1] = 0x0A;
         temp[2] = 0x05;
         if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-            TPD_INFO("write command error\n");
+            TPD_DEBUG("write command error\n");
         }
         if ((core_read(core_config->slave_i2c_addr, temp, 1)) < 0) {
-            TPD_INFO("Read command error\n");
+            TPD_DEBUG("Read command error\n");
         }
         if(temp[0] == 0x91)
         {
-            TPD_INFO("check fw ready\n");
+            TPD_DEBUG("check fw ready\n");
             break;
         }
     }
     if(i == 3 && temp[0] != 0x01)
-            TPD_INFO("FW is busy, error\n");
+            TPD_DEBUG("FW is busy, error\n");
 
     //load AP code
     if (core_config_ice_mode_enable() < 0) {
-        TPD_INFO("Failed to enter ICE mode\n");
+        TPD_DEBUG("Failed to enter ICE mode\n");
         res = -1;
         goto out;
     }
@@ -776,7 +776,7 @@ int core_load_ap_code(void)
     temp[1] = 0x0A;
     temp[2] = 0x06;
     if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-        TPD_INFO("write command error\n");
+        TPD_DEBUG("write command error\n");
     }
 out:
     core_fr->isEnableFR = true;
@@ -805,7 +805,7 @@ int core_firmware_get_project_h_file_data(void)
                 ret = -1;
             }
         } else {
-            TPD_INFO("p_firmware_headfile->firmware_data is NULL! exit firmware update!\n");
+            TPD_DEBUG("p_firmware_headfile->firmware_data is NULL! exit firmware update!\n");
             ret = -1;
         }
     }
@@ -823,7 +823,7 @@ int core_firmware_get_h_file_data(void)
 
     flash_fw = (uint8_t*)vmalloc(MAX_FLASH_FW_LEN);//256K
     if (ERR_ALLOC_MEM(flash_fw)) {
-        TPD_INFO("Failed to allocate flash_fw memory, %ld\n", PTR_ERR(flash_fw));
+        TPD_DEBUG("Failed to allocate flash_fw memory, %ld\n", PTR_ERR(flash_fw));
         res = -ENOMEM;
         goto out;
     }
@@ -841,7 +841,7 @@ int core_firmware_get_h_file_data(void)
     memcpy(dlm_fw, flash_fw + DLM_HEX_ADDRESS, MAX_DLM_FIRMWARE_SIZE);
 
     core_firmware->core_version = (ap_fw[0xFFF4] << 24) + (ap_fw[0xFFF5] << 16) + (ap_fw[0xFFF6] << 8) + ap_fw[0xFFF7];
-    TPD_INFO("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
+    TPD_DEBUG("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
     if (core_firmware->core_version >= 0x01000600) {
         core_gesture->area_section = (ap_fw[0xFFC4 + 3] << 24) + (ap_fw[0xFFC4 + 2] << 16) + (ap_fw[0xFFC4 + 1] << 8) + ap_fw[0xFFC4];
         core_gesture->ap_start_addr = (ap_fw[0xFFC4 + 7] << 24) + (ap_fw[0xFFC4 + 6] << 16) + (ap_fw[0xFFC4 + 5] << 8) + ap_fw[0xFFC4 + 4];
@@ -855,11 +855,11 @@ int core_firmware_get_h_file_data(void)
     core_gesture->length = MAX_GESTURE_FIRMWARE_SIZE;
     core_gesture->ap_length = MAX_GESTURE_FIRMWARE_SIZE;
 
-    TPD_INFO("gesture_start_addr = 0x%x, length = 0x%x\n", core_gesture->start_addr, core_gesture->length);
-    TPD_INFO("area = %d, ap_start_addr = 0x%x, ap_length = 0x%x\n", core_gesture->area_section, core_gesture->ap_start_addr, core_gesture->ap_length);
-    TPD_INFO("MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE);
+    TPD_DEBUG("gesture_start_addr = 0x%x, length = 0x%x\n", core_gesture->start_addr, core_gesture->length);
+    TPD_DEBUG("area = %d, ap_start_addr = 0x%x, ap_length = 0x%x\n", core_gesture->area_section, core_gesture->ap_start_addr, core_gesture->ap_length);
+    TPD_DEBUG("MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE);
     memcpy(mp_fw, flash_fw + MP_HEX_ADDRESS, MAX_MP_FIRMWARE_SIZE);
-    TPD_INFO("core_gesture->start_addr + core_gesture->length = 0x%X\n", core_gesture->start_addr + MAX_MP_FIRMWARE_SIZE);
+    TPD_DEBUG("core_gesture->start_addr + core_gesture->length = 0x%X\n", core_gesture->start_addr + MAX_MP_FIRMWARE_SIZE);
     memcpy(gesture_fw, flash_fw + core_gesture->start_addr, core_gesture->length);
 
     /* Extract block info */
@@ -907,22 +907,22 @@ int core_firmware_boot_host_download(void *chip_data)
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
 
-    TPD_INFO("MAX_AP_FIRMWARE_SIZE + MAX_DLM_FIRMWARE_SIZE + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MAX_AP_FIRMWARE_SIZE + MAX_DLM_FIRMWARE_SIZE + MAX_MP_FIRMWARE_SIZE);
+    TPD_DEBUG("MAX_AP_FIRMWARE_SIZE + MAX_DLM_FIRMWARE_SIZE + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MAX_AP_FIRMWARE_SIZE + MAX_DLM_FIRMWARE_SIZE + MAX_MP_FIRMWARE_SIZE);
     //flash_fw = kcalloc(MAX_AP_FIRMWARE_SIZE + MAX_DLM_FIRMWARE_SIZE + MAX_MP_FIRMWARE_SIZE, sizeof(uint8_t), GFP_KERNEL);
     flash_fw = (uint8_t*)vmalloc(MAX_FLASH_FW_LEN);
     if (ERR_ALLOC_MEM(flash_fw)) {
-        TPD_INFO("Failed to allocate flash_fw memory, %ld\n", PTR_ERR(flash_fw));
+        TPD_DEBUG("Failed to allocate flash_fw memory, %ld\n", PTR_ERR(flash_fw));
         res = -ENOMEM;
         goto out;
     }
 
     memset(flash_fw, 0xff, (int)sizeof(uint8_t) * MAX_FLASH_FW_LEN);
 
-    TPD_INFO("BOOT: Starting to upgrade firmware ...\n");
+    TPD_DEBUG("BOOT: Starting to upgrade firmware ...\n");
 
     core_firmware->isUpgrading = true;
     core_firmware->update_status = 0;
@@ -939,7 +939,7 @@ int core_firmware_boot_host_download(void *chip_data)
     memcpy(dlm_fw, flash_fw + DLM_HEX_ADDRESS, MAX_DLM_FIRMWARE_SIZE);
 
     core_firmware->core_version = (ap_fw[0xFFF4] << 24) + (ap_fw[0xFFF5] << 16) + (ap_fw[0xFFF6] << 8) + ap_fw[0xFFF7];
-    TPD_INFO("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
+    TPD_DEBUG("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
     if (core_firmware->core_version >= 0x01000600) {
         core_gesture->area_section = (ap_fw[0xFFC4 + 3] << 24) + (ap_fw[0xFFC4 + 2] << 16) + (ap_fw[0xFFC4 + 1] << 8) + ap_fw[0xFFC4];
         core_gesture->ap_start_addr = (ap_fw[0xFFC4 + 7] << 24) + (ap_fw[0xFFC4 + 6] << 16) + (ap_fw[0xFFC4 + 5] << 8) + ap_fw[0xFFC4 + 4];
@@ -953,38 +953,38 @@ int core_firmware_boot_host_download(void *chip_data)
 
     core_gesture->ap_length = MAX_GESTURE_FIRMWARE_SIZE;
     core_gesture->length = MAX_GESTURE_FIRMWARE_SIZE;
-    TPD_INFO("gesture_start_addr = 0x%x, length = 0x%x\n", core_gesture->start_addr, core_gesture->length);
-    TPD_INFO("area = %d, ap_start_addr = 0x%x, ap_length = 0x%x\n", core_gesture->area_section, core_gesture->ap_start_addr, core_gesture->ap_length);
-    TPD_INFO("MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE);
+    TPD_DEBUG("gesture_start_addr = 0x%x, length = 0x%x\n", core_gesture->start_addr, core_gesture->length);
+    TPD_DEBUG("area = %d, ap_start_addr = 0x%x, ap_length = 0x%x\n", core_gesture->area_section, core_gesture->ap_start_addr, core_gesture->ap_length);
+    TPD_DEBUG("MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE = 0x%X\n", MP_HEX_ADDRESS + MAX_MP_FIRMWARE_SIZE);
     memcpy(mp_fw, flash_fw + MP_HEX_ADDRESS, MAX_MP_FIRMWARE_SIZE);
-    TPD_INFO("core_gesture->start_addr + core_gesture->length = 0x%X\n", core_gesture->start_addr + MAX_MP_FIRMWARE_SIZE);
+    TPD_DEBUG("core_gesture->start_addr + core_gesture->length = 0x%X\n", core_gesture->start_addr + MAX_MP_FIRMWARE_SIZE);
     memcpy(gesture_fw, flash_fw + core_gesture->start_addr, core_gesture->length);
     ilitek_platform_disable_irq();
     if (chip_info->hw_res->reset_gpio) {
-        TPD_INFO("HW Reset: HIGH\n");
+        TPD_DEBUG("HW Reset: HIGH\n");
         gpio_direction_output(chip_info->hw_res->reset_gpio, 1);
         mdelay(chip_info->delay_time_high);
-        TPD_INFO("HW Reset: LOW\n");
+        TPD_DEBUG("HW Reset: LOW\n");
         gpio_set_value(chip_info->hw_res->reset_gpio, 0);
         mdelay(chip_info->delay_time_low);
-        TPD_INFO("HW Reset: HIGH\n");
+        TPD_DEBUG("HW Reset: HIGH\n");
         gpio_set_value(chip_info->hw_res->reset_gpio, 1);
         mdelay(chip_info->edge_delay);
     }
     else {
-        TPD_INFO("reset gpio is Invalid\n");
+        TPD_DEBUG("reset gpio is Invalid\n");
     }
     res = core_firmware->upgrade_func(chip_info, true);
     if (res < 0) {
         core_firmware->update_status = res;
-        TPD_INFO("Failed to upgrade firmware, res = %d\n", res);
+        TPD_DEBUG("Failed to upgrade firmware, res = %d\n", res);
         goto out;
     }
     mdelay(20);
-    TPD_INFO("mdelay 20 ms test for ftm\n");
+    TPD_DEBUG("mdelay 20 ms test for ftm\n");
 
     core_firmware->update_status = 100;
-    TPD_INFO("Update firmware information...\n");
+    TPD_DEBUG("Update firmware information...\n");
     core_config_get_chip_id();
     core_config_get_fw_ver(chip_info);
     core_config_get_protocol_ver();
@@ -1087,7 +1087,7 @@ static int convert_hex_file(uint8_t *pBuf, uint32_t nSize, bool isIRAM)
 
         if (nType == 0x00) {
             if (nAddr > MAX_HEX_FILE_SIZE) {
-                TPD_INFO("Invalid hex format\n");
+                TPD_DEBUG("Invalid hex format\n");
                 goto out;
             }
 
@@ -1117,7 +1117,7 @@ static int convert_hex_file(uint8_t *pBuf, uint32_t nSize, bool isIRAM)
                     }
                     if ((nAddr + k) == (0xFFF7)) {
                         core_firmware->core_version = (ap_fw[0xFFF4] << 24) + (ap_fw[0xFFF5] << 16) + (ap_fw[0xFFF6] << 8) + ap_fw[0xFFF7];
-                        TPD_INFO("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
+                        TPD_DEBUG("core_firmware->core_version = 0x%X\n", core_firmware->core_version);
                         if (core_firmware->core_version >= 0x01000600) {
                             core_gesture->area_section = (ap_fw[0xFFC4 + 3] << 24) + (ap_fw[0xFFC4 + 2] << 16) + (ap_fw[0xFFC4 + 1] << 8) + ap_fw[0xFFC4];
                             core_gesture->ap_start_addr = (ap_fw[0xFFC4 + 7] << 24) + (ap_fw[0xFFC4 + 6] << 16) + (ap_fw[0xFFC4 + 5] << 8) + ap_fw[0xFFC4 + 4];
@@ -1163,7 +1163,7 @@ static int convert_hex_file(uint8_t *pBuf, uint32_t nSize, bool isIRAM)
         return 0;
     #endif
 out:
-    TPD_INFO("Failed to convert HEX data\n");
+    TPD_DEBUG("Failed to convert HEX data\n");
     return -1;
 }
 
@@ -1178,7 +1178,7 @@ int core_firmware_get_hostdownload_data(void)
         res = -1;
     }
     if (res < 0) {
-        TPD_INFO("Failed to covert firmware data, res = %d\n", res);
+        TPD_DEBUG("Failed to covert firmware data, res = %d\n", res);
     }
     return res;
 }
@@ -1195,11 +1195,11 @@ int core_firmware_upgrade(void *chip_data, bool isIRAM)
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
     if (core_firmware->isUpgrading) {
-        TPD_INFO("isupgrading so return\n");
+        TPD_DEBUG("isupgrading so return\n");
         return 0;
     }
     core_firmware->isUpgrading = true;
@@ -1208,7 +1208,7 @@ int core_firmware_upgrade(void *chip_data, bool isIRAM)
     /* calling that function defined at init depends on chips. */
     res = core_firmware->upgrade_func(chip_info, isIRAM);
     if (res < 0) {
-        TPD_INFO("Failed to upgrade firmware, res = %d\n", res);
+        TPD_DEBUG("Failed to upgrade firmware, res = %d\n", res);
         goto out;
     }
 
@@ -1218,26 +1218,26 @@ int core_firmware_upgrade(void *chip_data, bool isIRAM)
             cmd[0] = 0x04;
             res = core_write(core_config->slave_i2c_addr, cmd, 1);
             if (res < 0) {
-                TPD_INFO("Failed to write data, %d\n", res);
+                TPD_DEBUG("Failed to write data, %d\n", res);
             }
 
             res = core_read(core_config->slave_i2c_addr, cmd, 3);
-            TPD_INFO("read value 0x%X 0x%X 0x%X\n", cmd[0], cmd[1], cmd[2]);
+            TPD_DEBUG("read value 0x%X 0x%X 0x%X\n", cmd[0], cmd[1], cmd[2]);
             if (res < 0) {
-                TPD_INFO("Failed to read tp set ddi trim code %d\n", res);
+                TPD_DEBUG("Failed to read tp set ddi trim code %d\n", res);
             }
             if (cmd[0] == 0x55) {
-                TPD_INFO("TP set ddi trim code ok read value 0x%X i = %d\n", cmd[0], i);
+                TPD_DEBUG("TP set ddi trim code ok read value 0x%X i = %d\n", cmd[0], i);
                 break;
             }
             else if (cmd[0] == 0x35) {
-                TPD_INFO("TP set ddi trim code bypass read value 0x%X\n", cmd[0]);
+                TPD_DEBUG("TP set ddi trim code bypass read value 0x%X\n", cmd[0]);
                 break;
             }
             mdelay(5);
         }
         if (i >= 14) {
-            TPD_INFO("check TP set ddi trim code error\n");
+            TPD_DEBUG("check TP set ddi trim code error\n");
         }
     }
     set_tp_fw_done();
@@ -1279,7 +1279,7 @@ int core_firmware_init(void)
 {
     core_firmware = kzalloc(sizeof(*core_firmware), GFP_KERNEL);
     if (ERR_ALLOC_MEM(core_firmware)) {
-        TPD_INFO("Failed to allocate core_firmware mem, %ld\n", PTR_ERR(core_firmware));
+        TPD_DEBUG("Failed to allocate core_firmware mem, %ld\n", PTR_ERR(core_firmware));
         core_firmware_remove();
         return -ENOMEM;
     }
@@ -1301,6 +1301,6 @@ int core_firmware_init(void)
 
 void core_firmware_remove(void)
 {
-    TPD_INFO("Remove core-firmware members\n");
+    TPD_DEBUG("Remove core-firmware members\n");
     ipio_kfree((void **)&core_firmware);
 }

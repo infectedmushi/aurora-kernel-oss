@@ -68,7 +68,7 @@ static void insert_func(int key, int len, uint8_t *cmd, char *name)
 
     tmp = kmalloc(sizeof(struct DataItem), GFP_KERNEL);
     if(ERR_ALLOC_MEM(tmp)) {
-        TPD_INFO("Failed to allocate memory\n");
+        TPD_DEBUG("Failed to allocate memory\n");
         return;
     }
 
@@ -329,16 +329,16 @@ void core_protocol_func_control(int key, int ctrl)
         if (tmp->key != 9) {
             if (tmp->key == 1 && ctrl == 0) {
                 if (core_config->ili_sleep_type == SLEEP_IN_GESTURE_PS) {
-                    TPD_INFO("Gesture mode TP enter sleep in\n");
+                    TPD_DEBUG("Gesture mode TP enter sleep in\n");
                     tmp->cmd[tmp->len - 1] = 0x00;
                 } else if (core_config->ili_sleep_type == SLEEP_IN_DEEP) {
-                    TPD_INFO("TP enter deep sleep in\n");
+                    TPD_DEBUG("TP enter deep sleep in\n");
                     tmp->cmd[tmp->len - 1] = 0x03;
                 } else if (core_config->ili_sleep_type == SLEEP_IN_BEGIN_FTM) {
-                    TPD_INFO("TP enter sleep in at begin of ftm, but not close lcd\n");
+                    TPD_DEBUG("TP enter sleep in at begin of ftm, but not close lcd\n");
                     tmp->cmd[tmp->len - 1] = 0x04;
                 } else if (core_config->ili_sleep_type == SLEEP_IN_END_FTM) {
-                    TPD_INFO("TP enter sleep in at end of ftm, close lcd to reduce 1ma\n");
+                    TPD_DEBUG("TP enter sleep in at end of ftm, close lcd to reduce 1ma\n");
                     tmp->cmd[tmp->len - 1] = 0x05;
                 } else {
                     tmp->cmd[tmp->len - 1] = ctrl;
@@ -347,13 +347,13 @@ void core_protocol_func_control(int key, int ctrl)
                 tmp->cmd[tmp->len - 1] = ctrl;
             }
         }
-        TPD_INFO("Found func's name: %s, key = %d cmd: 0x%02X 0x%02X 0x%02X\n",\
+        TPD_DEBUG("Found func's name: %s, key = %d cmd: 0x%02X 0x%02X 0x%02X\n",\
             tmp->name, key, tmp->cmd[0], tmp->cmd[1], tmp->cmd[2]);
         core_write(core_config->slave_i2c_addr, tmp->cmd, tmp->len);
         return;
     }
 
-    TPD_INFO("Can't find any main functions\n");
+    TPD_DEBUG("Can't find any main functions\n");
 }
 EXPORT_SYMBOL(core_protocol_func_control);
 
@@ -374,7 +374,7 @@ int core_protocol_update_ver(uint8_t major, uint8_t mid, uint8_t minor)
             protocol->major = major;
             protocol->mid = mid;
             protocol->minor = minor;
-            TPD_INFO("protocol: major = %d, mid = %d, minor = %d\n",
+            TPD_DEBUG("protocol: major = %d, mid = %d, minor = %d\n",
                  protocol->major, protocol->mid, protocol->minor);
 
             if (protocol->major == 0x5)
@@ -386,14 +386,14 @@ int core_protocol_update_ver(uint8_t major, uint8_t mid, uint8_t minor)
         }
     }
 
-    TPD_INFO("Doesn't support this version of protocol\n");
+    TPD_DEBUG("Doesn't support this version of protocol\n");
     return -1;
 }
 EXPORT_SYMBOL(core_protocol_update_ver);
 
 void core_gesture_remove(void)
 {
-    TPD_INFO("Remove core-gesture members\n");
+    TPD_DEBUG("Remove core-gesture members\n");
     ipio_kfree((void **)&core_gesture);
 }
 EXPORT_SYMBOL(core_gesture_remove);
@@ -403,7 +403,7 @@ int core_protocol_init(void)
     if (protocol == NULL) {
         protocol = kzalloc(sizeof(*protocol), GFP_KERNEL);
         if (ERR_ALLOC_MEM(protocol)) {
-            TPD_INFO("Failed to allocate protocol mem, %ld\n", PTR_ERR(protocol));
+            TPD_DEBUG("Failed to allocate protocol mem, %ld\n", PTR_ERR(protocol));
             core_protocol_remove();
             return -ENOMEM;
         }
@@ -414,7 +414,7 @@ int core_protocol_init(void)
 
     core_gesture = kmalloc(sizeof(*core_gesture), GFP_KERNEL);
     if (ERR_ALLOC_MEM(core_gesture)) {
-        TPD_INFO("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_gesture));
+        TPD_DEBUG("Failed to alllocate core_i2c mem %ld\n", PTR_ERR(core_gesture));
         core_gesture_remove();
     }
     core_gesture->entry = false;
@@ -425,7 +425,7 @@ EXPORT_SYMBOL(core_protocol_init);
 
 void core_protocol_remove(void)
 {
-    TPD_INFO("Remove core-protocol memebers\n");
+    TPD_DEBUG("Remove core-protocol memebers\n");
     ipio_kfree((void **)&protocol);
     free_func_hash();
     core_gesture_remove();
@@ -468,7 +468,7 @@ int core_flash_poll_busy(void)
         timer--;
     }
 
-    TPD_INFO("Polling busy Time out !\n");
+    TPD_DEBUG("Polling busy Time out !\n");
     res = -1;
 out:
     core_config_ice_mode_write(0x041000, 0x1, 1);    /* CS high */
@@ -490,17 +490,17 @@ int core_flash_write_enable(void)
     return 0;
 
 out:
-    TPD_INFO("Write enable failed !\n");
+    TPD_DEBUG("Write enable failed !\n");
     return -EIO;
 }
 EXPORT_SYMBOL(core_flash_write_enable);
 
 void core_flash_enable_protect(bool enable)
 {
-    TPD_INFO("Set flash protect as (%d)\n", enable);
+    TPD_DEBUG("Set flash protect as (%d)\n", enable);
 
     if (core_flash_write_enable() < 0) {
-        TPD_INFO("Failed to config flash's write enable\n");
+        TPD_DEBUG("Failed to config flash's write enable\n");
         return;
     }
 
@@ -531,7 +531,7 @@ void core_flash_enable_protect(bool enable)
         }
         break;
     default:
-        TPD_INFO("Can't find flash id, ignore protection\n");
+        TPD_DEBUG("Can't find flash id, ignore protection\n");
         break;
     }
 
@@ -544,17 +544,17 @@ void core_flash_init(uint16_t mid, uint16_t did)
 {
     int i = 0;
 
-    TPD_INFO("M_ID = %x, DEV_ID = %x", mid, did);
+    TPD_DEBUG("M_ID = %x, DEV_ID = %x", mid, did);
 
     flashtab = kzalloc(sizeof(ft), GFP_KERNEL);
     if (ERR_ALLOC_MEM(flashtab)) {
-        TPD_INFO("Failed to allocate flashtab memory, %ld\n", PTR_ERR(flashtab));
+        TPD_DEBUG("Failed to allocate flashtab memory, %ld\n", PTR_ERR(flashtab));
         return;
     }
 
     for (; i < ARRAY_SIZE(ft); i++) {
         if (mid == ft[i].mid && did == ft[i].dev_id) {
-            TPD_INFO("Find them in flash table\n");
+            TPD_DEBUG("Find them in flash table\n");
 
             flashtab->mid = mid;
             flashtab->dev_id = did;
@@ -567,7 +567,7 @@ void core_flash_init(uint16_t mid, uint16_t did)
     }
 
     if (i >= ARRAY_SIZE(ft)) {
-        TPD_INFO("Can't find them in flash table, apply default flash config\n");
+        TPD_DEBUG("Can't find them in flash table, apply default flash config\n");
         flashtab->mid = mid;
         flashtab->dev_id = did;
         flashtab->mem_size = (256 * K);
@@ -576,16 +576,16 @@ void core_flash_init(uint16_t mid, uint16_t did)
         flashtab->block = (64 * K);
     }
 
-    TPD_INFO("Max Memory size = %d\n", flashtab->mem_size);
-    TPD_INFO("Per program page = %d\n", flashtab->program_page);
-    TPD_INFO("Sector size = %d\n", flashtab->sector);
-    TPD_INFO("Block size = %d\n", flashtab->block);
+    TPD_DEBUG("Max Memory size = %d\n", flashtab->mem_size);
+    TPD_DEBUG("Per program page = %d\n", flashtab->program_page);
+    TPD_DEBUG("Sector size = %d\n", flashtab->sector);
+    TPD_DEBUG("Block size = %d\n", flashtab->block);
 }
 EXPORT_SYMBOL(core_flash_init);
 
 void core_flash_remove(void)
 {
-    TPD_INFO("Remove core-flash memebers\n");
+    TPD_DEBUG("Remove core-flash memebers\n");
 
     ipio_kfree((void **)&flashtab);
 }
@@ -639,7 +639,7 @@ static uint32_t check_chip_id(uint32_t pid_data)
     id = pid_data >> 16;
     type = (pid_data & 0x0000FF00) >> 8;
 
-    TPD_INFO("id = 0x%x, type = 0x%x\n", id, type);
+    TPD_DEBUG("id = 0x%x, type = 0x%x\n", id, type);
 
     if(id == CHIP_TYPE_ILI9881) {
         for(i = ILI9881_TYPE_F; i <= ILI9881_TYPE_H; i++) {
@@ -683,7 +683,7 @@ uint32_t core_config_read_write_onebyte(uint32_t addr)
     return data;
 
 out:
-    TPD_INFO("Failed to read/write data in ICE mode, res = %d\n", res);
+    TPD_DEBUG("Failed to read/write data in ICE mode, res = %d\n", res);
     return res;
 }
 EXPORT_SYMBOL(core_config_read_write_onebyte);
@@ -714,7 +714,7 @@ uint32_t core_config_ice_mode_read(uint32_t addr)
     return data;
 
 out:
-    TPD_INFO("Failed to read data in ICE mode, res = %d\n", res);
+    TPD_DEBUG("Failed to read data in ICE mode, res = %d\n", res);
     return res;
 }
 EXPORT_SYMBOL(core_config_ice_mode_read);
@@ -742,7 +742,7 @@ int core_config_ice_mode_write(uint32_t addr, uint32_t data, uint32_t size)
     res = core_write(core_config->slave_i2c_addr, szOutBuf, size + 4);
 
     if (res < 0)
-        TPD_INFO("Failed to write data in ICE mode, res = %d\n", res);
+        TPD_DEBUG("Failed to write data in ICE mode, res = %d\n", res);
 
     return res;
 }
@@ -760,7 +760,7 @@ void core_config_mode_control(uint8_t *from_user)
     ilitek_platform_disable_irq();
 
     if (from_user == NULL) {
-        TPD_INFO("Arguments from user space are invaild\n");
+        TPD_DEBUG("Arguments from user space are invaild\n");
         goto out;
     }
 
@@ -775,10 +775,10 @@ void core_config_mode_control(uint8_t *from_user)
             cmd[1] = *(from_user + 1);
             cmd[2] = *(from_user + 2);
 
-            TPD_INFO("Switch to I2CUART mode, cmd = %x, b1 = %x, b2 = %x\n", cmd[0], cmd[1], cmd[2]);
+            TPD_DEBUG("Switch to I2CUART mode, cmd = %x, b1 = %x, b2 = %x\n", cmd[0], cmd[1], cmd[2]);
 
             if ((core_write(core_config->slave_i2c_addr, cmd, 3)) < 0) {
-                TPD_INFO("Failed to switch I2CUART mode\n");
+                TPD_DEBUG("Failed to switch I2CUART mode\n");
                 goto out;
             }
 
@@ -788,10 +788,10 @@ void core_config_mode_control(uint8_t *from_user)
 
             core_fr->actual_fw_mode = mode;
 
-            TPD_INFO("Switch to Demo/Debug mode, cmd = 0x%x, b1 = 0x%x\n", cmd[0], cmd[1]);
+            TPD_DEBUG("Switch to Demo/Debug mode, cmd = 0x%x, b1 = 0x%x\n", cmd[0], cmd[1]);
 
             if ((core_write(core_config->slave_i2c_addr, cmd, 2)) < 0) {
-                TPD_INFO("Failed to switch Demo/Debug mode\n");
+                TPD_DEBUG("Failed to switch Demo/Debug mode\n");
                 goto out;
             }
 
@@ -802,10 +802,10 @@ void core_config_mode_control(uint8_t *from_user)
             cmd[0] = protocol->cmd_mode_ctrl;
             cmd[1] = mode;
 
-            TPD_INFO("Switch to Test mode, cmd = 0x%x, b1 = 0x%x\n", cmd[0], cmd[1]);
+            TPD_DEBUG("Switch to Test mode, cmd = 0x%x, b1 = 0x%x\n", cmd[0], cmd[1]);
 
             if ((core_write(core_config->slave_i2c_addr, cmd, 2)) < 0) {
-                TPD_INFO("Failed to switch Test mode\n");
+                TPD_DEBUG("Failed to switch Test mode\n");
                 goto out;
             }
 
@@ -820,7 +820,7 @@ void core_config_mode_control(uint8_t *from_user)
                 checksum += mp_code[i];
 
             if ((-checksum & 0xFF) != mp_code[codeLength - 1]) {
-                TPD_INFO("checksume error (0x%x), FW doesn't support test mode.\n",
+                TPD_DEBUG("checksume error (0x%x), FW doesn't support test mode.\n",
                         (-checksum & 0XFF));
                 goto out;
             }
@@ -832,10 +832,10 @@ void core_config_mode_control(uint8_t *from_user)
                 core_fr->actual_fw_mode = mode;
 
         } else {
-            TPD_INFO("Unknown firmware mode: %x\n", mode);
+            TPD_DEBUG("Unknown firmware mode: %x\n", mode);
         }
     } else {
-        TPD_INFO("Wrong the major version of protocol, 0x%x\n", protocol->major);
+        TPD_DEBUG("Wrong the major version of protocol, 0x%x\n", protocol->major);
     }
 
 out:
@@ -845,23 +845,23 @@ EXPORT_SYMBOL(core_config_mode_control);
 
 int core_config_mp_move_code(void)
 {
-    TPD_INFO("Prepaing to enter Test Mode\n");
+    TPD_DEBUG("Prepaing to enter Test Mode\n");
 #ifdef HOST_DOWNLOAD
     //ilitek_platform_tp_hw_reset(true);
     ilitek_reset((void *)ipd);
 #else
     if (core_config_check_cdc_busy(50) < 0) {
-        TPD_INFO("Check busy is timout ! Enter Test Mode failed\n");
+        TPD_DEBUG("Check busy is timout ! Enter Test Mode failed\n");
         return -1;
     }
 
     if (core_config_ice_mode_enable() < 0) {
-        TPD_INFO("Failed to enter ICE mode\n");
+        TPD_DEBUG("Failed to enter ICE mode\n");
         return -1;
     }
 
     if (core_config_set_watch_dog(false) < 0) {
-        TPD_INFO("Failed to disable watch dog\n");
+        TPD_DEBUG("Failed to disable watch dog\n");
     }
 
     /* DMA Trigger */
@@ -878,17 +878,17 @@ int core_config_mp_move_code(void)
     core_config_ice_mode_write(0x40040, 0xAE, 1);
 
     if (core_config_set_watch_dog(false) < 0) {
-        TPD_INFO("Failed to disable watch dog\n");
+        TPD_DEBUG("Failed to disable watch dog\n");
     }
 
     core_config_ice_mode_disable();
 
     if (core_config_check_cdc_busy(300) < 0) {
-        TPD_INFO("Check busy is timout ! Enter Test Mode failed\n");
+        TPD_DEBUG("Check busy is timout ! Enter Test Mode failed\n");
         return -1;
     }
 #endif
-    TPD_INFO("FW Test Mode ready\n");
+    TPD_DEBUG("FW Test Mode ready\n");
     return 0;
 }
 EXPORT_SYMBOL(core_config_mp_move_code);
@@ -949,7 +949,7 @@ void core_config_glove_ctrl(bool enable, bool seamless)
             cmd = 0x0;
     }
 
-    TPD_INFO("Glove = %d, seamless = %d, cmd = %d\n", enable, seamless, cmd);
+    TPD_DEBUG("Glove = %d, seamless = %d, cmd = %d\n", enable, seamless, cmd);
 
     return core_protocol_func_control(2, cmd);
 }
@@ -966,7 +966,7 @@ void core_config_stylus_ctrl(bool enable, bool seamless)
             cmd = 0x0;
     }
 
-    TPD_INFO("stylus = %d, seamless = %d, cmd = %x\n", enable, seamless, cmd);
+    TPD_DEBUG("stylus = %d, seamless = %d, cmd = %x\n", enable, seamless, cmd);
 
     return core_protocol_func_control(3, cmd);
 }
@@ -993,13 +993,13 @@ void core_config_gesture_ctrl(uint8_t func)
     uint8_t max_byte = 0x0;
     uint8_t min_byte = 0x0;
 
-    TPD_INFO("Gesture function = 0x%x\n", func);
+    TPD_DEBUG("Gesture function = 0x%x\n", func);
 
     max_byte = 0x3F;
     min_byte = 0x20;
 
     if (func > max_byte || func < min_byte) {
-        TPD_INFO("Gesture ctrl error, 0x%x\n", func);
+        TPD_DEBUG("Gesture ctrl error, 0x%x\n", func);
         return;
     }
 
@@ -1009,7 +1009,7 @@ EXPORT_SYMBOL(core_config_gesture_ctrl);
 
 void core_config_phone_cover_ctrl(bool enable)
 {
-    TPD_INFO("Phone Cover = %d\n", enable);
+    TPD_DEBUG("Phone Cover = %d\n", enable);
 
     return core_protocol_func_control(7, enable);
 }
@@ -1017,7 +1017,7 @@ EXPORT_SYMBOL(core_config_phone_cover_ctrl);
 
 void core_config_finger_sense_ctrl(bool enable)
 {
-    TPD_INFO("Finger sense = %d\n", enable);
+    TPD_DEBUG("Finger sense = %d\n", enable);
 
     return core_protocol_func_control(0, enable);
 }
@@ -1025,7 +1025,7 @@ EXPORT_SYMBOL(core_config_finger_sense_ctrl);
 
 void core_config_proximity_ctrl(bool enable)
 {
-    TPD_INFO("Proximity = %d\n", enable);
+    TPD_DEBUG("Proximity = %d\n", enable);
 
     return core_protocol_func_control(11, enable);
 }
@@ -1045,7 +1045,7 @@ void core_config_edge_limit_ctrl(void *chip_data, bool enable)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return;
     }
 
@@ -1098,21 +1098,21 @@ void core_config_set_phone_cover(uint8_t *pattern)
     int i = 0;
 
     if (pattern == NULL) {
-        TPD_INFO("Invaild pattern\n");
+        TPD_DEBUG("Invaild pattern\n");
         return;
     }
 
     for(i = 0; i < 8; i++)
         protocol->phone_cover_window[i+1] = pattern[i];
 
-    TPD_INFO("window: cmd = 0x%x\n", protocol->phone_cover_window[0]);
-    TPD_INFO("window: ul_x_l = 0x%x, ul_x_h = 0x%x\n", protocol->phone_cover_window[1],
+    TPD_DEBUG("window: cmd = 0x%x\n", protocol->phone_cover_window[0]);
+    TPD_DEBUG("window: ul_x_l = 0x%x, ul_x_h = 0x%x\n", protocol->phone_cover_window[1],
          protocol->phone_cover_window[2]);
-    TPD_INFO("window: ul_y_l = 0x%x, ul_y_l = 0x%x\n", protocol->phone_cover_window[3],
+    TPD_DEBUG("window: ul_y_l = 0x%x, ul_y_l = 0x%x\n", protocol->phone_cover_window[3],
          protocol->phone_cover_window[4]);
-    TPD_INFO("window: br_x_l = 0x%x, br_x_l = 0x%x\n", protocol->phone_cover_window[5],
+    TPD_DEBUG("window: br_x_l = 0x%x, br_x_l = 0x%x\n", protocol->phone_cover_window[5],
          protocol->phone_cover_window[6]);
-    TPD_INFO("window: br_y_l = 0x%x, br_y_l = 0x%x\n", protocol->phone_cover_window[7],
+    TPD_DEBUG("window: br_y_l = 0x%x, br_y_l = 0x%x\n", protocol->phone_cover_window[7],
          protocol->phone_cover_window[8]);
 
     core_protocol_func_control(9, 0);
@@ -1130,7 +1130,7 @@ void core_config_ic_suspend(void)
 {
     //uint8_t temp[4] = {0};
     core_gesture->suspend = true;
-    TPD_INFO("Starting to suspend ...\n");
+    TPD_DEBUG("Starting to suspend ...\n");
 
     /* sense stop */
     core_config_sense_ctrl(false);
@@ -1143,19 +1143,19 @@ void core_config_ic_suspend(void)
     }
     /* check system busy */
     if (core_config_check_cdc_busy(5) < 0) {
-        TPD_INFO("Check busy is timout retry!\n");
+        TPD_DEBUG("Check busy is timout retry!\n");
         core_config_sense_ctrl(false);
         core_config_check_cdc_busy(5);
     }
 
-    TPD_INFO("Enabled Gesture = %d\n", core_config->isEnableGesture);
+    TPD_DEBUG("Enabled Gesture = %d\n", core_config->isEnableGesture);
 
     if (core_config->isEnableGesture) {
         //core_fr->actual_fw_mode = P5_0_FIRMWARE_GESTURE_MODE;
         #ifdef HOST_DOWNLOAD
         if (P5_0_FIRMWARE_GESTURE_MODE != core_firmware->enter_mode) {
             if(core_load_gesture_code() < 0) {
-                TPD_INFO("load gesture code fail\n");
+                TPD_DEBUG("load gesture code fail\n");
             }
         }
         #endif
@@ -1165,7 +1165,7 @@ void core_config_ic_suspend(void)
         core_config_sleep_ctrl(false);
     }
 
-    TPD_INFO("Suspend done\n");
+    TPD_DEBUG("Suspend done\n");
 }
 EXPORT_SYMBOL(core_config_ic_suspend);
 
@@ -1173,7 +1173,7 @@ void core_config_ic_suspend_ftm(void)
 {
     //uint8_t temp[4] = {0};
     core_gesture->suspend = true;
-    TPD_INFO("Starting to suspend ...\n");
+    TPD_DEBUG("Starting to suspend ...\n");
 
     /* sense stop */
     core_config_sense_ctrl(false);
@@ -1186,7 +1186,7 @@ void core_config_ic_suspend_ftm(void)
     }
     /* check system busy */
     if (core_config_check_cdc_busy(5) < 0) {
-        TPD_INFO("Check busy is timout retry!\n");
+        TPD_DEBUG("Check busy is timout retry!\n");
         core_config_sense_ctrl(false);
         core_config_check_cdc_busy(5);
     }
@@ -1195,7 +1195,7 @@ void core_config_ic_suspend_ftm(void)
     /*ftm deep sleep in */
     core_config_sleep_ctrl(false);
 
-    TPD_INFO("Suspend done\n");
+    TPD_DEBUG("Suspend done\n");
 }
 EXPORT_SYMBOL(core_config_ic_suspend_ftm);
 
@@ -1210,12 +1210,12 @@ EXPORT_SYMBOL(core_config_ic_suspend_ftm);
 void core_config_ic_resume(void)
 {
     core_gesture->suspend = false;
-    TPD_INFO("Starting to resume ...\n");
+    TPD_DEBUG("Starting to resume ...\n");
     if (core_config->isEnableGesture) {
         #ifdef HOST_DOWNLOAD
         if(core_load_ap_code() < 0)
         {
-            TPD_INFO("load ap code fail\n");
+            TPD_DEBUG("load ap code fail\n");
             ilitek_platform_tp_hw_reset(true);
         }
         #endif
@@ -1228,7 +1228,7 @@ void core_config_ic_resume(void)
 
     /* check system busy */
     if (core_config_check_cdc_busy(50) < 0)
-        TPD_INFO("Check busy is timout !\n");
+        TPD_DEBUG("Check busy is timout !\n");
 
     /* sense start for TP */
     core_config_sense_ctrl(true);
@@ -1237,7 +1237,7 @@ void core_config_ic_resume(void)
     // core_config_ice_mode_enable();
     // mdelay(10);
     // core_config_ic_reset();
-    TPD_INFO("Resume done\n");
+    TPD_DEBUG("Resume done\n");
 }
 EXPORT_SYMBOL(core_config_ic_resume);
 #endif
@@ -1280,7 +1280,7 @@ int core_config_set_watch_dog(bool enable)
     uint32_t wdt_addr = core_config->wdt_addr;
 
     if (wdt_addr <= 0 || core_config->chip_id <= 0) {
-        TPD_INFO("WDT/CHIP ID is invalid\n");
+        TPD_DEBUG("WDT/CHIP ID is invalid\n");
         return -EINVAL;
     }
 
@@ -1289,7 +1289,7 @@ int core_config_set_watch_dog(bool enable)
         value_low = 0x81;
         value_high = 0x98;
     } else {
-        TPD_INFO("Unknown CHIP type (0x%x)\n",core_config->chip_id);
+        TPD_DEBUG("Unknown CHIP type (0x%x)\n",core_config->chip_id);
         return -ENODEV;
     }
 
@@ -1318,13 +1318,13 @@ int core_config_set_watch_dog(bool enable)
 
     if (timeout > 0) {
         if (enable) {
-            TPD_INFO("WDT turn on succeed\n");
+            TPD_DEBUG("WDT turn on succeed\n");
         } else {
             core_config_ice_mode_write(wdt_addr, 0, 1);
-            TPD_INFO("WDT turn off succeed\n");
+            TPD_DEBUG("WDT turn off succeed\n");
         }
     } else {
-        TPD_INFO("WDT turn on/off timeout !\n");
+        TPD_DEBUG("WDT turn on/off timeout !\n");
         return -EINVAL;
     }
 
@@ -1357,7 +1357,7 @@ int core_config_check_cdc_busy(int delay)
         timer--;
     }
     if (res < 0)
-        TPD_INFO("Check busy timeout !!\n");
+        TPD_DEBUG("Check busy timeout !!\n");
     return res;
 }
 EXPORT_SYMBOL(core_config_check_cdc_busy);
@@ -1369,7 +1369,7 @@ int core_config_check_int_status(void *chip_data, bool high)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -1;
     }
 
@@ -1392,7 +1392,7 @@ int core_config_check_int_status(void *chip_data, bool high)
     }
 
     if (res < 0)
-        TPD_INFO("Check busy timeout !!\n");
+        TPD_DEBUG("Check busy timeout !!\n");
 
     return res;
 }
@@ -1407,7 +1407,7 @@ int core_config_get_project_id(uint8_t *pid_data)
 
     res = core_config_ice_mode_enable();
     if (res < 0) {
-        TPD_INFO("Failed to enter ICE mode, res = %d\n", res);
+        TPD_DEBUG("Failed to enter ICE mode, res = %d\n", res);
         return -1;
     }
 
@@ -1430,7 +1430,7 @@ int core_config_get_project_id(uint8_t *pid_data)
     for(i = 0; i < pid_size; i++) {
         core_config_ice_mode_write(0x041008, 0xFF, 1);
         pid_data[i] = core_config_ice_mode_read(0x41010);
-        TPD_INFO("pid_data[%d] = 0x%x\n", i, pid_data[i]);
+        TPD_DEBUG("pid_data[%d] = 0x%x\n", i, pid_data[i]);
     }
 
     core_config_ice_mode_write(0x041010, 0x1, 0);   /* CS high */
@@ -1453,7 +1453,7 @@ int core_config_get_key_info(void)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1461,7 +1461,7 @@ int core_config_get_key_info(void)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1469,24 +1469,24 @@ int core_config_get_key_info(void)
 
     res = core_read(core_config->slave_i2c_addr, &g_read_buf[0], protocol->key_info_len);
     if (res < 0) {
-        TPD_INFO("Failed to read data, %d\n", res);
+        TPD_DEBUG("Failed to read data, %d\n", res);
         goto out;
     }
     if (g_read_buf[0] != cmd[1]) {
-        TPD_INFO("Failed to read key info packet data[0] = 0x%X\n", g_read_buf[0]);
+        TPD_DEBUG("Failed to read key info packet data[0] = 0x%X\n", g_read_buf[0]);
         goto out;
     }
     if (core_config->tp_info->nKeyCount) {
         if (core_config->tp_info->nKeyCount > 10) {
-            TPD_INFO("nKeyCount = %d > 10 force set 10\n", core_config->tp_info->nKeyCount);
+            TPD_DEBUG("nKeyCount = %d > 10 force set 10\n", core_config->tp_info->nKeyCount);
             core_config->tp_info->nKeyCount = 10;
         }
         /* NOTE: Firmware not ready yet */
         core_config->tp_info->nKeyAreaXLength = (g_read_buf[0] << 8) + g_read_buf[1];
         core_config->tp_info->nKeyAreaYLength = (g_read_buf[2] << 8) + g_read_buf[3];
 
-        TPD_INFO("key: length of X area = %x\n", core_config->tp_info->nKeyAreaXLength);
-        TPD_INFO("key: length of Y area = %x\n", core_config->tp_info->nKeyAreaYLength);
+        TPD_DEBUG("key: length of X area = %x\n", core_config->tp_info->nKeyAreaXLength);
+        TPD_DEBUG("key: length of Y area = %x\n", core_config->tp_info->nKeyAreaYLength);
 
         for (i = 0; i < core_config->tp_info->nKeyCount; i++) {
             core_config->tp_info->virtual_key[i].nId = g_read_buf[i * 5 + 4];
@@ -1494,7 +1494,7 @@ int core_config_get_key_info(void)
             core_config->tp_info->virtual_key[i].nY = (g_read_buf[i * 5 + 7] << 8) + g_read_buf[i * 5 + 8];
             core_config->tp_info->virtual_key[i].nStatus = 0;
 
-            TPD_INFO("key: id = %d, X = %d, Y = %d\n", core_config->tp_info->virtual_key[i].nId,
+            TPD_DEBUG("key: id = %d, X = %d, Y = %d\n", core_config->tp_info->virtual_key[i].nId,
                  core_config->tp_info->virtual_key[i].nX, core_config->tp_info->virtual_key[i].nY);
         }
     }
@@ -1516,7 +1516,7 @@ int core_config_get_tp_info(void)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1524,7 +1524,7 @@ int core_config_get_tp_info(void)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1532,11 +1532,11 @@ int core_config_get_tp_info(void)
 
     res = core_read(core_config->slave_i2c_addr, &g_read_buf[0], protocol->tp_info_len);
     if (res < 0) {
-        TPD_INFO("Failed to read data, %d\n", res);
+        TPD_DEBUG("Failed to read data, %d\n", res);
         goto out;
     }
     if (g_read_buf[0] != cmd[1]) {
-        TPD_INFO("Failed to read tp info packet data[0] = 0x%X\n", g_read_buf[0]);
+        TPD_DEBUG("Failed to read tp info packet data[0] = 0x%X\n", g_read_buf[0]);
         goto out;
     }
     /* in protocol v5, ignore the first btye because of a header. */
@@ -1586,7 +1586,7 @@ int core_config_get_protocol_ver(void)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1594,7 +1594,7 @@ int core_config_get_protocol_ver(void)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1602,17 +1602,17 @@ int core_config_get_protocol_ver(void)
 
     res = core_read(core_config->slave_i2c_addr, &g_read_buf[0], protocol->pro_ver_len);
     if (res < 0) {
-        TPD_INFO("Failed to read data, %d\n", res);
+        TPD_DEBUG("Failed to read data, %d\n", res);
         goto out;
     }
     if (g_read_buf[0] != cmd[1]) {
-        TPD_INFO("Failed to read protocol version packet data[0] = 0x%X\n", g_read_buf[0]);
+        TPD_DEBUG("Failed to read protocol version packet data[0] = 0x%X\n", g_read_buf[0]);
         goto out;
     }
     TPD_DEBUG("protocol->pro_ver_len = %d\n",protocol->pro_ver_len);
     /* ignore the first btye because of a header. */
     for (; i < protocol->pro_ver_len - 1; i++) {
-        //TPD_INFO("g_read_buf[%d] = %x\n",i,g_read_buf[i]);
+        //TPD_DEBUG("g_read_buf[%d] = %x\n",i,g_read_buf[i]);
         core_config->protocol_ver[i] = g_read_buf[i + 1];
     }
 
@@ -1627,7 +1627,7 @@ int core_config_get_protocol_ver(void)
     if (major != PROTOCOL_MAJOR || mid != PROTOCOL_MID || minor != PROTOCOL_MINOR) {
         res = core_protocol_update_ver(major, mid, minor);
         if (res < 0)
-            TPD_INFO("Protocol version is invalid\n");
+            TPD_DEBUG("Protocol version is invalid\n");
     }
 
 out:
@@ -1648,7 +1648,7 @@ int core_config_get_core_ver(void)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1656,7 +1656,7 @@ int core_config_get_core_ver(void)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1664,11 +1664,11 @@ int core_config_get_core_ver(void)
 
     res = core_read(core_config->slave_i2c_addr, &g_read_buf[0], protocol->core_ver_len);
     if (res < 0) {
-        TPD_INFO("Failed to read data, %d\n", res);
+        TPD_DEBUG("Failed to read data, %d\n", res);
         goto out;
     }
     if (g_read_buf[0] != cmd[1]) {
-        TPD_INFO("Failed to read core version packet data[0] = 0x%X\n", g_read_buf[0]);
+        TPD_DEBUG("Failed to read core version packet data[0] = 0x%X\n", g_read_buf[0]);
         goto out;
     }
     for (; i < protocol->core_ver_len - 1; i++)
@@ -1697,7 +1697,7 @@ int core_config_get_fw_ver(void *chip_data)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -1;
     }
 
@@ -1708,7 +1708,7 @@ int core_config_get_fw_ver(void *chip_data)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1716,7 +1716,7 @@ int core_config_get_fw_ver(void *chip_data)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("Failed to write data, %d\n", res);
+        TPD_DEBUG("Failed to write data, %d\n", res);
         goto out;
     }
 
@@ -1724,11 +1724,11 @@ int core_config_get_fw_ver(void *chip_data)
 
     res = core_read(core_config->slave_i2c_addr, &g_read_buf[0], protocol->fw_ver_len);
     if (res < 0) {
-        TPD_INFO("Failed to read fw version %d\n", res);
+        TPD_DEBUG("Failed to read fw version %d\n", res);
         goto out;
     }
     if (g_read_buf[0] != cmd[1]) {
-        TPD_INFO("Failed to read fw version packet data[0] = 0x%X\n", g_read_buf[0]);
+        TPD_DEBUG("Failed to read fw version packet data[0] = 0x%X\n", g_read_buf[0]);
         goto out;
     }
     for (; i < protocol->fw_ver_len; i++)
@@ -1737,13 +1737,13 @@ int core_config_get_fw_ver(void *chip_data)
     /* in protocol v5, ignore the first btye because of a header. */
     if (protocol->mid >= 0x3)
     {
-        TPD_INFO("Firmware Version = %d.%d.%d.%d\n",
+        TPD_DEBUG("Firmware Version = %d.%d.%d.%d\n",
          core_config->firmware_ver[1], core_config->firmware_ver[2], core_config->firmware_ver[3],
           core_config->firmware_ver[4]);
     }
     else
     {
-        TPD_INFO("Firmware Version = %d.%d.%d\n",
+        TPD_DEBUG("Firmware Version = %d.%d.%d\n",
          core_config->firmware_ver[1], core_config->firmware_ver[2], core_config->firmware_ver[3]);
     }
     sprintf(dev_version, "%02X", core_config->firmware_ver[3]);
@@ -1764,7 +1764,7 @@ int core_config_get_chip_id(void)
 
     res = core_config_ice_mode_enable();
     if (res < 0) {
-        TPD_INFO("Failed to enter ICE mode, res = %d\n", res);
+        TPD_DEBUG("Failed to enter ICE mode, res = %d\n", res);
         goto out;
     }
 
@@ -1773,17 +1773,17 @@ int core_config_get_chip_id(void)
     PIDData = core_config_ice_mode_read(core_config->pid_addr);
     core_config->chip_pid = PIDData;
     core_config->core_type = PIDData & 0xFF;
-    TPD_INFO("PID = 0x%x, Core type = 0x%x\n",
+    TPD_DEBUG("PID = 0x%x, Core type = 0x%x\n",
         core_config->chip_pid, core_config->core_type);
     if (PIDData) {
         RealID = check_chip_id(PIDData);
         if (RealID != core_config->chip_id) {
-            TPD_INFO("CHIP ID ERROR: 0x%x, TP_TOUCH_IC = 0x%x\n", RealID, TP_TOUCH_IC);
+            TPD_DEBUG("CHIP ID ERROR: 0x%x, TP_TOUCH_IC = 0x%x\n", RealID, TP_TOUCH_IC);
             res = -ENODEV;
             goto out;
         }
     } else {
-        TPD_INFO("PID DATA error : 0x%x\n", PIDData);
+        TPD_DEBUG("PID DATA error : 0x%x\n", PIDData);
         res = -EINVAL;
         goto out;
     }
@@ -1812,7 +1812,7 @@ uint32_t core_config_get_reg_data(uint32_t addr)
 
     res = core_config_ice_mode_enable();
     if (res < 0) {
-        TPD_INFO("Failed to enter ICE mode, res = %d\n", res);
+        TPD_DEBUG("Failed to enter ICE mode, res = %d\n", res);
         goto out;
     }
     mdelay(1);
@@ -1834,13 +1834,13 @@ void core_config_wr_pack( int packet )
     while(retry--) {
         reg_data = core_config_read_write_onebyte(0x73010);
         if ((reg_data & 0x02) == 0) {
-            TPD_INFO("check ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
+            TPD_DEBUG("check ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
             break;
         }
         mdelay(10);
     }
     if (retry <= 0) {
-        TPD_INFO("check 0x73010 error read 0x%X\n", reg_data);
+        TPD_DEBUG("check 0x73010 error read 0x%X\n", reg_data);
     }
     core_config_ice_mode_write(0x73000, packet, 4);
 }
@@ -1853,13 +1853,13 @@ uint32_t core_config_rd_pack( int packet)
     while(retry--) {
         reg_data = core_config_read_write_onebyte(0x73010);
         if ((reg_data & 0x02) == 0) {
-            TPD_INFO("check  ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
+            TPD_DEBUG("check  ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
             break;
         }
         mdelay(10);
     }
     if (retry <= 0) {
-        TPD_INFO("check 0x73010 error read 0x%X\n", reg_data);
+        TPD_DEBUG("check 0x73010 error read 0x%X\n", reg_data);
     }
     core_config_ice_mode_write(0x73000, packet, 4);
 
@@ -1867,13 +1867,13 @@ uint32_t core_config_rd_pack( int packet)
     while(retry--) {
         reg_data = core_config_read_write_onebyte(0x4800A);
         if ((reg_data & 0x02) == 0x02) {
-            TPD_INFO("check  ok 0x4800A read 0x%X retry = %d\n", reg_data, retry);
+            TPD_DEBUG("check  ok 0x4800A read 0x%X retry = %d\n", reg_data, retry);
             break;
         }
         mdelay(10);
     }
     if (retry <= 0) {
-        TPD_INFO("check 0x4800A error read 0x%X\n", reg_data);
+        TPD_DEBUG("check 0x4800A error read 0x%X\n", reg_data);
     }
     core_config_ice_mode_write(0x4800A, 0x02, 1);
     reg_data = core_config_ice_mode_read(0x73016);
@@ -1886,7 +1886,7 @@ void core_get_ddi_register_onlyone(uint8_t page, uint8_t reg)
     uint32_t setpage = 0x1FFFFF00 | page;
     uint32_t setreg = 0x2F000100 | (reg << 16);
 
-    TPD_INFO("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
+    TPD_DEBUG("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
     ////TDI_RD_KEY
     core_config_wr_pack(0x1FFF9487);
     //( *( __IO uint8 *)    (0x4800A) ) =0x2
@@ -1895,7 +1895,7 @@ void core_get_ddi_register_onlyone(uint8_t page, uint8_t reg)
     //// Read Page reg
     core_config_wr_pack(setpage);
     reg_data = core_config_rd_pack(setreg);
-    TPD_INFO("check page = 0x%X reg = 0x%X read 0x%X\n", page, reg, reg_data);
+    TPD_DEBUG("check page = 0x%X reg = 0x%X read 0x%X\n", page, reg, reg_data);
 
     ////TDI_RD_KEY OFF
     core_config_wr_pack(0x1FFF9400);
@@ -1906,7 +1906,7 @@ void core_set_ddi_register_onlyone(uint8_t page, uint8_t reg, uint8_t data)
     uint32_t setpage = 0x1FFFFF00 | page;
     uint32_t setreg = 0x1F000100 | (reg << 16) | data;
 
-    TPD_INFO("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
+    TPD_DEBUG("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
     ////TDI_WR_KEY
     core_config_wr_pack(0x1FFF9527);
     //// Switch to Page
@@ -1939,25 +1939,25 @@ void core_get_ddi_register(void)
     //// Read Page6_RDD
     core_config_wr_pack(0x1FFFFF06);
     reg_data = core_config_rd_pack(0x2FDD0100);
-    TPD_INFO("check Page6_RDD 0x2FDD0100 read 0x%X\n", reg_data);
+    TPD_DEBUG("check Page6_RDD 0x2FDD0100 read 0x%X\n", reg_data);
 
     //// Read Page0_R0A
     core_config_wr_pack(0x1FFFFF00);
     reg_data = core_config_rd_pack(0x2F0A0100);
-    TPD_INFO("check Page0_R0A 0x2F0A0100 read 0x%X\n", reg_data);
+    TPD_DEBUG("check Page0_R0A 0x2F0A0100 read 0x%X\n", reg_data);
 
     //// Read Page6_RD3
     core_config_wr_pack(0x1FFFFF06);
     reg_data = core_config_rd_pack(0x2FD30100);
-    TPD_INFO("check Page6_RD3 0x2FD30100 read 0x%X\n", reg_data);
+    TPD_DEBUG("check Page6_RD3 0x2FD30100 read 0x%X\n", reg_data);
     //// Read PageE_R07
     core_config_wr_pack(0x1FFFFF0E);
     reg_data = core_config_rd_pack(0x2F070100);
-    TPD_INFO("check PageE_R07 0x2F070100 read 0x%X\n", reg_data);
+    TPD_DEBUG("check PageE_R07 0x2F070100 read 0x%X\n", reg_data);
     //// Read PageE_R06
     core_config_wr_pack(0x1FFFFF0E);
     reg_data = core_config_rd_pack(0x2F060100);
-    TPD_INFO("check PageE_R06 0x2F060100 read 0x%X\n", reg_data);
+    TPD_DEBUG("check PageE_R06 0x2F060100 read 0x%X\n", reg_data);
     ////TDI_RD_KEY OFF
     core_config_wr_pack(0x1FFF9400);
 }
@@ -1967,39 +1967,39 @@ void core_get_tp_register(void)
     uint32_t reg_data = 0;
 
     reg_data = core_config_ice_mode_read(core_config->pid_addr);
-    TPD_INFO("PID = 0x%x\n", reg_data);
+    TPD_DEBUG("PID = 0x%x\n", reg_data);
     reg_data = core_config_ice_mode_read(0x44008);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x44008, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x44008, reg_data);
     reg_data = core_config_ice_mode_read(0x40044);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x40044, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x40044, reg_data);
     reg_data = core_config_ice_mode_read(0x40048);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x40048, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x40048, reg_data);
     reg_data = core_config_ice_mode_read(0x4004C);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x4004C, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x4004C, reg_data);
     reg_data = core_config_ice_mode_read(0x4701C);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x4701C, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x4701C, reg_data);
     reg_data = core_config_ice_mode_read(0x45024);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x45024, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x45024, reg_data);
     reg_data = core_config_ice_mode_read(0x45028);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x45028, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x45028, reg_data);
     reg_data = core_config_ice_mode_read(0x71014);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x71014, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x71014, reg_data);
     reg_data = core_config_ice_mode_read(0x43080);
-    TPD_INFO("addr = 0x%X reg_data = 0x%X\n", 0x43080, reg_data);
+    TPD_DEBUG("addr = 0x%X reg_data = 0x%X\n", 0x43080, reg_data);
 }
 
 int core_config_init(void)
 {
     core_config = kzalloc(sizeof(*core_config) * sizeof(uint8_t) * 6, GFP_KERNEL);
     if (ERR_ALLOC_MEM(core_config)) {
-        TPD_INFO("Failed to allocate core_config mem, %ld\n", PTR_ERR(core_config));
+        TPD_DEBUG("Failed to allocate core_config mem, %ld\n", PTR_ERR(core_config));
         core_config_remove();
         return -ENOMEM;
     }
 
     core_config->tp_info = kzalloc(sizeof(*core_config->tp_info), GFP_KERNEL);
     if (ERR_ALLOC_MEM(core_config->tp_info)) {
-        TPD_INFO("Failed to allocate core_config->tp_info mem, %ld\n", PTR_ERR(core_config->tp_info));
+        TPD_DEBUG("Failed to allocate core_config->tp_info mem, %ld\n", PTR_ERR(core_config->tp_info));
         core_config_remove();
         return -ENOMEM;
     }
@@ -2022,7 +2022,7 @@ EXPORT_SYMBOL(core_config_init);
 
 void core_config_remove(void)
 {
-    TPD_INFO("Remove core-config memebers\n");
+    TPD_DEBUG("Remove core-config memebers\n");
 
     if (core_config != NULL) {
         ipio_kfree((void **)&core_config->tp_info);

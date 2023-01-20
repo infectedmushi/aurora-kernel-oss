@@ -173,7 +173,7 @@ static int ft3681_spi_transfer(struct spi_device *spi, u8 *tx_buf, u8 *rx_buf,
 	ret = spi_sync(spi, &msg);
 
 	if (ret) {
-		TPD_INFO("spi_sync fail,ret:%d", ret);
+		TPD_DEBUG("spi_sync fail,ret:%d", ret);
 		return ret;
 	}
 
@@ -211,7 +211,7 @@ static int rdata_check(u8 *rdata, u32 rlen)
 	crc_read = (u16)(rdata[rlen - 1] << 8) + rdata[rlen - 2];
 
 	if (crc_calc != crc_read) {
-		TPD_INFO("rdata check fail");
+		TPD_DEBUG("rdata check fail");
 		return -EIO;
 	}
 
@@ -230,12 +230,12 @@ int ft3681_write(u8 *writebuf, u32 writelen)
 	u32 datalen = writelen - 1;
 
 	if (!ts_data || !ts_data->ft_spi) {
-		TPD_INFO("ts_data/ft_spi is invalid");
+		TPD_DEBUG("ts_data/ft_spi is invalid");
 		return -EINVAL;
 	}
 
 	if (!writebuf || !writelen) {
-		TPD_INFO("writebuf/len is invalid");
+		TPD_DEBUG("writebuf/len is invalid");
 		return -EINVAL;
 	}
 
@@ -245,7 +245,7 @@ int ft3681_write(u8 *writebuf, u32 writelen)
 		txbuf = kzalloc(txlen_need, GFP_KERNEL);
 
 		if (NULL == txbuf) {
-			TPD_INFO("txbuf malloc fail");
+			TPD_DEBUG("txbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_write;
 		}
@@ -253,7 +253,7 @@ int ft3681_write(u8 *writebuf, u32 writelen)
 		rxbuf = kzalloc(txlen_need, GFP_KERNEL);
 
 		if (NULL == rxbuf) {
-			TPD_INFO("rxbuf malloc fail");
+			TPD_DEBUG("rxbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_write;
 		}
@@ -283,7 +283,7 @@ int ft3681_write(u8 *writebuf, u32 writelen)
 			break;
 
 		} else {
-			TPD_INFO("data write(addr:%x),status:%x,retry:%d,ret:%d",
+			TPD_DEBUG("data write(addr:%x),status:%x,retry:%d,ret:%d",
 				 writebuf[0], rxbuf[3], i, ret);
 			ret = -EIO;
 			udelay(CS_HIGH_DELAY);
@@ -291,7 +291,7 @@ int ft3681_write(u8 *writebuf, u32 writelen)
 	}
 
 	if (ret < 0) {
-		TPD_INFO("data write(addr:%x) fail,status:%x,ret:%d",
+		TPD_DEBUG("data write(addr:%x) fail,status:%x,ret:%d",
 			 writebuf[0], rxbuf[3], ret);
 	}
 
@@ -336,12 +336,12 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 	u32 dp = 0;
 
 	if (!ts_data || !ts_data->ft_spi) {
-		TPD_INFO("ts_data/ft_spi is invalid");
+		TPD_DEBUG("ts_data/ft_spi is invalid");
 		return -EINVAL;
 	}
 
 	if (!cmd || !cmdlen || !data || !datalen) {
-		TPD_INFO("cmd/cmdlen/data/datalen is invalid");
+		TPD_DEBUG("cmd/cmdlen/data/datalen is invalid");
 		return -EINVAL;
 	}
 
@@ -351,7 +351,7 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 		txbuf = kzalloc(txlen_need, GFP_KERNEL);
 
 		if (NULL == txbuf) {
-			TPD_INFO("txbuf malloc fail");
+			TPD_DEBUG("txbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_read;
 		}
@@ -359,7 +359,7 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 		rxbuf = kzalloc(txlen_need, GFP_KERNEL);
 
 		if (NULL == rxbuf) {
-			TPD_INFO("rxbuf malloc fail");
+			TPD_DEBUG("rxbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_read;
 		}
@@ -393,7 +393,7 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 				ret = rdata_check(&rxbuf[dp], txlen - dp);
 
 				if (ret < 0) {
-					TPD_INFO("data read(addr:%x) crc abnormal,retry:%d",
+					TPD_DEBUG("data read(addr:%x) crc abnormal,retry:%d",
 						 cmd[0], i);
 					udelay(CS_HIGH_DELAY);
 					continue;
@@ -403,7 +403,7 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 			break;
 
 		} else {
-			TPD_INFO("data read(addr:%x) status:%x,retry:%d,ret:%d",
+			TPD_DEBUG("data read(addr:%x) status:%x,retry:%d,ret:%d",
 				 cmd[0], rxbuf[3], i, ret);
 			ret = -EIO;
 			udelay(CS_HIGH_DELAY);
@@ -411,7 +411,7 @@ int ft3681_read(u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
 	}
 
 	if (ret < 0) {
-		TPD_INFO("data read(addr:%x) %s,status:%x,ret:%d", cmd[0],
+		TPD_DEBUG("data read(addr:%x) %s,status:%x,ret:%d", cmd[0],
 			 (i >= SPI_RETRY_NUMBER) ? "crc abnormal" : "fail",
 			 rxbuf[3], ret);
 	}
@@ -445,14 +445,14 @@ static int ft3681_bus_init(struct chip_data_ft3681 *ts_data)
 	ts_data->bus_tx_buf = kzalloc(SPI_BUF_LENGTH, GFP_KERNEL);
 
 	if (NULL == ts_data->bus_tx_buf) {
-		TPD_INFO("failed to allocate memory for bus_tx_buf");
+		TPD_DEBUG("failed to allocate memory for bus_tx_buf");
 		return -ENOMEM;
 	}
 
 	ts_data->bus_rx_buf = kzalloc(SPI_BUF_LENGTH, GFP_KERNEL);
 
 	if (NULL == ts_data->bus_rx_buf) {
-		TPD_INFO("failed to allocate memory for bus_rx_buf");
+		TPD_DEBUG("failed to allocate memory for bus_rx_buf");
 		return -ENOMEM;
 	}
 
@@ -469,7 +469,7 @@ static int ft3681_spi_transfer_direct(u8 *writebuf, u32 writelen, u8 *readbuf, u
 	u32 txlen = (read_cmd) ? readlen : writelen;
 
 	if (!writebuf || !writelen) {
-		TPD_INFO("writebuf/len is invalid");
+		TPD_DEBUG("writebuf/len is invalid");
 		return -EINVAL;
 	}
 
@@ -477,14 +477,14 @@ static int ft3681_spi_transfer_direct(u8 *writebuf, u32 writelen, u8 *readbuf, u
 	if (txlen > SPI_BUF_LENGTH) {
 		txbuf = kzalloc(txlen, GFP_KERNEL);
 		if (NULL == txbuf) {
-			TPD_INFO("txbuf malloc fail");
+			TPD_DEBUG("txbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_spi_dir;
 		}
 
 		rxbuf = kzalloc(txlen, GFP_KERNEL);
 		if (NULL == rxbuf) {
-			TPD_INFO("rxbuf malloc fail");
+			TPD_DEBUG("rxbuf malloc fail");
 			ret = -ENOMEM;
 			goto err_spi_dir;
 		}
@@ -498,7 +498,7 @@ static int ft3681_spi_transfer_direct(u8 *writebuf, u32 writelen, u8 *readbuf, u
 	memcpy(txbuf, writebuf, writelen);
 	ret = ft3681_spi_transfer(ts_data->ft_spi, txbuf, rxbuf, txlen);
 	if (ret < 0) {
-		TPD_INFO("data read(addr:%x) fail,status:%x,ret:%d", txbuf[0], rxbuf[3], ret);
+		TPD_DEBUG("data read(addr:%x) fail,status:%x,ret:%d", txbuf[0], rxbuf[3], ret);
 		goto err_spi_dir;
 	}
 
@@ -528,11 +528,11 @@ err_spi_dir:
 static int ft3681_rstgpio_set(struct hw_resource *hw_res, bool on)
 {
 	if (gpio_is_valid(hw_res->reset_gpio)) {
-		TPD_INFO("Set the reset_gpio \n");
+		TPD_DEBUG("Set the reset_gpio \n");
 		gpio_direction_output(hw_res->reset_gpio, on);
 
 	} else {
-		TPD_INFO("reset is invalid!!\n");
+		TPD_DEBUG("reset is invalid!!\n");
 	}
 
 	return 0;
@@ -543,7 +543,7 @@ static int ft3681_rstgpio_set(struct hw_resource *hw_res, bool on)
  */
 static int ft3681_hw_reset(struct chip_data_ft3681 *ts_data, u32 delayms)
 {
-	TPD_INFO("%s.\n", __func__);
+	TPD_DEBUG("%s.\n", __func__);
 	ft3681_rstgpio_set(ts_data->hw_res, false); /* reset gpio*/
 	msleep(5);
 	ft3681_rstgpio_set(ts_data->hw_res, true); /* reset gpio*/
@@ -639,7 +639,7 @@ static int focal_get_fw_version(void *chip_data)
 {
 	u8 fw_ver = 0;
 	ft3681_read_reg(FT3681_REG_FW_VER, &fw_ver);
-	TPD_INFO("fw id is :%hhu", fw_ver);
+	TPD_DEBUG("fw id is :%hhu", fw_ver);
 	return (int)fw_ver;
 }
 
@@ -680,7 +680,7 @@ static int ft3681_esd_handle(void *chip_data)
 		ret = ft3681_read_reg(FT3681_REG_CHIP_ID, &val);
 
 		if (val != FT3681_VAL_CHIP_ID) {
-			TPD_INFO("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
+			TPD_DEBUG("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
 			msleep(10);
 			spi_err++;
 
@@ -693,7 +693,7 @@ static int ft3681_esd_handle(void *chip_data)
 	ret = ft3681_read_reg(FT3681_REG_FLOW_WORK_CNT, &val);
 
 	if (ret < 0) {
-		TPD_INFO("%s: read FT3681_REG_FLOW_WORK_CNT failed!\n", __func__);
+		TPD_DEBUG("%s: read FT3681_REG_FLOW_WORK_CNT failed!\n", __func__);
 		spi_err++;
 	}
 
@@ -707,7 +707,7 @@ static int ft3681_esd_handle(void *chip_data)
 	flow_work_cnt_last = ret;
 
 	if ((err_cnt >= 5) || (spi_err >= 3)) {
-		TPD_INFO("esd check failed, start reset!\n");
+		TPD_DEBUG("esd check failed, start reset!\n");
 		disable_irq_nosync(ts_data->ft_spi->irq);
 		tp_touch_btnkey_release();
 		ft3681_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
@@ -745,7 +745,7 @@ static bool ft3681_fwupg_check_flash_status(struct chip_data_ft3681 *ts_data,
 		msleep(retries_delay);
 	}
 
-	TPD_INFO("flash status fail,ok:%04x read:%04x, retries:%d", flash_status,
+	TPD_DEBUG("flash status fail,ok:%04x read:%04x, retries:%d", flash_status,
 		 read_status, i);
 
 	return false;
@@ -763,10 +763,10 @@ static int ft3681_fwupg_get_boot_state(enum FW_STATUS *fw_sts)
 	u8 cmd = 0;
 	u8 val[2] = { 0 };
 
-	TPD_INFO("**********read boot id**********");
+	TPD_DEBUG("**********read boot id**********");
 
 	if (!fw_sts) {
-		TPD_INFO("fw_sts is null");
+		TPD_DEBUG("fw_sts is null");
 		return -EINVAL;
 	}
 
@@ -774,7 +774,7 @@ static int ft3681_fwupg_get_boot_state(enum FW_STATUS *fw_sts)
 	ret = ft3681_write(&cmd, 1);
 
 	if (ret < 0) {
-		TPD_INFO("write 55 cmd fail");
+		TPD_DEBUG("write 55 cmd fail");
 		return ret;
 	}
 
@@ -783,18 +783,18 @@ static int ft3681_fwupg_get_boot_state(enum FW_STATUS *fw_sts)
 	ret = ft3681_read(&cmd, 1, val, 2);
 
 	if (ret < 0) {
-		TPD_INFO("write 90 cmd fail");
+		TPD_DEBUG("write 90 cmd fail");
 		return ret;
 	}
 
-	TPD_INFO("read boot id:0x%02x%02x", val[0], val[1]);
+	TPD_DEBUG("read boot id:0x%02x%02x", val[0], val[1]);
 
 	if ((val[0] == 0x56) && (val[1] == 0x62)) {
-		TPD_INFO("tp run in romboot");
+		TPD_DEBUG("tp run in romboot");
 		*fw_sts = FT3681_RUN_IN_ROM;
 
 	} else if ((val[0] == 0x56) && (val[1] == 0xE2)) {
-		TPD_INFO("tp run in pramboot");
+		TPD_DEBUG("tp run in pramboot");
 		*fw_sts = FT3681_RUN_IN_PRAM;
 	}
 
@@ -811,7 +811,7 @@ static int ft3681_fwupg_reset_to_romboot(void)
 	ret = ft3681_write(&cmd, 1);
 
 	if (ret < 0) {
-		TPD_INFO("pram/rom/bootloader reset cmd write fail");
+		TPD_DEBUG("pram/rom/bootloader reset cmd write fail");
 		return ret;
 	}
 
@@ -828,7 +828,7 @@ static int ft3681_fwupg_reset_to_romboot(void)
 	}
 
 	if (i >= FT3681_UPGRADE_LOOP) {
-		TPD_INFO("reset to romboot fail");
+		TPD_DEBUG("reset to romboot fail");
 		return -EIO;
 	}
 
@@ -847,10 +847,10 @@ static int ft3681_pram_write_buf(u8 *buf, u32 len)
 	u8 packet_buf[BYTES_PER_TIME + 6] = { 0 };
 	u32 cmdlen = 0;
 
-	TPD_INFO("write pramboot to pram,pramboot len=%d", len);
+	TPD_DEBUG("write pramboot to pram,pramboot len=%d", len);
 
 	if (!buf || (len < 0x120) || (len > (0x10000))) {
-		TPD_INFO("buf/pramboot length(%d) fail", len);
+		TPD_DEBUG("buf/pramboot length(%d) fail", len);
 		return -EINVAL;
 	}
 
@@ -878,7 +878,7 @@ static int ft3681_pram_write_buf(u8 *buf, u32 len)
 		ret = ft3681_write(packet_buf, FT3681_ROMBOOT_CMD_SET_PRAM_ADDR_LEN);
 
 		if (ret < 0) {
-			TPD_INFO("pramboot set write address(%d) fail", i);
+			TPD_DEBUG("pramboot set write address(%d) fail", i);
 			return ret;
 		}
 
@@ -892,7 +892,7 @@ static int ft3681_pram_write_buf(u8 *buf, u32 len)
 		ret = ft3681_write(packet_buf, packet_len + cmdlen);
 
 		if (ret < 0) {
-			TPD_INFO("pramboot write data(%d) fail", i);
+			TPD_DEBUG("pramboot write data(%d) fail", i);
 			return ret;
 		}
 	}
@@ -928,7 +928,7 @@ static int ft3681_pram_ecc_cal(u32 start_addr, u32 ecc_length, u16 *ecc)
 	u8 val[2] = { 0 };
 	u8 cmd[FT3681_ROMBOOT_CMD_ECC_NEW_LEN] = { 0 };
 
-	TPD_INFO("read out pramboot checksum");
+	TPD_DEBUG("read out pramboot checksum");
 	cmd[0] = FT3681_ROMBOOT_CMD_ECC;
 	cmd[1] = (start_addr >> 16) & 0xFF;
 	cmd[2] = (start_addr >> 8) & 0xFF;
@@ -939,7 +939,7 @@ static int ft3681_pram_ecc_cal(u32 start_addr, u32 ecc_length, u16 *ecc)
 	ret = ft3681_write(cmd, FT3681_ROMBOOT_CMD_ECC_NEW_LEN);
 
 	if (ret < 0) {
-		TPD_INFO("write pramboot ecc cal cmd fail");
+		TPD_DEBUG("write pramboot ecc cal cmd fail");
 		return ret;
 	}
 
@@ -948,7 +948,7 @@ static int ft3681_pram_ecc_cal(u32 start_addr, u32 ecc_length, u16 *ecc)
 	ret = ft3681_read(cmd, 1, val, 2);
 
 	if (ret < 0) {
-		TPD_INFO("read pramboot ecc fail");
+		TPD_DEBUG("read pramboot ecc fail");
 		return ret;
 	}
 
@@ -961,12 +961,12 @@ static int ft3681_pram_start(void)
 	u8 cmd = FT3681_ROMBOOT_CMD_START_APP;
 	int ret = 0;
 
-	TPD_INFO("remap to start pramboot");
+	TPD_DEBUG("remap to start pramboot");
 
 	ret = ft3681_write(&cmd, 1);
 
 	if (ret < 0) {
-		TPD_INFO("write start pram cmd fail");
+		TPD_DEBUG("write start pram cmd fail");
 		return ret;
 	}
 
@@ -1005,26 +1005,26 @@ static int fts_ft3681_write_pramboot_private(void *chip_data)
 	u8 *pb_buf;
 	u32 pb_len = 0;
 
-	TPD_INFO("**********pram write and init**********");
+	TPD_DEBUG("**********pram write and init**********");
 
 	pb_buf = ts_data->h_fw_file;
 	pb_len = ts_data->h_fw_size;
 
 	if (pb_len < 0x120) {
-		TPD_INFO("pramboot length(%d) fail", pb_len);
+		TPD_DEBUG("pramboot length(%d) fail", pb_len);
 		return -EINVAL;
 	}
 
-	TPD_INFO("check whether tp is in romboot or not ");
+	TPD_DEBUG("check whether tp is in romboot or not ");
 
 	ret = ft3681_fwupg_get_boot_state(&status);
 
 	if (status != FT3681_RUN_IN_ROM) {
-		TPD_INFO("tp isn't in romboot, need send reset to romboot");
+		TPD_DEBUG("tp isn't in romboot, need send reset to romboot");
 		ret = ft3681_fwupg_reset_to_romboot();
 
 		if (ret < 0) {
-			TPD_INFO("reset to romboot fail");
+			TPD_DEBUG("reset to romboot fail");
 			return ret;
 		}
 	}
@@ -1033,7 +1033,7 @@ static int fts_ft3681_write_pramboot_private(void *chip_data)
 	ret = ft3681_pram_write_buf(pb_buf, pb_len);
 
 	if (ret < 0) {
-		TPD_INFO("write pramboot buffer fail");
+		TPD_DEBUG("write pramboot buffer fail");
 		return ret;
 	}
 
@@ -1041,14 +1041,14 @@ static int fts_ft3681_write_pramboot_private(void *chip_data)
 	ret = ft3681_pram_ecc_cal(0, pb_len, &ecc_in_tp);
 
 	if (ret < 0) {
-		TPD_INFO("read pramboot ecc fail");
+		TPD_DEBUG("read pramboot ecc fail");
 		return ret;
 	}
 
-	TPD_INFO("pram ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
+	TPD_DEBUG("pram ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
 
 	if (ecc_in_host != ecc_in_tp) {
-		TPD_INFO("pramboot ecc check fail");
+		TPD_DEBUG("pramboot ecc check fail");
 		return -EIO;
 	}
 
@@ -1056,15 +1056,15 @@ static int fts_ft3681_write_pramboot_private(void *chip_data)
 	ret = ft3681_pram_start();
 
 	if (ret < 0) {
-		TPD_INFO("pram start fail");
+		TPD_DEBUG("pram start fail");
 		return ret;
 	}
 
-	TPD_INFO("after write pramboot, confirm run in pramboot");
+	TPD_DEBUG("after write pramboot, confirm run in pramboot");
 	state = ft3681_fwupg_check_state(FT3681_RUN_IN_PRAM);
 
 	if (!state) {
-		TPD_INFO("not in pramboot");
+		TPD_DEBUG("not in pramboot");
 		return -EIO;
 	}
 
@@ -1084,7 +1084,7 @@ static int ft3681_fwupg_enter_into_boot(struct chip_data_ft3681 *ts_data)
 		ret = ft3681_write_reg(FT3681_REG_UPGRADE, FT3681_UPGRADE_AA);
 
 		if (ret < 0) {
-			TPD_INFO("write FC=0xAA fail");
+			TPD_DEBUG("write FC=0xAA fail");
 			return ret;
 		}
 
@@ -1093,7 +1093,7 @@ static int ft3681_fwupg_enter_into_boot(struct chip_data_ft3681 *ts_data)
 		ret = ft3681_write_reg(FT3681_REG_UPGRADE, FT3681_UPGRADE_55);
 
 		if (ret < 0) {
-			TPD_INFO("write FC=0x55 fail");
+			TPD_DEBUG("write FC=0x55 fail");
 			return ret;
 		}
 
@@ -1104,7 +1104,7 @@ static int ft3681_fwupg_enter_into_boot(struct chip_data_ft3681 *ts_data)
 		ret = ft3681_write(&cmd, 1);
 
 		if (ret < 0) {
-			TPD_INFO("write 0x55 fail");
+			TPD_DEBUG("write 0x55 fail");
 			return ret;
 		}
 
@@ -1112,11 +1112,11 @@ static int ft3681_fwupg_enter_into_boot(struct chip_data_ft3681 *ts_data)
 		ret = ft3681_read(&cmd, 1, id, 2);
 
 		if (ret < 0) {
-			TPD_INFO("read boot id fail");
+			TPD_DEBUG("read boot id fail");
 			return ret;
 		}
 
-		TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+		TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
 
 		if ((id[0] == FT3681_VAL_BT_ID) && (id[1] == FT3681_VAL_BT_ID2)) {
 			break;
@@ -1127,7 +1127,7 @@ static int ft3681_fwupg_enter_into_boot(struct chip_data_ft3681 *ts_data)
 	ret = fts_ft3681_write_pramboot_private(ts_data);
 
 	if (ret < 0) {
-		TPD_INFO("pram write_init fail");
+		TPD_DEBUG("pram write_init fail");
 		return ret;
 	}
 
@@ -1140,14 +1140,14 @@ static int ft3681_fwupg_erase(struct chip_data_ft3681 *ts_data, u32 delay)
 	u8 cmd = 0;
 	bool flag = false;
 
-	TPD_INFO("**********erase now**********");
+	TPD_DEBUG("**********erase now**********");
 
 	/*send to erase flash*/
 	cmd = FT3681_CMD_ERASE_APP;
 	ret = ft3681_write(&cmd, 1);
 
 	if (ret < 0) {
-		TPD_INFO("send erase cmd fail");
+		TPD_DEBUG("send erase cmd fail");
 		return ret;
 	}
 
@@ -1158,7 +1158,7 @@ static int ft3681_fwupg_erase(struct chip_data_ft3681 *ts_data, u32 delay)
 					       FT3681_RETRIES_REASE, FT3681_RETRIES_DELAY_REASE);
 
 	if (!flag) {
-		TPD_INFO("check ecc flash status fail");
+		TPD_DEBUG("check ecc flash status fail");
 		return -EIO;
 	}
 
@@ -1183,8 +1183,8 @@ static int ft3681_flash_write_buf(struct chip_data_ft3681 *ts_data, u32 saddr,
 	u16 read_status = 0;
 	u16 wr_ok = 0;
 
-	TPD_INFO("**********write data to flash**********");
-	TPD_INFO("data buf start addr=0x%x, len=0x%x", saddr, len);
+	TPD_DEBUG("**********write data to flash**********");
+	TPD_DEBUG("data buf start addr=0x%x, len=0x%x", saddr, len);
 	packet_number = len / BYTES_PER_TIME;
 	remainder = len % BYTES_PER_TIME;
 
@@ -1193,7 +1193,7 @@ static int ft3681_flash_write_buf(struct chip_data_ft3681 *ts_data, u32 saddr,
 	}
 
 	packet_len = BYTES_PER_TIME;
-	TPD_INFO("write data, num:%d remainder:%d", packet_number, remainder);
+	TPD_DEBUG("write data, num:%d remainder:%d", packet_number, remainder);
 
 	for (i = 0; i < packet_number; i++) {
 		offset = i * BYTES_PER_TIME;
@@ -1211,7 +1211,7 @@ static int ft3681_flash_write_buf(struct chip_data_ft3681 *ts_data, u32 saddr,
 		ret = ft3681_write(packet_buf, 4);
 
 		if (ret < 0) {
-			TPD_INFO("set flash address fail");
+			TPD_DEBUG("set flash address fail");
 			return ret;
 		}
 
@@ -1222,7 +1222,7 @@ static int ft3681_flash_write_buf(struct chip_data_ft3681 *ts_data, u32 saddr,
 		ret = ft3681_write(&packet_buf[0], packet_len + cmdlen);
 
 		if (ret < 0) {
-			TPD_INFO("app write fail");
+			TPD_DEBUG("app write fail");
 			return ret;
 		}
 
@@ -1277,13 +1277,13 @@ int ft3681_fwupg_ecc_cal_tp(struct chip_data_ft3681 *ts_data, u32 saddr, u32 len
 	int ecc = 0;
 	bool bflag = false;
 
-	TPD_INFO("**********read out checksum**********");
+	TPD_DEBUG("**********read out checksum**********");
 	/* check sum init */
 	wbuf[0] = FT3681_CMD_ECC_INIT;
 	ret = ft3681_write(&wbuf[0], 1);
 
 	if (ret < 0) {
-		TPD_INFO("ecc init cmd write fail");
+		TPD_DEBUG("ecc init cmd write fail");
 		return ret;
 	}
 
@@ -1299,7 +1299,7 @@ int ft3681_fwupg_ecc_cal_tp(struct chip_data_ft3681 *ts_data, u32 saddr, u32 len
 	ret = ft3681_write(&wbuf[0], 7);
 
 	if (ret < 0) {
-		TPD_INFO("ecc calc cmd write fail");
+		TPD_DEBUG("ecc calc cmd write fail");
 		return ret;
 	}
 
@@ -1311,7 +1311,7 @@ int ft3681_fwupg_ecc_cal_tp(struct chip_data_ft3681 *ts_data, u32 saddr, u32 len
 						FT3681_RETRIES_DELAY_ECC_CAL);
 
 	if (!bflag) {
-		TPD_INFO("ecc flash status read fail");
+		TPD_DEBUG("ecc flash status read fail");
 		return -EIO;
 	}
 
@@ -1320,7 +1320,7 @@ int ft3681_fwupg_ecc_cal_tp(struct chip_data_ft3681 *ts_data, u32 saddr, u32 len
 	ret = ft3681_read(&wbuf[0], 1, val, 2);
 
 	if (ret < 0) {
-		TPD_INFO("ecc read cmd write fail");
+		TPD_DEBUG("ecc read cmd write fail");
 		return ret;
 	}
 
@@ -1337,7 +1337,7 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	int ecc_in_tp = 0;
 
 	if (!buf) {
-		TPD_INFO("fw_buf is invalid");
+		TPD_DEBUG("fw_buf is invalid");
 		return -EINVAL;
 	}
 
@@ -1345,7 +1345,7 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	ret = ft3681_fwupg_enter_into_boot(ts_data);
 
 	if (ret < 0) {
-		TPD_INFO("enter into pramboot/bootloader fail,ret=%d", ret);
+		TPD_DEBUG("enter into pramboot/bootloader fail,ret=%d", ret);
 		goto fw_reset;
 	}
 
@@ -1356,7 +1356,7 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	ret = ft3681_write(&cmd[0], 4);
 
 	if (ret < 0) {
-		TPD_INFO("data len cmd write fail");
+		TPD_DEBUG("data len cmd write fail");
 		goto fw_reset;
 	}
 
@@ -1364,7 +1364,7 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	ret = ft3681_fwupg_erase(ts_data, FT3681_REASE_APP_DELAY);
 
 	if (ret < 0) {
-		TPD_INFO("erase cmd write fail");
+		TPD_DEBUG("erase cmd write fail");
 		goto fw_reset;
 	}
 
@@ -1373,7 +1373,7 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	ret = ft3681_flash_write_buf(ts_data, start_addr, buf, len, 1);
 
 	if (ret < 0) {
-		TPD_INFO("flash write fail");
+		TPD_DEBUG("flash write fail");
 		goto fw_reset;
 	}
 
@@ -1381,35 +1381,35 @@ static int ft3681_upgrade(struct chip_data_ft3681 *ts_data, u8 *buf, u32 len)
 	ecc_in_tp = ft3681_fwupg_ecc_cal_tp(ts_data, start_addr, len);
 
 	if (ecc_in_tp < 0) {
-		TPD_INFO("ecc read fail");
+		TPD_DEBUG("ecc read fail");
 		goto fw_reset;
 	}
 
-	TPD_INFO("ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
+	TPD_DEBUG("ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
 
 	if (ecc_in_tp != ecc_in_host) {
-		TPD_INFO("ecc check fail");
+		TPD_DEBUG("ecc check fail");
 		goto fw_reset;
 	}
 
-	TPD_INFO("upgrade success, reset to normal boot");
+	TPD_DEBUG("upgrade success, reset to normal boot");
 	cmd[0] = FT3681_CMD_RESET;
 	ret = ft3681_write(&cmd[0], 1);
 
 	if (ret < 0) {
-		TPD_INFO("reset to normal boot fail");
+		TPD_DEBUG("reset to normal boot fail");
 	}
 
 	msleep(200);
 	return 0;
 
 fw_reset:
-	TPD_INFO("upgrade fail, reset to normal boot");
+	TPD_DEBUG("upgrade fail, reset to normal boot");
 	cmd[0] = FT3681_CMD_RESET;
 	ret = ft3681_write(&cmd[0], 1);
 
 	if (ret < 0) {
-		TPD_INFO("reset to normal boot fail");
+		TPD_DEBUG("reset to normal boot fail");
 	}
 
 	return -EIO;
@@ -1436,11 +1436,11 @@ static int ft3681_enter_factory_work_mode(struct chip_data_ft3681 *ts_data,
 	int retry = 20;
 	u8 regval = 0;
 
-	TPD_INFO("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
+	TPD_DEBUG("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
 	ret = ft3681_write_reg(DEVIDE_MODE_ADDR, mode_val);
 
 	if (ret < 0) {
-		TPD_INFO("%s:write mode(val:0x%x) fail", __func__, mode_val);
+		TPD_DEBUG("%s:write mode(val:0x%x) fail", __func__, mode_val);
 		return ret;
 	}
 
@@ -1455,7 +1455,7 @@ static int ft3681_enter_factory_work_mode(struct chip_data_ft3681 *ts_data,
 	}
 
 	if (!retry) {
-		TPD_INFO("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
+		TPD_DEBUG("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
 		return -EIO;
 	}
 
@@ -1470,11 +1470,11 @@ static int ft3681_start_scan(struct chip_data_ft3681 *ts_data)
 	u8 regval = 0;
 	u8 scanval = FT3681_FACTORY_MODE_VALUE | (1 << 7);
 
-	TPD_INFO("%s: start to scan a frame", __func__);
+	TPD_DEBUG("%s: start to scan a frame", __func__);
 	ret = ft3681_write_reg(DEVIDE_MODE_ADDR, scanval);
 
 	if (ret < 0) {
-		TPD_INFO("%s:start to scan a frame fail", __func__);
+		TPD_DEBUG("%s:start to scan a frame fail", __func__);
 		return ret;
 	}
 
@@ -1489,7 +1489,7 @@ static int ft3681_start_scan(struct chip_data_ft3681 *ts_data)
 	}
 
 	if (!retry) {
-		TPD_INFO("%s:scan a frame timeout", __func__);
+		TPD_DEBUG("%s:scan a frame timeout", __func__);
 		return -EIO;
 	}
 
@@ -1509,19 +1509,19 @@ static int ft3681_get_rawdata(struct chip_data_ft3681 *ts_data, int *raw,
 	u8 regval = 0;
 	u8 *buf = NULL;
 
-	TPD_INFO("%s:call", __func__);
+	TPD_DEBUG("%s:call", __func__);
 	/*kzalloc buffer*/
 	buf = kzalloc(byte_num, GFP_KERNEL);
 
 	if (!buf) {
-		TPD_INFO("%s:kzalloc for raw byte buf fail", __func__);
+		TPD_DEBUG("%s:kzalloc for raw byte buf fail", __func__);
 		return -ENOMEM;
 	}
 
 	ret = ft3681_enter_factory_work_mode(ts_data, FT3681_FACTORY_MODE_VALUE);
 
 	if (ret < 0) {
-		TPD_INFO("%s:enter factory mode fail", __func__);
+		TPD_DEBUG("%s:enter factory mode fail", __func__);
 		goto raw_err;
 	}
 
@@ -1530,7 +1530,7 @@ static int ft3681_get_rawdata(struct chip_data_ft3681 *ts_data, int *raw,
 		ret = ft3681_write_reg(FACTORY_REG_DATA_SELECT, 0x01);
 
 		if (ret < 0) {
-			TPD_INFO("%s:write 0x01 to reg0x06 fail", __func__);
+			TPD_DEBUG("%s:write 0x01 to reg0x06 fail", __func__);
 			goto reg_restore;
 		}
 	}
@@ -1538,14 +1538,14 @@ static int ft3681_get_rawdata(struct chip_data_ft3681 *ts_data, int *raw,
 	ret = ft3681_start_scan(ts_data);
 
 	if (ret < 0) {
-		TPD_INFO("%s:scan a frame fail", __func__);
+		TPD_DEBUG("%s:scan a frame fail", __func__);
 		goto reg_restore;
 	}
 
 	ret = ft3681_write_reg(FACTORY_REG_LINE_ADDR, 0xAA);
 
 	if (ret < 0) {
-		TPD_INFO("%s:write 0xAA to reg0x01 fail", __func__);
+		TPD_DEBUG("%s:write 0xAA to reg0x01 fail", __func__);
 		goto reg_restore;
 	}
 
@@ -1565,7 +1565,7 @@ static int ft3681_get_rawdata(struct chip_data_ft3681 *ts_data, int *raw,
 		ret = ft3681_read(&raw_addr, 1, buf + offset, packet_len);
 
 		if (ret < 0) {
-			TPD_INFO("%s:read raw data(packet:%d) fail", __func__,
+			TPD_DEBUG("%s:read raw data(packet:%d) fail", __func__,
 				 offset / MAX_PACKET_SIZE);
 			goto reg_restore;
 		}
@@ -1584,7 +1584,7 @@ reg_restore:
 		ret = ft3681_write_reg(FACTORY_REG_DATA_SELECT, regval);
 
 		if (ret < 0) {
-			TPD_INFO("%s:restore reg0x06 fail", __func__);
+			TPD_DEBUG("%s:restore reg0x06 fail", __func__);
 		}
 	}
 
@@ -1593,7 +1593,7 @@ raw_err:
 	ret = ft3681_enter_factory_work_mode(ts_data, FT3681_WORK_MODE_VALUE);
 
 	if (ret < 0) {
-		TPD_INFO("%s:enter work mode fail", __func__);
+		TPD_DEBUG("%s:enter work mode fail", __func__);
 	}
 
 	return ret;
@@ -1610,7 +1610,7 @@ static void ft3681_self_delta_read(struct seq_file *s, void *chip_data)
 	int tx_num = ts_data->hw_res->TX_NUM;
 	int rx_num = ts_data->hw_res->RX_NUM;
 
-	TPD_INFO("%s:start to read self-cap diff data", __func__);
+	TPD_DEBUG("%s:start to read self-cap diff data", __func__);
 	focal_esd_check_enable(ts_data, false);
 
 	raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1623,7 +1623,7 @@ static void ft3681_self_delta_read(struct seq_file *s, void *chip_data)
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, true);
@@ -1648,7 +1648,7 @@ static void ft3681_self_delta_read(struct seq_file *s, void *chip_data)
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, true);
@@ -1687,71 +1687,71 @@ static void ft3681_self_delta_read_another(struct seq_file *s, void *chip_data)
 	unsigned char *Pstr = NULL;
 	int lsize = tx_num * rx_num;
 
-	TPD_INFO("%s:start to read self-cap diff data", __func__);
+	TPD_DEBUG("%s:start to read self-cap diff data", __func__);
 	focal_esd_check_enable(ts_data, false);
 
 	Pstr = kzalloc(lsize * (sizeof(int)), GFP_KERNEL);
 	memset(Pstr, 0x0, lsize);
 	raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
 	if (!raw) {
-		TPD_INFO("kzalloc for raw fail\n");
+		TPD_DEBUG("kzalloc for raw fail\n");
 		goto raw_fail;
 	}
 
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, true);
 	if (ret < 0) {
-		TPD_INFO("get self delta data fail\n");
+		TPD_DEBUG("get self delta data fail\n");
 		goto raw_fail;
 	}
 
-	TPD_INFO("self data delta \n");
+	TPD_DEBUG("self data delta \n");
 	for (i = 0; i < tx_num + rx_num; i++) {
 		if (i % DATA_LEN_EACH_RAW == 0) {
-			TPD_INFO("\n");
+			TPD_DEBUG("\n");
 			if(i != 0) {
-				TPD_INFO("i=%d: %s", i, Pstr);
+				TPD_DEBUG("i=%d: %s", i, Pstr);
 				memset(Pstr, 0x0, lsize);
 			}
 		}
 		snprintf(pTmp, lsize, " %5d", raw[i]);
 		strncat(Pstr, pTmp, lsize);
 	}
-	TPD_INFO("i=%d: %s", tx_num + rx_num, Pstr);
-	TPD_INFO("\n");
+	TPD_DEBUG("i=%d: %s", tx_num + rx_num, Pstr);
+	TPD_DEBUG("\n");
 
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, true);
 	if (ret < 0) {
-		TPD_INFO("get self delta data fail\n");
+		TPD_DEBUG("get self delta data fail\n");
 		goto raw_fail;
 	}
 
-	TPD_INFO("self data delta waterproof\n");
+	TPD_DEBUG("self data delta waterproof\n");
 	memset(Pstr, 0x0, lsize);
 	for (i = 0; i < tx_num + rx_num; i++) {
 		if (i % DATA_LEN_EACH_RAW == 0) {
-			TPD_INFO("\n");
+			TPD_DEBUG("\n");
 			if(i != 0) {
-				TPD_INFO("i=%d: %s", i, Pstr);
+				TPD_DEBUG("i=%d: %s", i, Pstr);
 				memset(Pstr, 0x0, lsize);
 			}
 		}
 		snprintf(pTmp, lsize, " %5d", raw[i]);
 		strncat(Pstr, pTmp, lsize);
 	}
-	TPD_INFO("i=%d: %s", tx_num + rx_num, Pstr);
-	TPD_INFO("\n");
+	TPD_DEBUG("i=%d: %s", tx_num + rx_num, Pstr);
+	TPD_DEBUG("\n");
 
 raw_fail:
 	focal_esd_check_enable(ts_data, true);
@@ -1769,7 +1769,7 @@ static void ft3681_delta_read(struct seq_file *s, void *chip_data)
 	int tx_num = ts_data->hw_res->TX_NUM;
 	int rx_num = ts_data->hw_res->RX_NUM;
 
-	TPD_INFO("%s:start to read diff data", __func__);
+	TPD_DEBUG("%s:start to read diff data", __func__);
 	focal_esd_check_enable(ts_data, false);   /*no allowed esd check*/
 
 	raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1782,7 +1782,7 @@ static void ft3681_delta_read(struct seq_file *s, void *chip_data)
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, true);
@@ -1818,7 +1818,7 @@ static void ft3681_baseline_read(struct seq_file *s, void *chip_data)
 	int tx_num = ts_data->hw_res->TX_NUM;
 	int rx_num = ts_data->hw_res->RX_NUM;
 
-	TPD_INFO("%s:start to read raw data", __func__);
+	TPD_DEBUG("%s:start to read raw data", __func__);
 	focal_esd_check_enable(ts_data, false);
 
 	raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1831,7 +1831,7 @@ static void ft3681_baseline_read(struct seq_file *s, void *chip_data)
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 	}
 
 	ret = ft3681_get_rawdata(ts_data, raw, false);
@@ -1899,7 +1899,7 @@ static void ft3681_main_register_read(struct seq_file *s, void *chip_data)
 static int ft3681_enable_black_gesture(struct chip_data_ft3681 *ts_data,
 				       bool enable)
 {
-	TPD_INFO("MODE_GESTURE, write 0xD0=%d", enable);
+	TPD_DEBUG("MODE_GESTURE, write 0xD0=%d", enable);
 	ft3681_write_reg(FT3681_REG_GESTURE_EN, enable);
 	ft3681_write_reg(0xD1, 0xFF);
 	ft3681_write_reg(0xD2, 0xFF);
@@ -1926,20 +1926,20 @@ static int ft3681_enable_edge_limit(struct chip_data_ft3681 *ts_data, int enable
 		}
 	}
 
-	TPD_INFO("MODE_EDGE, write 0x8B|45=0x%x", ts_data->ctrl_reg_state);
+	TPD_DEBUG("MODE_EDGE, write 0x8B|45=0x%x", ts_data->ctrl_reg_state);
 	return ft3681_write_reg(FT3681_REG_CTRL, ts_data->ctrl_reg_state);
 }
 
 static int ft3681_enable_charge_mode(struct chip_data_ft3681 *ts_data, int enable)
 {
-	TPD_INFO("MODE_CHARGE, write 0x8B|01=0x%x", ts_data->ctrl_reg_state);
+	TPD_DEBUG("MODE_CHARGE, write 0x8B|01=0x%x", ts_data->ctrl_reg_state);
 	SET_REG(FT3681_REG_CHARGER_MODE_EN_BIT, enable);
 	return ft3681_write_reg(FT3681_REG_CTRL, ts_data->ctrl_reg_state);
 }
 
 static int ft3681_enable_game_mode(struct chip_data_ft3681 *ts_data, int enable)
 {
-	TPD_INFO("MODE_GAME, write 0x8B|23=0x%x", ts_data->ctrl_reg_state);
+	TPD_DEBUG("MODE_GAME, write 0x8B|23=0x%x", ts_data->ctrl_reg_state);
 	SET_REG(FT3681_REG_GAME_MODE_EN_BIT, enable);
 	return ft3681_write_reg(FT3681_REG_CTRL, ts_data->ctrl_reg_state);
 }
@@ -1947,7 +1947,7 @@ static int ft3681_enable_game_mode(struct chip_data_ft3681 *ts_data, int enable)
 static int ft3681_enable_headset_mode(struct chip_data_ft3681 *ts_data,
 				      int enable)
 {
-	TPD_INFO("MODE_HEADSET, write 0x8B|6=0x%x \n", enable);
+	TPD_DEBUG("MODE_HEADSET, write 0x8B|6=0x%x \n", enable);
 	SET_REG(FT3681_REG_HEADSET_MODE_EN_BIT, enable);
 	return ft3681_write_reg(FT3681_REG_CTRL, ts_data->ctrl_reg_state);
 }
@@ -1964,15 +1964,15 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 
 	switch (mode) {
 	case MODE_NORMAL:
-		TPD_INFO("MODE_NORMAL");
+		TPD_DEBUG("MODE_NORMAL");
 		break;
 
 	case MODE_SLEEP:
-		TPD_INFO("MODE_SLEEP, write 0xA5=3");
+		TPD_DEBUG("MODE_SLEEP, write 0xA5=3");
 		ret = ft3681_write_reg(FT3681_REG_POWER_MODE, 0x03);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enter into sleep failed.\n", __func__);
+			TPD_DEBUG("%s: enter into sleep failed.\n", __func__);
 			goto mode_err;
 		}
 
@@ -1980,7 +1980,7 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		break;
 
 	case MODE_GESTURE:
-		TPD_INFO("MODE_GESTURE, Melo, ts->is_suspended = %d \n",
+		TPD_DEBUG("MODE_GESTURE, Melo, ts->is_suspended = %d \n",
 			 ts_data->ts->is_suspended);
 
 		if (ts_data->ts->is_suspended) {                             /* do not pull up reset when doing resume*/
@@ -1992,7 +1992,7 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		ret = ft3681_enable_black_gesture(ts_data, flag);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enable gesture failed.\n", __func__);
+			TPD_DEBUG("%s: enable gesture failed.\n", __func__);
 			goto mode_err;
 		}
 
@@ -2005,7 +2005,7 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		ret = ft3681_enable_edge_limit(ts_data, flag);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enable edg limit failed.\n", __func__);
+			TPD_DEBUG("%s: enable edg limit failed.\n", __func__);
 			goto mode_err;
 		}
 
@@ -2018,7 +2018,7 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		ret = ft3681_enable_charge_mode(ts_data, flag);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enable charge mode failed.\n", __func__);
+			TPD_DEBUG("%s: enable charge mode failed.\n", __func__);
 			goto mode_err;
 		}
 
@@ -2028,7 +2028,7 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		ret = ft3681_enable_game_mode(ts_data, flag);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enable game mode failed.\n", __func__);
+			TPD_DEBUG("%s: enable game mode failed.\n", __func__);
 			goto mode_err;
 		}
 
@@ -2038,14 +2038,14 @@ static int ft3681_mode_switch(void *chip_data, work_mode mode, bool flag)
 		ret = ft3681_enable_headset_mode(ts_data, flag);
 
 		if (ret < 0) {
-			TPD_INFO("%s: enable headset mode failed.\n", __func__);
+			TPD_DEBUG("%s: enable headset mode failed.\n", __func__);
 			goto mode_err;
 		}
 
 		break;
 
 	default:
-		TPD_INFO("%s: Wrong mode.\n", __func__);
+		TPD_DEBUG("%s: Wrong mode.\n", __func__);
 		goto mode_err;
 	}
 
@@ -2064,7 +2064,7 @@ static int ft3681_reset(void *chip_data)
 {
 	struct chip_data_ft3681 *ts_data = (struct chip_data_ft3681 *)chip_data;
 
-	TPD_INFO("%s:call\n", __func__);
+	TPD_DEBUG("%s:call\n", __func__);
 	ft3681_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
 
 	return 0;
@@ -2095,11 +2095,11 @@ static int ft3681_get_vendor(void *chip_data, struct panel_info *panel_data)
 	if ((len > 3) && (panel_data->fw_name[len - 3] == 'i') && \
 	    (panel_data->fw_name[len - 2] == 'm')
 	    && (panel_data->fw_name[len - 1] == 'g')) {
-		TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type,
+		TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type,
 			 panel_data->fw_name);
 	}
 
-	TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type,
+	TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type,
 		 panel_data->fw_name);
 
 	return 0;
@@ -2112,19 +2112,19 @@ static int ft3681_get_chip_info(void *chip_data)
 
 	ft3681_read_reg(FT3681_REG_CHIP_ID, &id[0]);
 	ft3681_read_reg(FT3681_REG_CHIP_ID2, &id[1]);
-	TPD_INFO("read chip id:0x%02x%02x", id[0], id[1]);
+	TPD_DEBUG("read chip id:0x%02x%02x", id[0], id[1]);
 
 	if ((id[0] == FT3681_VAL_CHIP_ID) && (id[1] == FT3681_VAL_CHIP_ID2)) {
 		return 0;
 	}
 
-	TPD_INFO("fw is invalid, need read boot id");
+	TPD_DEBUG("fw is invalid, need read boot id");
 	cmd = 0x55;
 	ft3681_write(&cmd, 1);
 	msleep(12);
 	cmd = 0x90;
 	ft3681_read(&cmd, 1, id, 2);
-	TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+	TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
 
 	if ((id[0] == FT3681_VAL_BT_ID) && (id[1] == FT3681_VAL_BT_ID2)) {
 		return 0;
@@ -2140,7 +2140,7 @@ static int ft3681_ftm_process(void *chip_data)
 	ret = ft3681_mode_switch(chip_data, MODE_SLEEP, true);
 
 	if (ret < 0) {
-		TPD_INFO("%s:switch mode to MODE_SLEEP fail", __func__);
+		TPD_DEBUG("%s:switch mode to MODE_SLEEP fail", __func__);
 		return ret;
 	}
 
@@ -2164,21 +2164,21 @@ static fw_check_state ft3681_fw_check(void *chip_data,
 		msleep(12);
 		cmd = 0x90;
 		ft3681_read(&cmd, 1, id, 2);
-		TPD_INFO("boot id:0x%02x%02x, fw abnormal", id[0], id[1]);
+		TPD_DEBUG("boot id:0x%02x%02x, fw abnormal", id[0], id[1]);
 		return FW_ABNORMAL;
 	}
 
 	/*fw check normal need update tp_fw  && device info*/
 	ft3681_read_reg(FT3681_REG_FW_VER, &ts_data->fwver);
 	panel_data->TP_FW = (uint32_t)ts_data->fwver;
-	TPD_INFO("FW VER:%d", panel_data->TP_FW);
+	TPD_DEBUG("FW VER:%d", panel_data->TP_FW);
 
 	if (panel_data->manufacture_info.version) {
 		sprintf(dev_version, "%04x", panel_data->TP_FW);
 		strlcpy(&(panel_data->manufacture_info.version[7]), dev_version, 5);
 
 	} else {
-		TPD_INFO("manufacture_info.version not exist");
+		TPD_DEBUG("manufacture_info.version not exist");
 	}
 
 	return FW_NORMAL;
@@ -2194,7 +2194,7 @@ static fw_update_state ft3681_fw_update(void *chip_data, const struct firmware *
 	u32 len = 0;
 
 	if (!fw) {
-		TPD_INFO("fw is null");
+		TPD_DEBUG("fw is null");
 		return FW_UPDATE_ERROR;
 	}
 
@@ -2202,19 +2202,19 @@ static fw_update_state ft3681_fw_update(void *chip_data, const struct firmware *
 	len = (int)fw->size;
 
 	if ((len < 0x120) || (len > (120 * 1024))) {
-		TPD_INFO("fw_len(%d) is invalid", len);
+		TPD_DEBUG("fw_len(%d) is invalid", len);
 		return FW_UPDATE_ERROR;
 	}
 
 	if (force || (buf[OFFSET_FW_DATA_FW_VER] != ts_data->fwver)) {
-		TPD_INFO("Need update, force(%d)/fwver:Host(0x%02x),TP(0x%02x)", force,
+		TPD_DEBUG("Need update, force(%d)/fwver:Host(0x%02x),TP(0x%02x)", force,
 			 buf[OFFSET_FW_DATA_FW_VER], ts_data->fwver);
 		focal_esd_check_enable(ts_data, false);
 		ret = ft3681_upgrade(ts_data, buf, len);
 		focal_esd_check_enable(ts_data, true);
 
 		if (ret < 0) {
-			TPD_INFO("fw update fail");
+			TPD_DEBUG("fw update fail");
 			return FW_UPDATE_ERROR;
 		}
 
@@ -2233,7 +2233,7 @@ static void ft3681_read_fod_info(struct chip_data_ft3681 *ts_data)
 	ret = ft3681_read(&cmd, 1, val, FT3681_REG_FOD_INFO_LEN);
 
 	if (ret < 0) {
-		TPD_INFO("%s:read FOD info fail", __func__);
+		TPD_DEBUG("%s:read FOD info fail", __func__);
 		return;
 	}
 
@@ -2277,13 +2277,13 @@ static u32 ft3681_u32_trigger_reason(void *chip_data, int gesture_enable,
 	ret = ft3681_read(&cmd, 1, &touch_buf[0], ts_data->touch_size);
 
 	if (ret < 0) {
-		TPD_INFO("read touch point one fail");
+		TPD_DEBUG("read touch point one fail");
 		return IRQ_IGNORE;
 	}
 
 	if ((touch_buf[1] == 0xFF) && (touch_buf[2] == 0xFF)
 	    && (touch_buf[3] == 0xFF)) {
-		TPD_INFO("Need recovery TP state");
+		TPD_DEBUG("Need recovery TP state");
 		return IRQ_FW_AUTO_RESET;
 	}
 
@@ -2353,7 +2353,7 @@ static int ft3681_get_touch_points(void *chip_data, struct point_info *points,
 	finger_num = touch_buf[1] & 0xFF;
 
 	if (finger_num > max_num) {
-		TPD_INFO("invalid point_num(%d),max_num(%d)", finger_num, max_num);
+		TPD_DEBUG("invalid point_num(%d),max_num(%d)", finger_num, max_num);
 		return -EIO;
 	}
 
@@ -2367,7 +2367,7 @@ static int ft3681_get_touch_points(void *chip_data, struct point_info *points,
 			break;
 
 		} else if (pointid >= max_num) {
-			TPD_INFO("ID(%d) beyond max_num(%d)", pointid, max_num);
+			TPD_DEBUG("ID(%d) beyond max_num(%d)", pointid, max_num);
 			return -EINVAL;
 		}
 
@@ -2429,7 +2429,7 @@ static int ft3681_get_touch_points(void *chip_data, struct point_info *points,
 			snr->channel_x = snr->x / PITCH_X_WIDTH;
 			snr->channel_y = snr->y / PITCH_Y_WIDTH;
 			GET_LEN_BY_WIDTH_MAJOR(snr->width_major, &snr->area_len);
-			TPD_INFO("snr%d: [%d %d, %d] {%d %d} len %d \n", pointid, snr->x, snr->y, snr->width_major, snr->channel_x, snr->channel_y, snr->area_len);
+			TPD_DEBUG("snr%d: [%d %d, %d] {%d %d} len %d \n", pointid, snr->x, snr->y, snr->width_major, snr->channel_x, snr->channel_y, snr->area_len);
 		}
 
 		points[pointid].status = 0;
@@ -2439,14 +2439,14 @@ static int ft3681_get_touch_points(void *chip_data, struct point_info *points,
 			obj_attention |= (1 << pointid);
 
 			if (finger_num == 0) {
-				TPD_INFO("abnormal touch data from fw");
+				TPD_DEBUG("abnormal touch data from fw");
 				return -EIO;
 			}
 		}
 	}
 
 	if (event_num == 0) {
-		TPD_INFO("no touch point information");
+		TPD_DEBUG("no touch point information");
 		return -EIO;
 	}
 
@@ -2460,11 +2460,11 @@ static void ft3681_health_report(void *chip_data, struct monitor_data *mon_data)
 	u8 val = 0;
 
 	ret = ft3681_read_reg(0x01, &val);
-	TPD_INFO("Health register(0x01):0x%x", val);
+	TPD_DEBUG("Health register(0x01):0x%x", val);
 	ret = ft3681_read_reg(FT3681_REG_HEALTH_1, &val);
-	TPD_INFO("Health register(0xFD):0x%x", val);
+	TPD_DEBUG("Health register(0xFD):0x%x", val);
 	ret = ft3681_read_reg(FT3681_REG_HEALTH_2, &val);
-	TPD_INFO("Health register(0xFE):0x%x", val);
+	TPD_DEBUG("Health register(0xFE):0x%x", val);
 }
 
 static int ft3681_get_gesture_info(void *chip_data, struct gesture_info *gesture)
@@ -2479,16 +2479,16 @@ static int ft3681_get_gesture_info(void *chip_data, struct gesture_info *gesture
 	ret = ft3681_read(&cmd, 1, &buf[2], FT3681_GESTURE_DATA_LEN - 2);
 
 	if (ret < 0) {
-		TPD_INFO("read gesture data fail");
+		TPD_DEBUG("read gesture data fail");
 		return ret;
 	}
 
 	gesture_id = buf[2];
 	point_num = buf[3];
-	TPD_INFO("gesture_id=%d, point_num=%d", gesture_id, point_num);
+	TPD_DEBUG("gesture_id=%d, point_num=%d", gesture_id, point_num);
 
 	if (gesture == NULL) {
-		TPD_INFO("gesture == NULL, return\n\
+		TPD_DEBUG("gesture == NULL, return\n\
 			gesture->Point_start.x = %d\n;\
 			gesture->Point_start.y = %d\n;\
 			gesture->Point_end.x = %d\n;\
@@ -2582,7 +2582,7 @@ static int ft3681_get_gesture_info(void *chip_data, struct gesture_info *gesture
 
 	case GESTURE_FINGER_PRINT:
 		ft3681_read_fod_info(ts_data);
-		TPD_INFO("FOD event type:0x%x", ts_data->fod_info.event_type);
+		TPD_DEBUG("FOD event type:0x%x", ts_data->fod_info.event_type);
 		TPD_DEBUG("%s, fgerprint, touched = %d, fp_down = %d, fp_down_report = %d, \n",
 			  __func__, ts_data->ts->view_area_touched, ts_data->fod_info.fp_down,
 			  ts_data->fod_info.fp_down_report);
@@ -2644,11 +2644,11 @@ static void ft3681_enable_fingerprint_underscreen(void *chip_data, uint32_t enab
 		ts_data->is_ic_sleep = false;
 	}
 
-	TPD_INFO("%s:enable=%d", __func__, enable);
+	TPD_DEBUG("%s:enable=%d", __func__, enable);
 	ret = ft3681_read_reg(FT3681_REG_FOD_EN, &val);
 
 	if (ret < 0) {
-		TPD_INFO("%s: read FOD enable(%x) fail", __func__, FT3681_REG_FOD_EN);
+		TPD_DEBUG("%s: read FOD enable(%x) fail", __func__, FT3681_REG_FOD_EN);
 		return;
 	}
 
@@ -2677,11 +2677,11 @@ static void ft3681_enable_fingerprint_underscreen(void *chip_data, uint32_t enab
 		/*        ts_data->fod_info.fp_down_report = 0;*/
 	}
 
-	TPD_INFO("%s:write %x=%x.", __func__, FT3681_REG_FOD_EN, val);
+	TPD_DEBUG("%s:write %x=%x.", __func__, FT3681_REG_FOD_EN, val);
 	ret = ft3681_write_reg(FT3681_REG_FOD_EN, val);
 
 	if (ret < 0) {
-		TPD_INFO("%s: write FOD enable(%x=%x) fail", __func__, FT3681_REG_FOD_EN, val);
+		TPD_DEBUG("%s: write FOD enable(%x=%x) fail", __func__, FT3681_REG_FOD_EN, val);
 	}
 }
 
@@ -2691,7 +2691,7 @@ static void ft3681_screenon_fingerprint_info(void *chip_data,
 	struct chip_data_ft3681 *ts_data = (struct chip_data_ft3681 *)chip_data;
 
 	memset(fp_tpinfo, 0, sizeof(struct fp_underscreen_info));
-	TPD_INFO("FOD event type:0x%x", ts_data->fod_info.event_type);
+	TPD_DEBUG("FOD event type:0x%x", ts_data->fod_info.event_type);
 
 	if (ts_data->fod_info.fp_down) {
 		fp_tpinfo->touch_state = FINGERPRINT_DOWN_DETECT;
@@ -2704,7 +2704,7 @@ static void ft3681_screenon_fingerprint_info(void *chip_data,
 	fp_tpinfo->x = ts_data->fod_info.fp_x;
 	fp_tpinfo->y = ts_data->fod_info.fp_y;
 
-	TPD_INFO("FOD Info:touch_state:%d,area_rate:%d,x:%d,y:%d[fp_down:%d]",
+	TPD_DEBUG("FOD Info:touch_state:%d,area_rate:%d,x:%d,y:%d[fp_down:%d]",
 		 fp_tpinfo->touch_state, fp_tpinfo->area_rate, fp_tpinfo->x,
 		 fp_tpinfo->y, ts_data->fod_info.fp_down);
 }
@@ -2731,14 +2731,14 @@ static uint8_t ft3681_get_touch_direction(void *chip_data)
 
 static int ft3681_refresh_switch(void *chip_data, int fps)
 {
-	TPD_INFO("lcd fps =%d", fps);
+	TPD_DEBUG("lcd fps =%d", fps);
 	return ft3681_write_reg(FT3681_REG_REPORT_RATE,
 				(fps == 60 ? FT3681_120HZ_REPORT_RATE : FT3681_180HZ_REPORT_RATE));
 }
 
 static int ft3681_smooth_lv_set(void *chip_data, int level)
 {
-	TPD_INFO("set smooth lv to %d", level);
+	TPD_DEBUG("set smooth lv to %d", level);
 	return ft3681_write_reg(FT3681_REG_SMOOTH_LEVEL, level);
 }
 
@@ -2746,19 +2746,19 @@ static int ft3681_sensitive_lv_set(void *chip_data, int level)
 {
 	int ret = 0;
 
-	TPD_INFO("set sensitive lv to %d", level);
+	TPD_DEBUG("set sensitive lv to %d", level);
 
 	ret = ft3681_write_reg(FT3681_REG_STABLE_DISTANCE_AFTER_N, level);
 
 	if (ret < 0) {
-		TPD_INFO("write FT3681_REG_STABLE_DISTANCE_AFTER_N fail");
+		TPD_DEBUG("write FT3681_REG_STABLE_DISTANCE_AFTER_N fail");
 		return ret;
 	}
 
 	ret = ft3681_write_reg(FT3681_REG_STABLE_DISTANCE, level);
 
 	if (ret < 0) {
-		TPD_INFO("write FT3681_REG_STABLE_DISTANCE fail");
+		TPD_DEBUG("write FT3681_REG_STABLE_DISTANCE fail");
 		return ret;
 	}
 
@@ -2771,7 +2771,7 @@ static int ft3681_set_high_frame_rate(void *chip_data, int level, int time)
 	struct chip_data_ft3681 *ts_data = (struct chip_data_ft3681 *)chip_data;
 	struct touchpanel_data *ts = spi_get_drvdata(ts_data->ft_spi);
 
-	TPD_INFO("set high_frame_rate to %d, keep %ds", level, time);
+	TPD_DEBUG("set high_frame_rate to %d, keep %ds", level, time);
 
 	if (level != 0) {
 		level = 4;
@@ -2780,7 +2780,7 @@ static int ft3681_set_high_frame_rate(void *chip_data, int level, int time)
 	level = level | (!ts->noise_level);
 
 	ret = ft3681_enable_game_mode(ts_data, level);
-	TPD_INFO("write control reg = %x", ts_data->ctrl_reg_state);
+	TPD_DEBUG("write control reg = %x", ts_data->ctrl_reg_state);
 
 	if (ret < 0) {
 		return ret;
@@ -2809,26 +2809,26 @@ static void ft3681_enable_gesture_mask(void *chip_data, uint32_t enable)
 	ret = ft3681_write_reg(FT3681_REG_GESTURE_CONFIG1, config1);
 
 	if (ret < 0) {
-		TPD_INFO("%s: write FT3681_REG_GESTURE_CONFIG1 enable(%x=%x) fail", __func__,
+		TPD_DEBUG("%s: write FT3681_REG_GESTURE_CONFIG1 enable(%x=%x) fail", __func__,
 			 FT3681_REG_GESTURE_CONFIG1, config1);
 	}
 
 	ret = ft3681_write_reg(FT3681_REG_GESTURE_CONFIG2, config2);
 
 	if (ret < 0) {
-		TPD_INFO("%s: write FT3681_REG_GESTURE_CONFIG2 enable(%x=%x) fail", __func__,
+		TPD_DEBUG("%s: write FT3681_REG_GESTURE_CONFIG2 enable(%x=%x) fail", __func__,
 			 FT3681_REG_GESTURE_CONFIG2, config2);
 	}
 
 	ret = ft3681_write_reg(FT3681_REG_GESTURE_CONFIG4, config4);
 
 	if (ret < 0) {
-		TPD_INFO("%s: write FT3681_REG_GESTURE_CONFIG4 enable(%x=%x) fail", __func__,
+		TPD_DEBUG("%s: write FT3681_REG_GESTURE_CONFIG4 enable(%x=%x) fail", __func__,
 			 FT3681_REG_GESTURE_CONFIG4, config4);
 	}
 
 	msleep(1);
-	TPD_INFO("%s, enable[%d] register[FT3681_REG_GESTURE_CONFIG1. FT3681_REG_GESTURE_CONFIG2. FT3681_REG_GESTURE_CONFIG4]",
+	TPD_DEBUG("%s, enable[%d] register[FT3681_REG_GESTURE_CONFIG1. FT3681_REG_GESTURE_CONFIG2. FT3681_REG_GESTURE_CONFIG4]",
 		 __func__, enable);
 }
 
@@ -2843,7 +2843,7 @@ static int ft3681_parse_dts(struct chip_data_ft3681 *ts_data,
 
 	ts_data->high_resolution_support = of_property_read_bool(np,
 					   "high_resolution_support");
-	TPD_INFO("%s:high_resolution_support is:%d\n", __func__,
+	TPD_DEBUG("%s:high_resolution_support is:%d\n", __func__,
 		 ts_data->high_resolution_support);
 
 	return 0;
@@ -2860,14 +2860,14 @@ static ssize_t ft3681_debug_read(struct file *filp, char __user *buff, size_t co
 	struct ftxxxx_proc *proc = &ts_data->proc;;
 
 	if (buflen <= 0) {
-		TPD_INFO("apk proc read count(%d) fail", buflen);
+		TPD_DEBUG("apk proc read count(%d) fail", buflen);
 		return -EINVAL;
 	}
 
 	if (buflen > PROC_BUF_SIZE) {
 		readbuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
 		if (NULL == readbuf) {
-			TPD_INFO("apk proc wirte buf zalloc fail");
+			TPD_DEBUG("apk proc wirte buf zalloc fail");
 			return -ENOMEM;
 		}
 	} else {
@@ -2879,7 +2879,7 @@ static ssize_t ft3681_debug_read(struct file *filp, char __user *buff, size_t co
 		num_read_chars = 1;
 		ret = ft3681_read_reg(proc->cmd[0], &readbuf[0]);
 		if (ret < 0) {
-			TPD_INFO("PROC_READ_REGISTER read error");
+			TPD_DEBUG("PROC_READ_REGISTER read error");
 			goto proc_read_err;
 		}
 		break;
@@ -2888,7 +2888,7 @@ static ssize_t ft3681_debug_read(struct file *filp, char __user *buff, size_t co
 		num_read_chars = buflen;
 		ret = ft3681_read(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
 		if (ret < 0) {
-			TPD_INFO("PROC_READ_DATA read error");
+			TPD_DEBUG("PROC_READ_DATA read error");
 			goto proc_read_err;
 		}
 		break;
@@ -2897,7 +2897,7 @@ static ssize_t ft3681_debug_read(struct file *filp, char __user *buff, size_t co
 		num_read_chars = buflen;
 		ret = ft3681_spi_transfer_direct(proc->cmd, proc->cmd_len, readbuf, num_read_chars);
 		if (ret < 0) {
-			TPD_INFO("PROC_READ_DATA_DIRECT read error");
+			TPD_DEBUG("PROC_READ_DATA_DIRECT read error");
 			goto proc_read_err;
 		}
 		break;
@@ -2917,7 +2917,7 @@ static ssize_t ft3681_debug_read(struct file *filp, char __user *buff, size_t co
 	ret = num_read_chars;
 proc_read_err:
 	if ((num_read_chars > 0) && copy_to_user(buff, readbuf, num_read_chars)) {
-		TPD_INFO("copy to user error");
+		TPD_DEBUG("copy to user error");
 		ret = -EFAULT;
 	}
 
@@ -2941,7 +2941,7 @@ static int ft3681_get_rawdata_tmp(struct chip_data_ft3681 *ts_data, int *raw,
 	u8 raw_addr = 0;
 	u8 regval = 0;
 
-	TPD_INFO("%s:call", __func__);
+	TPD_DEBUG("%s:call", __func__);
 
 	memset(buf, 0, byte_num);
 
@@ -2950,7 +2950,7 @@ static int ft3681_get_rawdata_tmp(struct chip_data_ft3681 *ts_data, int *raw,
 		ret = ft3681_write_reg(FACTORY_REG_DATA_SELECT, 0x01);
 
 		if (ret < 0) {
-			TPD_INFO("%s:write 0x01 to reg0x06 fail", __func__);
+			TPD_DEBUG("%s:write 0x01 to reg0x06 fail", __func__);
 			goto reg_restore_tmp;
 		}
 	}
@@ -2958,14 +2958,14 @@ static int ft3681_get_rawdata_tmp(struct chip_data_ft3681 *ts_data, int *raw,
 	ret = ft3681_start_scan(ts_data);
 
 	if (ret < 0) {
-		TPD_INFO("%s:scan a frame fail", __func__);
+		TPD_DEBUG("%s:scan a frame fail", __func__);
 		goto reg_restore_tmp;
 	}
 
 	ret = ft3681_write_reg(FACTORY_REG_LINE_ADDR, 0xAA);
 
 	if (ret < 0) {
-		TPD_INFO("%s:write 0xAA to reg0x01 fail", __func__);
+		TPD_DEBUG("%s:write 0xAA to reg0x01 fail", __func__);
 		goto reg_restore_tmp;
 	}
 
@@ -2985,7 +2985,7 @@ static int ft3681_get_rawdata_tmp(struct chip_data_ft3681 *ts_data, int *raw,
 		ret = ft3681_read(&raw_addr, 1, buf + offset, packet_len);
 
 		if (ret < 0) {
-			TPD_INFO("%s:read raw data(packet:%d) fail", __func__,
+			TPD_DEBUG("%s:read raw data(packet:%d) fail", __func__,
 				 offset / MAX_PACKET_SIZE);
 			goto reg_restore_tmp;
 		}
@@ -3004,7 +3004,7 @@ reg_restore_tmp:
 		ret = ft3681_write_reg(FACTORY_REG_DATA_SELECT, regval);
 
 		if (ret < 0) {
-			TPD_INFO("%s:restore reg0x06 fail", __func__);
+			TPD_DEBUG("%s:restore reg0x06 fail", __func__);
 		}
 	}
 
@@ -3028,12 +3028,12 @@ static void ft3681_delta_snr_read(struct seq_file *s, void *chip_data, uint32_t 
 		return;
 	}
 
-	TPD_INFO("%s:snr read diff data", __func__);
+	TPD_DEBUG("%s:snr read diff data", __func__);
 	focal_esd_check_enable(ts_data, false);   //no allowed esd check
 
 	buf = kzalloc(byte_num, GFP_KERNEL);
 	if (!buf) {
-		TPD_INFO("%s:kzalloc for raw byte buf fail", __func__);
+		TPD_DEBUG("%s:kzalloc for raw byte buf fail", __func__);
 		goto buf_fail;
 	}
 
@@ -3046,18 +3046,18 @@ static void ft3681_delta_snr_read(struct seq_file *s, void *chip_data, uint32_t 
 	ret = ft3681_write_reg(FT3681_REG_AUTOCLB_ADDR, 0x01);
 
 	if (ret < 0) {
-		TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+		TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
 		goto set_fail;
 	}
 
 	ret = ft3681_write_reg(0x00, 0x40);
 
 	if (ret < 0) {
-		TPD_INFO("%s:enter factory mode fail", __func__);
+		TPD_DEBUG("%s:enter factory mode fail", __func__);
 		goto set_fail;
 	}
 
-	TPD_INFO("%s:enter factory mode", __func__);
+	TPD_DEBUG("%s:enter factory mode", __func__);
 
 	for (i = 0; i < count; i++) {
 
@@ -3076,7 +3076,7 @@ static void ft3681_delta_snr_read(struct seq_file *s, void *chip_data, uint32_t 
 				snr->min = raw[rx_num * snr->channel_x + snr->channel_y];
 			}
 			snr->sum += raw[rx_num * snr->channel_x + snr->channel_y];
-			TPD_INFO("snr report %d += %d \n", snr->sum, raw[rx_num * snr->channel_x + snr->channel_y]);
+			TPD_DEBUG("snr report %d += %d \n", snr->sum, raw[rx_num * snr->channel_x + snr->channel_y]);
 		}
 	}
 
@@ -3087,11 +3087,11 @@ static void ft3681_delta_snr_read(struct seq_file *s, void *chip_data, uint32_t 
 	seq_printf(s, "%d|", snr->sum/count);
 	seq_printf(s, "%d\n", snr->noise);
 	SNR_RESET(snr);
-	TPD_INFO("snr-cover [%d %d] %d %d %d %d\n", snr->channel_x, snr->channel_y, snr->max, snr->min, snr->sum, snr->noise);
+	TPD_DEBUG("snr-cover [%d %d] %d %d %d %d\n", snr->channel_x, snr->channel_y, snr->max, snr->min, snr->sum, snr->noise);
 
 set_fail:
 	ft3681_write_reg(0x00, 0x00);
-	TPD_INFO("%s:enter work mode", __func__);
+	TPD_DEBUG("%s:enter work mode", __func__);
 	kfree(raw);
 
 raw_fail:
@@ -3115,14 +3115,14 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 	struct ftxxxx_proc *proc = &ts_data->proc;
 
 	if (buflen < 1) {
-		TPD_INFO("apk proc wirte count(%d) fail", buflen);
+		TPD_DEBUG("apk proc wirte count(%d) fail", buflen);
 		return -EINVAL;
 	}
 
 	if (buflen > PROC_BUF_SIZE) {
 		writebuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
 		if (NULL == writebuf) {
-			TPD_INFO("apk proc wirte buf zalloc fail");
+			TPD_DEBUG("apk proc wirte buf zalloc fail");
 			return -ENOMEM;
 		}
 	} else {
@@ -3130,7 +3130,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 	}
 
 	if (copy_from_user(writebuf, buff, buflen)) {
-		TPD_INFO("[APK]: copy from user error!!");
+		TPD_DEBUG("[APK]: copy from user error!!");
 		ret = -EFAULT;
 		goto proc_write_err;
 	}
@@ -3143,7 +3143,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 
 	switch (proc->opmode) {
 	case PROC_SET_TEST_FLAG:
-		TPD_INFO("[APK]: PROC_SET_TEST_FLAG = %x", writebuf[1]);
+		TPD_DEBUG("[APK]: PROC_SET_TEST_FLAG = %x", writebuf[1]);
 		if (writebuf[1] == 0) {
 			focal_esd_check_enable(ts_data, true);
 		} else {
@@ -3158,7 +3158,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 	case PROC_WRITE_REGISTER:
 		ret = ft3681_write_reg(writebuf[1], writebuf[2]);
 		if (ret < 0) {
-			TPD_INFO("PROC_WRITE_REGISTER write error");
+			TPD_DEBUG("PROC_WRITE_REGISTER write error");
 			goto proc_write_err;
 		}
 		break;
@@ -3166,7 +3166,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 	case PROC_READ_DATA:
 		writelen = buflen - 1;
 		if (writelen >= FT3681_MAX_COMMMAND_LENGTH) {
-			TPD_INFO("cmd(PROC_READ_DATA) length(%d) fail", writelen);
+			TPD_DEBUG("cmd(PROC_READ_DATA) length(%d) fail", writelen);
 			goto proc_write_err;
 		}
 		memcpy(proc->cmd, writebuf + 1, writelen);
@@ -3177,7 +3177,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 		writelen = buflen - 1;
 		ret = ft3681_write(writebuf + 1, writelen);
 		if (ret < 0) {
-			TPD_INFO("PROC_WRITE_DATA write error");
+			TPD_DEBUG("PROC_WRITE_DATA write error");
 			goto proc_write_err;
 		}
 		break;
@@ -3187,7 +3187,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 			snprintf(tmp, PROC_BUF_SIZE, "%s", writebuf + 1);
 			tmp[buflen - 1] = '\0';
 			if (strncmp(tmp, "focal_driver", 12) == 0) {
-				TPD_INFO("APK execute HW Reset");
+				TPD_DEBUG("APK execute HW Reset");
 				ft3681_hw_reset(ts_data, 0);
 			}
 		}
@@ -3196,7 +3196,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 	case PROC_READ_DATA_DIRECT:
 		writelen = buflen - 1;
 		if (writelen >= FT3681_MAX_COMMMAND_LENGTH) {
-			TPD_INFO("cmd(PROC_READ_DATA_DIRECT) length(%d) fail", writelen);
+			TPD_DEBUG("cmd(PROC_READ_DATA_DIRECT) length(%d) fail", writelen);
 			goto proc_write_err;
 		}
 		memcpy(proc->cmd, writebuf + 1, writelen);
@@ -3207,7 +3207,7 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 		writelen = buflen - 1;
 		ret = ft3681_spi_transfer_direct(writebuf + 1, writelen, NULL, 0);
 		if (ret < 0) {
-			TPD_INFO("PROC_WRITE_DATA_DIRECT write error");
+			TPD_DEBUG("PROC_WRITE_DATA_DIRECT write error");
 			goto proc_write_err;
 		}
 		break;
@@ -3216,11 +3216,11 @@ static ssize_t ft3681_debug_write(struct file *filp, const char __user *buff, si
 		ts_data->ft_spi->mode = writebuf[1];
 		ts_data->ft_spi->bits_per_word = writebuf[2];
 		ts_data->ft_spi->max_speed_hz = *(u32 *)(writebuf + 4);
-		TPD_INFO("spi,mode=%d,bits=%d,speed=%d", ts_data->ft_spi->mode,
+		TPD_DEBUG("spi,mode=%d,bits=%d,speed=%d", ts_data->ft_spi->mode,
 			 ts_data->ft_spi->bits_per_word, ts_data->ft_spi->max_speed_hz);
 		ret = spi_setup(ts_data->ft_spi);
 		if (ret) {
-			TPD_INFO("spi setup fail");
+			TPD_DEBUG("spi setup fail");
 			goto proc_write_err;
 		}
 		break;
@@ -3261,17 +3261,17 @@ static int ft3681_create_apk_debug_channel(struct chip_data_ft3681 *ts_data)
 
 	proc->proc_entry = proc_create_data("ftxxxx-debug", 0777, NULL, &ft3681_proc_fops, ts_data);
 	if (NULL == proc->proc_entry) {
-		TPD_INFO("create proc entry fail");
+		TPD_DEBUG("create proc entry fail");
 		return -ENOMEM;
 	}
 
 	// ts_data->proc_ta.proc_entry = proc_create_data("ft3681_ta", 0777, NULL, \
 	// &ft3681_procta_fops, ts_data);
 	// if (!ts_data->proc_ta.proc_entry) {
-	// TPD_INFO("create proc_ta entry fail");
+	// TPD_DEBUG("create proc_ta entry fail");
 	// return -ENOMEM;
 	// }
-	TPD_INFO("Create proc entry success!");
+	TPD_DEBUG("Create proc entry success!");
 	return 0;
 }
 
@@ -3326,24 +3326,24 @@ static void ft3681_start_aging_test(void *chip_data)
 {
 	int ret = -1;
 
-	TPD_INFO("%s: start aging test \n", __func__);
+	TPD_DEBUG("%s: start aging test \n", __func__);
 	ret = ft3681_write_reg(FT3681_REG_GAME_MODE_EN, 2);
 	if (ret < 0) {
-		TPD_INFO("%s: enable(%x=%x) fail", __func__, FT3681_REG_GAME_MODE_EN, 2);
+		TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FT3681_REG_GAME_MODE_EN, 2);
 	}
 	ret = ft3681_write_reg(FT3681_REG_POWER_MODE, 0);
 	if (ret < 0) {
-		TPD_INFO("%s: enable(%x=%x) fail", __func__, FT3681_REG_POWER_MODE, 0);
+		TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FT3681_REG_POWER_MODE, 0);
 	}
 }
 static void ft3681_finish_aging_test(void *chip_data)
 {
 	int ret = -1;
 
-	TPD_INFO("%s: finish aging test \n", __func__);
+	TPD_DEBUG("%s: finish aging test \n", __func__);
 	ret = ft3681_write_reg(FT3681_REG_GAME_MODE_EN, 1);
 	if (ret < 0) {
-		TPD_INFO("%s: enable(%x=%x) fail", __func__, FT3681_REG_GAME_MODE_EN, 1);
+		TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FT3681_REG_GAME_MODE_EN, 1);
 	}
 }
 
@@ -3357,14 +3357,14 @@ static int ft3681_tp_probe(struct spi_device *spi)
 	struct touchpanel_data *ts = NULL;
 	int ret = -1;
 
-	TPD_INFO("%s  is called\n", __func__);
+	TPD_DEBUG("%s  is called\n", __func__);
 
 	spi->mode = SPI_MODE_0;
 	spi->bits_per_word = 8;
 	ret = spi_setup(spi);
 
 	if (ret) {
-		TPD_INFO("spi setup fail");
+		TPD_DEBUG("spi setup fail");
 		return ret;
 	}
 
@@ -3372,7 +3372,7 @@ static int ft3681_tp_probe(struct spi_device *spi)
 	ts_data = kzalloc(sizeof(struct chip_data_ft3681), GFP_KERNEL);
 
 	if (ts_data == NULL) {
-		TPD_INFO("ts_data kzalloc error\n");
+		TPD_DEBUG("ts_data kzalloc error\n");
 		ret = -ENOMEM;
 		return ret;
 	}
@@ -3385,7 +3385,7 @@ static int ft3681_tp_probe(struct spi_device *spi)
 	ret = ft3681_bus_init(ts_data);
 
 	if (ret < 0) {
-		TPD_INFO("bus init error\n");
+		TPD_DEBUG("bus init error\n");
 		goto ts_malloc_failed;
 	}
 
@@ -3395,7 +3395,7 @@ static int ft3681_tp_probe(struct spi_device *spi)
 	ts = common_touch_data_alloc();
 
 	if (ts == NULL) {
-		TPD_INFO("ts kzalloc error\n");
+		TPD_DEBUG("ts kzalloc error\n");
 		ret = -ENOMEM;
 		goto ts_malloc_failed;
 	}
@@ -3448,7 +3448,7 @@ static int ft3681_tp_probe(struct spi_device *spi)
 	focal_create_sysfs_spi(spi);
 
 	ts_data->probe_done = 1;
-	TPD_INFO("%s, probe normal end\n", __func__);
+	TPD_DEBUG("%s, probe normal end\n", __func__);
 
 	return 0;
 
@@ -3462,7 +3462,7 @@ ts_malloc_failed:
 	ts_data = NULL;
 	/*ret = -1;*/
 
-	TPD_INFO("%s, probe error\n", __func__);
+	TPD_DEBUG("%s, probe error\n", __func__);
 
 	return ret;
 }
@@ -3473,7 +3473,7 @@ static int ft3681_tp_remove(struct spi_device *spi)
 	ts->s_client = NULL;
 	spi_set_drvdata(spi, NULL);
 
-	TPD_INFO("%s is called\n", __func__);
+	TPD_DEBUG("%s is called\n", __func__);
 	kfree(ts);
 
 	return 0;
@@ -3483,7 +3483,7 @@ static int ft3681_spi_suspend(struct device *dev)
 {
 	struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-	TPD_INFO("%s: is called\n", __func__);
+	TPD_DEBUG("%s: is called\n", __func__);
 	tp_i2c_suspend(ts);
 
 	return 0;
@@ -3493,7 +3493,7 @@ static int ft3681_spi_resume(struct device *dev)
 {
 	struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-	TPD_INFO("%s is called\n", __func__);
+	TPD_DEBUG("%s is called\n", __func__);
 	tp_i2c_resume(ts);
 
 	return 0;
@@ -3527,14 +3527,14 @@ static struct spi_driver ft3681_ts_driver = {
 
 static int __init tp_driver_init_ft3681(void)
 {
-	TPD_INFO("%s is called\n", __func__);
+	TPD_DEBUG("%s is called\n", __func__);
 
 	if (!tp_judge_ic_match(TPD_DEVICE)) {
 		return 0;
 	}
 
 	if (spi_register_driver(&ft3681_ts_driver) != 0) {
-		TPD_INFO("unable to add spi driver.\n");
+		TPD_DEBUG("unable to add spi driver.\n");
 		return -1;
 	}
 

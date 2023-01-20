@@ -180,7 +180,7 @@ static int debug_mode_get_data(struct file_buffer *file, u8 type, u32 frame_coun
         return ret;
 
     while ((write_index < frame_count) && (timeout > 0)) {
-        TPD_INFO("frame = %d,index = %d,count = %d\n", write_index, write_index % 1024, idev->debug_data_frame);
+        TPD_DEBUG("frame = %d,index = %d,count = %d\n", write_index, write_index % 1024, idev->debug_data_frame);
         if ((write_index % 1024) < idev->debug_data_frame) {
             mutex_lock(&idev->touch_mutex);
             file->file_len = 0;
@@ -255,7 +255,7 @@ static ssize_t ilitek_proc_get_delta_data_read(struct file *pFile, char __user *
     col = idev->xch_num;
     read_length = 4 + 2 * row * col + 1 ;
 
-    TPD_INFO("read length = %d\n", read_length);
+    TPD_DEBUG("read length = %d\n", read_length);
 
     data = kcalloc(read_length + 1, sizeof(u8), GFP_KERNEL);
     if (ERR_ALLOC_MEM(data)) {
@@ -293,16 +293,16 @@ static ssize_t ilitek_proc_get_delta_data_read(struct file *pFile, char __user *
         delta[index] = (data[i] << 8) + data[i + 1];
 
     size = snprintf(g_user_buf + size, PAGE_SIZE - size, "======== Deltadata ========\n");
-    TPD_INFO("======== Deltadata ========\n");
+    TPD_DEBUG("======== Deltadata ========\n");
 
     size += snprintf(g_user_buf + size, PAGE_SIZE - size,
                      "Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
-    TPD_INFO("Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
+    TPD_DEBUG("Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
 
     // print delta data
     for (y = 0; y < row; y++) {
         size += snprintf(g_user_buf + size, PAGE_SIZE - size, "[%2d] ", (y + 1));
-        TPD_INFO("[%2d] ", (y + 1));
+        TPD_DEBUG("[%2d] ", (y + 1));
 
         for (x = 0; x < col; x++) {
             int shift = y * col + x;
@@ -348,7 +348,7 @@ static ssize_t ilitek_proc_fw_get_raw_data_read(struct file *pFile, char __user 
     col = idev->xch_num;
     read_length = 4 + 2 * row * col + 1 ;
 
-    TPD_INFO("read length = %d\n", read_length);
+    TPD_DEBUG("read length = %d\n", read_length);
 
     data = kcalloc(read_length + 1, sizeof(u8), GFP_KERNEL);
     if (ERR_ALLOC_MEM(data)) {
@@ -386,16 +386,16 @@ static ssize_t ilitek_proc_fw_get_raw_data_read(struct file *pFile, char __user 
         rawdata[index] = (data[i] << 8) + data[i + 1];
 
     size = snprintf(g_user_buf, PAGE_SIZE, "======== RawData ========\n");
-    TPD_INFO("======== RawData ========\n");
+    TPD_DEBUG("======== RawData ========\n");
 
     size += snprintf(g_user_buf + size, PAGE_SIZE - size,
                      "Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
-    TPD_INFO("Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
+    TPD_DEBUG("Header 0x%x ,Type %d, Length %d\n", data[0], data[1], (data[2] << 8) | data[3]);
 
     // print raw data
     for (y = 0; y < row; y++) {
         size += snprintf(g_user_buf + size, PAGE_SIZE - size, "[%2d] ", (y + 1));
-        TPD_INFO("[%2d] ", (y + 1));
+        TPD_DEBUG("[%2d] ", (y + 1));
 
         for (x = 0; x < col; x++) {
             int shift = y * col + x;
@@ -456,7 +456,7 @@ static ssize_t ilitek_proc_rw_tp_reg_read(struct file *pFile, char __user *buf, 
     write_data = rw_reg[3];
     write_len = rw_reg[4];
 
-    TPD_INFO("stop_mcu = %d\n", rw_reg[0]);
+    TPD_DEBUG("stop_mcu = %d\n", rw_reg[0]);
 
     idev->esd_check_enabled = false;
     mutex_lock(&idev->touch_mutex);
@@ -477,11 +477,11 @@ static ssize_t ilitek_proc_rw_tp_reg_read(struct file *pFile, char __user *buf, 
 
     if (type == read) {
         ret = ilitek_ice_mode_read(addr, &read_data, sizeof(u32));
-        TPD_INFO("READ:addr = 0x%06x, read = 0x%08x\n", addr, read_data);
+        TPD_DEBUG("READ:addr = 0x%06x, read = 0x%08x\n", addr, read_data);
         size = snprintf(g_user_buf, PAGE_SIZE, "READ:addr = 0x%06x, read = 0x%08x\n", addr, read_data);
     } else {
         ilitek_ice_mode_write(addr, write_data, write_len);
-        TPD_INFO("WRITE:addr = 0x%06x, write = 0x%08x, len =%d byte\n", addr, write_data, write_len);
+        TPD_DEBUG("WRITE:addr = 0x%06x, write = 0x%08x, len =%d byte\n", addr, write_data, write_len);
         size = snprintf(g_user_buf, PAGE_SIZE, "WRITE:addr = 0x%06x, write = 0x%08x, len =%d byte\n", addr, write_data, write_len);
     }
 
@@ -509,14 +509,14 @@ static ssize_t ilitek_proc_rw_tp_reg_write(struct file *filp, const char *buff, 
 
     if (buff != NULL) {
         if (copy_from_user(cmd, buff, size - 1)) {
-            TPD_INFO("copy data from user space, failed\n");
+            TPD_DEBUG("copy data from user space, failed\n");
             return -1;
         }
     }
     token = cur = cmd;
     while ((token = strsep(&cur, ",")) != NULL) {
         rw_reg[count] = str2hex(token);
-        TPD_INFO("rw_reg[%d] = 0x%x\n", count, rw_reg[count]);
+        TPD_DEBUG("rw_reg[%d] = 0x%x\n", count, rw_reg[count]);
         count++;
     }
     return size;
@@ -539,14 +539,14 @@ static ssize_t ilitek_proc_debug_switch_read(struct file *pFile, char __user *bu
                 for (i = 0; i < 1024; i++) {
                     idev->debug_buf[i] = (char *)kmalloc(2048 * sizeof(unsigned char), GFP_KERNEL);
                     if (ERR_ALLOC_MEM(idev->debug_buf[i])) {
-                        TPD_INFO("Failed to malloc debug_buf[%d]\n", i);
+                        TPD_DEBUG("Failed to malloc debug_buf[%d]\n", i);
                     }
                 }
             } else {
-                TPD_INFO("Failed to malloc debug_buf\n");
+                TPD_DEBUG("Failed to malloc debug_buf\n");
             }
         } else {
-            TPD_INFO("Already malloc debug_buf\n");
+            TPD_DEBUG("Already malloc debug_buf\n");
         }
     } else {
         if (!ERR_ALLOC_MEM(idev->debug_buf)) {
@@ -555,10 +555,10 @@ static ssize_t ilitek_proc_debug_switch_read(struct file *pFile, char __user *bu
             }
             ipio_kfree((void **)&idev->debug_buf);
         } else {
-            TPD_INFO("Already free debug_buf\n");
+            TPD_DEBUG("Already free debug_buf\n");
         }
     }
-    TPD_INFO(" %s debug_flag message = %x\n", idev->debug_node_open ? "Enabled" : "Disabled", idev->debug_node_open);
+    TPD_DEBUG(" %s debug_flag message = %x\n", idev->debug_node_open ? "Enabled" : "Disabled", idev->debug_node_open);
 
     size = snprintf(g_user_buf, USER_STR_BUFF,
                     "debug_node_open : %s\n",
@@ -708,8 +708,8 @@ static ssize_t ilitek_proc_get_debug_mode_data_read(struct file *filp, char __us
     }
 
     /* save data to csv */
-    TPD_INFO("Get Raw data %d frame\n", idev->raw_count);
-    TPD_INFO("Get Delta data %d frame\n", idev->delta_count);
+    TPD_DEBUG("Get Raw data %d frame\n", idev->raw_count);
+    TPD_DEBUG("Get Delta data %d frame\n", idev->delta_count);
     csv.file_len += snprintf(csv.ptr + csv.file_len,
                              DEBUG_DATA_FILE_SIZE - csv.file_len,
                              "Get Raw data %d frame\n", idev->raw_count);
@@ -766,16 +766,16 @@ static ssize_t ilitek_proc_get_debug_mode_data_write(struct file *filp, const ch
 
     if (buff != NULL) {
         if (copy_from_user(cmd, buff, size - 1)) {
-            TPD_INFO("copy data from user space, failed\n");
+            TPD_DEBUG("copy data from user space, failed\n");
             return -1;
         }
     }
 
-    TPD_INFO("size = %d, cmd = %s\n", (int)size, cmd);
+    TPD_DEBUG("size = %d, cmd = %s\n", (int)size, cmd);
     token = cur = cmd;
     while ((token = strsep(&cur, ",")) != NULL) {
         temp[count] = str2hex(token);
-        TPD_INFO("temp[%d] = %d\n", count, temp[count]);
+        TPD_DEBUG("temp[%d] = %d\n", count, temp[count]);
         count++;
     }
 
@@ -783,7 +783,7 @@ static ssize_t ilitek_proc_get_debug_mode_data_write(struct file *filp, const ch
     idev->delta_count = ((temp[2] << 8) | temp[3]);
     idev->bg_count = ((temp[4] << 8) | temp[5]);
 
-    TPD_INFO("Raw_count = %d, Delta_count = %d, BG_count = %d\n", idev->raw_count, idev->delta_count, idev->bg_count);
+    TPD_DEBUG("Raw_count = %d, Delta_count = %d, BG_count = %d\n", idev->raw_count, idev->delta_count, idev->bg_count);
     return size;
 }
 
@@ -792,7 +792,7 @@ static ssize_t ilitek_node_mp_lcm_on_test_read(struct file *filp, char __user *b
     int ret = 0;
     char apk_ret[100] = {0};
 
-    TPD_INFO("Run MP test with LCM on\n");
+    TPD_DEBUG("Run MP test with LCM on\n");
 
     if (*pos != 0)
         return 0;
@@ -811,7 +811,7 @@ static ssize_t ilitek_node_mp_lcm_off_test_read(struct file *filp, char __user *
     int ret = 0;
     char apk_ret[100] = {0};
 
-    TPD_INFO("Run MP test with LCM off\n");
+    TPD_DEBUG("Run MP test with LCM off\n");
 
     if (*pos != 0)
         return 0;
@@ -837,7 +837,7 @@ static ssize_t ilitek_proc_fw_process_read(struct file *filp, char __user *buff,
 
     len = snprintf(g_user_buf, USER_STR_BUFF, "%02d\n", idev->fw_update_stat);
 
-    TPD_INFO("update status = %d\n", idev->fw_update_stat);
+    TPD_DEBUG("update status = %d\n", idev->fw_update_stat);
 
     ret = copy_to_user((char *) buff, &idev->fw_update_stat, len);
     if (ret < 0) {
@@ -855,7 +855,7 @@ static int ilitek_tdd_fw_hex_open(void)
     mm_segment_t old_fs;
     loff_t pos = 0;
 
-    TPD_INFO("Open file method = FILP_OPEN, path = %s\n", UPDATE_FW_PATH);
+    TPD_DEBUG("Open file method = FILP_OPEN, path = %s\n", UPDATE_FW_PATH);
 
     f = filp_open(UPDATE_FW_PATH, O_RDONLY, 0644);
     if (ERR_ALLOC_MEM(f)) {
@@ -864,7 +864,7 @@ static int ilitek_tdd_fw_hex_open(void)
     }
 
     fsize = f->f_inode->i_size;
-    TPD_INFO("fsize = %d\n", fsize);
+    TPD_DEBUG("fsize = %d\n", fsize);
     if (fsize <= 0) {
         ipio_err("The size of file is invaild\n");
         filp_close(f, NULL);
@@ -876,11 +876,11 @@ static int ilitek_tdd_fw_hex_open(void)
     //new fw data buffer
     idev->tp_firmware.data = vmalloc(fsize);
     if (idev->tp_firmware.data == NULL) {
-        TPD_INFO("kmalloc tp firmware data error\n");
+        TPD_DEBUG("kmalloc tp firmware data error\n");
 
         idev->tp_firmware.data = vmalloc(fsize);
         if (idev->tp_firmware.data == NULL) {
-            TPD_INFO("retry kmalloc tp firmware data error\n");
+            TPD_DEBUG("retry kmalloc tp firmware data error\n");
             return -ENOMEM;
         }
     }
@@ -903,7 +903,7 @@ static ssize_t ilitek_node_fw_upgrade_read(struct file *filp, char __user *buff,
     int ret = 0;
     u32 len = 0;
 
-    TPD_INFO("Preparing to upgarde firmware\n");
+    TPD_DEBUG("Preparing to upgarde firmware\n");
 
     if (*pos != 0)
         return 0;
@@ -938,7 +938,7 @@ static ssize_t ilitek_proc_debug_level_read(struct file *filp, char __user *buff
 
     memset(g_user_buf, 0, USER_STR_BUFF * sizeof(unsigned char));
 
-    TPD_INFO("Current DEBUG Level = %d\n", ipio_debug_level);
+    TPD_DEBUG("Current DEBUG Level = %d\n", ipio_debug_level);
 
     len = snprintf(g_user_buf, PAGE_SIZE, "Current DEBUG Level = %d\n", ipio_debug_level);
 
@@ -957,12 +957,12 @@ static ssize_t ilitek_proc_debug_level_write(struct file *filp, const char *buff
 
     if (buff != NULL) {
         if (copy_from_user(cmd, buff, size - 1)) {
-            TPD_INFO("copy data from user space, failed\n");
+            TPD_DEBUG("copy data from user space, failed\n");
             return -1;
         }
     }
     ipio_debug_level = katoi(cmd);
-    TPD_INFO("ipio_debug_level = %d\n", ipio_debug_level);
+    TPD_DEBUG("ipio_debug_level = %d\n", ipio_debug_level);
     return size;
 }
 
@@ -977,12 +977,12 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
 
     if (buff != NULL) {
         if (copy_from_user(cmd, buff, size - 1)) {
-            TPD_INFO("copy data from user space, failed\n");
+            TPD_DEBUG("copy data from user space, failed\n");
             return -1;
         }
     }
 
-    TPD_INFO("size = %d, cmd = %s\n", (int)size, cmd);
+    TPD_DEBUG("size = %d, cmd = %s\n", (int)size, cmd);
 
     token = cur = cmd;
 
@@ -990,11 +990,11 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
 
     while ((token = strsep(&cur, ",")) != NULL) {
         data[count] = str2hex(token);
-        TPD_INFO("data[%d] = %x\n", count, data[count]);
+        TPD_DEBUG("data[%d] = %x\n", count, data[count]);
         count++;
     }
 
-    TPD_INFO("cmd = %s\n", cmd);
+    TPD_DEBUG("cmd = %s\n", cmd);
     mutex_lock(&idev->touch_mutex);
     if (strcmp(cmd, "hwreset") == 0) {
         ilitek_tddi_reset_ctrl(TP_HW_RST_ONLY);
@@ -1024,14 +1024,14 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
     } else if (strcmp(cmd, "enablewqesd") == 0) {
         idev->esd_check_enabled = true;
     } else if (strcmp(cmd, "enablewqbat") == 0) {
-        TPD_INFO("oplus kit ctrl this\n");
+        TPD_DEBUG("oplus kit ctrl this\n");
     } else if (strcmp(cmd, "disablewqesd") == 0) {
         idev->esd_check_enabled = false;
     } else if (strcmp(cmd, "disablewqbat") == 0) {
-        TPD_INFO("oplus kit ctrl this\n");
+        TPD_DEBUG("oplus kit ctrl this\n");
     } else if (strcmp(cmd, "gesture") == 0) {
         idev->gesture = !idev->gesture;
-        TPD_INFO("gesture = %d\n", idev->gesture);
+        TPD_DEBUG("gesture = %d\n", idev->gesture);
     } else if (strcmp(cmd, "esdgesture") == 0) {
         ilitek_tddi_wq_ges_recover();
     } else if (strcmp(cmd, "iceflag") == 0) {
@@ -1039,16 +1039,16 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
             atomic_set(&idev->ice_stat, ENABLE);
         else
             atomic_set(&idev->ice_stat, DISABLE);
-        TPD_INFO("ice mode flag = %d\n", atomic_read(&idev->ice_stat));
+        TPD_DEBUG("ice mode flag = %d\n", atomic_read(&idev->ice_stat));
     } else if (strcmp(cmd, "gesturenormal") == 0) {
         idev->gesture_mode = P5_X_FW_GESTURE_NORMAL_MODE;
-        TPD_INFO("gesture mode = %d\n", idev->gesture_mode);
+        TPD_DEBUG("gesture mode = %d\n", idev->gesture_mode);
     } else if (strcmp(cmd, "gestureinfo") == 0) {
         idev->gesture_mode = P5_X_FW_GESTURE_INFO_MODE;
-        TPD_INFO("gesture mode = %d\n", idev->gesture_mode);
+        TPD_DEBUG("gesture mode = %d\n", idev->gesture_mode);
     } else if (strcmp(cmd, "netlink") == 0) {
         idev->netlink = !idev->netlink;
-        TPD_INFO("netlink flag= %d\n", idev->netlink);
+        TPD_DEBUG("netlink flag= %d\n", idev->netlink);
     } else if (strcmp(cmd, "switchtestmode") == 0) {
         tp_mode = P5_X_FW_TEST_MODE;
         ilitek_tddi_switch_mode(&tp_mode);
@@ -1068,46 +1068,46 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
             idev->gesture_demo_en = DISABLE;
         else
             idev->gesture_demo_en = ENABLE;
-        TPD_INFO("Gesture demo mode control = %d\n",  idev->gesture_demo_en);
+        TPD_DEBUG("Gesture demo mode control = %d\n",  idev->gesture_demo_en);
         ilitek_tddi_ic_func_ctrl("gesture_demo_en", idev->gesture_demo_en);
     } else if (strcmp(cmd, "gesturefailrsn") == 0) {
         if (data[1] == 0)
             ilitek_set_gesture_fail_reason(DISABLE);
         else
             ilitek_set_gesture_fail_reason(ENABLE);
-        TPD_INFO("%s gesture fail reason\n", data[1] ? "ENABLE" : "DISABLE");
+        TPD_DEBUG("%s gesture fail reason\n", data[1] ? "ENABLE" : "DISABLE");
     } else if (strcmp(cmd, "dbgflag") == 0) {
         idev->debug_node_open = !idev->debug_node_open;
-        TPD_INFO("debug flag message = %d\n", idev->debug_node_open);
+        TPD_DEBUG("debug flag message = %d\n", idev->debug_node_open);
     } else if (strcmp(cmd, "iow") == 0) {
         int w_len = 0;
         w_len = data[1];
-        TPD_INFO("w_len = %d\n", w_len);
+        TPD_DEBUG("w_len = %d\n", w_len);
 
         for (i = 0; i < w_len; i++) {
             temp[i] = data[2 + i];
-            TPD_INFO("write[%d] = %x\n", i, temp[i]);
+            TPD_DEBUG("write[%d] = %x\n", i, temp[i]);
         }
 
         idev->write(temp, w_len);
     } else if (strcmp(cmd, "ior") == 0) {
         int r_len = 0;
         r_len = data[1];
-        TPD_INFO("r_len = %d\n", r_len);
+        TPD_DEBUG("r_len = %d\n", r_len);
         idev->read(temp, r_len);
         for (i = 0; i < r_len; i++)
-            TPD_INFO("read[%d] = %x\n", i, temp[i]);
+            TPD_DEBUG("read[%d] = %x\n", i, temp[i]);
     } else if (strcmp(cmd, "iowr") == 0) {
         int delay = 0;
         int w_len = 0, r_len = 0;
         w_len = data[1];
         r_len = data[2];
         delay = data[3];
-        TPD_INFO("w_len = %d, r_len = %d, delay = %d\n", w_len, r_len, delay);
+        TPD_DEBUG("w_len = %d, r_len = %d, delay = %d\n", w_len, r_len, delay);
 
         for (i = 0; i < w_len; i++) {
             temp[i] = data[4 + i];
-            TPD_INFO("write[%d] = %x\n", i, temp[i]);
+            TPD_DEBUG("write[%d] = %x\n", i, temp[i]);
         }
         idev->write(temp, w_len);
         memset(temp, 0, sizeof(temp));
@@ -1115,15 +1115,15 @@ static ssize_t ilitek_node_ioctl_write(struct file *filp, const char *buff, size
         idev->read(temp, r_len);
 
         for (i = 0; i < r_len; i++)
-            TPD_INFO("read[%d] = %x\n", i, temp[i]);
+            TPD_DEBUG("read[%d] = %x\n", i, temp[i]);
     } else if (strcmp(cmd, "getddiregdata") == 0) {
-        TPD_INFO("Get ddi reg one page: page = %x, reg = %x\n", data[1], data[2]);
+        TPD_DEBUG("Get ddi reg one page: page = %x, reg = %x\n", data[1], data[2]);
         ilitek_tddi_ic_get_ddi_reg_onepage(data[1], data[2]);
     } else if (strcmp(cmd, "setddiregdata") == 0) {
-        TPD_INFO("Set ddi reg one page: page = %x, reg = %x, data = %x\n", data[1], data[2], data[3]);
+        TPD_DEBUG("Set ddi reg one page: page = %x, reg = %x, data = %x\n", data[1], data[2], data[3]);
         ilitek_tddi_ic_set_ddi_reg_onepage(data[1], data[2], data[3]);
     } else if (strcmp(cmd, "dumpiramdata") == 0) {
-        TPD_INFO("Start = 0x%x, End = 0x%x, Dump IRAM path = %s\n", data[1], data[2], DUMP_IRAM_PATH);
+        TPD_DEBUG("Start = 0x%x, End = 0x%x, Dump IRAM path = %s\n", data[1], data[2], DUMP_IRAM_PATH);
         ilitek_tddi_fw_dump_iram_data(data[1], data[2]);
     } else if (strcmp(cmd, "edge_plam_ctrl") == 0) {
         ilitek_tddi_edge_palm_ctrl(data[1]);
@@ -1205,7 +1205,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
     mutex_lock(&idev->touch_mutex);
     switch (cmd) {
     case ILITEK_IOCTL_I2C_WRITE_DATA:
-        TPD_INFO("ioctl: write len = %d\n", i2c_rw_length);
+        TPD_DEBUG("ioctl: write len = %d\n", i2c_rw_length);
         if (copy_from_user(szBuf, (u8 *) arg, i2c_rw_length)) {
             ipio_err("Failed to copy data from user space\n");
             ret = ENOMEM;
@@ -1216,7 +1216,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ipio_err("Failed to write data\n");
         break;
     case ILITEK_IOCTL_I2C_READ_DATA:
-        TPD_INFO("ioctl: read len = %d\n", i2c_rw_length);
+        TPD_DEBUG("ioctl: read len = %d\n", i2c_rw_length);
         ret = idev->read(szBuf, i2c_rw_length);
         if (ret < 0) {
             ipio_err("Failed to read data\n");
@@ -1231,11 +1231,11 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         i2c_rw_length = arg;
         break;
     case ILITEK_IOCTL_TP_HW_RESET:
-        TPD_INFO("ioctl: hw reset\n");
+        TPD_DEBUG("ioctl: hw reset\n");
         ilitek_tddi_reset_ctrl(ILITEK_RESET_METHOD);
         break;
     case ILITEK_IOCTL_TP_POWER_SWITCH:
-        TPD_INFO("Not implemented yet\n");
+        TPD_DEBUG("Not implemented yet\n");
         break;
     case ILITEK_IOCTL_TP_REPORT_SWITCH:
         if (copy_from_user(szBuf, (u8 *) arg, 1)) {
@@ -1243,13 +1243,13 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: report switch = %d\n", szBuf[0]);
+        TPD_DEBUG("ioctl: report switch = %d\n", szBuf[0]);
         if (szBuf[0]) {
             idev->report = ENABLE;
-            TPD_INFO("report is enabled\n");
+            TPD_DEBUG("report is enabled\n");
         } else {
             idev->report = DISABLE;
-            TPD_INFO("report is disabled\n");
+            TPD_DEBUG("report is disabled\n");
         }
         break;
     case ILITEK_IOCTL_TP_IRQ_SWITCH:
@@ -1258,7 +1258,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: irq switch = %d\n", szBuf[0]);
+        TPD_DEBUG("ioctl: irq switch = %d\n", szBuf[0]);
         if (szBuf[0])
             ilitek_plat_irq_enable();
         else
@@ -1272,7 +1272,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             break;
         }
         ipio_debug_level = katoi(dbg);
-        TPD_INFO("ipio_debug_level = %d", ipio_debug_level);
+        TPD_DEBUG("ipio_debug_level = %d", ipio_debug_level);
         break;
     case ILITEK_IOCTL_TP_FUNC_MODE:
 
@@ -1281,11 +1281,11 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: set func mode = %x,%x,%x\n", szBuf[0], szBuf[1], szBuf[2]);
+        TPD_DEBUG("ioctl: set func mode = %x,%x,%x\n", szBuf[0], szBuf[1], szBuf[2]);
         idev->write(&szBuf[0], 3);
         break;
     case ILITEK_IOCTL_TP_FW_VER:
-        TPD_INFO("ioctl: get fw version\n");
+        TPD_DEBUG("ioctl: get fw version\n");
         ret = ilitek_tddi_ic_get_fw_ver();
         if (ret < 0) {
             ipio_err("Failed to get firmware version\n");
@@ -1295,13 +1295,13 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         szBuf[2] = (idev->chip->fw_ver >> 8) & 0xFF;
         szBuf[1] = (idev->chip->fw_ver >> 16) & 0xFF;
         szBuf[0] = idev->chip->fw_ver >> 24;
-        TPD_INFO("Firmware version = %d.%d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+        TPD_DEBUG("Firmware version = %d.%d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
         ret = copy_to_user((u8 *) arg, szBuf, 4);
         if (ret < 0)
             ipio_err("Failed to copy firmware version to user space\n");
         break;
     case ILITEK_IOCTL_TP_PL_VER:
-        TPD_INFO("ioctl: get protocl version\n");
+        TPD_DEBUG("ioctl: get protocl version\n");
         ret = ilitek_tddi_ic_get_protocl_ver();
         if (ret < 0) {
             ipio_err("Failed to get protocol version\n");
@@ -1310,13 +1310,13 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         szBuf[2] = idev->protocol->ver & 0xFF;
         szBuf[1] = (idev->protocol->ver >> 8) & 0xFF;
         szBuf[0] = idev->protocol->ver >> 16;
-        TPD_INFO("Protocol version = %d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2]);
+        TPD_DEBUG("Protocol version = %d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2]);
         ret = copy_to_user((u8 *) arg, szBuf, 3);
         if (ret < 0)
             ipio_err("Failed to copy protocol version to user space\n");
         break;
     case ILITEK_IOCTL_TP_CORE_VER:
-        TPD_INFO("ioctl: get core version\n");
+        TPD_DEBUG("ioctl: get core version\n");
         ret = ilitek_tddi_ic_get_core_ver();
         if (ret < 0) {
             ipio_err("Failed to get core version\n");
@@ -1326,13 +1326,13 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         szBuf[2] = (idev->chip->core_ver >> 8) & 0xFF;
         szBuf[1] = (idev->chip->core_ver >> 16) & 0xFF;
         szBuf[0] = idev->chip->core_ver >> 24;
-        TPD_INFO("Core version = %d.%d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+        TPD_DEBUG("Core version = %d.%d.%d.%d\n", szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
         ret = copy_to_user((u8 *) arg, szBuf, 4);
         if (ret < 0)
             ipio_err("Failed to copy core version to user space\n");
         break;
     case ILITEK_IOCTL_TP_DRV_VER:
-        TPD_INFO("ioctl: get driver version\n");
+        TPD_DEBUG("ioctl: get driver version\n");
         length = snprintf(szBuf, IOCTL_I2C_BUFF, "%s", DRIVER_VERSION);
         ret = copy_to_user((u8 *) arg, szBuf, length);
         if (ret < 0) {
@@ -1340,7 +1340,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         }
         break;
     case ILITEK_IOCTL_TP_CHIP_ID:
-        TPD_INFO("ioctl: get chip id\n");
+        TPD_DEBUG("ioctl: get chip id\n");
         ilitek_ice_mode_ctrl(ENABLE, OFF);
         ret = ilitek_tddi_ic_get_info();
         if (ret < 0) {
@@ -1361,17 +1361,17 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: netlink ctrl = %d\n", szBuf[0]);
+        TPD_DEBUG("ioctl: netlink ctrl = %d\n", szBuf[0]);
         if (szBuf[0]) {
             idev->netlink = ENABLE;
-            TPD_INFO("ioctl: Netlink is enabled\n");
+            TPD_DEBUG("ioctl: Netlink is enabled\n");
         } else {
             idev->netlink = DISABLE;
-            TPD_INFO("ioctl: Netlink is disabled\n");
+            TPD_DEBUG("ioctl: Netlink is disabled\n");
         }
         break;
     case ILITEK_IOCTL_TP_NETLINK_STATUS:
-        TPD_INFO("ioctl: get netlink stat = %d\n", idev->netlink);
+        TPD_DEBUG("ioctl: get netlink stat = %d\n", idev->netlink);
         ret = copy_to_user((int *)arg, &idev->netlink, sizeof(int));
         if (ret < 0)
             ipio_err("Failed to copy chip id to user space\n");
@@ -1383,14 +1383,14 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: switch fw mode = %d\n", szBuf[0]);
+        TPD_DEBUG("ioctl: switch fw mode = %d\n", szBuf[0]);
         ret = ilitek_tddi_switch_mode(szBuf);
         if (ret < 0) {
-            TPD_INFO("switch to fw mode (%d) failed\n", szBuf[0]);
+            TPD_DEBUG("switch to fw mode (%d) failed\n", szBuf[0]);
         }
         break;
     case ILITEK_IOCTL_TP_MODE_STATUS:
-        TPD_INFO("ioctl: current firmware mode = %d", idev->actual_tp_mode);
+        TPD_DEBUG("ioctl: current firmware mode = %d", idev->actual_tp_mode);
         ret = copy_to_user((int *)arg, &idev->actual_tp_mode, sizeof(int));
         if (ret < 0)
             ipio_err("Failed to copy chip id to user space\n");
@@ -1402,13 +1402,13 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
             ret = ENOMEM;
             break;
         }
-        TPD_INFO("ioctl: switch ice mode = %d", szBuf[0]);
+        TPD_DEBUG("ioctl: switch ice mode = %d", szBuf[0]);
         if (szBuf[0]) {
             atomic_set(&idev->ice_stat, ENABLE);
-            TPD_INFO("ioctl: set ice mode enabled\n");
+            TPD_DEBUG("ioctl: set ice mode enabled\n");
         } else {
             atomic_set(&idev->ice_stat, DISABLE);
-            TPD_INFO("ioctl: set ice mode disabled\n");
+            TPD_DEBUG("ioctl: set ice mode disabled\n");
         }
         break;
     case ILITEK_IOCTL_TP_INTERFACE_TYPE:
@@ -1419,7 +1419,7 @@ static long ilitek_node_ioctl(struct file *filp, unsigned int cmd, unsigned long
         }
         break;
     case ILITEK_IOCTL_TP_DUMP_FLASH:
-        TPD_INFO("ioctl: dump flash data donothing\n");
+        TPD_DEBUG("ioctl: dump flash data donothing\n");
         break;
     default:
         ret = -ENOTTY;
@@ -1523,9 +1523,9 @@ void netlink_reply_msg(void *raw, int size)
     int msg_size = size;
     u8 *data = (u8 *) raw;
 
-    TPD_INFO("The size of data being sent to user = %d\n", msg_size);
-    TPD_INFO("pid = %d\n", netlink_pid);
-    TPD_INFO("Netlink is enable = %d\n", idev->netlink);
+    TPD_DEBUG("The size of data being sent to user = %d\n", msg_size);
+    TPD_DEBUG("pid = %d\n", netlink_pid);
+    TPD_DEBUG("Netlink is enable = %d\n", idev->netlink);
 
     if (idev->netlink) {
         skb_out = nlmsg_new(msg_size, 0);
@@ -1551,17 +1551,17 @@ static void netlink_recv_msg(struct sk_buff *skb)
 {
     netlink_pid = 0;
 
-    TPD_INFO("Netlink = %d\n", idev->netlink);
+    TPD_DEBUG("Netlink = %d\n", idev->netlink);
 
     netlink_head = (struct nlmsghdr *)skb->data;
 
-    TPD_INFO("Received a request from client: %s, %d\n",
+    TPD_DEBUG("Received a request from client: %s, %d\n",
              (char *)NLMSG_DATA(netlink_head), (int)strlen((char *)NLMSG_DATA(netlink_head)));
 
     /* pid of sending process */
     netlink_pid = netlink_head->nlmsg_pid;
 
-    TPD_INFO("the pid of sending process = %d\n", netlink_pid);
+    TPD_DEBUG("the pid of sending process = %d\n", netlink_pid);
 
     /* TODO: may do something if there's not receiving msg from user. */
     if (netlink_pid != 0) {
@@ -1587,7 +1587,7 @@ static int netlink_init(void)
     netlink_skb = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
 #endif
 
-    TPD_INFO("Initialise Netlink and create its socket\n");
+    TPD_DEBUG("Initialise Netlink and create its socket\n");
 
     if (!netlink_skb) {
         ipio_err("Failed to create nelink socket\n");
@@ -1611,7 +1611,7 @@ void ilitek_tddi_node_init(void)
             ret = -ENODEV;
         } else {
             proc_table[i].isCreated = true;
-            TPD_INFO("Succeed to create %s under /proc\n", proc_table[i].name);
+            TPD_DEBUG("Succeed to create %s under /proc\n", proc_table[i].name);
         }
     }
     netlink_init();
@@ -1625,9 +1625,9 @@ static int ilitek_tp_auto_test_read_func(struct seq_file *s, void *v)
     if (!ts) {
         return 0;
     }
-    TPD_INFO("s->size = %d  s->count = %d\n", (int)s->size, (int)s->count);
+    TPD_DEBUG("s->size = %d  s->count = %d\n", (int)s->size, (int)s->count);
 
-    TPD_INFO("enter %s\n", __func__);
+    TPD_DEBUG("enter %s\n", __func__);
     ilitek_tddi_mp_test_handler(apk_ret, s, NULL, ON);
 
     operate_mode_switch(ts);
@@ -1657,7 +1657,7 @@ int ilitek_create_proc_for_oplus(struct touchpanel_data *ts)
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &ilitek_tp_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("Couldn't create proc entry\n");
+        TPD_DEBUG("Couldn't create proc entry\n");
     }
     return ret;
 }

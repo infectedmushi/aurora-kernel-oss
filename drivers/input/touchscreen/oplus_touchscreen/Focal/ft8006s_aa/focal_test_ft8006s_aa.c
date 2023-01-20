@@ -79,11 +79,11 @@
 
 
 #define FTS_TEST_FUNC_ENTER() do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Enter\n", __func__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Enter\n", __func__); \
 } while (0)
 
 #define FTS_TEST_FUNC_EXIT()  do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
 } while (0)
 
 
@@ -91,14 +91,14 @@
     if (fts_data->s) { \
         seq_printf(fts_data->s, fmt, ##args); \
     } \
-    TPD_INFO(fmt, ##args); \
+    TPD_DEBUG(fmt, ##args); \
 } while (0)
 
 #define FTS_TEST_SAVE_ERR(fmt, args...)  do { \
     if (fts_data->s) { \
         seq_printf(fts_data->s, fmt, ##args); \
     } \
-    TPD_INFO(fmt, ##args); \
+    TPD_DEBUG(fmt, ##args); \
 } while (0)
 
 
@@ -149,7 +149,7 @@ void print_buffer(int *buffer, int length, int line_num)
     int cnt = 0;
 
     if ((NULL == buffer) || (length <= 0)) {
-        TPD_INFO("buffer/length(%d) fail\n", length);
+        TPD_DEBUG("buffer/length(%d) fail\n", length);
         return;
     }
 
@@ -281,7 +281,7 @@ static int read_mass_data(u8 addr, int byte_num, int *buf)
     }
 
     /* read rawdata buffer */
-    TPD_INFO("mass data len:%d", byte_num);
+    TPD_DEBUG("mass data len:%d", byte_num);
     ret = fts_test_read(addr, data, byte_num);
     if (ret < 0) {
         FTS_TEST_SAVE_ERR("read mass data fail\n");
@@ -345,7 +345,7 @@ static int enter_work_mode(void)
     int i = 0;
     int j = 0;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
     if ((ret >= 0) && (0x00 == mode))
         return 0;
@@ -357,7 +357,7 @@ static int enter_work_mode(void)
             for (j = 0; j < 20; j++) {
                 ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
                 if ((ret >= 0) && (0x00 == mode)) {
-                    TPD_INFO("enter work mode success");
+                    TPD_DEBUG("enter work mode success");
                     return 0;
                 } else
                     sys_delay(FACTORY_TEST_DELAY);
@@ -372,7 +372,7 @@ static int enter_work_mode(void)
         return -EIO;
     }
 
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return 0;
 }
 
@@ -397,7 +397,7 @@ static int enter_factory_mode(void)
             for (j = 0; j < 20; j++) {
                 ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
                 if ((ret >= 0) && (FTS_FACTORY_MODE == mode)) {
-                    TPD_INFO("enter factory mode success");
+                    TPD_DEBUG("enter factory mode success");
                     sys_delay(200);
                     return 0;
                 } else
@@ -471,7 +471,7 @@ static int start_scan(void)
         if ((ret >= 0) && (val == finish_val)) {
             break;
         } else
-            TPD_INFO("reg%x=%x,retry:%d", addr, val, times);
+            TPD_DEBUG("reg%x=%x,retry:%d", addr, val, times);
     }
 
     if (times >= FACTORY_TEST_RETRY) {
@@ -582,7 +582,7 @@ static int get_cb_incell(u16 saddr, int byte_num, int *cb_buf)
         packet_num++;
     read_num = BYTES_PER_TIME;
 
-    TPD_INFO("cb packet:%d,remainder:%d", packet_num, packet_remainder);
+    TPD_DEBUG("cb packet:%d,remainder:%d", packet_num, packet_remainder);
     cb_addr = FACTORY_REG_CB_ADDR;
     for (i = 0; i < packet_num; i++) {
         offset = read_num * i;
@@ -747,7 +747,7 @@ static int fts_short_test(struct fts_ts_data *ts_data, bool *test_result)
 
         if ((ts_data->short_data[i] < ts_data->fts_autotest_offset->fts_short_data_N[i])
             || (ts_data->short_data[i] > ts_data->fts_autotest_offset->fts_short_data_P[i])) {
-            TPD_INFO("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
+            TPD_DEBUG("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->short_data[i],
                               ts_data->fts_autotest_offset->fts_short_data_N[i],
                               ts_data->fts_autotest_offset->fts_short_data_P[i]);
@@ -841,7 +841,7 @@ static int fts_open_test(struct fts_ts_data *ts_data, bool *test_result)
 
         if ((ts_data->open_data[i] < ts_data->fts_autotest_offset->fts_open_data_N[i])
             || (ts_data->open_data[i] > ts_data->fts_autotest_offset->fts_open_data_P[i])) {
-            TPD_INFO("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
+            TPD_DEBUG("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->open_data[i],
                               ts_data->fts_autotest_offset->fts_open_data_N[i],
                               ts_data->fts_autotest_offset->fts_open_data_P[i]);
@@ -932,7 +932,7 @@ static int fts_cb_test(struct fts_ts_data *ts_data, bool *test_result)
 
         if ((ts_data->cb_data[i] < ts_data->fts_autotest_offset->fts_cb_data_N[i])
             || (ts_data->cb_data[i] > ts_data->fts_autotest_offset->fts_cb_data_P[i])) {
-            TPD_INFO("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
+            TPD_DEBUG("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->cb_data[i],
                               ts_data->fts_autotest_offset->fts_cb_data_N[i],
                               ts_data->fts_autotest_offset->fts_cb_data_P[i]);
@@ -1025,7 +1025,7 @@ static int fts_rawdata_test(struct fts_ts_data *ts_data, bool *test_result)
 
         if ((ts_data->raw_data[i] < ts_data->fts_autotest_offset->fts_raw_data_N[i])
             || (ts_data->raw_data[i] > ts_data->fts_autotest_offset->fts_raw_data_P[i])) {
-            TPD_INFO("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
+            TPD_DEBUG("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->raw_data[i],
                               ts_data->fts_autotest_offset->fts_raw_data_N[i],
                               ts_data->fts_autotest_offset->fts_raw_data_P[i]);
@@ -1156,7 +1156,7 @@ static int fts_lcdnoise_test(struct fts_ts_data *ts_data, bool *test_result)
 
         if ((ts_data->lcdnoise_data[i] < ts_data->fts_autotest_offset->fts_lcdnoise_data_N[i])
             || (ts_data->lcdnoise_data[i] > ts_data->fts_autotest_offset->fts_lcdnoise_data_P[i])) {
-            TPD_INFO("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
+            TPD_DEBUG("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->lcdnoise_data[i],
                               ts_data->fts_autotest_offset->fts_lcdnoise_data_N[i],
                               ts_data->fts_autotest_offset->fts_lcdnoise_data_P[i]);
@@ -1207,7 +1207,7 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
     struct timespec now_time;
     struct rtc_time rtc_now_time;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
 
     //step2: create a file to store test data in /sdcard/Tp_Test
     getnstimeofday(&now_time);
@@ -1260,7 +1260,7 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
 
     if (ts_data->csv_fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", file_data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", file_data_buf);
         set_fs(old_fs);
 		return;
     }
@@ -1367,14 +1367,14 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
         set_fs(old_fs);
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return;
 }
 
 
 static int fts_auto_endoperation(struct fts_ts_data *ts_data)
 {
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     if (ts_data->short_data) {
         kfree(ts_data->short_data);
         ts_data->short_data = NULL;
@@ -1395,7 +1395,7 @@ static int fts_auto_endoperation(struct fts_ts_data *ts_data)
         kfree(ts_data->lcdnoise_data);
         ts_data->lcdnoise_data = NULL;
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 
     return 0;
 }
@@ -1409,7 +1409,7 @@ static int fts_start_test(struct fts_ts_data *ts_data)
     int failed_count = 0;
 
     FTS_TEST_FUNC_ENTER();
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     fts_auto_preoperation(ts_data);
 
     if (!ts_data->black_screen_test) {
@@ -1452,16 +1452,16 @@ static int fts_start_test(struct fts_ts_data *ts_data)
     fts_auto_write_result(ts_data, failed_count);
     fts_auto_endoperation(ts_data);
 
-    TPD_INFO("%s: test_result = [0x%x] \n ", __func__, test_result);
+    TPD_DEBUG("%s: test_result = [0x%x] \n ", __func__, test_result);
     FTS_TEST_FUNC_EXIT();
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 
     return failed_count;
 }
 
 static void fts_autotest_endoperation(struct fts_ts_data *ts_data, const struct firmware *limit_fw)
 {
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     
     if (ts_data->fts_autotest_offset) {
         kfree(ts_data->fts_autotest_offset->node_valid);
@@ -1473,7 +1473,7 @@ static void fts_autotest_endoperation(struct fts_ts_data *ts_data, const struct 
         release_firmware(limit_fw);
         limit_fw = NULL;
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 }
 
 #define FTS_THR_DEBUG   0
@@ -1497,18 +1497,18 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
     } else {
         ts_data->use_panelfactory_limit = true;
     }
-    TPD_INFO("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
+    TPD_DEBUG("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
 #endif 
 
     ts_data->fts_autotest_offset = kzalloc(sizeof(struct fts_autotest_offset), GFP_KERNEL);
     if (!ts_data->fts_autotest_offset) {
-        TPD_INFO("allocating memory for fts_autotest_offset fails");
+        TPD_DEBUG("allocating memory for fts_autotest_offset fails");
         return -ENOMEM;
     }
 
     ts_data->fts_autotest_offset->node_valid = kzalloc(node_num * sizeof(int32_t), GFP_KERNEL);
     if (!ts_data->fts_autotest_offset->node_valid) {
-        TPD_INFO("allocating memory for node_valid fails");
+        TPD_DEBUG("allocating memory for node_valid fails");
         return -ENOMEM;
     }
 
@@ -1545,23 +1545,23 @@ if (FTS_THR_DEBUG) {
     
 } else {
     ret = request_firmware(&limit_fw, ts->panel_data.test_limit_name, ts_data->dev);
-    TPD_INFO("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
+    TPD_DEBUG("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
     if (ret < 0) {
-        TPD_INFO("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         goto RELEASE_DATA;
     }
 
     ph = (struct auto_test_header *)(limit_fw->data);
 #if 0
-    TPD_INFO("start to dump img \n");
+    TPD_DEBUG("start to dump img \n");
     p_print = (uint8_t *)ph;
     for (i = 0; i < 16 * 8; i++) {
         if (i % 16 == 0){
-            TPD_INFO("current line [%d]: \n", i/16);
+            TPD_DEBUG("current line [%d]: \n", i/16);
         }
-        TPD_INFO("0x%x \n", *(p_print + i * sizeof(uint8_t)));
+        TPD_DEBUG("0x%x \n", *(p_print + i * sizeof(uint8_t)));
     }
-    TPD_INFO("end of dump img \n");
+    TPD_DEBUG("end of dump img \n");
 #endif
     p_item_offset = (uint32_t *)(limit_fw->data + 16);
     for (i = 0; i < 8 * sizeof(ph->test_item); i++) {
@@ -1569,16 +1569,16 @@ if (FTS_THR_DEBUG) {
             item_cnt++;
         }
     }
-    TPD_INFO("%s: total test item = %d \n", __func__, item_cnt);
+    TPD_DEBUG("%s: total test item = %d \n", __func__, item_cnt);
 
-    TPD_INFO("%s: populating nvt_test_offset \n", __func__);
+    TPD_DEBUG("%s: populating nvt_test_offset \n", __func__);
     for (i = 0; i < item_cnt; i++) {
-        TPD_INFO("%s: i[%d] \n", __func__, i);
+        TPD_DEBUG("%s: i[%d] \n", __func__, i);
         item_head = (struct auto_test_item_header *)(limit_fw->data + p_item_offset[i]);        
         if (item_head->item_limit_type == LIMIT_TYPE_NO_DATA) {
-            TPD_INFO("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
+            TPD_DEBUG("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
         } else if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_DATA) {
-            TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+            TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
             if (item_head->item_bit == TYPE_SHORT_DATA) {
                 ts_data->fts_autotest_offset->fts_short_data_P = (int32_t *)(limit_fw->data + item_head->top_limit_offset);
                 ts_data->fts_autotest_offset->fts_short_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
@@ -1612,7 +1612,7 @@ if (FTS_THR_DEBUG) {
             }
             
         } else {
-            TPD_INFO("[%d] unknown item type \n", item_head->item_bit);
+            TPD_DEBUG("[%d] unknown item type \n", item_head->item_bit);
         }        
     }
     return 0;
@@ -1662,9 +1662,9 @@ static int fts_enter_test_environment(struct touchpanel_data *ts, bool test_stat
     char *p_node = NULL;
     char *postfix = "_TEST.img";
 
-    TPD_INFO("fw test download function");
+    TPD_DEBUG("fw test download function");
     if (ts->loading_fw) {
-        TPD_INFO("fw is loading, not download again");
+        TPD_DEBUG("fw is loading, not download again");
         return -EINVAL;
     }
 
@@ -1672,7 +1672,7 @@ static int fts_enter_test_environment(struct touchpanel_data *ts, bool test_stat
         //update test firmware
         fw_name_test = kzalloc(MAX_FW_NAME_LENGTH, GFP_KERNEL);
         if (fw_name_test == NULL) {
-            TPD_INFO("fw_name_test kzalloc error!\n");
+            TPD_DEBUG("fw_name_test kzalloc error!\n");
             return -ENOMEM;
         }
 
@@ -1680,12 +1680,12 @@ static int fts_enter_test_environment(struct touchpanel_data *ts, bool test_stat
         copy_len = p_node - ts->panel_data.fw_name;
         memcpy(fw_name_test, ts->panel_data.fw_name, copy_len);
         strlcat(fw_name_test, postfix, MAX_FW_NAME_LENGTH);
-        TPD_INFO("fw_name_test is %s\n", fw_name_test);
+        TPD_DEBUG("fw_name_test is %s\n", fw_name_test);
 
         /*write test firmware.bin*/
         ret = request_firmware(&fw, fw_name_test, ts->dev);
         if (ret) {
-            TPD_INFO("request_firmware(%s) fail", fw_name_test);
+            TPD_DEBUG("request_firmware(%s) fail", fw_name_test);
             return -ENODATA;
         }
     } else {
@@ -1701,7 +1701,7 @@ static int fts_enter_test_environment(struct touchpanel_data *ts, bool test_stat
 
     msleep(50);
     fts_test_read_reg(FTS_REG_FACTORY_MODE_DETACH_FLAG, &detach_flag);
-    TPD_INFO("regb4:0x%02x\n", detach_flag);
+    TPD_DEBUG("regb4:0x%02x\n", detach_flag);
 
     if (fw) {
         release_firmware(fw);
@@ -1716,7 +1716,7 @@ int fts_test_entry(struct fts_ts_data *ts_data, bool black_screen)
     struct touchpanel_data *ts = ts_data->ts;
     const struct firmware *limit_fw = NULL;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     FTS_TEST_SAVE_ERR("FW_VER:0x%02x, TX_NUM:%d, RX_NUM:%d\n", ts_data->fwver, 
         ts_data->hw_res->TX_NUM, ts_data->hw_res->RX_NUM);
 
@@ -1764,7 +1764,7 @@ test_err:
 err_exit_test_mode:
     fts_autotest_endoperation(ts_data, limit_fw);
     fts_enter_test_environment(ts, 0);
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return ret;
 }
 

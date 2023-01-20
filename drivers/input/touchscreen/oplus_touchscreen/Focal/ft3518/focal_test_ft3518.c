@@ -56,11 +56,11 @@
 
 
 #define FTS_TEST_FUNC_ENTER() do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Enter\n", __func__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Enter\n", __func__); \
 } while (0)
 
 #define FTS_TEST_FUNC_EXIT()  do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
 } while (0)
 
 
@@ -74,7 +74,7 @@
     if (fts_data->s) { \
         seq_printf(fts_data->s, fmt, ##args); \
     } \
-    TPD_INFO(fmt, ##args); \
+    TPD_DEBUG(fmt, ##args); \
 } while (0)
 
 
@@ -125,7 +125,7 @@ void print_buffer(int *buffer, int length, int line_num)
     int cnt = 0;
 
     if ((NULL == buffer) || (length <= 0)) {
-        TPD_INFO("buffer/length(%d) fail", length);
+        TPD_DEBUG("buffer/length(%d) fail", length);
         return;
     }
 
@@ -337,7 +337,7 @@ static int read_mass_data(u8 addr, int byte_num, int *buf)
     }
 
     /* read rawdata buffer */
-    TPD_INFO("mass data len:%d", byte_num);
+    TPD_DEBUG("mass data len:%d", byte_num);
     ret = fts_test_read(addr, data, byte_num);
     if (ret < 0) {
         FTS_TEST_SAVE_ERR("read mass data fail\n");
@@ -400,7 +400,7 @@ static int enter_work_mode(void)
     int i = 0;
     int j = 0;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
     if ((ret >= 0) && (0x00 == mode))
         return 0;
@@ -412,7 +412,7 @@ static int enter_work_mode(void)
             for (j = 0; j < 20; j++) {
                 ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
                 if ((ret >= 0) && (0x00 == mode)) {
-                    TPD_INFO("enter work mode success");
+                    TPD_DEBUG("enter work mode success");
                     return 0;
                 } else
                     sys_delay(FACTORY_TEST_DELAY);
@@ -427,7 +427,7 @@ static int enter_work_mode(void)
         return -EIO;
     }
 
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return 0;
 }
 
@@ -468,7 +468,7 @@ static int enter_factory_mode(struct fts_ts_data *ts_data)
             for (j = 0; j < 20; j++) {
                 ret = fts_test_read_reg(DEVIDE_MODE_ADDR, &mode);
                 if ((ret >= 0) && (FTS_FACTORY_MODE == mode)) {
-                    TPD_INFO("enter factory mode success");
+                    TPD_DEBUG("enter factory mode success");
                     sys_delay(200);
                     fts_special_operation_for_samsung(ts_data);
                     return 0;
@@ -564,7 +564,7 @@ static int start_scan(void)
         if ((ret >= 0) && (val == finish_val)) {
             break;
         } else
-            TPD_INFO("reg%x=%x,retry:%d", addr, val, times);
+            TPD_DEBUG("reg%x=%x,retry:%d", addr, val, times);
     }
 
     if (times >= FACTORY_TEST_RETRY) {
@@ -642,7 +642,7 @@ static int get_cb_sc(int byte_num, int *cb_buf, enum byte_mode mode)
     read_num = BYTES_PER_TIME;
     offset = 0;
 
-    TPD_INFO("cb packet:%d,remainder:%d", packet_num, packet_remainder);
+    TPD_DEBUG("cb packet:%d,remainder:%d", packet_num, packet_remainder);
     for (i = 0; i < packet_num; i++) {
         if ((i == (packet_num - 1)) && packet_remainder) {
             read_num = packet_remainder;
@@ -738,7 +738,7 @@ static bool compare_mc_sc(struct fts_ts_data *ts_data, bool tx_check, bool rx_ch
                 continue;
 
             if ((data[i] < min[i]) || (data[i] > max[i])) {
-                TPD_INFO("rx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i], min[i]);
+                TPD_DEBUG("rx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i], min[i]);
                 FTS_TEST_SAVE_ERR("test fail,rx%d=%5d,range=(%5d,%5d)\n",
                                   i + 1, data[i], min[i], max[i]);
                 result = false;
@@ -752,7 +752,7 @@ static bool compare_mc_sc(struct fts_ts_data *ts_data, bool tx_check, bool rx_ch
                 continue;
 
             if ((data[i] < min[i]) || (data[i] > max[i])) {
-                TPD_INFO("tx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i], min[i]);
+                TPD_DEBUG("tx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i], min[i]);
                 FTS_TEST_SAVE_INFO("test fail,tx%d=%5d,range=(%5d,%5d)\n",
                                    i - rx_num + 1, data[i], min[i], max[i]);
                 result = false;
@@ -1393,7 +1393,7 @@ static int fts_noise_autotest(struct fts_ts_data *ts_data, bool *test_result)
     FTS_TEST_SAVE_INFO("\n============ Test Item: Noise Test\n");
 
     if (!ts_data->fts_autotest_offset->fts_noise_data_P || !ts_data->fts_autotest_offset->fts_noise_data_N) {
-        TPD_INFO("fts_noise_data_P || fts_noise_data_N is NULL");
+        TPD_DEBUG("fts_noise_data_P || fts_noise_data_N is NULL");
         return 0;
     }
 
@@ -1414,7 +1414,7 @@ static int fts_noise_autotest(struct fts_ts_data *ts_data, bool *test_result)
         FTS_TEST_SAVE_ERR("read reg0d fail,ret=%d\n", ret);
         goto test_err;
     }
-    TPD_INFO("reg0d_val = [%d]\n", reg0d_val);
+    TPD_DEBUG("reg0d_val = [%d]\n", reg0d_val);
 
     /* save origin value */
     ret = fts_test_read_reg(FACTORY_REG_DATA_SELECT, &reg06_val);
@@ -1422,14 +1422,14 @@ static int fts_noise_autotest(struct fts_ts_data *ts_data, bool *test_result)
         FTS_TEST_SAVE_ERR("read reg06 fail,ret=%d\n", ret);
         goto test_err;
     }
-    TPD_INFO("reg06_val = [%d]\n", reg06_val);
+    TPD_DEBUG("reg06_val = [%d]\n", reg06_val);
 
     ret = fts_test_read_reg(FACTORY_REG_FIR, &fir);
     if (ret < 0) {
         FTS_TEST_SAVE_ERR("read fir error,ret=%d\n", ret);
         goto test_err;
     }
-    TPD_INFO("fir = [%d]\n", fir);
+    TPD_DEBUG("fir = [%d]\n", fir);
 
     ret = fts_test_write_reg(FACTORY_REG_DATA_SELECT, 0x01);
     if (ret < 0) {
@@ -1479,20 +1479,20 @@ static int fts_noise_autotest(struct fts_ts_data *ts_data, bool *test_result)
 
     /* compare */
     //max = reg0d_val * 4 * thr->noise_coefficient / 100;
-    //TPD_INFO("reg0d:%d, max:%d", (int)reg0d_val, max);
+    //TPD_DEBUG("reg0d:%d, max:%d", (int)reg0d_val, max);
     result = true;
     if (ts_data->fts_autotest_offset->fts_noise_data_P && ts_data->fts_autotest_offset->fts_noise_data_N) {
         for (i = 0; i < node_num; i++) {
             //if ((rawdata[i] > ts_data->fts_autotest_offset->fts_noise_data_P[i]) || (rawdata[i] < ts_data->fts_autotest_offset->fts_noise_data_N[i])) {
             if (ts_data->noise_rawdata[i] > ts_data->fts_autotest_offset->fts_noise_data_P[i]) {
-                TPD_INFO("noise data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_noise_data_P[i], ts_data->noise_rawdata[i], ts_data->fts_autotest_offset->fts_noise_data_N[i]);
+                TPD_DEBUG("noise data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_noise_data_P[i], ts_data->noise_rawdata[i], ts_data->fts_autotest_offset->fts_noise_data_N[i]);
                 FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                                   i / rx_num + 1, i % rx_num + 1, ts_data->noise_rawdata[i], ts_data->fts_autotest_offset->fts_noise_data_N[i], ts_data->fts_autotest_offset->fts_noise_data_P[i]);
                 result = false;
             }
         }
     } else {
-        TPD_INFO("fts_raw_data_P || fts_raw_data_N is null \n");
+        TPD_DEBUG("fts_raw_data_P || fts_raw_data_N is null \n");
         result = false;
     }
 
@@ -1544,7 +1544,7 @@ static int fts_rawdata_autotest(struct fts_ts_data *ts_data, bool *test_result)
     FTS_TEST_SAVE_INFO("\n============ Test Item: Rawdata Test\n");
 
     if (!ts_data->fts_autotest_offset->fts_raw_data_P || !ts_data->fts_autotest_offset->fts_raw_data_N) {
-        TPD_INFO("fts_raw_data_P || fts_raw_data_N is NULL");
+        TPD_DEBUG("fts_raw_data_P || fts_raw_data_N is NULL");
         return 0;
     }
 
@@ -1641,7 +1641,7 @@ static int fts_rawdata_autotest(struct fts_ts_data *ts_data, bool *test_result)
             continue;
 
         if ((ts_data->rawdata[i] < ts_data->fts_autotest_offset->fts_raw_data_N[i]) || (ts_data->rawdata[i] > ts_data->fts_autotest_offset->fts_raw_data_P[i])) {
-            TPD_INFO("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_raw_data_P[i], ts_data->rawdata[i], ts_data->fts_autotest_offset->fts_raw_data_N[i]);
+            TPD_DEBUG("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_raw_data_P[i], ts_data->rawdata[i], ts_data->fts_autotest_offset->fts_raw_data_N[i]);
             FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, ts_data->rawdata[i],
                               ts_data->fts_autotest_offset->fts_raw_data_N[i], ts_data->fts_autotest_offset->fts_raw_data_P[i]);
@@ -1704,7 +1704,7 @@ static int fts_uniformity_autotest(struct fts_ts_data *ts_data, bool *test_resul
     FTS_TEST_SAVE_INFO("\n============ Test Item: Rawdata Unfiormity Test\n");
 
     if (!ts_data->fts_autotest_offset->fts_uniformity_data_P || !ts_data->fts_autotest_offset->fts_uniformity_data_N) {
-        TPD_INFO("fts_uniformity_data_P || fts_uniformity_data_N is NULL");
+        TPD_DEBUG("fts_uniformity_data_P || fts_uniformity_data_N is NULL");
         return 0;
     }
 
@@ -1740,7 +1740,7 @@ static int fts_uniformity_autotest(struct fts_ts_data *ts_data, bool *test_resul
             continue;
 
         if ((rl_tmp[i] < ts_data->fts_autotest_offset->fts_uniformity_data_N[i]) || (rl_tmp[i] > ts_data->fts_autotest_offset->fts_uniformity_data_P[i])) {
-            TPD_INFO("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_uniformity_data_P[i], rl_tmp[i], ts_data->fts_autotest_offset->fts_uniformity_data_N[i]);
+            TPD_DEBUG("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_uniformity_data_P[i], rl_tmp[i], ts_data->fts_autotest_offset->fts_uniformity_data_N[i]);
             FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, rl_tmp[i],
                               ts_data->fts_autotest_offset->fts_uniformity_data_N[i], ts_data->fts_autotest_offset->fts_uniformity_data_P[i]);
@@ -1769,7 +1769,7 @@ static int fts_uniformity_autotest(struct fts_ts_data *ts_data, bool *test_resul
             continue;
 
         if ((rl_tmp[i] < ts_data->fts_autotest_offset->fts_uniformity_data_N[i]) || (rl_tmp[i] > ts_data->fts_autotest_offset->fts_uniformity_data_P[i])) {
-            TPD_INFO("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_uniformity_data_P[i], rl_tmp[i], ts_data->fts_autotest_offset->fts_uniformity_data_N[i]);
+            TPD_DEBUG("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->fts_autotest_offset->fts_uniformity_data_P[i], rl_tmp[i], ts_data->fts_autotest_offset->fts_uniformity_data_N[i]);
             FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
                               i / rx_num + 1, i % rx_num + 1, rl_tmp[i],
                               ts_data->fts_autotest_offset->fts_uniformity_data_N[i], ts_data->fts_autotest_offset->fts_uniformity_data_P[i]);
@@ -1814,7 +1814,7 @@ static int fts_scap_cb_autotest(struct fts_ts_data *ts_data, bool *test_result)
     FTS_TEST_SAVE_INFO("\n============ Test Item: Scap CB Test\n");
 
     if (!ts_data->fts_autotest_offset->fts_scap_cb_data_P || !ts_data->fts_autotest_offset->fts_scap_cb_data_N || !ts_data->fts_autotest_offset->fts_scap_cb_data_waterproof_N || !ts_data->fts_autotest_offset->fts_scap_cb_data_waterproof_P) {
-        TPD_INFO("fts_scap_cb_data_P || fts_scap_cb_data_N || fts_scap_cb_data_waterproof_N || fts_scap_cb_data_waterproof_P is NULL");
+        TPD_DEBUG("fts_scap_cb_data_P || fts_scap_cb_data_N || fts_scap_cb_data_waterproof_N || fts_scap_cb_data_waterproof_P is NULL");
         return 0;
     }
 
@@ -1939,7 +1939,7 @@ static int fts_scap_rawdata_autotest(struct fts_ts_data *ts_data, bool *test_res
 
     if (!ts_data->fts_autotest_offset->fts_scap_raw_data_P || !ts_data->fts_autotest_offset->fts_scap_raw_data_N ||
         !ts_data->fts_autotest_offset->fts_scap_raw_waterproof_data_N || !ts_data->fts_autotest_offset->fts_scap_raw_waterproof_data_P) {
-        TPD_INFO("fts_scap_raw_data_P || fts_scap_raw_data_N || fts_scap_raw_waterproof_data_N || fts_scap_raw_waterproof_data_P is NULL");
+        TPD_DEBUG("fts_scap_raw_data_P || fts_scap_raw_data_N || fts_scap_raw_waterproof_data_N || fts_scap_raw_waterproof_data_P is NULL");
         return 0;
     }
 
@@ -2107,13 +2107,13 @@ test_err:
     ret = fts_test_write_reg(FACTROY_REG_SHORT_DELAY, stall_value);
 
     if (is_weak_short_gnd && is_weak_short_mut) {
-        TPD_INFO("gnd and mutual weak short! \n");
+        TPD_DEBUG("gnd and mutual weak short! \n");
     } else if (is_weak_short_gnd) {
-        TPD_INFO("gnd weak short! \n");
+        TPD_DEBUG("gnd weak short! \n");
     } else if (is_weak_short_mut) {
-        TPD_INFO("mutual weak short! \n");
+        TPD_DEBUG("mutual weak short! \n");
     } else {
-        TPD_INFO("no short! \n");
+        TPD_DEBUG("no short! \n");
     }
 
     if (tmp_result) {
@@ -2142,7 +2142,7 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
     struct timespec now_time;
     struct rtc_time rtc_now_time;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
 
     //step2: create a file to store test data in /sdcard/Tp_Test
     getnstimeofday(&now_time);
@@ -2174,7 +2174,7 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
     ts_data->csv_fd = sys_open(file_data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
     if (ts_data->csv_fd < 0) {
-        TPD_INFO("Open log file '%s' failed, %d.\n", file_data_buf, ts_data->csv_fd);
+        TPD_DEBUG("Open log file '%s' failed, %d.\n", file_data_buf, ts_data->csv_fd);
         set_fs(old_fs);
         return;
     }
@@ -2250,14 +2250,14 @@ static void fts_auto_write_result(struct fts_ts_data *ts_data, int failed_count)
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
         set_fs(old_fs);
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return;
 }
 
 
 static int fts_auto_endoperation(struct fts_ts_data *ts_data)
 {
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     if (ts_data->rawdata_linearity) {
         kfree(ts_data->rawdata_linearity);
         ts_data->rawdata_linearity = NULL;
@@ -2282,7 +2282,7 @@ static int fts_auto_endoperation(struct fts_ts_data *ts_data)
         kfree(ts_data->noise_rawdata);
         ts_data->noise_rawdata = NULL;
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 
     return 0;
 }
@@ -2300,14 +2300,14 @@ static int fts_rst_test(struct fts_ts_data *ts_data)
 	fts_test_write_reg(FTS_REG_REPORT_RATE, val2);
 	fts_rstpin_reset((void*)ts_data);
 	fts_test_read_reg(FTS_REG_REPORT_RATE, &val3);
-	TPD_INFO("one: reset test: val = %d, val3 = %d", val, val3);
+	TPD_DEBUG("one: reset test: val = %d, val3 = %d", val, val3);
 
 	fts_test_read_reg(FTS_REG_REPORT_RATE, &val);
 	val2 = val - 1;
 	fts_test_write_reg(FTS_REG_REPORT_RATE, val2);
 	fts_rstpin_reset((void*)ts_data);
 	fts_test_read_reg(FTS_REG_REPORT_RATE, &val3);
-	TPD_INFO("two: reset test: val = %d, val3 = %d", val, val3);
+	TPD_DEBUG("two: reset test: val = %d, val3 = %d", val, val3);
 
 	if (val3 != val) {
 		FTS_TEST_SAVE_ERR("check reg to test rst failed.\n");
@@ -2325,7 +2325,7 @@ static int fts_start_test(struct fts_ts_data *ts_data)
     int failed_count = 0;
 
     FTS_TEST_FUNC_ENTER();
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     fts_auto_preoperation(ts_data);
 
     /*noise test*/
@@ -2387,9 +2387,9 @@ static int fts_start_test(struct fts_ts_data *ts_data)
     fts_auto_write_result(ts_data, failed_count);
     fts_auto_endoperation(ts_data);
 
-    TPD_INFO("%s: test_result = [0x%x] \n ", __func__, test_result);
+    TPD_DEBUG("%s: test_result = [0x%x] \n ", __func__, test_result);
     FTS_TEST_FUNC_EXIT();
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 
     return failed_count;
 }
@@ -2399,7 +2399,7 @@ static void fts_threshold_free(struct fts_ts_data *ts_data)
 {
     struct mc_sc_threshold *thr = &ts_data->mpt.thr;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     kfree(thr->node_valid);
     kfree(thr->node_valid_sc);
     kfree(thr->rawdata_h_max);
@@ -2418,13 +2418,13 @@ static void fts_threshold_free(struct fts_ts_data *ts_data)
     kfree(thr->scap_rawdata_on_min);
     kfree(thr->panel_differ_max);
     kfree(thr->panel_differ_min);
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return;
 }
 
 static void fts_autotest_endoperation(struct fts_ts_data *ts_data, const struct firmware *limit_fw)
 {
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     if (ts_data->fts_autotest_offset) {
         kfree(ts_data->fts_autotest_offset);
         ts_data->fts_autotest_offset = NULL;
@@ -2434,7 +2434,7 @@ static void fts_autotest_endoperation(struct fts_ts_data *ts_data, const struct 
         release_firmware(limit_fw);
         limit_fw = NULL;
     }
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
 }
 
 static int fts_threshold_malloc(struct fts_ts_data *ts_data)
@@ -2593,10 +2593,10 @@ static int fts_get_threshold(struct fts_ts_data *ts_data, char *data)
             thr->panel_differ_max[i] = 1400;
             thr->panel_differ_min[i] = 200;
         }
-        TPD_INFO("raw_max = [%d] raw_min = [%d] \n", 12000, 2690);
-        TPD_INFO("tx_linearity_max = [%d] tx_linearity_min = [%d] \n", 40, 0);
-        TPD_INFO("rx_linearity_max = [%d] rx_linearity_min = [%d] \n", 40, 0);
-        TPD_INFO("panel_differ_max = [%d] panel_differ_min = [%d] \n", 1400, 200);
+        TPD_DEBUG("raw_max = [%d] raw_min = [%d] \n", 12000, 2690);
+        TPD_DEBUG("tx_linearity_max = [%d] tx_linearity_min = [%d] \n", 40, 0);
+        TPD_DEBUG("rx_linearity_max = [%d] rx_linearity_min = [%d] \n", 40, 0);
+        TPD_DEBUG("panel_differ_max = [%d] panel_differ_min = [%d] \n", 1400, 200);
 
 #if 0
         thr->rawdata_h_max[0] = 7090;
@@ -2620,11 +2620,11 @@ static int fts_get_threshold(struct fts_ts_data *ts_data, char *data)
             thr->scap_rawdata_on_max[i] = 15000;
             thr->scap_rawdata_on_min[i] = 3000;
         }
-        TPD_INFO("node_valid_sc = [%d] \n", 1);
-        TPD_INFO("scap_cb_off_max = [%d] scap_cb_off_min = [%d] \n", 490, 0);
-        TPD_INFO("scap_cb_on_max = [%d] scap_cb_on_min = [%d] \n", 490, 0);
-        TPD_INFO("scap_rawdata_off_max = [%d] scap_rawdata_off_min = [%d] \n", 15000, 3000);
-        TPD_INFO("scap_rawdata_on_max = [%d] scap_rawdata_on_min = [%d] \n", 15000, 3000);
+        TPD_DEBUG("node_valid_sc = [%d] \n", 1);
+        TPD_DEBUG("scap_cb_off_max = [%d] scap_cb_off_min = [%d] \n", 490, 0);
+        TPD_DEBUG("scap_cb_on_max = [%d] scap_cb_on_min = [%d] \n", 490, 0);
+        TPD_DEBUG("scap_rawdata_off_max = [%d] scap_rawdata_off_min = [%d] \n", 15000, 3000);
+        TPD_DEBUG("scap_rawdata_on_max = [%d] scap_rawdata_on_min = [%d] \n", 15000, 3000);
     }
 
     return 0;
@@ -2648,28 +2648,28 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
     } else {
         ts_data->use_panelfactory_limit = true;
     }
-    TPD_INFO("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
+    TPD_DEBUG("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
 
     ts_data->fts_autotest_offset = kzalloc(sizeof(struct fts_autotest_offset), GFP_KERNEL);
 
     ret = request_real_test_limit(ts,&limit_fw, ts->panel_data.test_limit_name, &ts_data->client->dev);
-    TPD_INFO("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
+    TPD_DEBUG("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
     if (ret < 0) {
-        TPD_INFO("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         goto RELEASE_DATA;
     }
 
     ph = (struct auto_test_header *)(limit_fw->data);
 #if 0
-    TPD_INFO("start to dump img \n");
+    TPD_DEBUG("start to dump img \n");
     p_print = (uint8_t *)ph;
     for (i = 0; i < 16 * 8; i++) {
         if (i % 16 == 0) {
-            TPD_INFO("current line [%d]: \n", i / 16);
+            TPD_DEBUG("current line [%d]: \n", i / 16);
         }
-        TPD_INFO("0x%x \n", *(p_print + i * sizeof(uint8_t)));
+        TPD_DEBUG("0x%x \n", *(p_print + i * sizeof(uint8_t)));
     }
-    TPD_INFO("end of dump img \n");
+    TPD_DEBUG("end of dump img \n");
 #endif
     p_item_offset = (uint32_t *)(limit_fw->data + 16);
     for (i = 0; i < 8 * sizeof(ph->test_item); i++) {
@@ -2677,17 +2677,17 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
             item_cnt++;
         }
     }
-    TPD_INFO("%s: total test item = %d \n", __func__, item_cnt);
+    TPD_DEBUG("%s: total test item = %d \n", __func__, item_cnt);
 
-    TPD_INFO("%s: populating nvt_test_offset \n", __func__);
+    TPD_DEBUG("%s: populating nvt_test_offset \n", __func__);
     for (i = 0; i < item_cnt; i++) {
-        TPD_INFO("%s: i[%d] \n", __func__, i);
+        TPD_DEBUG("%s: i[%d] \n", __func__, i);
         item_head = (struct auto_test_item_header *)(limit_fw->data + p_item_offset[i]);
         if (item_head->item_limit_type == LIMIT_TYPE_NO_DATA) {
-            TPD_INFO("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
+            TPD_DEBUG("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
         } else if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_DATA) {
             if (false == ts_data->use_panelfactory_limit) {
-                TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+                TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
                 if(item_head->item_bit == TYPE_NOISE_DATA) {
                     ts_data->fts_autotest_offset->fts_noise_data_P = (int32_t *)(limit_fw->data + item_head->top_limit_offset);
                     ts_data->fts_autotest_offset->fts_noise_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
@@ -2702,7 +2702,7 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
                     ts_data->fts_autotest_offset->fts_panel_differ_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
                 }
             } else if (true == ts_data->use_panelfactory_limit) {
-                TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+                TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
                 if(item_head->item_bit == TYPE_FACTORY_NOISE_DATA) {
                     ts_data->fts_autotest_offset->fts_noise_data_P = (int32_t *)(limit_fw->data + item_head->top_limit_offset);
                     ts_data->fts_autotest_offset->fts_noise_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
@@ -2719,7 +2719,7 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
             }
         } else if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_RX_TX_DATA) {
             if (false == ts_data->use_panelfactory_limit) {
-                TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+                TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
                 if (item_head->item_bit == TYPE_SCAP_CB_DATA) {
                     ts_data->fts_autotest_offset->fts_scap_cb_data_P = (int32_t *)(limit_fw->data + item_head->top_limit_offset);
                     ts_data->fts_autotest_offset->fts_scap_cb_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
@@ -2734,7 +2734,7 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
                     ts_data->fts_autotest_offset->fts_scap_raw_waterproof_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
                 }
             } else if (true == ts_data->use_panelfactory_limit) {
-                TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+                TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
                 if (item_head->item_bit == TYPE_FACTORY_SCAP_CB_DATA) {
                     ts_data->fts_autotest_offset->fts_scap_cb_data_P = (int32_t *)(limit_fw->data + item_head->top_limit_offset);
                     ts_data->fts_autotest_offset->fts_scap_cb_data_N = (int32_t *)(limit_fw->data + item_head->floor_limit_offset);
@@ -2750,7 +2750,7 @@ static int fts_get_threshold_from_img(struct fts_ts_data *ts_data, char *data, c
                 }
             }
         } else {
-            TPD_INFO("[%d] unknown item type \n", item_head->item_bit);
+            TPD_DEBUG("[%d] unknown item type \n", item_head->item_bit);
         }
     }
     ret = 0;
@@ -2769,31 +2769,31 @@ static void fts_print_threshold(struct fts_ts_data *ts_data)
     int node_num = tx_num * rx_num;
     int channel_num = tx_num + rx_num;
 
-    TPD_INFO("noise threshold max/min:");
+    TPD_DEBUG("noise threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_noise_data_P, node_num, rx_num);
     print_buffer(ts_data->fts_autotest_offset->fts_noise_data_N, node_num, rx_num);
 
-    TPD_INFO("rawdata threshold max/min:");
+    TPD_DEBUG("rawdata threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_raw_data_P, node_num, rx_num);
     print_buffer(ts_data->fts_autotest_offset->fts_raw_data_N, node_num, rx_num);
 
-    TPD_INFO("uniformity threshold max/min:");
+    TPD_DEBUG("uniformity threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_uniformity_data_P, node_num, rx_num);
     print_buffer(ts_data->fts_autotest_offset->fts_uniformity_data_N, node_num, rx_num);
 
-    TPD_INFO("scap cb normal threshold max/min:");
+    TPD_DEBUG("scap cb normal threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_scap_cb_data_P, channel_num, channel_num);
     print_buffer(ts_data->fts_autotest_offset->fts_scap_cb_data_N, channel_num, channel_num);
 
-    TPD_INFO("scap cb waterproof threshold max/min:");
+    TPD_DEBUG("scap cb waterproof threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_scap_cb_data_waterproof_P, channel_num, channel_num);
     print_buffer(ts_data->fts_autotest_offset->fts_scap_cb_data_waterproof_N, channel_num, channel_num);
 
-    TPD_INFO("scap rawdata threshold max/min:");
+    TPD_DEBUG("scap rawdata threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_scap_raw_data_P, channel_num, channel_num);
     print_buffer(ts_data->fts_autotest_offset->fts_scap_raw_data_N, channel_num, channel_num);
 
-    TPD_INFO("scap rawdata waterproof threshold max/min:");
+    TPD_DEBUG("scap rawdata waterproof threshold max/min:");
     print_buffer(ts_data->fts_autotest_offset->fts_scap_raw_waterproof_data_P, channel_num, channel_num);
     print_buffer(ts_data->fts_autotest_offset->fts_scap_raw_waterproof_data_N, channel_num, channel_num);
 }
@@ -2803,7 +2803,7 @@ int fts_test_entry(struct fts_ts_data *ts_data)
     int ret = 0;
     const struct firmware *limit_fw = NULL;
 
-    TPD_INFO("%s +\n", __func__);
+    TPD_DEBUG("%s +\n", __func__);
     FTS_TEST_SAVE_ERR("FW_VER:0x%02x, TX_NUM:%d, RX_NUM:%d\n", ts_data->fwver, ts_data->hw_res->TX_NUM, ts_data->hw_res->RX_NUM);
     ret = fts_get_threshold(ts_data, NULL);
     if (ret < 0) {
@@ -2843,6 +2843,6 @@ test_err:
     enter_work_mode();
     fts_threshold_free(ts_data);
     fts_autotest_endoperation(ts_data, limit_fw);
-    TPD_INFO("%s -\n", __func__);
+    TPD_DEBUG("%s -\n", __func__);
     return ret;
 }

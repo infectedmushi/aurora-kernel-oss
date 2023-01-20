@@ -162,13 +162,13 @@ static int hx83112a_nf_spi_read(uint8_t *command, uint8_t command_len, uint8_t *
     for (retry = 0; retry < toRetry; retry++) {
         error = spi_sync(hx83112a_nf_pri_ts->s_client, &message);
         if (error) {
-            TPD_INFO("SPI read error: %d\n", error);
+            TPD_DEBUG("SPI read error: %d\n", error);
         } else {
             break;
         }
     }
     if (retry == toRetry) {
-        TPD_INFO("%s: SPI read error retry over %d\n",
+        TPD_DEBUG("%s: SPI read error retry over %d\n",
                  __func__, toRetry);
         return -EIO;
     }
@@ -232,7 +232,7 @@ static int hx83112a_nf_bus_write(uint8_t command, uint32_t length, uint8_t *data
     }
 
     if (spi_format_buf == NULL) {
-        TPD_INFO("%s: Can't allocate enough buf\n", __func__);
+        TPD_DEBUG("%s: Can't allocate enough buf\n", __func__);
         return -ENOMEM;
     }
     spi_format_buf[0] = 0xF2;
@@ -279,7 +279,7 @@ void hx83112a_nf_flash_write_burst(uint8_t *reg_byte, uint8_t *write_data)
     }
 
     if (hx83112a_nf_bus_write(0x00, 8, data_byte) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 }
@@ -290,14 +290,14 @@ void hx83112a_nf_flash_write_burst_length(uint8_t *reg_byte, uint8_t *write_data
     data_byte = kzalloc(sizeof(uint8_t) * (length + 4), GFP_KERNEL);
 
     if (data_byte == NULL) {
-        TPD_INFO("%s: Can't allocate enough buf\n", __func__);
+        TPD_DEBUG("%s: Can't allocate enough buf\n", __func__);
         return;
     }
     memcpy(data_byte, reg_byte, 4); /* assign addr 4bytes */
     memcpy(data_byte + 4, write_data, length); /* assign data n bytes */
 
     if (hx83112a_nf_bus_write(0, length + 4, data_byte) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
     }
     kfree(data_byte);
 }
@@ -308,13 +308,13 @@ void hx83112a_nf_burst_enable(uint8_t auto_add_4_byte)
     tmp_data[0] = 0x31;
 
     if (hx83112a_nf_bus_write(0x13, 1, tmp_data) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 
     tmp_data[0] = (0x10 | auto_add_4_byte);
     if (hx83112a_nf_bus_write(0x0D, 1, tmp_data) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
     /*isBusrtOn = true;*/
@@ -326,7 +326,7 @@ void hx83112a_nf_register_read(uint8_t *read_addr, int read_length, uint8_t *rea
     int ret;
     if(hx83112a_nf_cfg_flag == false) {
         if(read_length > 256) {
-            TPD_INFO("%s: read len over 256!\n", __func__);
+            TPD_DEBUG("%s: read len over 256!\n", __func__);
             return;
         }
         if (read_length > 4) {
@@ -341,18 +341,18 @@ void hx83112a_nf_register_read(uint8_t *read_addr, int read_length, uint8_t *rea
         tmp_data[3] = read_addr[3];
         ret = hx83112a_nf_bus_write(0x00, 4, tmp_data);
         if (ret < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         tmp_data[0] = 0x00;
         ret = hx83112a_nf_bus_write(0x0C, 1, tmp_data);
         if (ret < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
 
         if (hx83112a_nf_bus_read(0x08, read_length, read_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         if (read_length > 4) {
@@ -360,11 +360,11 @@ void hx83112a_nf_register_read(uint8_t *read_addr, int read_length, uint8_t *rea
         }
     } else if(hx83112a_nf_cfg_flag == true) {
         if(hx83112a_nf_bus_read(read_addr[0], read_length, read_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
     } else {
-        TPD_INFO("%s: hx83112a_nf_cfg_flag = %d, value is wrong!\n", __func__, hx83112a_nf_cfg_flag);
+        TPD_DEBUG("%s: hx83112a_nf_cfg_flag = %d, value is wrong!\n", __func__, hx83112a_nf_cfg_flag);
         return;
     }
 }
@@ -386,11 +386,11 @@ void hx83112a_nf_register_write(uint8_t *write_addr, int write_length, uint8_t *
         }
     } else if(hx83112a_nf_cfg_flag == true) {
         if(hx83112a_nf_bus_write(write_addr[0], write_length, write_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
     } else {
-        TPD_INFO("%s: hx83112a_nf_cfg_flag = %d, value is wrong!\n", __func__, hx83112a_nf_cfg_flag);
+        TPD_DEBUG("%s: hx83112a_nf_cfg_flag = %d, value is wrong!\n", __func__, hx83112a_nf_cfg_flag);
         return;
     }
 }
@@ -430,11 +430,11 @@ static int hx83112a_nf_mcu_register_write(uint8_t *write_addr, uint32_t write_le
     tmp_addr[2] = write_addr[2];
     tmp_addr[1] = write_addr[1];
     tmp_addr[0] = write_addr[0];
-    TPD_INFO("%s, write addr = 0x%02X%02X%02X%02X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
+    TPD_DEBUG("%s, write addr = 0x%02X%02X%02X%02X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
 
     tmp_data = kzalloc (sizeof (uint8_t) * max_bus_size, GFP_KERNEL);
     if (tmp_data == NULL) {
-        TPD_INFO("%s: Can't allocate enough buf \n", __func__);
+        TPD_DEBUG("%s: Can't allocate enough buf \n", __func__);
         return -1;
     }
 
@@ -499,7 +499,7 @@ bool hx83112a_nf_sense_off(void)
         //===========================================
         tmp_data[0] = 0x27;
         if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //===========================================
@@ -507,7 +507,7 @@ bool hx83112a_nf_sense_off(void)
         //===========================================
         tmp_data[0] = 0x95;
         if (hx83112a_nf_bus_write(0x32, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
 
@@ -520,7 +520,7 @@ bool hx83112a_nf_sense_off(void)
         tmp_addr[0] = 0xA8;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
 
-        TPD_INFO("%s: Check enter_save_mode data[0]=%X \n", __func__, tmp_data[0]);
+        TPD_DEBUG("%s: Check enter_save_mode data[0]=%X \n", __func__, tmp_data[0]);
 
         if (tmp_data[0] == 0x0C) {
             //=====================================
@@ -593,7 +593,7 @@ bool hx83112a_nf_sense_off_mptest(void)
         msleep(20);
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
         cnt++;
-        TPD_INFO("%s: save mode lock cnt = %d, data[0] = %2X!\n", __func__, cnt, tmp_data[0]);
+        TPD_DEBUG("%s: save mode lock cnt = %d, data[0] = %2X!\n", __func__, cnt, tmp_data[0]);
     } while (tmp_data[0] != 0x87 && (cnt < 50));
 
     cnt = 0;
@@ -604,7 +604,7 @@ bool hx83112a_nf_sense_off_mptest(void)
         //===========================================
         tmp_data[0] = 0x27;
         if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //===========================================
@@ -612,7 +612,7 @@ bool hx83112a_nf_sense_off_mptest(void)
         //===========================================
         tmp_data[0] = 0x95;
         if (hx83112a_nf_bus_write(0x32, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
 
@@ -625,7 +625,7 @@ bool hx83112a_nf_sense_off_mptest(void)
         tmp_addr[0] = 0xA8;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
 
-        TPD_INFO("%s: Check enter_save_mode data[0]=%X \n", __func__, tmp_data[0]);
+        TPD_DEBUG("%s: Check enter_save_mode data[0]=%X \n", __func__, tmp_data[0]);
 
         if (tmp_data[0] == 0x0C) {
             //=====================================
@@ -701,7 +701,7 @@ bool hx83112a_nf_enter_safe_mode(void)
         //===========================================
         tmp_data[0] = 0x27;
         if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //===========================================
@@ -709,7 +709,7 @@ bool hx83112a_nf_enter_safe_mode(void)
         //===========================================
         tmp_data[0] = 0x95;
         if (hx83112a_nf_bus_write(0x32, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
 
@@ -718,7 +718,7 @@ bool hx83112a_nf_enter_safe_mode(void)
         //===========================================
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //msleep(10);
@@ -727,7 +727,7 @@ bool hx83112a_nf_enter_safe_mode(void)
         //===========================================
         tmp_data[0] = 0x27;
         if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
         //===========================================
@@ -735,7 +735,7 @@ bool hx83112a_nf_enter_safe_mode(void)
         //===========================================
         tmp_data[0] = 0x95;
         if (hx83112a_nf_bus_write(0x32, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return false;
         }
 
@@ -808,7 +808,7 @@ void hx83112a_nf_interface_on(void)
 
     //Read a dummy register to wake up I2C.
     if ( hx83112a_nf_bus_read(0x08, 4, tmp_data) < 0) { // to knock I2C
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return;
     }
 
@@ -818,7 +818,7 @@ void hx83112a_nf_interface_on(void)
         //===========================================
         tmp_data[0] = 0x31;
         if (hx83112a_nf_bus_write(0x13, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         //===========================================
@@ -827,7 +827,7 @@ void hx83112a_nf_interface_on(void)
         //===========================================
         tmp_data[0] = (0x10);
         if (hx83112a_nf_bus_write(0x0D, 1, tmp_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
 
@@ -843,7 +843,7 @@ void hx83112a_nf_interface_on(void)
     } while (++cnt < 10);
 
     if (cnt > 0) {
-        TPD_INFO("%s:Polling burst mode: %d times", __func__, cnt);
+        TPD_DEBUG("%s:Polling burst mode: %d times", __func__, cnt);
     }
 }
 
@@ -852,7 +852,7 @@ void hx83112a_nf_diag_register_set(uint8_t diag_command)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("diag_command = %d\n", diag_command );
+    TPD_DEBUG("diag_command = %d\n", diag_command );
 
     hx83112a_nf_interface_on();
 
@@ -867,7 +867,7 @@ void hx83112a_nf_diag_register_set(uint8_t diag_command)
     hx83112a_nf_flash_write_burst(tmp_addr, tmp_data);
 
     hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-    TPD_INFO("%s: tmp_data[3] = 0x%02X, tmp_data[2] = 0x%02X, tmp_data[1] = 0x%02X, tmp_data[0] = 0x%02X!\n",
+    TPD_DEBUG("%s: tmp_data[3] = 0x%02X, tmp_data[2] = 0x%02X, tmp_data[1] = 0x%02X, tmp_data[0] = 0x%02X!\n",
              __func__, tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
 
 }
@@ -938,12 +938,12 @@ bool hx83112a_nf_wait_wip(int Timing)
         retry_cnt++;
 
         if (in_buffer[0] != 0x00 || in_buffer[1] != 0x00 || in_buffer[2] != 0x00 || in_buffer[3] != 0x00) {
-            TPD_INFO("%s:Wait wip retry_cnt:%d, buffer[0]=%d, buffer[1]=%d, buffer[2]=%d, buffer[3]=%d \n", __func__,
+            TPD_DEBUG("%s:Wait wip retry_cnt:%d, buffer[0]=%d, buffer[1]=%d, buffer[2]=%d, buffer[3]=%d \n", __func__,
                      retry_cnt, in_buffer[0], in_buffer[1], in_buffer[2], in_buffer[3]);
         }
 
         if (retry_cnt > 100) {
-            TPD_INFO("%s: Wait wip error!\n", __func__);
+            TPD_DEBUG("%s: Wait wip error!\n", __func__);
             return false;
         }
         msleep(Timing);
@@ -1002,7 +1002,7 @@ void hx83112a_nf_sense_on(uint8_t FlashMode)
         } while ((tmp_data[1] != 0x01 || tmp_data[0] != 0x00) && retry++ < 5);
 
         if (retry >= 5) {
-            TPD_INFO("%s: Fail:\n", __func__);
+            TPD_DEBUG("%s: Fail:\n", __func__);
 
             //===AHBI2C_SystemReset==========
             tmp_addr[3] = 0x90;
@@ -1020,10 +1020,10 @@ void hx83112a_nf_sense_on(uint8_t FlashMode)
             /* reset code*/
             tmp_data[0] = 0x00;
             if (hx83112a_nf_bus_write(0x31, 1, tmp_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
             }
             if (hx83112a_nf_bus_write(0x32, 1, tmp_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
             }
 
             tmp_addr[3] = 0x90;
@@ -1071,17 +1071,17 @@ int HX83112A_NF_POWERONOF = 1;
 
 void hx83112a_nf_in_parse_assign_cmd(uint32_t addr, uint8_t *cmd, int len)
 {
-    /*TPD_INFO("%s: Entering!\n", __func__);*/
+    /*TPD_DEBUG("%s: Entering!\n", __func__);*/
     switch (len) {
     case 1:
         cmd[0] = addr;
-        /*TPD_INFO("%s: cmd[0] = 0x%02X\n", __func__, cmd[0]);*/
+        /*TPD_DEBUG("%s: cmd[0] = 0x%02X\n", __func__, cmd[0]);*/
         break;
 
     case 2:
         cmd[0] = addr % 0x100;
         cmd[1] = (addr >> 8) % 0x100;
-        /*TPD_INFO("%s: cmd[0] = 0x%02X,cmd[1] = 0x%02X\n", __func__, cmd[0], cmd[1]);*/
+        /*TPD_DEBUG("%s: cmd[0] = 0x%02X,cmd[1] = 0x%02X\n", __func__, cmd[0], cmd[1]);*/
         break;
 
     case 4:
@@ -1089,18 +1089,18 @@ void hx83112a_nf_in_parse_assign_cmd(uint32_t addr, uint8_t *cmd, int len)
         cmd[1] = (addr >> 8) % 0x100;
         cmd[2] = (addr >> 16) % 0x100;
         cmd[3] = addr / 0x1000000;
-        /*  TPD_INFO("%s: cmd[0] = 0x%02X,cmd[1] = 0x%02X,cmd[2] = 0x%02X,cmd[3] = 0x%02X\n",
+        /*  TPD_DEBUG("%s: cmd[0] = 0x%02X,cmd[1] = 0x%02X,cmd[2] = 0x%02X,cmd[3] = 0x%02X\n",
             __func__, cmd[0], cmd[1], cmd[2], cmd[3]);*/
         break;
 
     default:
-        TPD_INFO("%s: input length fault, len = %d!\n", __func__, len);
+        TPD_DEBUG("%s: input length fault, len = %d!\n", __func__, len);
     }
 }
 
 void hx83112a_nf_update_dirly_0f(void)
 {
-    TPD_INFO("It will update fw after esd event in zero flash mode!\n");
+    TPD_DEBUG("It will update fw after esd event in zero flash mode!\n");
     g_hx83112a_nf_core_fp.fp_0f_operation_dirly();
 }
 
@@ -1123,8 +1123,8 @@ int hx83112a_nf_dis_rload_0f(int disable)
         hx83112a_nf_register_read(hx83112a_nf_pzf_op->addr_dis_flash_reload, 4, tmp_data, false);
         TPD_DETAIL("Now data: tmp_data[3] = 0x%02X || tmp_data[2] = 0x%02X || tmp_data[1] = 0x%02X || tmp_data[0] = 0x%02X\n", tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
         if( tmp_data[3] != 0x00 || tmp_data[2] != 0x00 || tmp_data[1] != 0x9A || tmp_data[0] != 0xA9) {
-            TPD_INFO("Now data: tmp_data[3] = 0x%02X || tmp_data[2] = 0x%02X || tmp_data[1] = 0x%02X || tmp_data[0] = 0x%02X\n", tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
-            TPD_INFO("Not Same,Write Fail, there is %d retry times!\n", retry);
+            TPD_DEBUG("Now data: tmp_data[3] = 0x%02X || tmp_data[2] = 0x%02X || tmp_data[1] = 0x%02X || tmp_data[0] = 0x%02X\n", tmp_data[3], tmp_data[2], tmp_data[1], tmp_data[0]);
+            TPD_DEBUG("Not Same,Write Fail, there is %d retry times!\n", retry);
         } else {
             check_val = 1;
             TPD_DETAIL("It's same! Write success!\n");
@@ -1256,20 +1256,20 @@ void hx83112a_nf_mcu_write_sram_0f(const struct firmware *fw_entry, uint8_t *add
     TPD_DETAIL("%s,  total size=%d\n", __func__, total_size);
 
     if (hx83112a_nf_chip_info->tmp_data == NULL) {
-        //TPD_INFO("%s,  enteralloc hx83112a_nf_chip_info->tmp_data\n", __func__);
+        //TPD_DEBUG("%s,  enteralloc hx83112a_nf_chip_info->tmp_data\n", __func__);
         hx83112a_nf_chip_info->tmp_data = kzalloc (sizeof (uint8_t) * firmware_update_space, GFP_KERNEL);
         if (hx83112a_nf_chip_info->tmp_data == NULL) {
-            TPD_INFO("%s, alloc hx83112a_nf_chip_info->tmp_data failed\n", __func__);
+            TPD_DEBUG("%s, alloc hx83112a_nf_chip_info->tmp_data failed\n", __func__);
             return ;
         }
-        //TPD_INFO("%s, end---------alloc hx83112a_nf_chip_info->tmp_data\n", __func__);
+        //TPD_DEBUG("%s, end---------alloc hx83112a_nf_chip_info->tmp_data\n", __func__);
     }
     memcpy (hx83112a_nf_chip_info->tmp_data, fw_entry->data, total_size);
     /*
     for (i = 0;i < 10;i++) {
-        TPD_INFO("[%d] 0x%2.2X", i, tmp_data[i]);
+        TPD_DEBUG("[%d] 0x%2.2X", i, tmp_data[i]);
     }
-    TPD_INFO("\n");
+    TPD_DEBUG("\n");
     */
     if (total_size_temp % max_bus_size == 0) {
         total_read_times = total_size_temp / max_bus_size;
@@ -1279,8 +1279,8 @@ void hx83112a_nf_mcu_write_sram_0f(const struct firmware *fw_entry, uint8_t *add
 
     for (i = 0; i < (total_read_times); i++) {
         /*
-        TPD_INFO("[log]write %d time start!\n", i);
-        TPD_INFO("[log]addr[3] = 0x%02X, addr[2] = 0x%02X, addr[1] = 0x%02X, addr[0] = 0x%02X!\n", tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
+        TPD_DEBUG("[log]write %d time start!\n", i);
+        TPD_DEBUG("[log]addr[3] = 0x%02X, addr[2] = 0x%02X, addr[1] = 0x%02X, addr[0] = 0x%02X!\n", tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
         */
         if (total_size_temp >= max_bus_size) {
             hx83112a_nf_flash_write_burst_length(tmp_addr, &(hx83112a_nf_chip_info->tmp_data[start_index + i * max_bus_size]),  max_bus_size);
@@ -1290,7 +1290,7 @@ void hx83112a_nf_mcu_write_sram_0f(const struct firmware *fw_entry, uint8_t *add
             hx83112a_nf_flash_write_burst_length(tmp_addr, &(hx83112a_nf_chip_info->tmp_data[start_index + i * max_bus_size]),  total_size_temp % max_bus_size);
         }
 
-        /*TPD_INFO("[log]write %d time end!\n", i);*/
+        /*TPD_DEBUG("[log]write %d time end!\n", i);*/
         address = ((i + 1) * max_bus_size);
         tmp_addr[0] = addr[0] + (uint8_t) ((address) & 0x00FF);
 
@@ -1367,15 +1367,15 @@ bool hx83112a_nf_parse_bin_cfg_data(const struct firmware *fw_entry)
 
     /*1. get number of partition*/
     part_num = fw_entry->data[HX64K + 12];
-    TPD_INFO("%s, Number of partition is %d\n", __func__, part_num);
+    TPD_DEBUG("%s, Number of partition is %d\n", __func__, part_num);
     if (part_num <= 1) {
-        TPD_INFO("%s, size of cfg part failed! part_num = %d\n", __func__, part_num);
+        TPD_DEBUG("%s, size of cfg part failed! part_num = %d\n", __func__, part_num);
         return false;
     }
     /*2. initial struct of array*/
     hx83112a_nf_info_arr = kzalloc(part_num * sizeof(struct hx83112a_nf_info), GFP_KERNEL);
     if (hx83112a_nf_info_arr == NULL) {
-        TPD_INFO("%s, Allocate ZF info array failed!\n", __func__);
+        TPD_DEBUG("%s, Allocate ZF info array failed!\n", __func__);
         return false;
     }
 
@@ -1390,9 +1390,9 @@ bool hx83112a_nf_parse_bin_cfg_data(const struct firmware *fw_entry)
         hx83112a_nf_info_arr[i].cfg_addr += hx83112a_nf_info_arr[i].sram_addr[2] << 16;
         hx83112a_nf_info_arr[i].cfg_addr += hx83112a_nf_info_arr[i].sram_addr[3] << 24;
 
-        /*TPD_INFO("%s, [%d] SRAM addr = %08X\n", __func__, i, hx83112a_nf_info_arr[i].cfg_addr);
-        TPD_INFO("%s, [%d] fw_addr = %04X!\n", __func__, i, hx83112a_nf_info_arr[i].fw_addr);
-        TPD_INFO("%s, [%d] write_size = %d!\n", __func__, i, hx83112a_nf_info_arr[i].write_size); */
+        /*TPD_DEBUG("%s, [%d] SRAM addr = %08X\n", __func__, i, hx83112a_nf_info_arr[i].cfg_addr);
+        TPD_DEBUG("%s, [%d] fw_addr = %04X!\n", __func__, i, hx83112a_nf_info_arr[i].fw_addr);
+        TPD_DEBUG("%s, [%d] write_size = %d!\n", __func__, i, hx83112a_nf_info_arr[i].write_size); */
         if (i == 0)
             continue;
         if (dsram_base > hx83112a_nf_info_arr[i].cfg_addr) {
@@ -1408,7 +1408,7 @@ bool hx83112a_nf_parse_bin_cfg_data(const struct firmware *fw_entry)
     hx83112a_nf_cfg_sz = (dsram_max - dsram_base) + hx83112a_nf_info_arr[i_max].write_size;
     hx83112a_nf_cfg_sz = hx83112a_nf_cfg_sz + (hx83112a_nf_cfg_sz % 16);
 
-    TPD_INFO("%s, hx83112a_nf_cfg_sz = %d!, dsram_base = %X, dsram_max = %X\n", __func__, hx83112a_nf_cfg_sz, dsram_base, dsram_max);
+    TPD_DEBUG("%s, hx83112a_nf_cfg_sz = %d!, dsram_base = %X, dsram_max = %X\n", __func__, hx83112a_nf_cfg_sz, dsram_base, dsram_max);
 
     if (hx83112a_nf_FW_buf == NULL)
         hx83112a_nf_FW_buf = kzalloc(sizeof(unsigned char) * FW_BIN_16K_SZ, GFP_KERNEL);
@@ -1417,7 +1417,7 @@ bool hx83112a_nf_parse_bin_cfg_data(const struct firmware *fw_entry)
         memcpy(hx83112a_nf_FW_buf + (hx83112a_nf_info_arr[i].cfg_addr - dsram_base), (unsigned char *)&fw_entry->data[hx83112a_nf_info_arr[i].fw_addr], hx83112a_nf_info_arr[i].write_size);
 
     hx83112a_nf_cfg_crc = hx83112a_nf_mcu_Calculate_CRC_with_AP(hx83112a_nf_FW_buf, 0, hx83112a_nf_cfg_sz);
-    TPD_INFO("chenyunrui:hx83112a_nf_cfg_crc = %d\n", hx83112a_nf_cfg_crc);
+    TPD_DEBUG("chenyunrui:hx83112a_nf_cfg_crc = %d\n", hx83112a_nf_cfg_crc);
     kfree(hx83112a_nf_info_arr);
     return true;
 }
@@ -1430,7 +1430,7 @@ static int hx83112a_nf_nf_zf_part_info(const struct firmware *fw_entry)
     bool ret = false;
 
     if (!hx83112a_nf_parse_bin_cfg_data(fw_entry))
-        TPD_INFO("%s, Parse cfg from bin failed\n", __func__);
+        TPD_DEBUG("%s, Parse cfg from bin failed\n", __func__);
     hx83112a_nf_register_write(hx83112a_nf_pzf_op->addr_system_reset, 4, hx83112a_nf_pzf_op->data_system_reset, false);
     hx83112a_nf_enter_safe_mode();
     getnstimeofday(&timeStart);
@@ -1440,13 +1440,13 @@ static int hx83112a_nf_nf_zf_part_info(const struct firmware *fw_entry)
     crc = hx83112a_nf_hw_check_CRC(hx83112a_nf_pzf_op->data_sram_start_addr, HX_48K_SZ);
     ret = (crc == 0) ? true : false;
     if (crc != 0)
-        TPD_INFO("48k CRC Failed! CRC = %X", crc);
+        TPD_DEBUG("48k CRC Failed! CRC = %X", crc);
     do {
         hx83112a_nf_mcu_register_write(hx83112a_nf_sram_min, hx83112a_nf_cfg_sz, hx83112a_nf_FW_buf, 0);
         /*hx83112a_nf_register_write(hx83112a_nf_sram_min, hx83112a_nf_cfg_sz, hx83112a_nf_FW_buf, 0); */
         crc = hx83112a_nf_hw_check_CRC(hx83112a_nf_sram_min, hx83112a_nf_cfg_sz);
         if (crc != hx83112a_nf_cfg_crc)
-            TPD_INFO("Config CRC FAIL, HW CRC = %X, SW CRC = %X, retry time = %d", crc, hx83112a_nf_cfg_crc, retry);
+            TPD_DEBUG("Config CRC FAIL, HW CRC = %X, SW CRC = %X, retry time = %d", crc, hx83112a_nf_cfg_crc, retry);
         retry++;
     } while (!ret && retry < 10);
     if (HX83112A_NF_POWERONOF == 1)
@@ -1456,7 +1456,7 @@ static int hx83112a_nf_nf_zf_part_info(const struct firmware *fw_entry)
 
     getnstimeofday(&timeEnd);
     timeDelta.tv_nsec = (timeEnd.tv_sec * 1000000000 + timeEnd.tv_nsec) - (timeStart.tv_sec * 1000000000 + timeStart.tv_nsec);
-    TPD_INFO("update firmware time = %ld us\n", timeDelta.tv_nsec / 1000);
+    TPD_DEBUG("update firmware time = %ld us\n", timeDelta.tv_nsec / 1000);
     return 0;
 }
 
@@ -1475,29 +1475,29 @@ void hx83112a_nf_mcu_firmware_update_0f(const struct firmware *fw_entry)
 
 fw_reload:
     if (fw_entry == NULL || reload) {
-        TPD_INFO("Get FW from headfile\n");
+        TPD_DEBUG("Get FW from headfile\n");
         if (request_fw_headfile == NULL) {
             request_fw_headfile = kzalloc(sizeof(struct firmware), GFP_KERNEL);
         }
         if(request_fw_headfile == NULL) {
-            TPD_INFO("%s kzalloc failed!\n", __func__);
+            TPD_DEBUG("%s kzalloc failed!\n", __func__);
             return;
         }
         if (hx83112a_nf_chip_info->g_fw_sta) {
-            TPD_INFO("request firmware failed, get from g_fw_buf\n");
+            TPD_DEBUG("request firmware failed, get from g_fw_buf\n");
             request_fw_headfile->size = hx83112a_nf_chip_info->g_fw_len;
             request_fw_headfile->data = hx83112a_nf_chip_info->g_fw_buf;
             tmp_fw_entry = request_fw_headfile;
 
         } else {
-            TPD_INFO("request firmware failed, get from headfile\n");
+            TPD_DEBUG("request firmware failed, get from headfile\n");
             if(hx83112a_nf_chip_info->p_firmware_headfile->firmware_data) {
                 request_fw_headfile->size = hx83112a_nf_chip_info->p_firmware_headfile->firmware_size;
                 request_fw_headfile->data = hx83112a_nf_chip_info->p_firmware_headfile->firmware_data;
                 tmp_fw_entry = request_fw_headfile;
                 hx83112a_nf_chip_info->using_headfile = true;
             } else {
-                TPD_INFO("firmware_data is NULL! exit firmware update!\n");
+                TPD_DEBUG("firmware_data is NULL! exit firmware update!\n");
                 if(request_fw_headfile != NULL) {
                     kfree(request_fw_headfile);
                     request_fw_headfile = NULL;
@@ -1531,13 +1531,13 @@ fw_reload:
                 TPD_DETAIL("%s, HW CRC OK in %d time \n", __func__, retry);
                 break;
             } else {
-                TPD_INFO("%s, HW CRC FAIL in %d time !\n", __func__, retry);
+                TPD_DEBUG("%s, HW CRC FAIL in %d time !\n", __func__, retry);
             }
             retry++;
         } while (((temp_data[3] == 0 && temp_data[2] == 0 && temp_data[1] == 0 && temp_data[0] == 0 && retry < 80) || (crc != 0 && retry < 30)) && !(hx83112a_nf_chip_info->using_headfile && retry < 3));
 
         if (crc != 0) {
-            TPD_INFO("Last time CRC Fail!\n");
+            TPD_DEBUG("Last time CRC Fail!\n");
             if(reload) {
                 return;
             } else {
@@ -1558,13 +1558,13 @@ fw_reload:
                     TPD_DETAIL("%s, config info ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, config info fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, config info fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("config info CRC Fail!\n");
+                TPD_DEBUG("config info CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1583,13 +1583,13 @@ fw_reload:
                     TPD_DETAIL("%s, 1 FW config ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, 1 FW config fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, 1 FW config fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("1 FW config CRC Fail!\n");
+                TPD_DEBUG("1 FW config CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1608,13 +1608,13 @@ fw_reload:
                     TPD_DETAIL("%s, 3 FW config ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, 3 FW config fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, 3 FW config fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("3 FW config CRC Fail!\n");
+                TPD_DEBUG("3 FW config CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1634,13 +1634,13 @@ fw_reload:
                     TPD_DETAIL("%s, 1 ADC config ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, 1 ADC config fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, 1 ADC config fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("1 ADC config CRC Fail!\n");
+                TPD_DEBUG("1 ADC config CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1659,13 +1659,13 @@ fw_reload:
                     TPD_DETAIL("%s, 2 ADC config ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, 2 ADC config fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, 2 ADC config fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("2 ADC config CRC Fail!\n");
+                TPD_DEBUG("2 ADC config CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1685,13 +1685,13 @@ fw_reload:
                     TPD_DETAIL("%s, mapping table ok in %d time \n", __func__, retry);
                     break;
                 } else {
-                    TPD_INFO("%s, mapping table fail in %d time !\n", __func__, retry);
+                    TPD_DEBUG("%s, mapping table fail in %d time !\n", __func__, retry);
                 }
                 retry++;
             } while ((crc != 0 && retry < 30) || (hx83112a_nf_chip_info->using_headfile && retry < 15));
 
             if (crc != 0) {
-                TPD_INFO("mapping table CRC Fail!\n");
+                TPD_DEBUG("mapping table CRC Fail!\n");
                 if (!reload) {
                     reload = true;
                     goto fw_reload;
@@ -1723,27 +1723,27 @@ int hx83112a_nf_0f_op_file_dirly(char *file_name)
     const struct firmware *fw_entry = NULL;
 
 
-    TPD_INFO("%s, Entering \n", __func__);
-    TPD_INFO("file name = %s\n", file_name);
+    TPD_DEBUG("%s, Entering \n", __func__);
+    TPD_DEBUG("file name = %s\n", file_name);
     if (hx83112a_nf_pri_ts->fw_update_app_support) {
         err = request_firmware_select (&fw_entry, file_name, hx83112a_nf_pri_ts->dev);
     } else {
         err = request_firmware (&fw_entry, file_name, hx83112a_nf_pri_ts->dev);
     }
     if (err < 0) {
-        TPD_INFO("%s, fail in line%d error code=%d, file maybe fail\n", __func__, __LINE__, err);
+        TPD_DEBUG("%s, fail in line%d error code=%d, file maybe fail\n", __func__, __LINE__, err);
         return err;
     }
 
     //hx83112a_nf_int_enable (0);
 
     if(hx83112a_nf_f_0f_updat == 1) {
-        TPD_INFO("%s:[Warning]Other thread is updating now!\n", __func__);
+        TPD_DEBUG("%s:[Warning]Other thread is updating now!\n", __func__);
         release_firmware (fw_entry);
         err = -1;
         return err;
     } else {
-        TPD_INFO("%s:Entering Update Flow!\n", __func__);
+        TPD_DEBUG("%s:Entering Update Flow!\n", __func__);
         hx83112a_nf_f_0f_updat = 1;
     }
 
@@ -1757,7 +1757,7 @@ int hx83112a_nf_0f_op_file_dirly(char *file_name)
     release_firmware (fw_entry);
 
     hx83112a_nf_f_0f_updat = 0;
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, END \n", __func__);
     return err;
 }
 int hx83112a_nf_mcu_0f_operation_dirly(void)
@@ -1768,11 +1768,11 @@ int hx83112a_nf_mcu_0f_operation_dirly(void)
     TPD_DETAIL("%s, Entering \n", __func__);
 
     if(hx83112a_nf_f_0f_updat == 1) {
-        TPD_INFO("%s:[Warning]Other thread is updating now!\n", __func__);
+        TPD_DEBUG("%s:[Warning]Other thread is updating now!\n", __func__);
         err = -1;
         return err;
     } else {
-        TPD_INFO("%s:Entering Update Flow!\n", __func__);
+        TPD_DEBUG("%s:Entering Update Flow!\n", __func__);
         hx83112a_nf_f_0f_updat = 1;
     }
 
@@ -1793,10 +1793,10 @@ int hx83112a_nf_mcu_0f_operation_test_dirly(char *fw_name)
 
     TPD_DETAIL("%s, Entering \n", __func__);
     TPD_DETAIL("file name = %s\n", fw_name);
-    TPD_INFO("Request TP firmware.\n");
+    TPD_DEBUG("Request TP firmware.\n");
     err = request_firmware (&fw_entry, fw_name, hx83112a_nf_pri_ts->dev);
     if (err < 0) {
-        TPD_INFO("%s, fail in line%d error code=%d, file maybe fail\n", __func__, __LINE__, err);
+        TPD_DEBUG("%s, fail in line%d error code=%d, file maybe fail\n", __func__, __LINE__, err);
         if (fw_entry != NULL) {
             release_firmware(fw_entry);
             fw_entry = NULL;
@@ -1815,7 +1815,7 @@ int hx83112a_nf_mcu_0f_operation_test_dirly(char *fw_name)
 
 void hx83112a_nf_mcu_0f_operation(struct work_struct *work)
 {
-    TPD_INFO("%s, Entering \n", __func__);
+    TPD_DEBUG("%s, Entering \n", __func__);
 
 #ifdef CONFIG_TOUCHPANEL_MTK_PLATFORM
     if (hx83112a_nf_pri_ts->boot_mode != RECOVERY_BOOT  && !is_oem_unlocked())
@@ -1823,17 +1823,17 @@ void hx83112a_nf_mcu_0f_operation(struct work_struct *work)
     if (hx83112a_nf_pri_ts->boot_mode != MSM_BOOT_MODE__RECOVERY  && !is_oem_unlocked())
 #endif
     {
-        TPD_INFO("file name = %s\n", hx83112a_nf_pri_ts->panel_data.fw_name);
+        TPD_DEBUG("file name = %s\n", hx83112a_nf_pri_ts->panel_data.fw_name);
 
     } else {
-        TPD_INFO("TP firmware has been requested.\n");
+        TPD_DEBUG("TP firmware has been requested.\n");
     }
 
     if (hx83112a_nf_f_0f_updat == 1) {
-        TPD_INFO("%s:[Warning]Other thread is updating now!\n", __func__);
+        TPD_DEBUG("%s:[Warning]Other thread is updating now!\n", __func__);
         return ;
     } else {
-        TPD_INFO("%s:Entering Update Flow!\n", __func__);
+        TPD_DEBUG("%s:Entering Update Flow!\n", __func__);
         hx83112a_nf_f_0f_updat = 1;
     }
 
@@ -1852,7 +1852,7 @@ void hx83112a_nf_mcu_0f_operation(struct work_struct *work)
     msleep (10);
     hx83112a_nf_sense_on(0x00);
     msleep (10);
-    TPD_INFO("%s:End \n", __func__);
+    TPD_DEBUG("%s:End \n", __func__);
 
 #ifdef CONFIG_OPLUS_TP_APK
     if(hx83112a_nf_chip_info->debug_mode_sta) {
@@ -1865,7 +1865,7 @@ void hx83112a_nf_mcu_0f_operation(struct work_struct *work)
     hx83112a_nf_enable_interrupt(hx83112a_nf_chip_info, true);
 
     hx83112a_nf_f_0f_updat = 0;
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, END \n", __func__);
     return ;
 }
 
@@ -1884,7 +1884,7 @@ void hx83112a_nf_mcu_read_sram_0f(const struct firmware *fw_entry, uint8_t *addr
     uint8_t *temp_info_data;
     int *not_same_buff;
 
-    TPD_INFO("%s, Entering \n", __func__);
+    TPD_DEBUG("%s, Entering \n", __func__);
 
     hx83112a_nf_burst_enable(1);
 
@@ -1912,9 +1912,9 @@ void hx83112a_nf_mcu_read_sram_0f(const struct firmware *fw_entry, uint8_t *addr
     tmp_addr[2] = addr[2];
     tmp_addr[1] = addr[1];
     tmp_addr[0] = addr[0];
-    TPD_INFO("%s, read addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
+    TPD_DEBUG("%s, read addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
 
-    TPD_INFO("%s, total size=%d\n", __func__, total_size);
+    TPD_DEBUG("%s, total size=%d\n", __func__, total_size);
 
     hx83112a_nf_burst_enable(1);
 
@@ -1942,8 +1942,8 @@ void hx83112a_nf_mcu_read_sram_0f(const struct firmware *fw_entry, uint8_t *addr
 
         msleep (10);
     }
-    TPD_INFO("%s, READ Start \n", __func__);
-    TPD_INFO("%s, start_index = %d \n", __func__, start_index);
+    TPD_DEBUG("%s, READ Start \n", __func__);
+    TPD_DEBUG("%s, start_index = %d \n", __func__, start_index);
     j = start_index;
     for (i = 0; i < read_len; i++, j++) {
         if (hx83112a_nf_chip_info->g_fw_buf[j] != temp_info_data[i]) {
@@ -1951,30 +1951,30 @@ void hx83112a_nf_mcu_read_sram_0f(const struct firmware *fw_entry, uint8_t *addr
             not_same_buff[i] = 1;
         }
 
-        TPD_INFO("0x%2.2X, ", temp_info_data[i]);
+        TPD_DEBUG("0x%2.2X, ", temp_info_data[i]);
 
         if (i > 0 && i % 16 == 15) {
             printk ("\n");
         }
     }
-    TPD_INFO("%s, READ END \n", __func__);
-    TPD_INFO("%s, Not Same count=%d\n", __func__, not_same);
+    TPD_DEBUG("%s, READ END \n", __func__);
+    TPD_DEBUG("%s, Not Same count=%d\n", __func__, not_same);
     if (not_same != 0) {
         j = start_index;
         for (i = 0; i < read_len; i++, j++) {
             if (not_same_buff[i] == 1) {
-                TPD_INFO("bin = [%d] 0x%2.2X\n", i, hx83112a_nf_chip_info->g_fw_buf[j]);
+                TPD_DEBUG("bin = [%d] 0x%2.2X\n", i, hx83112a_nf_chip_info->g_fw_buf[j]);
             }
         }
         for (i = 0; i < read_len; i++, j++) {
             if (not_same_buff[i] == 1) {
-                TPD_INFO("sram = [%d] 0x%2.2X \n", i, temp_info_data[i]);
+                TPD_DEBUG("sram = [%d] 0x%2.2X \n", i, temp_info_data[i]);
             }
         }
     }
-    TPD_INFO("%s, READ END \n", __func__);
-    TPD_INFO("%s, Not Same count=%d\n", __func__, not_same);
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, READ END \n", __func__);
+    TPD_DEBUG("%s, Not Same count=%d\n", __func__, not_same);
+    TPD_DEBUG("%s, END \n", __func__);
 
     kfree (not_same_buff);
     kfree (temp_info_data);
@@ -1996,7 +1996,7 @@ void hx83112a_nf_mcu_read_all_sram(uint8_t *addr, int read_len)
     uint8_t tmp_addr[4];
     uint8_t *temp_info_data;
 
-    TPD_INFO("%s, Entering \n", __func__);
+    TPD_DEBUG("%s, Entering \n", __func__);
 
     hx83112a_nf_burst_enable(1);
 
@@ -2011,9 +2011,9 @@ void hx83112a_nf_mcu_read_all_sram(uint8_t *addr, int read_len)
     tmp_addr[2] = addr[2];
     tmp_addr[1] = addr[1];
     tmp_addr[0] = addr[0];
-    TPD_INFO("%s, read addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
+    TPD_DEBUG("%s, read addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
 
-    TPD_INFO("%s, total size=%d\n", __func__, total_size);
+    TPD_DEBUG("%s, total size=%d\n", __func__, total_size);
 
     if (total_size % max_bus_size == 0) {
         total_read_times = total_size / max_bus_size;
@@ -2035,27 +2035,27 @@ void hx83112a_nf_mcu_read_all_sram(uint8_t *addr, int read_len)
 
         msleep (10);
     }
-    TPD_INFO("%s, NOW addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
+    TPD_DEBUG("%s, NOW addr tmp_addr[3] = 0x%2.2X, tmp_addr[2] = 0x%2.2X, tmp_addr[1] = 0x%2.2X, tmp_addr[0] = 0x%2.2X\n", __func__, tmp_addr[3], tmp_addr[2], tmp_addr[1], tmp_addr[0]);
     /*for (i = 0;i < read_len;i++) {
-        TPD_INFO("0x%2.2X, ", temp_info_data[i]);
+        TPD_DEBUG("0x%2.2X, ", temp_info_data[i]);
 
         if (i > 0 && i%16 == 15)
             printk("\n");
     }*/
 
     /* need modify
-    TPD_INFO("Now Write File start!\n");
+    TPD_DEBUG("Now Write File start!\n");
     vts_name = getname_kernel("/sdcard/dump_dsram.txt");
     fn = file_open_name(vts_name, O_CREAT | O_WRONLY, 0);
     if (!IS_ERR (fn)) {
-        TPD_INFO("%s create file and ready to write\n", __func__);
+        TPD_DEBUG("%s create file and ready to write\n", __func__);
         fn->f_op->write (fn, temp_info_data, read_len*sizeof (uint8_t), &fn->f_pos);
         filp_close (fn, NULL);
     }
-    TPD_INFO("Now Write File End!\n");
+    TPD_DEBUG("Now Write File End!\n");
     */
 
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, END \n", __func__);
 
     kfree (temp_info_data);
 }
@@ -2064,7 +2064,7 @@ void hx83112a_nf_mcu_firmware_read_0f(const struct firmware *fw_entry, int type)
 {
     uint8_t tmp_addr[4] = {0};
 
-    TPD_INFO("%s, Entering \n", __func__);
+    TPD_DEBUG("%s, Entering \n", __func__);
     if (type == 0) { /* first 48K */
         g_hx83112a_nf_core_fp.fp_read_sram_0f (fw_entry, hx83112a_nf_pzf_op->data_sram_start_addr, 0, HX_48K_SZ);
         g_hx83112a_nf_core_fp.fp_read_all_sram (tmp_addr, 0xC000);
@@ -2076,23 +2076,23 @@ void hx83112a_nf_mcu_firmware_read_0f(const struct firmware *fw_entry, int type)
         g_hx83112a_nf_core_fp.fp_read_sram_0f (fw_entry, hx83112a_nf_pzf_op->data_adc_cfg_3, 0xD000, 376);
         g_hx83112a_nf_core_fp.fp_read_all_sram (hx83112a_nf_pzf_op->data_sram_clean, HX_32K_SZ);
     }
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, END \n", __func__);
 }
 
 void hx83112a_nf_mcu_0f_operation_check(int type)
 {
 
 
-    TPD_INFO("%s, Entering \n", __func__);
+    TPD_DEBUG("%s, Entering \n", __func__);
 
-    TPD_INFO("first 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[0], hx83112a_nf_chip_info->g_fw_buf[1], hx83112a_nf_chip_info->g_fw_buf[2], hx83112a_nf_chip_info->g_fw_buf[3]);
-    TPD_INFO("next 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[4], hx83112a_nf_chip_info->g_fw_buf[5], hx83112a_nf_chip_info->g_fw_buf[6], hx83112a_nf_chip_info->g_fw_buf[7]);
-    TPD_INFO("and next 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[8], hx83112a_nf_chip_info->g_fw_buf[9], hx83112a_nf_chip_info->g_fw_buf[10], hx83112a_nf_chip_info->g_fw_buf[11]);
+    TPD_DEBUG("first 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[0], hx83112a_nf_chip_info->g_fw_buf[1], hx83112a_nf_chip_info->g_fw_buf[2], hx83112a_nf_chip_info->g_fw_buf[3]);
+    TPD_DEBUG("next 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[4], hx83112a_nf_chip_info->g_fw_buf[5], hx83112a_nf_chip_info->g_fw_buf[6], hx83112a_nf_chip_info->g_fw_buf[7]);
+    TPD_DEBUG("and next 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n", hx83112a_nf_chip_info->g_fw_buf[8], hx83112a_nf_chip_info->g_fw_buf[9], hx83112a_nf_chip_info->g_fw_buf[10], hx83112a_nf_chip_info->g_fw_buf[11]);
 
     g_hx83112a_nf_core_fp.fp_firmware_read_0f(NULL, type);
 
     //release_firmware(hx83112a_nf_chip_info->g_fw_entry);
-    TPD_INFO("%s, END \n", __func__);
+    TPD_DEBUG("%s, END \n", __func__);
     return ;
 }
 #endif
@@ -2162,7 +2162,7 @@ bool hx83112a_nf_ic_package_check(void)
         tmp_addr[0] = 0xD0;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
 
-        TPD_INFO("%s:Read driver IC ID = %X, %X, %X\n", __func__, tmp_data[3], tmp_data[2], tmp_data[1]);
+        TPD_DEBUG("%s:Read driver IC ID = %X, %X, %X\n", __func__, tmp_data[3], tmp_data[2], tmp_data[1]);
         /*if ((tmp_data[3] == 0x83) && (tmp_data[2] == 0x11) && ((tmp_data[1] == 0x2a) || (tmp_data[1] == 0x2b)))*/
         if (1) {
             HX83112A_NF_IC_TYPE = HX_83112A_SERIES_PWON;
@@ -2189,12 +2189,12 @@ bool hx83112a_nf_ic_package_check(void)
             g_i_CID_MAJ = i_CTPM_FW[HX83112A_NF_CID_VER_MAJ_FLASH_ADDR];
             g_i_CID_MIN = i_CTPM_FW[HX83112A_NF_CID_VER_MIN_FLASH_ADDR];
 #endif
-            TPD_INFO("Himax IC package 83112_in\n");
+            TPD_DEBUG("Himax IC package 83112_in\n");
             ret_data = true;
             break;
         } else {
             ret_data = false;
-            TPD_INFO("%s:Read driver ID register Fail:\n", __func__);
+            TPD_DEBUG("%s:Read driver ID register Fail:\n", __func__);
         }
     }
 
@@ -2207,7 +2207,7 @@ void hx83112a_nf_power_on_init(void)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s\n", __func__);
+    TPD_DEBUG("%s\n", __func__);
 
     /*RawOut select initial*/
     tmp_addr[3] = 0x80;
@@ -2259,20 +2259,20 @@ static void hx83112a_nf_read_FW_ver(void)
         hx83112a_nf_register_read(cmd, 4, data2, false);
 
         if ((data[1] == 0x3A && data[0] == 0xA3) || (data2[1] == 0x72 && data2[0] == 0xc0)) {
-            TPD_INFO("reload OK! \n");
+            TPD_DEBUG("reload OK! \n");
             reload_status = 1;
             break;
         } else if (retry == 0) {
-            TPD_INFO("reload 20 times! fail \n");
+            TPD_DEBUG("reload 20 times! fail \n");
             return;
         } else {
             retry--;
             msleep(10);
-            TPD_INFO("reload fail, delay 10ms retry=%d\n", retry);
+            TPD_DEBUG("reload fail, delay 10ms retry=%d\n", retry);
         }
     }
-    TPD_INFO("%s : data[0] = 0x%2.2X, data[1] = 0x%2.2X, data[2] = 0x%2.2X, data[3] = 0x%2.2X\n", __func__, data[0], data[1], data[2], data[3]);
-    TPD_INFO("reload_status=%d\n", reload_status);
+    TPD_DEBUG("%s : data[0] = 0x%2.2X, data[1] = 0x%2.2X, data[2] = 0x%2.2X, data[3] = 0x%2.2X\n", __func__, data[0], data[1], data[2], data[3]);
+    TPD_DEBUG("reload_status=%d\n", reload_status);
 
     hx83112a_nf_sense_off();
 
@@ -2287,8 +2287,8 @@ static void hx83112a_nf_read_FW_ver(void)
     hx83112a_nf_register_read(cmd, 4, data, false);
 
 
-    TPD_INFO("PANEL_VER : %X \n", data[0]);
-    TPD_INFO("FW_VER : %X \n", data[1] << 8 | data[2]);
+    TPD_DEBUG("PANEL_VER : %X \n", data[0]);
+    TPD_DEBUG("FW_VER : %X \n", data[1] << 8 | data[2]);
 
     cmd[3] = 0x10;
     cmd[2] = 0x00;
@@ -2296,9 +2296,9 @@ static void hx83112a_nf_read_FW_ver(void)
     cmd[0] = 0x84;
     hx83112a_nf_register_read(cmd, 4, data, false);
 
-    TPD_INFO("CFG_VER : %X \n", data[2] << 8 | data[3]);
-    TPD_INFO("TOUCH_VER : %X \n", data[2]);
-    TPD_INFO("DISPLAY_VER : %X \n", data[3]);
+    TPD_DEBUG("CFG_VER : %X \n", data[2] << 8 | data[3]);
+    TPD_DEBUG("TOUCH_VER : %X \n", data[2]);
+    TPD_DEBUG("DISPLAY_VER : %X \n", data[3]);
 
     cmd[3] = 0x10;
     cmd[2] = 0x00;
@@ -2306,7 +2306,7 @@ static void hx83112a_nf_read_FW_ver(void)
     cmd[0] = 0x00;
     hx83112a_nf_register_read(cmd, 4, data, false);
 
-    TPD_INFO("CID_VER : %X \n", ( data[2] << 8 | data[3]) );
+    TPD_DEBUG("CID_VER : %X \n", ( data[2] << 8 | data[3]) );
     return;
 }
 
@@ -2327,7 +2327,7 @@ void hx83112a_nf_read_OPLUS_FW_ver(struct chip_data_hx83112a_nf *chip_info)
     if (data[0] == 0xEA && data[1] == 0x00 && (data[2] & 0xF0) == 0x60)
         hx83112a_nf_isEA006proj = true;
     chip_info->fw_id = data[0] << 24 | data[1] << 16 | data[2] << 8 | data[3];
-    TPD_INFO("%s : data[0] = 0x%2.2X, data[1] = 0x%2.2X, data[2] = 0x%2.2X, data[3] = 0x%2.2X\n", __func__, data[0], data[1], data[2], data[3]);
+    TPD_DEBUG("%s : data[0] = 0x%2.2X, data[1] = 0x%2.2X, data[2] = 0x%2.2X, data[3] = 0x%2.2X\n", __func__, data[0], data[1], data[2], data[3]);
 
     cmd[3] = 0x10;  // oplus fw id bin address : 0xc014    Tp ic address : 0x 10007014
     cmd[2] = 0x00;
@@ -2335,7 +2335,7 @@ void hx83112a_nf_read_OPLUS_FW_ver(struct chip_data_hx83112a_nf *chip_info)
     cmd[0] = 0x84;
     hx83112a_nf_register_read(cmd, 4, data, false);
     touch_ver = data[0] << 24 | data[1] << 16 | data[2] << 8 | data[3];
-    TPD_INFO("%s :touch_ver = 0x%08X\n", __func__, touch_ver);
+    TPD_DEBUG("%s :touch_ver = 0x%08X\n", __func__, touch_ver);
 
     cmd[3] = 0x10;
     cmd[2] = 0x00;
@@ -2343,7 +2343,7 @@ void hx83112a_nf_read_OPLUS_FW_ver(struct chip_data_hx83112a_nf *chip_info)
     cmd[0] = 0x00;
     hx83112a_nf_register_read(cmd, 4, data, false);
     chip_info->fw_ver = data[2] << 8 | data[3];
-    TPD_INFO("%s :fw_Ver = 0x%04X \n", __func__, chip_info->fw_ver);
+    TPD_DEBUG("%s :fw_Ver = 0x%04X \n", __func__, chip_info->fw_ver);
     return;
 }
 
@@ -2465,8 +2465,8 @@ int hx83112a_nf_report_data_init(int max_touch_point, int tx_num, int rx_num)
     } else {
         hx83112a_nf_touch_data->rawdata_frame_size = (tx_num * rx_num + tx_num + rx_num) / hx83112a_nf_touch_data->rawdata_size + 1;
     }
-    TPD_INFO("%s: rawdata_frame_size = %d ", __func__, hx83112a_nf_touch_data->rawdata_frame_size);
-    TPD_INFO("%s: max_touch_point:%d, hx_raw_cnt_max:%d, hx_raw_cnt_rmd:%d, g_hx_rawdata_size:%d, hx83112a_nf_touch_data->touch_info_size:%d\n",
+    TPD_DEBUG("%s: rawdata_frame_size = %d ", __func__, hx83112a_nf_touch_data->rawdata_frame_size);
+    TPD_DEBUG("%s: max_touch_point:%d, hx_raw_cnt_max:%d, hx_raw_cnt_rmd:%d, g_hx_rawdata_size:%d, hx83112a_nf_touch_data->touch_info_size:%d\n",
              __func__, max_touch_point, hx83112a_nf_touch_data->raw_cnt_max, hx83112a_nf_touch_data->raw_cnt_rmd, hx83112a_nf_touch_data->rawdata_size, hx83112a_nf_touch_data->touch_info_size);
 
     hx83112a_nf_touch_data->hx_coord_buf = kzalloc(sizeof(uint8_t) * (hx83112a_nf_touch_data->touch_info_size), GFP_KERNEL);
@@ -2504,7 +2504,7 @@ mem_alloc_fail:
     kfree(hx83112a_nf_touch_data->hx_event_buf);
     //#endif
 
-    TPD_INFO("%s: Memory allocate fail!\n", __func__);
+    TPD_DEBUG("%s: Memory allocate fail!\n", __func__);
     return MEM_ALLOC_FAIL;
 
 }
@@ -2516,7 +2516,7 @@ bool hx83112a_nf_read_event_stack(uint8_t *buf, uint8_t length)
     //  AHB_I2C Burst Read Off
     cmd[0] = 0x00;
     if (hx83112a_nf_bus_write(0x11, 1, cmd) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return 0;
     }
 
@@ -2525,7 +2525,7 @@ bool hx83112a_nf_read_event_stack(uint8_t *buf, uint8_t length)
     //  AHB_I2C Burst Read On
     cmd[0] = 0x01;
     if (hx83112a_nf_bus_write(0x11, 1, cmd) < 0) {
-        TPD_INFO("%s: i2c access fail!\n", __func__);
+        TPD_DEBUG("%s: i2c access fail!\n", __func__);
         return 0;
     }
     return 1;
@@ -2539,10 +2539,10 @@ int hx83112a_nf_ic_esd_recovery(int hx_esd_event, int hx_zero_event, int length)
         goto checksum_fail;
     } else if (hx_zero_event == length) {
         hx83112a_nf_zero_event_count++;
-        TPD_INFO("[HIMAX TP MSG]: ALL Zero event is %d times.\n", hx83112a_nf_zero_event_count);
+        TPD_DEBUG("[HIMAX TP MSG]: ALL Zero event is %d times.\n", hx83112a_nf_zero_event_count);
         if (hx83112a_nf_zero_event_count > 5) {
             hx83112a_nf_zero_event_count = 0;
-            TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL Zero.\n");
+            TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL Zero.\n");
             goto checksum_fail;
         }
         goto err_workqueue_out;
@@ -2561,7 +2561,7 @@ static int hx83112a_nf_resetgpio_set(struct hw_resource *hw_res, bool on)
         TPD_DETAIL("Set the reset_gpio on=%d \n", on);
         ret = gpio_direction_output(hw_res->reset_gpio, on);
         if (ret) {
-            TPD_INFO("Set the reset_gpio on=%d fail\n", on);
+            TPD_DEBUG("Set the reset_gpio on=%d fail\n", on);
         } else {
             HX83112A_NF_RESET_STATE = on;
         }
@@ -2597,7 +2597,7 @@ void hx83112a_nf_esd_hw_reset(struct chip_data_hx83112a_nf *chip_info)
     } while (!ret && load_fw_times > 0);
 
     if (!load_fw_times) {
-        TPD_INFO("%s: load_fw_times over 10 times\n", __func__);
+        TPD_DEBUG("%s: load_fw_times over 10 times\n", __func__);
     }
 
     hx83112a_nf_sense_on(0x00);
@@ -2632,9 +2632,9 @@ int hx83112a_nf_checksum_cal(struct chip_data_hx83112a_nf *chip_info, uint8_t *b
     else if (ts_status == HX_REPORT_SMWP_EVENT) {
         length = (GEST_PTLG_ID_LEN + GEST_PTLG_HDR_LEN);
     } else {
-        TPD_INFO("%s, Neither Normal Nor SMWP error!\n", __func__);
+        TPD_DEBUG("%s, Neither Normal Nor SMWP error!\n", __func__);
     }
-    //TPD_INFO("Now status=%d,length=%d\n",ts_status,length);
+    //TPD_DEBUG("Now status=%d,length=%d\n",ts_status,length);
     for (loop_i = 0; loop_i < length; loop_i++) {
         check_sum_cal += buf[loop_i];
         /* #ifdef HX_ESD_RECOVERY  */
@@ -2659,15 +2659,15 @@ int hx83112a_nf_checksum_cal(struct chip_data_hx83112a_nf *chip_info, uint8_t *b
             if (hx_EB_event == length) {
                 hx_esd_event = length;
                 hx83112a_nf_EB_event_flag++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xEB.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xEB.\n");
             } else if (hx_EC_event == length) {
                 hx_esd_event = length;
                 hx83112a_nf_EC_event_flag++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xEC.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xEC.\n");
             } else if (hx_ED_event == length) {
                 hx_esd_event = length;
                 hx83112a_nf_ED_event_flag++;
-                TPD_INFO("[HIMAX TP MSG]: ESD event checked - ALL 0xED.\n");
+                TPD_DEBUG("[HIMAX TP MSG]: ESD event checked - ALL 0xED.\n");
             } else {
                 hx_esd_event = 0;
             }
@@ -2685,29 +2685,29 @@ int hx83112a_nf_checksum_cal(struct chip_data_hx83112a_nf *chip_info, uint8_t *b
             } else if (shaking_ret == ERR_WORK_OUT) {
                 goto err_workqueue_out;
             } else {
-                //TPD_INFO("I2C running. Nothing to be done!\n");
+                //TPD_DEBUG("I2C running. Nothing to be done!\n");
                 goto workqueue_out;
             }
         } else if (HX83112A_NF_ESD_RESET_ACTIVATE) {
             /* drop 1st interrupts after chip reset */
             HX83112A_NF_ESD_RESET_ACTIVATE = 0;
-            TPD_INFO("[HX83112A_NF_ESD_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
+            TPD_DEBUG("[HX83112A_NF_ESD_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
             goto checksum_fail;
         } else if (HX83112A_NF_HW_RESET_ACTIVATE) {
             /* drop 1st interrupts after chip reset */
             HX83112A_NF_HW_RESET_ACTIVATE = 0;
-            TPD_INFO("[HX83112A_NF_HW_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
+            TPD_DEBUG("[HX83112A_NF_HW_RESET_ACTIVATE]:%s: Back from reset, ready to serve.\n", __func__);
             goto ready_to_serve;
         }
     }
     //#endif
     if ((check_sum_cal % 0x100 != 0) ) {
-        TPD_INFO("[HIMAX TP MSG] checksum fail : check_sum_cal: 0x%02X\n", check_sum_cal);
+        TPD_DEBUG("[HIMAX TP MSG] checksum fail : check_sum_cal: 0x%02X\n", check_sum_cal);
         //goto checksum_fail;
         goto workqueue_out;
     }
 
-    /* TPD_INFO("%s:End\n",__func__); */
+    /* TPD_DEBUG("%s:End\n",__func__); */
     return NO_ERR;
 
 ready_to_serve:
@@ -2751,9 +2751,9 @@ void hx83112a_nf_idle_mode(int disable)
     uint8_t tmp_data[4];
     uint8_t switch_cmd = 0x00;
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
     do {
-        TPD_INFO("%s,now %d times\n!", __func__, retry);
+        TPD_DEBUG("%s,now %d times\n!", __func__, retry);
 
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
@@ -2770,13 +2770,13 @@ void hx83112a_nf_idle_mode(int disable)
         hx83112a_nf_flash_write_burst(tmp_addr, tmp_data);
 
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s:After turn ON/OFF IDLE Mode [0] = 0x%02X, [1] = 0x%02X, [2] = 0x%02X, [3] = 0x%02X\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s:After turn ON/OFF IDLE Mode [0] = 0x%02X, [1] = 0x%02X, [2] = 0x%02X, [3] = 0x%02X\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         retry--;
         msleep(10);
     } while ((tmp_data[0] != switch_cmd) && retry > 0);
 
-    TPD_INFO("%s: setting OK!\n", __func__);
+    TPD_DEBUG("%s: setting OK!\n", __func__);
 }
 
 
@@ -2785,7 +2785,7 @@ void hx83112a_nf_reload_disable(int on)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
 
     if (on) {/*reload disable*/
         tmp_addr[3] = 0x10;
@@ -2809,7 +2809,7 @@ void hx83112a_nf_reload_disable(int on)
 
     hx83112a_nf_flash_write_burst(tmp_addr, tmp_data);
 
-    TPD_INFO("%s: setting OK!\n", __func__);
+    TPD_DEBUG("%s: setting OK!\n", __func__);
 }
 
 int hx83112a_nf_test_data_pop_out(struct chip_data_hx83112a_nf *chip_info, char *g_Test_list_log, char *g_Company_info_log, char *g_project_test_info_log, char *rslt_buf, char *filepath)
@@ -2824,8 +2824,8 @@ int hx83112a_nf_test_data_pop_out(struct chip_data_hx83112a_nf *chip_info, char 
     loff_t pos = 0;
     int ret_val = NO_ERR;
 
-    TPD_INFO("%s: Entering!\n", __func__);
-    TPD_INFO("data size = 0x%04X\n", (uint32_t)strlen(rslt_buf));
+    TPD_DEBUG("%s: Entering!\n", __func__);
+    TPD_DEBUG("data size = 0x%04X\n", (uint32_t)strlen(rslt_buf));
 
     /*Company Info*/
     snprintf(g_Company_info_log, 160, "%s%s%s%s", line, Company, Info, line);
@@ -2843,7 +2843,7 @@ int hx83112a_nf_test_data_pop_out(struct chip_data_hx83112a_nf *chip_info, char 
         raw_file = file_open_name(vts_name, O_TRUNC | O_CREAT | O_RDWR, 0660);
 
     if (IS_ERR(raw_file)) {
-        TPD_INFO("%s open file failed = %ld\n", __func__, PTR_ERR(raw_file));
+        TPD_DEBUG("%s open file failed = %ld\n", __func__, PTR_ERR(raw_file));
         ret_val = -EIO;
         goto SAVE_DATA_ERR;
     }
@@ -2866,7 +2866,7 @@ int hx83112a_nf_test_data_pop_out(struct chip_data_hx83112a_nf *chip_info, char 
     set_fs(fs);
 
 SAVE_DATA_ERR:
-    TPD_INFO("%s: End!\n", __func__);
+    TPD_DEBUG("%s: End!\n", __func__);
     return ret_val;
 }
 
@@ -2879,12 +2879,12 @@ int hx83112a_nf_test_data_get(struct chip_data_hx83112a_nf *chip_info, uint32_t 
     char *testdata = NULL;
     uint32_t SZ_SIZE = hx83112a_nf_1kind_raw_size;
 
-    TPD_INFO("%s: Entering, Now type=%s!\n", __func__,
+    TPD_DEBUG("%s: Entering, Now type=%s!\n", __func__,
              hx83112a_nf_inspection_mode[now_item]);
 
     testdata = kzalloc(sizeof(char) * SZ_SIZE, GFP_KERNEL);
     if (!testdata) {
-        TPD_INFO("%s:%d testdata kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d testdata kzalloc buf error\n", __func__, __LINE__);
         return -ENOMEM;
     }
     len += snprintf((testdata + len), SZ_SIZE - len, "%s", start_log);
@@ -2899,10 +2899,10 @@ int hx83112a_nf_test_data_get(struct chip_data_hx83112a_nf *chip_info, uint32_t 
 
     memcpy(&hx83112a_nf_rslt_data[hx83112a_nf_rslt_data_len], testdata, len);
     hx83112a_nf_rslt_data_len += len;
-    TPD_INFO("%s: hx83112a_nf_rslt_data_len=%d!\n", __func__, hx83112a_nf_rslt_data_len);
+    TPD_DEBUG("%s: hx83112a_nf_rslt_data_len=%d!\n", __func__, hx83112a_nf_rslt_data_len);
 
     kfree(testdata);
-    TPD_INFO("%s: End!\n", __func__);
+    TPD_DEBUG("%s: End!\n", __func__);
     return NO_ERR;
 
 }
@@ -2999,7 +2999,7 @@ int hx83112a_nf_get_rawdata(struct chip_data_hx83112a_nf *chip_info, uint32_t *R
                 hx83112a_nf_register_read(tmp_addr, max_i2c_size, &tmp_rawdata[i * max_i2c_size], false);
                 total_size_temp = total_size_temp - max_i2c_size;
             } else {
-                //TPD_INFO("last total_size_temp=%d\n",total_size_temp);
+                //TPD_DEBUG("last total_size_temp=%d\n",total_size_temp);
                 hx83112a_nf_register_read(tmp_addr, total_size_temp % max_i2c_size, &tmp_rawdata[i * max_i2c_size], false);
             }
 
@@ -3021,7 +3021,7 @@ int hx83112a_nf_get_rawdata(struct chip_data_hx83112a_nf *chip_info, uint32_t *R
         retry++;
     }
     if (retry >= 10) {
-        TPD_INFO("Retry over 10 times: do recovery\n");
+        TPD_DEBUG("Retry over 10 times: do recovery\n");
         hx83112a_nf_esd_hw_reset(chip_info);
         return RESULT_RETRY;
     }
@@ -3065,7 +3065,7 @@ int hx83112a_nf_get_rawdata(struct chip_data_hx83112a_nf *chip_info, uint32_t *R
         printk("\n");
     }
 
-    TPD_INFO("Max = %5d, Min = %5d \n", Max_DATA, Min_DATA);
+    TPD_DEBUG("Max = %5d, Min = %5d \n", Max_DATA, Min_DATA);
 #endif
 
     kfree(tmp_rawdata);
@@ -3109,7 +3109,7 @@ void hx83112a_nf_switch_data_type(uint8_t checktype)
         datatype = DATA_LPWUG_IDLE_NOISE;
         break;
     default:
-        TPD_INFO("Wrong type=%d\n", checktype);
+        TPD_DEBUG("Wrong type=%d\n", checktype);
         break;
     }
     hx83112a_nf_diag_register_set(datatype);
@@ -3119,7 +3119,7 @@ int hx83112a_nf_switch_mode(int mode)
 {
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
-    TPD_INFO("%s: Entering\n", __func__);
+    TPD_DEBUG("%s: Entering\n", __func__);
 
     //Stop Handshaking
     tmp_addr[3] = 0x10;
@@ -3191,7 +3191,7 @@ int hx83112a_nf_switch_mode(int mode)
     }
     hx83112a_nf_flash_write_burst_length(tmp_addr, tmp_data, 4);
 
-    TPD_INFO("%s: End of setting!\n", __func__);
+    TPD_DEBUG("%s: End of setting!\n", __func__);
 
     return 0;
 
@@ -3283,7 +3283,7 @@ uint32_t hx83112a_nf_check_mode(uint8_t checktype)
         wait_pwd[1] = PWD_LPWUG_IDLE_END;
         break;
     default:
-        TPD_INFO("Wrong type=%d\n", checktype);
+        TPD_DEBUG("Wrong type=%d\n", checktype);
         break;
     }
 
@@ -3292,10 +3292,10 @@ uint32_t hx83112a_nf_check_mode(uint8_t checktype)
     tmp_addr[1] = 0x7F;
     tmp_addr[0] = 0x04;
     hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-    TPD_INFO("%s: hx83112a_nf_wait_sorting_mode, tmp_data[0]=%x, tmp_data[1]=%x\n", __func__, tmp_data[0], tmp_data[1]);
+    TPD_DEBUG("%s: hx83112a_nf_wait_sorting_mode, tmp_data[0]=%x, tmp_data[1]=%x\n", __func__, tmp_data[0], tmp_data[1]);
 
     if (wait_pwd[0] == tmp_data[0] && wait_pwd[1] == tmp_data[1]) {
-        TPD_INFO("Change to mode=%s\n", hx83112a_nf_inspection_mode[checktype]);
+        TPD_DEBUG("Change to mode=%s\n", hx83112a_nf_inspection_mode[checktype]);
         return 0;
     } else
         return 1;
@@ -3333,13 +3333,13 @@ void hx83112a_nf_get_noise_base(void)
     hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
     threshold = tmp_data[0];
 
-    /*TPD_INFO("tmp_data[0]=0x%x tmp_data[1]=0x%x tmp_data[2]=0x%x tmp_data[3]=0x%x\n",
+    /*TPD_DEBUG("tmp_data[0]=0x%x tmp_data[1]=0x%x tmp_data[2]=0x%x tmp_data[3]=0x%x\n",
               tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
     */
     /*NOISEMAX = tmp_data[3]*(NOISE_P/256);*/
     NOISEMAX = ratio * threshold;
     LPWUG_NOISEMAX = ratio * threshold_LPWUG;
-    TPD_INFO("NOISEMAX=%d LPWUG_NOISE_MAX=%d \n", NOISEMAX, LPWUG_NOISEMAX);
+    TPD_DEBUG("NOISEMAX=%d LPWUG_NOISE_MAX=%d \n", NOISEMAX, LPWUG_NOISEMAX);
 }
 
 uint16_t hx83112a_nf_get_noise_weight(void)
@@ -3354,7 +3354,7 @@ uint16_t hx83112a_nf_get_noise_weight(void)
     tmp_addr[0] = 0xC8;
     hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
     weight = (tmp_data[1] << 8) | tmp_data[0];
-    TPD_INFO("%s: weight = %d ", __func__, weight);
+    TPD_DEBUG("%s: weight = %d ", __func__, weight);
 
     return weight;
 }
@@ -3401,7 +3401,7 @@ uint32_t hx83112a_nf_wait_sorting_mode(uint8_t checktype)
         wait_pwd[1] = PWD_LPWUG_IDLE_END;
         break;
     default:
-        TPD_INFO("Wrong type=%d\n", checktype);
+        TPD_DEBUG("Wrong type=%d\n", checktype);
         break;
     }
 
@@ -3411,7 +3411,7 @@ uint32_t hx83112a_nf_wait_sorting_mode(uint8_t checktype)
         tmp_addr[1] = 0x7F;
         tmp_addr[0] = 0x04;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: hx83112a_nf_wait_sorting_mode, tmp_data[0]=%x, tmp_data[1]=%x\n", __func__, tmp_data[0], tmp_data[1]);
+        TPD_DEBUG("%s: hx83112a_nf_wait_sorting_mode, tmp_data[0]=%x, tmp_data[1]=%x\n", __func__, tmp_data[0], tmp_data[1]);
 
         if (wait_pwd[0] == tmp_data[0] && wait_pwd[1] == tmp_data[1]) {
             return 0;
@@ -3421,22 +3421,22 @@ uint32_t hx83112a_nf_wait_sorting_mode(uint8_t checktype)
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xA8;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000A8, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 0x900000A8, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x90;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xE4;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000E4, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 0x900000E4, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x90;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xF8;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 0x900000F8, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
-        TPD_INFO("Now retry %d times!\n", count++);
+        TPD_DEBUG("%s: 0x900000F8, tmp_data[0]=%x, tmp_data[1]=%x, tmp_data[2]=%x, tmp_data[3]=%x \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("Now retry %d times!\n", count++);
         msleep(50);
     } while (count < 50);
 
@@ -3481,7 +3481,7 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
     }
 
     if (hx83112a_nf_check_mode(checktype)) {
-        TPD_INFO("Need Change Mode, target=%s", hx83112a_nf_inspection_mode[checktype]);
+        TPD_DEBUG("Need Change Mode, target=%s", hx83112a_nf_inspection_mode[checktype]);
 
         hx83112a_nf_sense_off_mptest();
 
@@ -3495,7 +3495,7 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             hx83112a_nf_set_N_frame(NOISEFRAME, checktype);
             /*hx83112a_nf_get_noise_base();*/
         } else if(checktype >= HIMAX_INSPECTION_LPWUG_RAWDATA) {
-            TPD_INFO("N frame = %d\n", 1);
+            TPD_DEBUG("N frame = %d\n", 1);
             hx83112a_nf_set_N_frame(1, checktype);
         } else {
             hx83112a_nf_set_N_frame(2, checktype);
@@ -3506,7 +3506,7 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
 
         ret = hx83112a_nf_wait_sorting_mode(checktype);
         if (ret) {
-            TPD_INFO("%s: hx83112a_nf_wait_sorting_mode FAIL\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf_wait_sorting_mode FAIL\n", __func__);
             return ret;
         }
     }
@@ -3515,42 +3515,42 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
 
     ret = hx83112a_nf_get_rawdata(chip_info, RAW, datalen);
     if (ret) {
-        TPD_INFO("%s: hx83112a_nf_get_rawdata FAIL\n", __func__);
+        TPD_DEBUG("%s: hx83112a_nf_get_rawdata FAIL\n", __func__);
 
         tmp_addr[3] = 0x90;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0xA8;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 900000A8: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 900000A8: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x7F;
         tmp_addr[0] = 0x40;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 10007F40: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 10007F40: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
         tmp_addr[0] = 0x00;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 10000000: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 10000000: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x7F;
         tmp_addr[0] = 0x04;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 10007F04: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 10007F04: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         tmp_addr[3] = 0x80;
         tmp_addr[2] = 0x02;
         tmp_addr[1] = 0x04;
         tmp_addr[0] = 0xB4;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: 800204B4: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s: 800204B4: data[0]=%0x02X, data[1]=%0x02X, data[2]=%0x02X, data[3]=%0x02X, \n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
 
         //900000A8,10007F40,10000000,10007F04,800204B4
         return ret;
@@ -3561,12 +3561,12 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
 
     rslt_log = kzalloc(256 * sizeof(char), GFP_KERNEL);
     if (!rslt_log) {
-        TPD_INFO("%s:%d rslt_log kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d rslt_log kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
     start_log = kzalloc(256 * sizeof(char), GFP_KERNEL);
     if (!start_log) {
-        TPD_INFO("%s:%d  start_log kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d  start_log kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
 
@@ -3581,18 +3581,18 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > OPENMAX || RAW[i] < OPENMIN) {
-                    TPD_INFO("%s: open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: open test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_OPENMAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_OPENMIN][i]) {
-                    TPD_INFO("%s: open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: open test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             }
         }
-        TPD_INFO("%s: open test PASS\n", __func__);
+        TPD_DEBUG("%s: open test PASS\n", __func__);
         break;
 
     case HIMAX_INSPECTION_MICRO_OPEN:
@@ -3602,21 +3602,21 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > M_OPENMAX || RAW[i] < M_OPENMIN) {
-                    TPD_INFO("%s: micro open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: micro open test FAIL\n", __func__);
                     ret =  RESULT_ERR;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_M_OPENMAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_M_OPENMIN][i]) {
-                    TPD_INFO("%s: micro open test FAIL\n", __func__);
+                    TPD_DEBUG("%s: micro open test FAIL\n", __func__);
                     ret =  RESULT_ERR;
                 }
             }
         }
-        TPD_INFO("M_OPENMAX = %d, M_OPENMIN = %d\n",
+        TPD_DEBUG("M_OPENMAX = %d, M_OPENMIN = %d\n",
                  hx83112a_nf_inspection_criteria[IDX_M_OPENMAX][1],
                  hx83112a_nf_inspection_criteria[IDX_M_OPENMIN][1]);
-        TPD_INFO("%s: micro open test PASS\n", __func__);
+        TPD_DEBUG("%s: micro open test PASS\n", __func__);
         break;
 
     case HIMAX_INSPECTION_SHORT:
@@ -3626,18 +3626,18 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > SHORTMAX || RAW[i] < SHORTMIN) {
-                    TPD_INFO("%s: short test FAIL\n", __func__);
+                    TPD_DEBUG("%s: short test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_SHORTMAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_SHORTMIN][i]) {
-                    TPD_INFO("%s: short test FAIL\n", __func__);
+                    TPD_DEBUG("%s: short test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             }
         }
-        TPD_INFO("%s: short test PASS\n", __func__);
+        TPD_DEBUG("%s: short test PASS\n", __func__);
         break;
 
     case HIMAX_INSPECTION_RAWDATA:
@@ -3647,18 +3647,18 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > CRITERIA_RAWDATA_MAX || RAW[i] < CRITERIA_RAWDATA_MIN) {
-                    TPD_INFO("%s: rawdata test FAIL\n", __func__);
+                    TPD_DEBUG("%s: rawdata test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_RAWDATA_MAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_RAWDATA_MIN][i]) {
-                    TPD_INFO("%s: rawdata test FAIL\n", __func__);
+                    TPD_DEBUG("%s: rawdata test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             }
         }
-        TPD_INFO("%s: rawdata test PASS\n", __func__);
+        TPD_DEBUG("%s: rawdata test PASS\n", __func__);
         break;
 
     case HIMAX_INSPECTION_NOISE:
@@ -3667,7 +3667,7 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
                 continue;
             }
             if (RAW[i] > NOISEMAX) {
-                TPD_INFO("%s: noise test FAIL\n", __func__);
+                TPD_DEBUG("%s: noise test FAIL\n", __func__);
                 return RESULT_ERR;
             }
         }*/
@@ -3678,7 +3678,7 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
                     continue;
                 }
                 if (RAW[i] > NOISEMAX) {
-                    TPD_INFO("%s: noise test FAIL\n", __func__);
+                    TPD_DEBUG("%s: noise test FAIL\n", __func__);
                     ret = RESULT_ERR;
                 }
             }
@@ -3686,19 +3686,19 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             snprintf(start_log, 256 * sizeof(char), "\n Threshold = %d\n", NOISEMAX);
             weight = hx83112a_nf_get_noise_weight();
             if (weight > NOISEMAX) {
-                TPD_INFO("%s: noise test FAIL\n", __func__);
+                TPD_DEBUG("%s: noise test FAIL\n", __func__);
                 ret = RESULT_ERR;
             }
         }
-        TPD_INFO("%s: noise test PASS\n", __func__);
+        TPD_DEBUG("%s: noise test PASS\n", __func__);
 
 #ifdef RAWDATA_NOISE
-        TPD_INFO("[MP_RAW_TEST_RAW]\n");
+        TPD_DEBUG("[MP_RAW_TEST_RAW]\n");
 
         hx83112a_nf_switch_data_type(HIMAX_INSPECTION_RAWDATA);
         ret = hx83112a_nf_get_rawdata(chip_info, RAW, datalen);
         if (ret == RESULT_ERR) {
-            TPD_INFO("%s: hx83112a_nf_get_rawdata FAIL\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf_get_rawdata FAIL\n", __func__);
             ret = RESULT_ERR;
         }
 #endif
@@ -3711,18 +3711,18 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > CRITERIA_LPWUG_RAWDATA_MAX || RAW[i] < LPWUG_RAWDATA_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ERAW;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_LPWUG_RAWDATA_MAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_LPWUG_RAWDATA_MIN][i]) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_RAWDATA FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ERAW;
                 }
             }
         }
-        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_RAWDATA PASS\n", __func__);
+        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_RAWDATA PASS\n", __func__);
         break;
     case HIMAX_INSPECTION_LPWUG_NOISE:
         if(hx83112a_nf_isBD12proj || hx83112a_nf_isEA006proj) {
@@ -3732,13 +3732,13 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
                 }
                 if(hx83112a_nf_isRead_csv == false) {
                     if (RAW[i] > LPWUG_NOISE_MAX || RAW[i] < LPWUG_NOISE_MIN) {
-                        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
+                        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
                         ret = THP_AFE_INSPECT_ENOISE;
                     }
                 } else {
                     if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_LPWUG_NOISE_MAX][i] ||
                         RAW[i] < hx83112a_nf_inspection_criteria[IDX_LPWUG_NOISE_MIN][i]) {
-                        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
+                        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
                         ret = THP_AFE_INSPECT_ENOISE;
                     }
                 }
@@ -3748,17 +3748,17 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             weight = hx83112a_nf_get_noise_weight();
             if(hx83112a_nf_isRead_csv == false) {
                 if (weight > LPWUG_NOISEMAX || weight < LPWUG_NOISE_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ENOISE;
                 }
             } else {
                 if (weight > LPWUG_NOISEMAX || weight < hx83112a_nf_inspection_criteria[IDX_LPWUG_NOISE_MIN][i]) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ENOISE;
                 }
             }
         }
-        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_NOISE PASS\n", __func__);
+        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_NOISE PASS\n", __func__);
         break;
 
     case HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA:
@@ -3768,18 +3768,18 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > CRITERIA_LPWUG_IDLE_RAWDATA_MAX || RAW[i] < LPWUG_IDLE_RAWDATA_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ERAW;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_LPWUG_IDLE_RAWDATA_MAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_LPWUG_IDLE_RAWDATA_MIN][i]) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ERAW;
                 }
             }
         }
-        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA PASS\n", __func__);
+        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA PASS\n", __func__);
         break;
     case HIMAX_INSPECTION_LPWUG_IDLE_NOISE:
         for (i = 0; i < (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM); i++) {
@@ -3788,22 +3788,22 @@ int hx83112a_nf_mpTestFunc(struct chip_data_hx83112a_nf *chip_info, uint8_t chec
             }
             if(hx83112a_nf_isRead_csv == false) {
                 if (RAW[i] > LPWUG_IDLE_NOISE_MAX || RAW[i] < LPWUG_IDLE_NOISE_MIN) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ENOISE;
                 }
             } else {
                 if (RAW[i] > hx83112a_nf_inspection_criteria[IDX_LPWUG_IDLE_NOISE_MAX][i] ||
                     RAW[i] < hx83112a_nf_inspection_criteria[IDX_LPWUG_IDLE_NOISE_MIN][i]) {
-                    TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
+                    TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE FAIL\n", __func__);
                     ret = THP_AFE_INSPECT_ENOISE;
                 }
             }
         }
-        TPD_INFO("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE PASS\n", __func__);
+        TPD_DEBUG("%s: HIMAX_INSPECTION_LPWUG_IDLE_NOISE PASS\n", __func__);
         break;
 
     default:
-        TPD_INFO("Wrong type=%d\n", checktype);
+        TPD_DEBUG("Wrong type=%d\n", checktype);
         break;
     }
 
@@ -3885,7 +3885,7 @@ static int hx83112a_nf_diff_str(char *str1, char *str2)
     for (i = 0; i < str1_len; i++) {
         if (str1[i] != str2[i]) {
             result = i + 1;
-            TPD_INFO("%s: different in %d!\n", __func__, result);
+            TPD_DEBUG("%s: different in %d!\n", __func__, result);
             return result;
         }
     }
@@ -3902,13 +3902,13 @@ int hx83112a_nf_find_crtra_id(char *input)
     for (i = 0 ; i < HX83112A_NF_CRITERIA_SIZE ; i++) {
         if (hx83112a_nf_diff_str(hx83112a_nf_inspt_crtra_name[i], input) == 0) {
             result = i;
-            TPD_INFO("find the str=%s, idx=%d\n",
+            TPD_DEBUG("find the str=%s, idx=%d\n",
                      hx83112a_nf_inspt_crtra_name[i], i);
             break;
         }
     }
     if (i > (HX83112A_NF_CRITERIA_SIZE - 1)) {
-        TPD_INFO("%s: find Fail!\n", __func__);
+        TPD_DEBUG("%s: find Fail!\n", __func__);
         return LENGTH_FAIL;
     }
 
@@ -3940,7 +3940,7 @@ static int hiamx_parse_str2int(char *str)
 
     for (i = 0; i < strlen(str); i++) {
         if (str[i] != '-' && str[i] > '9' && str[i] < '0') {
-            TPD_INFO("%s: Parsing fail!\n", __func__);
+            TPD_DEBUG("%s: Parsing fail!\n", __func__);
             result = -9487;
             negtive_flag = 0;
             break;
@@ -4016,16 +4016,16 @@ static int hx_get_crtra_by_name(struct chip_data_hx83112a_nf *chip_info, char **
             */
             count_type = hx83112a_nf_find_crtra_id(result[i]);
             if (count_type < 0) {
-                TPD_INFO("1. %s:Name Not match!\n", __func__);
+                TPD_DEBUG("1. %s:Name Not match!\n", __func__);
                 /* E("can recognize[%d]=%s\n", count_type,
                  * hx83112a_nf_inspt_crtra_name[count_type]);
                  */
-                TPD_INFO("get from file[%d]=%s\n", i, result[i]);
-                TPD_INFO("Please check criteria file again!\n");
+                TPD_DEBUG("get from file[%d]=%s\n", i, result[i]);
+                TPD_DEBUG("Please check criteria file again!\n");
                 err = THP_AFE_INSPECT_EFILE;
                 goto END_FUNCTION;
             } else {
-                TPD_INFO("Now str=%s, idx=%d\n",
+                TPD_DEBUG("Now str=%s, idx=%d\n",
                          hx83112a_nf_inspt_crtra_name[count_type], count_type);
                 hx83112a_nf_inspt_crtra_flag[count_type] = 1;
             }
@@ -4036,10 +4036,10 @@ static int hx_get_crtra_by_name(struct chip_data_hx83112a_nf *chip_info, char **
         if (temp != -9487) {
             hx83112a_nf_inspection_criteria[count_type][count_data] = temp;
         } else {
-            TPD_INFO("%s: Parsing Fail in %d\n", __func__, i);
-            TPD_INFO("in range:[%d]=%s\n", count_type,
+            TPD_DEBUG("%s: Parsing Fail in %d\n", __func__, i);
+            TPD_DEBUG("in range:[%d]=%s\n", count_type,
                      hx83112a_nf_inspt_crtra_name[count_type]);
-            TPD_INFO("btw, get from file[%d]=%s\n", i, result[i]);
+            TPD_DEBUG("btw, get from file[%d]=%s\n", i, result[i]);
             break;
         }
         /* dbg
@@ -4054,7 +4054,7 @@ static int hx_get_crtra_by_name(struct chip_data_hx83112a_nf *chip_info, char **
     /* dbg:print all of criteria from parsing file */
     hx83112a_nf_print_crtra_after_parsing(chip_info);
 
-    TPD_INFO("Total loop=%d\n", i);
+    TPD_DEBUG("Total loop=%d\n", i);
 END_FUNCTION:
     return err;
 }
@@ -4075,13 +4075,13 @@ static int hx83112a_nf_parse_criteria_file(struct chip_data_hx83112a_nf *chip_in
     int file_size = 0;
     int size_of_result_str = 0;
 
-    TPD_INFO("%s, Entering\n", __func__);
-    TPD_INFO("file name = %s\n", chip_info->test_limit_name);
+    TPD_DEBUG("%s, Entering\n", __func__);
+    TPD_DEBUG("file name = %s\n", chip_info->test_limit_name);
 
     /* default path is /system/etc/firmware */
     err = request_firmware(&file_entry, chip_info->test_limit_name, hx83112a_nf_pri_ts->dev);
     if (err < 0) {
-        TPD_INFO("%s, fail in line%d error code=%d\n", __func__, __LINE__, err);
+        TPD_DEBUG("%s, fail in line%d error code=%d\n", __func__, __LINE__, err);
         err = THP_AFE_INSPECT_EFILE;
         hx83112a_nf_isRead_csv = false;
         goto END_FUNC_REQ_FAIL;
@@ -4100,18 +4100,18 @@ static int hx83112a_nf_parse_criteria_file(struct chip_data_hx83112a_nf *chip_in
     }
 
     if(result == NULL){
-        TPD_INFO("%s: result is NULL, alloc memory.\n", __func__);
+        TPD_DEBUG("%s: result is NULL, alloc memory.\n", __func__);
         result = kcalloc(data_size, sizeof(char *), GFP_KERNEL);
         if (result != NULL) {
             for (i = 0 ; i < data_size; i++) {
                 result[i] = kcalloc(str_max_len, sizeof(char), GFP_KERNEL);
                 if (result[i] == NULL) {
-                    TPD_INFO("%s: rst_arr Memory allocation falied!\n", __func__);
+                    TPD_DEBUG("%s: rst_arr Memory allocation falied!\n", __func__);
                     goto rst_arr_mem_alloc_failed;
                 }
             }
         } else {
-            TPD_INFO("%s: Memory allocation falied!\n", __func__);
+            TPD_DEBUG("%s: Memory allocation falied!\n", __func__);
             goto rst_mem_alloc_failed;
         }
     } else {
@@ -4122,8 +4122,8 @@ static int hx83112a_nf_parse_criteria_file(struct chip_data_hx83112a_nf *chip_in
 
     result_all_len = data_size;
     file_size = file_entry->size;
-    TPD_INFO("Now result_all_len=%d\n", result_all_len);
-    TPD_INFO("Now file_size=%d\n", file_size);
+    TPD_DEBUG("Now result_all_len=%d\n", result_all_len);
+    TPD_DEBUG("Now file_size=%d\n", file_size);
 
     /* dbg */
     TPD_DEBUG("first 4 bytes 0x%2X, 0x%2X, 0x%2X, 0x%2X !\n",
@@ -4134,11 +4134,11 @@ static int hx83112a_nf_parse_criteria_file(struct chip_data_hx83112a_nf *chip_in
     size_of_result_str =
         hx83112a_nf_saperate_comma(file_entry, result, data_size);
 
-    TPD_INFO("%s: now size_of_result_str=%d\n", __func__, size_of_result_str);
+    TPD_DEBUG("%s: now size_of_result_str=%d\n", __func__, size_of_result_str);
 
     err = hx_get_crtra_by_name(chip_info, result, size_of_result_str);
     if (err != THP_AFE_INSPECT_OK) {
-        TPD_INFO("%s:Load criteria from file fail, go end!\n", __func__);
+        TPD_DEBUG("%s:Load criteria from file fail, go end!\n", __func__);
     }
 
     goto END_FUNC;
@@ -4154,7 +4154,7 @@ rst_mem_alloc_failed:
 END_FUNC:
     release_firmware(file_entry);
 END_FUNC_REQ_FAIL:
-    TPD_INFO("%s, END\n", __func__);
+    TPD_DEBUG("%s, END\n", __func__);
     return err;
     /* parsing Criteria end */
 }
@@ -4185,14 +4185,14 @@ static int hx83112a_nf_self_test_data_init(struct chip_data_hx83112a_nf *chip_in
     /* get test item and its items of criteria*/
     HX83112A_NF_CRITERIA_ITEM = hx83112a_nf_get_size_str_arr(hx83112a_nf_inspection_mode);
     HX83112A_NF_CRITERIA_SIZE = hx83112a_nf_get_size_str_arr(hx83112a_nf_inspt_crtra_name);
-    TPD_INFO("There is %d HX83112A_NF_CRITERIA_ITEM and %d HX83112A_NF_CRITERIA_SIZE\n",
+    TPD_DEBUG("There is %d HX83112A_NF_CRITERIA_ITEM and %d HX83112A_NF_CRITERIA_SIZE\n",
              HX83112A_NF_CRITERIA_ITEM, HX83112A_NF_CRITERIA_SIZE);
 
     /* init criteria data*/
     hx83112a_nf_inspt_crtra_flag = kzalloc(HX83112A_NF_CRITERIA_SIZE * sizeof(int), GFP_KERNEL);
     hx83112a_nf_inspection_criteria = kzalloc(sizeof(int *)*HX83112A_NF_CRITERIA_SIZE, GFP_KERNEL);
     if (hx83112a_nf_inspt_crtra_flag == NULL || hx83112a_nf_inspection_criteria == NULL) {
-        TPD_INFO("%s: %d, Memory allocation falied!\n", __func__, __LINE__);
+        TPD_DEBUG("%s: %d, Memory allocation falied!\n", __func__, __LINE__);
         return MEM_ALLOC_FAIL;
     }
 
@@ -4200,7 +4200,7 @@ static int hx83112a_nf_self_test_data_init(struct chip_data_hx83112a_nf *chip_in
         hx83112a_nf_inspection_criteria[i] = kcalloc(
                 (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM), sizeof(int), GFP_KERNEL);
         if (hx83112a_nf_inspection_criteria[i] == NULL) {
-            TPD_INFO("%s: %d, Memory allocation falied!\n", __func__, __LINE__);
+            TPD_DEBUG("%s: %d, Memory allocation falied!\n", __func__, __LINE__);
             return MEM_ALLOC_FAIL;
         }
     }
@@ -4233,7 +4233,7 @@ static void hx83112a_nf_black_screen_test(void *chip_data, char *message)
     struct chip_data_hx83112a_nf *chip_info = (struct chip_data_hx83112a_nf *)chip_data;
     int i = 0;
 
-    TPD_INFO("%s\n", __func__);
+    TPD_DEBUG("%s\n", __func__);
 
     hx83112a_nf_rslt_data_len = 0;
 
@@ -4249,21 +4249,21 @@ static void hx83112a_nf_black_screen_test(void *chip_data, char *message)
     hx83112a_nf_fail_write_count = 0;
     hx83112a_nf_file_path_OK = kcalloc(256, sizeof(char), GFP_KERNEL);
     if (!hx83112a_nf_file_path_OK) {
-        TPD_INFO("%s:%d hx83112a_nf_file_path_OK kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_file_path_OK kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
     hx83112a_nf_file_path_NG = kcalloc(256, sizeof(char), GFP_KERNEL);
     if (!hx83112a_nf_file_path_NG) {
-        TPD_INFO("%s:%d hx83112a_nf_file_path_NG kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_file_path_NG kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
 
     if (hx83112a_nf_rslt_data == NULL) {
-        TPD_INFO("hx83112a_nf_rslt_data is NULL");
+        TPD_DEBUG("hx83112a_nf_rslt_data is NULL");
         hx83112a_nf_rslt_data = kcalloc(hx83112a_nf_1kind_raw_size * HX83112A_NF_CRITERIA_ITEM,
                               sizeof(char), GFP_KERNEL);
         if (!hx83112a_nf_rslt_data) {
-            TPD_INFO("%s:%d hx83112a_nf_rslt_data kzalloc buf error\n", __func__, __LINE__);
+            TPD_DEBUG("%s:%d hx83112a_nf_rslt_data kzalloc buf error\n", __func__, __LINE__);
             goto RET_OUT;
         }
     } else {
@@ -4273,7 +4273,7 @@ static void hx83112a_nf_black_screen_test(void *chip_data, char *message)
     /*Init Log Data */
 
     //6. LPWUG RAWDATA
-    TPD_INFO("[MP_LPWUG_TEST_RAW]\n");
+    TPD_DEBUG("[MP_LPWUG_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_RAWDATA, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
@@ -4281,49 +4281,49 @@ static void hx83112a_nf_black_screen_test(void *chip_data, char *message)
     snprintf(buf, 128, "6. MP_LPWUG_TEST_RAW: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 15, "test Item:\n");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "6. MP_LPWUG_TEST_RAW: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     if (error != 0)
         error_num++;
 
     //7. LPWUG NOISE
     retry_cnt = 3;
-    TPD_INFO("[MP_LPWUG_TEST_NOISE]\n");
+    TPD_DEBUG("[MP_LPWUG_TEST_NOISE]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_NOISE, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "7. MP_LPWUG_TEST_NOISE: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "7. MP_LPWUG_TEST_NOISE: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     if (error != 0)
         error_num++;
 
     //8. LPWUG IDLE RAWDATA
     retry_cnt = 3;
-    TPD_INFO("[MP_LPWUG_IDLE_TEST_RAW]\n");
+    TPD_DEBUG("[MP_LPWUG_IDLE_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_IDLE_RAWDATA, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "8. MP_LPWUG_IDLE_TEST_RAW: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "8. MP_LPWUG_IDLE_TEST_RAW: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     if (error != 0)
         error_num++;
 
     //9. LPWUG IDLE RAWDATA
     retry_cnt = 3;
-    TPD_INFO("[MP_LPWUG_IDLE_TEST_NOISE]\n");
+    TPD_DEBUG("[MP_LPWUG_IDLE_TEST_NOISE]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_LPWUG_IDLE_NOISE, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "9. MP_LPWUG_IDLE_TEST_NOISE: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "9. MP_LPWUG_IDLE_TEST_NOISE: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     sprintf(message, "%s\n", buf);
     if (error != 0)
         error_num++;
@@ -4354,7 +4354,7 @@ static void hx83112a_nf_black_screen_test(void *chip_data, char *message)
 
 
     sprintf(message, "%d errors. %s", error_num, error_num ? "" : "All test passed.");
-    TPD_INFO("%d errors. %s\n", error_num, error_num ? "" : "All test passed.");
+    TPD_DEBUG("%d errors. %s\n", error_num, error_num ? "" : "All test passed.");
 
 #ifndef HX_ZERO_FLASH
     hx83112a_nf_sense_off();
@@ -4380,9 +4380,9 @@ RET_OUT:
         }
         kfree(hx83112a_nf_inspection_criteria);
         hx83112a_nf_inspection_criteria = NULL;
-        TPD_INFO("Now it have free the hx83112a_nf_inspection_criteria!\n");
+        TPD_DEBUG("Now it have free the hx83112a_nf_inspection_criteria!\n");
     } else {
-        TPD_INFO("No Need to free hx83112a_nf_inspection_criteria!\n");
+        TPD_DEBUG("No Need to free hx83112a_nf_inspection_criteria!\n");
     }
 
     if (hx83112a_nf_inspt_crtra_flag) {
@@ -4427,10 +4427,10 @@ int hx83112a_nf_chip_self_test(struct seq_file *s, struct chip_data_hx83112a_nf 
     uint8_t back_data[4];
     uint8_t retry_cnt = 3;
 
-    TPD_INFO("%s:Entering\n", __func__);
+    TPD_DEBUG("%s:Entering\n", __func__);
 
     //1. Open Test
-    TPD_INFO("[MP_OPEN_TEST_RAW]\n");
+    TPD_DEBUG("[MP_OPEN_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_OPEN, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
@@ -4438,35 +4438,35 @@ int hx83112a_nf_chip_self_test(struct seq_file *s, struct chip_data_hx83112a_nf 
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 15, "test Item:\n");
     snprintf(buf, 128, "1. Open Test: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "1. Open Test: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     if (error != 0)
         error_num++;
 
     //2. Micro-Open Test
     retry_cnt = 3;
-    TPD_INFO("[MP_MICRO_OPEN_TEST_RAW]\n");
+    TPD_DEBUG("[MP_MICRO_OPEN_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_MICRO_OPEN, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "2. Micro Open Test: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "2. Micro Open Test: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     if (error != 0)
         error_num++;
 
     //3. Short Test
     retry_cnt = 3;
-    TPD_INFO("[MP_SHORT_TEST_RAW]\n");
+    TPD_DEBUG("[MP_SHORT_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_SHORT, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "3. Short Test: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "3. Short Test: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     if (error != 0)
         error_num++;
@@ -4474,14 +4474,14 @@ int hx83112a_nf_chip_self_test(struct seq_file *s, struct chip_data_hx83112a_nf 
 #ifndef RAWDATA_NOISE
     //4. RawData Test
     retry_cnt = 3;
-    TPD_INFO("[MP_RAW_TEST_RAW]\n");
+    TPD_DEBUG("[MP_RAW_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_RAWDATA, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "4. Raw data Test: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "4. Raw data Test: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     if (error != 0)
         error_num++;
@@ -4489,14 +4489,14 @@ int hx83112a_nf_chip_self_test(struct seq_file *s, struct chip_data_hx83112a_nf 
 
     //5. Noise Test
     retry_cnt = 3;
-    TPD_INFO("[MP_NOISE_TEST_RAW]\n");
+    TPD_DEBUG("[MP_NOISE_TEST_RAW]\n");
     do {
         error = hx83112a_nf_mpTestFunc(chip_info, HIMAX_INSPECTION_NOISE, (chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) + chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM);
         retry_cnt--;
     } while ((error == RESULT_RETRY) && (retry_cnt > 0));
     snprintf(buf, 128, "5. Noise Test: %s\n", error ? "Error" : "Ok");
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 32, "5. Noise Test: %s\n", error ? "NG" : "Ok");
-    TPD_INFO("%s", buf);
+    TPD_DEBUG("%s", buf);
     seq_printf(s, buf);
     if (error != 0)
         error_num++;
@@ -4519,11 +4519,11 @@ int hx83112a_nf_chip_self_test(struct seq_file *s, struct chip_data_hx83112a_nf 
         back_data[1] = 0XA5;
         back_data[0] = 0X5A;
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: tmp_data[0] = 0x%22X, retry_cnt=%d \n", __func__, tmp_data[0], retry_cnt);
+        TPD_DEBUG("%s: tmp_data[0] = 0x%22X, retry_cnt=%d \n", __func__, tmp_data[0], retry_cnt);
         retry_cnt++;
     } while ((tmp_data[3] != back_data[3] || tmp_data[2] != back_data[2] || tmp_data[1] != back_data[1] || tmp_data[0] != back_data[0]) && retry_cnt < HIMAX_REG_RETRY_TIMES);
 
-    TPD_INFO("%s:End", __func__);
+    TPD_DEBUG("%s:End", __func__);
     hx83112a_nf_sense_off_mptest();
     hx83112a_nf_switch_mode(HIMAX_INSPECTION_LPWUG_RAWDATA);
     hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 22, "Final_result: %s\n", error_num ? "Fail" : "Pass");
@@ -4548,7 +4548,7 @@ void hx83112a_nf_init_psl(void) //power saving level
     tmp_data[0] = 0x00;
     hx83112a_nf_register_write(tmp_addr, 4, tmp_data, false);
 
-    TPD_INFO("%s: power saving level reset OK!\n", __func__);
+    TPD_DEBUG("%s: power saving level reset OK!\n", __func__);
 }
 
 
@@ -4617,7 +4617,7 @@ void hx83112a_nf_chip_erase(void)
     msleep(2000);
 
     if (!hx83112a_nf_wait_wip(100)) {
-        TPD_INFO("%s:83112_Chip_Erase Fail\n", __func__);
+        TPD_DEBUG("%s:83112_Chip_Erase Fail\n", __func__);
     }
 
 }
@@ -4730,7 +4730,7 @@ void hx83112a_nf_flash_programming(uint8_t *FW_content, int FW_Size)
 
 
         if (hx83112a_nf_bus_write(0x00, 20, buring_data) < 0) {
-            TPD_INFO("%s: i2c access fail!\n", __func__);
+            TPD_DEBUG("%s: i2c access fail!\n", __func__);
             return;
         }
         //=================================
@@ -4756,13 +4756,13 @@ void hx83112a_nf_flash_programming(uint8_t *FW_content, int FW_Size)
             }
 
             if (hx83112a_nf_bus_write(0x00, program_length + 4, buring_data) < 0) {
-                TPD_INFO("%s: i2c access fail!\n", __func__);
+                TPD_DEBUG("%s: i2c access fail!\n", __func__);
                 return;
             }
         }
 
         if (!hx83112a_nf_wait_wip(1)) {
-            TPD_INFO("%s:83112_Flash_Programming Fail\n", __func__);
+            TPD_DEBUG("%s:83112_Flash_Programming Fail\n", __func__);
         }
     }
 }
@@ -4778,7 +4778,7 @@ int hx83112a_nf_fts_ctpm_fw_upgrade_with_sys_fs_64k(unsigned char *fw, int len, 
     uint8_t tmp_data[4];
 
     if (len != FW_SIZE_64k) {
-        TPD_INFO("%s: The file size is not 64K bytes\n", __func__);
+        TPD_DEBUG("%s: The file size is not 64K bytes\n", __func__);
         return false;
     }
 
@@ -4873,7 +4873,7 @@ static size_t hx83112a_nf_proc_register_read(struct file *file, char *buf, size_
     if (!HX83112A_NF_HX_PROC_SEND_FLAG) {
         temp_buf = kzalloc(len, GFP_KERNEL);
 
-        TPD_INFO("hx83112a_nf_register_show: %02X, %02X, %02X, %02X\n", hx83112a_nf_register_command[3], hx83112a_nf_register_command[2], hx83112a_nf_register_command[1], hx83112a_nf_register_command[0]);
+        TPD_DEBUG("hx83112a_nf_register_show: %02X, %02X, %02X, %02X\n", hx83112a_nf_register_command[3], hx83112a_nf_register_command[2], hx83112a_nf_register_command[1], hx83112a_nf_register_command[0]);
 
         hx83112a_nf_register_read(hx83112a_nf_register_command, max_bus_size, data, hx83112a_nf_cfg_flag);
 
@@ -4887,7 +4887,7 @@ static size_t hx83112a_nf_proc_register_read(struct file *file, char *buf, size_
         }
         ret += snprintf(temp_buf + ret, len - ret, "\n");
         if (copy_to_user(buf, temp_buf, len)) {
-            TPD_INFO("%s, here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s, here:%d\n", __func__, __LINE__);
         }
         kfree(temp_buf);
         HX83112A_NF_HX_PROC_SEND_FLAG = 1;
@@ -4912,7 +4912,7 @@ static size_t hx83112a_nf_proc_register_write(struct file *file, const char *buf
     //struct touchpanel_data *ts = PDE_DATA(file_inode(file));
 
     if (len >= 80) {
-        TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
         return -EFAULT;
     }
 
@@ -4925,12 +4925,12 @@ static size_t hx83112a_nf_proc_register_write(struct file *file, const char *buf
     memset(w_data, 0x0, sizeof(w_data));
     memset(x_pos, 0x0, sizeof(x_pos));
 
-    TPD_INFO("himax %s \n", buf);
+    TPD_DEBUG("himax %s \n", buf);
 
     if ((buf[0] == 'r' || buf[0] == 'w') && buf[1] == ':' && buf[2] == 'x') {
         length = strlen(buf);
 
-        //TPD_INFO("%s: length = %d.\n", __func__,length);
+        //TPD_DEBUG("%s: length = %d.\n", __func__,length);
         for (loop_i = 0; loop_i < length; loop_i++) {//find postion of 'x'
             if (buf[loop_i] == 'x') {
                 x_pos[count] = loop_i;
@@ -4939,7 +4939,7 @@ static size_t hx83112a_nf_proc_register_write(struct file *file, const char *buf
         }
 
         data_str = strrchr(buf, 'x');
-        TPD_INFO("%s: %s.\n", __func__, data_str);
+        TPD_DEBUG("%s: %s.\n", __func__, data_str);
         length = strlen(data_str + 1) - 1;
 
         if (buf[0] == 'r') {
@@ -4983,14 +4983,14 @@ static size_t hx83112a_nf_proc_register_write(struct file *file, const char *buf
                 hx83112a_nf_byte_length = x_pos[1] - x_pos[0] - 2;
                 for (loop_i = 0; loop_i < count; loop_i++) {//parsing addr after 'x'
                     memcpy(buf_tmp, buf + x_pos[loop_i] + 1, hx83112a_nf_byte_length);
-                    //TPD_INFO("%s: buf_tmp = %s\n", __func__,buf_tmp);
+                    //TPD_DEBUG("%s: buf_tmp = %s\n", __func__,buf_tmp);
                     if (!kstrtoul(buf_tmp, 16, &result)) {
                         if (loop_i == 0) {
                             hx83112a_nf_register_command[loop_i] = (uint8_t)(result);
-                            //TPD_INFO("%s: hx83112a_nf_register_command = %X\n", __func__,hx83112a_nf_register_command[0]);
+                            //TPD_DEBUG("%s: hx83112a_nf_register_command = %X\n", __func__,hx83112a_nf_register_command[0]);
                         } else {
                             w_data[loop_i - 1] = (uint8_t)(result);
-                            //TPD_INFO("%s: w_data[%d] = %2X\n", __func__,loop_i - 1,w_data[loop_i - 1]);
+                            //TPD_DEBUG("%s: w_data[%d] = %2X\n", __func__,loop_i - 1,w_data[loop_i - 1]);
                         }
                     }
                 }
@@ -5012,9 +5012,9 @@ void hx83112a_nf_return_event_stack(void)
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
     do {
-        TPD_INFO("%s, now %d times\n!", __func__, retry);
+        TPD_DEBUG("%s, now %d times\n!", __func__, retry);
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -5031,7 +5031,7 @@ void hx83112a_nf_return_event_stack(void)
 
     } while ((tmp_data[1] != 0x00 && tmp_data[0] != 0x00) && retry > 0);
 
-    TPD_INFO("%s: End of setting!\n", __func__);
+    TPD_DEBUG("%s: End of setting!\n", __func__);
 
 }
 /*IC_BASED_END*/
@@ -5045,15 +5045,15 @@ int hx83112a_nf_write_read_reg(uint8_t *tmp_addr, uint8_t *tmp_data, uint8_t hb,
 
         msleep(20);
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s:Now tmp_data[0] = 0x%02X, [1] = 0x%02X, [2] = 0x%02X, [3] = 0x%02X\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
+        TPD_DEBUG("%s:Now tmp_data[0] = 0x%02X, [1] = 0x%02X, [2] = 0x%02X, [3] = 0x%02X\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
     } while ((tmp_data[1] != hb && tmp_data[0] != lb) && cnt++ < 100);
 
     if (cnt >= 99) {
-        TPD_INFO("hx83112a_nf_write_read_reg ERR Now register 0x%08X : high byte = 0x%02X, low byte = 0x%02X\n", tmp_addr[3], tmp_data[1], tmp_data[0]);
+        TPD_DEBUG("hx83112a_nf_write_read_reg ERR Now register 0x%08X : high byte = 0x%02X, low byte = 0x%02X\n", tmp_addr[3], tmp_data[1], tmp_data[0]);
         return -1;
     }
 
-    TPD_INFO("Now register 0x%08X : high byte = 0x%02X, low byte = 0x%02X\n", tmp_addr[3], tmp_data[1], tmp_data[0]);
+    TPD_DEBUG("Now register 0x%08X : high byte = 0x%02X, low byte = 0x%02X\n", tmp_addr[3], tmp_data[1], tmp_data[0]);
     return NO_ERR;
 }
 
@@ -5079,7 +5079,7 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
 
     /*1. Read number of MKey R100070E8H to determin data size*/
     m_key_num = 0;
-    //TPD_INFO("%s,m_key_num=%d\n",__func__,m_key_num);
+    //TPD_DEBUG("%s,m_key_num=%d\n",__func__,m_key_num);
     total_size += m_key_num * 2;
 
     /* 2. Start DSRAM Rawdata and Wait Data Ready */
@@ -5093,7 +5093,7 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
     tmp_data[0] = 0xA5;
     fw_run_flag = hx83112a_nf_write_read_reg(tmp_addr, tmp_data, 0xA5, 0x5A);
     if (fw_run_flag < 0) {
-        TPD_INFO("%s Data NOT ready => bypass \n", __func__);
+        TPD_DEBUG("%s Data NOT ready => bypass \n", __func__);
         kfree(temp_info_data);
         return;
     }
@@ -5116,7 +5116,7 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
             hx83112a_nf_register_read(tmp_addr, max_i2c_size, &temp_info_data[i * max_i2c_size], false);
             total_size_temp = total_size_temp - max_i2c_size;
         } else {
-            //TPD_INFO("last total_size_temp=%d\n",total_size_temp);
+            //TPD_DEBUG("last total_size_temp=%d\n",total_size_temp);
             hx83112a_nf_register_read(tmp_addr, total_size_temp % max_i2c_size,
                                 &temp_info_data[i * max_i2c_size], false);
         }
@@ -5127,9 +5127,9 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
     }
 
     /* 4. FW stop outputing */
-    //TPD_INFO("HX83112A_NF_DSRAM_Flag=%d\n",HX83112A_NF_DSRAM_Flag);
+    //TPD_DEBUG("HX83112A_NF_DSRAM_Flag=%d\n",HX83112A_NF_DSRAM_Flag);
     if (HX83112A_NF_DSRAM_Flag == false) {
-        //TPD_INFO("Return to Event Stack!\n");
+        //TPD_DEBUG("Return to Event Stack!\n");
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -5140,7 +5140,7 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
         tmp_data[0] = 0x00;
         hx83112a_nf_flash_write_burst(tmp_addr, tmp_data);
     } else {
-        //TPD_INFO("Continue to SRAM!\n");
+        //TPD_DEBUG("Continue to SRAM!\n");
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
         tmp_addr[1] = 0x00;
@@ -5162,12 +5162,12 @@ void hx83112a_nf_get_DSRAM_data(uint8_t *info_data, uint8_t x_num, uint8_t y_num
 
     if (check_sum_cal % 0x10000 != 0) {
         memcpy(info_data, &temp_info_data[4], mutual_data_size * sizeof(uint8_t));
-        TPD_INFO("%s check_sum_cal fail=%2x \n", __func__, check_sum_cal);
+        TPD_DEBUG("%s check_sum_cal fail=%2x \n", __func__, check_sum_cal);
         kfree(temp_info_data);
         return;
     } else {
         memcpy(info_data, &temp_info_data[4], mutual_data_size * sizeof(uint8_t));
-        TPD_INFO("%s checksum PASS \n", __func__);
+        TPD_DEBUG("%s checksum PASS \n", __func__);
     }
     kfree(temp_info_data);
 }
@@ -5189,11 +5189,11 @@ void hx83112a_nf_ts_diag_func(struct chip_data_hx83112a_nf *chip_info, int32_t *
 
     dsram_type = hx83112a_nf_diag_command / 10;
 
-    TPD_INFO("%s:Entering hx83112a_nf_diag_command=%d\n!", __func__, hx83112a_nf_diag_command);
+    TPD_DEBUG("%s:Entering hx83112a_nf_diag_command=%d\n!", __func__, hx83112a_nf_diag_command);
 
     if (dsram_type == 8) {
         dsram_type = 1;
-        TPD_INFO("%s Sorting Mode run sram type1 ! \n", __func__);
+        TPD_DEBUG("%s Sorting Mode run sram type1 ! \n", __func__);
     }
 
     hx83112a_nf_burst_enable(1);
@@ -5221,8 +5221,8 @@ void hx83112a_nf_diag_parse_raw_data(struct hx83112a_nf_report_data *hx83112a_nf
         && hx83112a_nf_touch_data->hx_rawdata_buf[3] == diag_cmd) {
         RawDataLen_word = hx83112a_nf_touch_data->rawdata_size / 2;
         index = (hx83112a_nf_touch_data->hx_rawdata_buf[2] - 1) * RawDataLen_word;
-        //TPD_INFO("Header[%d]: %x, %x, %x, %x, mutual: %d, self: %d\n", index, buf[56], buf[57], buf[58], buf[59], mul_num, self_num);
-        //TPD_INFO("RawDataLen=%d , RawDataLen_word=%d , hx_touch_info_size=%d\n", RawDataLen, RawDataLen_word, hx_touch_info_size);
+        //TPD_DEBUG("Header[%d]: %x, %x, %x, %x, mutual: %d, self: %d\n", index, buf[56], buf[57], buf[58], buf[59], mul_num, self_num);
+        //TPD_DEBUG("RawDataLen=%d , RawDataLen_word=%d , hx_touch_info_size=%d\n", RawDataLen, RawDataLen_word, hx_touch_info_size);
         for (i = 0; i < RawDataLen_word; i++) {
             temp1 = index + i;
 
@@ -5255,7 +5255,7 @@ bool hx83112a_nf_diag_check_sum(struct hx83112a_nf_report_data *hx83112a_nf_touc
         check_sum_cal += (hx83112a_nf_touch_data->hx_rawdata_buf[i + 1] * 256 + hx83112a_nf_touch_data->hx_rawdata_buf[i]);
     }
     if (check_sum_cal % 0x10000 != 0) {
-        TPD_INFO("%s fail=%2X \n", __func__, check_sum_cal);
+        TPD_DEBUG("%s fail=%2X \n", __func__, check_sum_cal);
         return 0;
         //goto bypass_checksum_failed_packet;
     }
@@ -5280,7 +5280,7 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
     memset(receive, 0x00, sizeof(receive));
 
     if (len >= 80) {
-        TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
         return -EFAULT;
     }
     if (copy_from_user(messages, buff, len)) {
@@ -5296,21 +5296,21 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
     storage_type = hx83112a_nf_diag_command / 10;
     rawdata_type = hx83112a_nf_diag_command % 10;
 
-    TPD_INFO(" messages       = %s\n"
+    TPD_DEBUG(" messages       = %s\n"
              " hx83112a_nf_diag_command = 0x%x\n"
              " storage_type   = 0x%x\n"
              " rawdata_type   = 0x%x\n",
              messages, hx83112a_nf_diag_command, storage_type, rawdata_type);
 
     if (hx83112a_nf_diag_command > 0 && rawdata_type == 0) {
-        TPD_INFO("[Himax]hx83112a_nf_diag_command = 0x%x, storage_type=%d, rawdata_type=%d! Maybe no support!\n", hx83112a_nf_diag_command, storage_type, rawdata_type);
+        TPD_DEBUG("[Himax]hx83112a_nf_diag_command = 0x%x, storage_type=%d, rawdata_type=%d! Maybe no support!\n", hx83112a_nf_diag_command, storage_type, rawdata_type);
         hx83112a_nf_diag_command = 0x00;
     } else {
-        TPD_INFO("[Himax]hx83112a_nf_diag_command = 0x%x, storage_type=%d, rawdata_type=%d\n", hx83112a_nf_diag_command, storage_type, rawdata_type);
+        TPD_DEBUG("[Himax]hx83112a_nf_diag_command = 0x%x, storage_type=%d, rawdata_type=%d\n", hx83112a_nf_diag_command, storage_type, rawdata_type);
     }
 
     if (storage_type == 0 && rawdata_type > 0 && rawdata_type < 8) {
-        TPD_INFO("%s, common\n", __func__);
+        TPD_DEBUG("%s, common\n", __func__);
         if (HX83112A_NF_DSRAM_Flag) {
             //(1) Clear DSRAM flag
             HX83112A_NF_DSRAM_Flag = false;
@@ -5323,7 +5323,7 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
         command[0] = hx83112a_nf_diag_command;
         hx83112a_nf_diag_register_set(command[0]);
     } else if (storage_type > 0 && storage_type < 8 && rawdata_type > 0 && rawdata_type < 8) {
-        TPD_INFO("%s, dsram\n", __func__);
+        TPD_DEBUG("%s, dsram\n", __func__);
 
         //0. set diag flag
         if (HX83112A_NF_DSRAM_Flag) {
@@ -5350,11 +5350,11 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
 
         default:
             command[0] = 0x00;
-            TPD_INFO("%s: Sram no support this type !\n", __func__);
+            TPD_DEBUG("%s: Sram no support this type !\n", __func__);
             break;
         }
         hx83112a_nf_diag_register_set(command[0]);
-        TPD_INFO("%s: Start get raw data in DSRAM\n", __func__);
+        TPD_DEBUG("%s: Start get raw data in DSRAM\n", __func__);
         //1. Disable ISR
         disable_irq(chip_info->hx_irq);
 
@@ -5363,7 +5363,7 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
     } else {
         //set diag flag
         if (HX83112A_NF_DSRAM_Flag) {
-            TPD_INFO("return and cancel sram thread!\n");
+            TPD_DEBUG("return and cancel sram thread!\n");
             //(1) Clear DSRAM flag
             HX83112A_NF_DSRAM_Flag = false;
             hx83112a_nf_return_event_stack();
@@ -5371,7 +5371,7 @@ static size_t hx83112a_nf_proc_diag_write(struct file *file, const char *buff, s
         command[0] = 0x00;
         hx83112a_nf_diag_command = 0x00;
         hx83112a_nf_diag_register_set(command[0]);
-        TPD_INFO("return to normal hx83112a_nf_diag_command = 0x%x\n", hx83112a_nf_diag_command);
+        TPD_DEBUG("return to normal hx83112a_nf_diag_command = 0x%x\n", hx83112a_nf_diag_command);
     }
     return len;
 }
@@ -5462,7 +5462,7 @@ static size_t hx83112a_nf_proc_diag_read(struct file *file, char *buff, size_t l
             hx83112a_nf_min_self = 0xFFFF;
         }
         if (copy_to_user(buff, temp_buf, len)) {
-            TPD_INFO("%s, here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s, here:%d\n", __func__, __LINE__);
         }
         HX83112A_NF_HX_PROC_SEND_FLAG = 1;
 RET_OUT:
@@ -5486,17 +5486,17 @@ uint8_t hx83112a_nf_read_DD_status(struct chip_data_hx83112a_nf *chip_info, uint
     hx83112a_nf_cmd_set[3] = 0xAA;
     hx83112a_nf_register_write(cmd_addr, 4, hx83112a_nf_cmd_set, 0);
 
-    TPD_INFO("%s: hx83112a_nf_cmd_set[0] = 0x%02X, hx83112a_nf_cmd_set[1] = 0x%02X, hx83112a_nf_cmd_set[2] = 0x%02X, hx83112a_nf_cmd_set[3] = 0x%02X\n", __func__, hx83112a_nf_cmd_set[0], hx83112a_nf_cmd_set[1], hx83112a_nf_cmd_set[2], hx83112a_nf_cmd_set[3]);
+    TPD_DEBUG("%s: hx83112a_nf_cmd_set[0] = 0x%02X, hx83112a_nf_cmd_set[1] = 0x%02X, hx83112a_nf_cmd_set[2] = 0x%02X, hx83112a_nf_cmd_set[3] = 0x%02X\n", __func__, hx83112a_nf_cmd_set[0], hx83112a_nf_cmd_set[1], hx83112a_nf_cmd_set[2], hx83112a_nf_cmd_set[3]);
 
     for (cnt = 0; cnt < 100; cnt++) {
         hx83112a_nf_register_read(cmd_addr, 4, tmp_data, false);
-        TPD_INFO("%s: tmp_data[0] = 0x%02X, tmp_data[1] = 0x%02X, tmp_data[2] = 0x%02X, tmp_data[3] = 0x%02X, cnt=%d\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3], cnt);
+        TPD_DEBUG("%s: tmp_data[0] = 0x%02X, tmp_data[1] = 0x%02X, tmp_data[2] = 0x%02X, tmp_data[3] = 0x%02X, cnt=%d\n", __func__, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3], cnt);
         msleep(10);
         if (tmp_data[3] == 0xBB) {
-            TPD_INFO("%s Data ready goto moving data\n", __func__);
+            TPD_DEBUG("%s Data ready goto moving data\n", __func__);
             break;
         } else if (cnt >= 99) {
-            TPD_INFO("%s Data not ready in FW \n", __func__);
+            TPD_DEBUG("%s Data not ready in FW \n", __func__);
             return FW_NOT_READY;
         }
     }
@@ -5532,7 +5532,7 @@ static size_t hx83112a_nf_proc_DD_debug_read(struct file *file, char *buf, size_
         //else
         ret += snprintf(temp_buf + ret, len - ret, "\n");
         if (copy_to_user(buf, temp_buf, len))
-            TPD_INFO("%s, here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s, here:%d\n", __func__, __LINE__);
         kfree(temp_buf);
         HX83112A_NF_HX_PROC_SEND_FLAG = 1;
     } else
@@ -5549,7 +5549,7 @@ static size_t hx83112a_nf_proc_DD_debug_write(struct file *file, const char *buf
     char buf_tmp2[4];
 
     if (len >= 20) {
-        TPD_INFO("%s: no command exceeds 20 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 20 chars.\n", __func__);
         return -EFAULT;
     }
     if (copy_from_user(buf_tmp, buff, len)) {
@@ -5564,10 +5564,10 @@ static size_t hx83112a_nf_proc_DD_debug_write(struct file *file, const char *buf
             if (!kstrtoul(buf_tmp2, 16, &result))
                 hx83112a_nf_cmd_set[cnt] = (uint8_t)result;
             else
-                TPD_INFO("String to oul is fail in cnt = %d, buf_tmp2 = %s", cnt, buf_tmp2);
+                TPD_DEBUG("String to oul is fail in cnt = %d, buf_tmp2 = %s", cnt, buf_tmp2);
             cnt--;
         }
-        TPD_INFO("hx83112a_nf_cmd_set[2] = %02X, hx83112a_nf_cmd_set[1] = %02X, hx83112a_nf_cmd_set[0] = %02X\n", hx83112a_nf_cmd_set[2], hx83112a_nf_cmd_set[1], hx83112a_nf_cmd_set[0]);
+        TPD_DEBUG("hx83112a_nf_cmd_set[2] = %02X, hx83112a_nf_cmd_set[1] = %02X, hx83112a_nf_cmd_set[0] = %02X\n", hx83112a_nf_cmd_set[2], hx83112a_nf_cmd_set[1], hx83112a_nf_cmd_set[0]);
     } else
         hx83112a_nf_mutual_set_flag = 0;
 
@@ -5640,7 +5640,7 @@ static size_t hx83112a_nf_proc_FW_debug_read(struct file *file, char *buf,
         }
         ret += snprintf(temp_buf + ret, len - ret, "\n");
         if (copy_to_user(buf, temp_buf, len))
-            TPD_INFO("%s, here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s, here:%d\n", __func__, __LINE__);
         kfree(temp_buf);
         HX83112A_NF_HX_PROC_SEND_FLAG = 1;
     } else
@@ -5651,7 +5651,7 @@ static size_t hx83112a_nf_proc_FW_debug_read(struct file *file, char *buf,
 static int hx83112a_nf_configuration_init(struct chip_data_hx83112a_nf *chip_info, bool config)
 {
     int ret = 0;
-    TPD_INFO("%s, configuration init = %d\n", __func__, config);
+    TPD_DEBUG("%s, configuration init = %d\n", __func__, config);
     return ret;
 }
 
@@ -5660,14 +5660,14 @@ int hx83112a_nf_ic_reset(struct chip_data_hx83112a_nf *chip_info, uint8_t loadco
     int ret = 0;
     HX83112A_NF_HW_RESET_ACTIVATE = 1;
 
-    TPD_INFO("%s, status: loadconfig=%d, int_off=%d\n", __func__, loadconfig, int_off);
+    TPD_DEBUG("%s, status: loadconfig=%d, int_off=%d\n", __func__, loadconfig, int_off);
 
     if (chip_info->hw_res->reset_gpio) {
         if (int_off) {
 
             ret = hx83112a_nf_enable_interrupt(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf enable interrupt failed.\n", __func__);
                 return ret;
             }
         }
@@ -5679,19 +5679,19 @@ int hx83112a_nf_ic_reset(struct chip_data_hx83112a_nf *chip_info, uint8_t loadco
         if (loadconfig) {
             ret = hx83112a_nf_configuration_init(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf configuration init failed.\n", __func__);
                 return ret;
             }
             ret = hx83112a_nf_configuration_init(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf configuration init failed.\n", __func__);
                 return ret;
             }
         }
         if (int_off) {
             ret = hx83112a_nf_enable_interrupt(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf enable interrupt failed.\n", __func__);
                 return ret;
             }
         }
@@ -5707,7 +5707,7 @@ static size_t hx83112a_nf_proc_reset_write(struct file *file, const char *buff,
     struct chip_data_hx83112a_nf *chip_info = (struct chip_data_hx83112a_nf *)ts->chip_data;
 
     if (len >= 12) {
-        TPD_INFO("%s: no command exceeds 12 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 12 chars.\n", __func__);
         return -EFAULT;
     }
     if (copy_from_user(buf_tmp, buff, len)) {
@@ -5736,7 +5736,7 @@ static size_t hx83112a_nf_proc_sense_on_off_write(struct file *file, const char 
     //struct touchpanel_data *ts = PDE_DATA(file_inode(file));
 
     if (len >= 80) {
-        TPD_INFO("%s: no command exceeds 80 chars.\n", __func__);
+        TPD_DEBUG("%s: no command exceeds 80 chars.\n", __func__);
         return -EFAULT;
     }
     if (copy_from_user(buf, buff, len)) {
@@ -5745,17 +5745,17 @@ static size_t hx83112a_nf_proc_sense_on_off_write(struct file *file, const char 
 
     if (buf[0] == '0') {
         hx83112a_nf_sense_off();
-        TPD_INFO("Sense off \n");
+        TPD_DEBUG("Sense off \n");
     } else if(buf[0] == '1') {
         if (buf[1] == 's') {
             hx83112a_nf_sense_on(0x00);
-            TPD_INFO("Sense on re-map on, run sram \n");
+            TPD_DEBUG("Sense on re-map on, run sram \n");
         } else {
             hx83112a_nf_sense_on(0x01);
-            TPD_INFO("Sense on re-map off, run flash \n");
+            TPD_DEBUG("Sense on re-map off, run flash \n");
         }
     } else {
-        TPD_INFO("Do nothing \n");
+        TPD_DEBUG("Do nothing \n");
     }
     return len;
 }
@@ -5779,7 +5779,7 @@ static void hx83112a_nf_gesture_debug_mode_set(bool on_off)
         tmp_data[1] = 0xA1;
         tmp_data[0] = 0x1A;
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
-        TPD_INFO("%s: Report 40 trajectory coordinate points .\n", __func__);
+        TPD_DEBUG("%s: Report 40 trajectory coordinate points .\n", __func__);
     }  else {
         hx83112a_nf_switch_algo = 0;
         hx83112a_nf_check_point_format = 0;
@@ -5789,7 +5789,7 @@ static void hx83112a_nf_gesture_debug_mode_set(bool on_off)
         tmp_data[0] = 0x00;
 
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
-        TPD_INFO("%s: close FW enter algorithm switch.\n", __func__);
+        TPD_DEBUG("%s: close FW enter algorithm switch.\n", __func__);
     }
 }
 
@@ -5812,7 +5812,7 @@ static void hx83112a_nf_debug_mode_set(bool on_off)
         tmp_data[1] = 0xA5;
         tmp_data[0] = 0x5A;
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
-        TPD_INFO("%s: open FW enter algorithm switch.\n", __func__);
+        TPD_DEBUG("%s: open FW enter algorithm switch.\n", __func__);
     }  else {
         hx83112a_nf_switch_algo = 0;
         hx83112a_nf_check_point_format = 0;
@@ -5822,7 +5822,7 @@ static void hx83112a_nf_debug_mode_set(bool on_off)
         tmp_data[0] = 0x00;
 
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
-        TPD_INFO("%s: close FW enter algorithm switch.\n", __func__);
+        TPD_DEBUG("%s: close FW enter algorithm switch.\n", __func__);
     }
 }
 
@@ -5979,7 +5979,7 @@ static void hx83112a_nf_debug_sta_judge(struct chip_data_hx83112a_nf *chip_info)
     memcpy(&last_sta, &sta, sizeof(last_sta));
 
     if (tp_debug > 0) {
-        TPD_INFO("The sta  is = 0x%02X,0x%02X\n",
+        TPD_DEBUG("The sta  is = 0x%02X,0x%02X\n",
                  hx83112a_nf_touch_data->hx_state_info[3],
                  hx83112a_nf_touch_data->hx_state_info[4]);
     }
@@ -6005,11 +6005,11 @@ static int hx83112a_nf_get_touch_points(void *chip_data, struct point_info *poin
     uint8_t hx_state_info_pos;
 
     if (!hx83112a_nf_touch_data) {
-        TPD_INFO("%s:%d hx83112a_nf_touch_data is NULL\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_touch_data is NULL\n", __func__, __LINE__);
     }
 
     if (!hx83112a_nf_touch_data->hx_coord_buf) {
-        TPD_INFO("%s:%d hx83112a_nf_touch_data->hx_coord_buf is NULL\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_touch_data->hx_coord_buf is NULL\n", __func__, __LINE__);
         return 0;
     }
 
@@ -6019,7 +6019,7 @@ static int hx83112a_nf_get_touch_points(void *chip_data, struct point_info *poin
     else
         ret = hx83112a_nf_read_event_stack(buf, hx83112a_nf_touch_data->touch_info_size);
     if (!ret) {
-        TPD_INFO("%s: can't read data from chip in normal!\n", __func__);
+        TPD_DEBUG("%s: can't read data from chip in normal!\n", __func__);
         goto checksum_fail;
     }
 
@@ -6055,7 +6055,7 @@ static int hx83112a_nf_get_touch_points(void *chip_data, struct point_info *poin
     if (hx83112a_nf_diag_command) {
         mutual_num = chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM;
         self_num = chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM;
-        TPD_INFO("hx83112a_nf_touch_data->touch_all_size= %d hx83112a_nf_touch_data->touch_info_size = %d, %d\n", \
+        TPD_DEBUG("hx83112a_nf_touch_data->touch_all_size= %d hx83112a_nf_touch_data->touch_info_size = %d, %d\n", \
                  hx83112a_nf_touch_data->touch_all_size, hx83112a_nf_touch_data->touch_info_size, hx83112a_nf_touch_data->touch_all_size - hx83112a_nf_touch_data->touch_info_size);
         memcpy(hx83112a_nf_touch_data->hx_rawdata_buf, &buf[hx83112a_nf_touch_data->touch_info_size], hx83112a_nf_touch_data->touch_all_size - hx83112a_nf_touch_data->touch_info_size);
         if (!hx83112a_nf_diag_check_sum(hx83112a_nf_touch_data)) {
@@ -6107,7 +6107,7 @@ static int hx83112a_nf_get_vendor(void *chip_data, struct panel_info *panel_data
 
     chip_info->tp_type = panel_data->tp_type;
     chip_info->p_tp_fw = &panel_data->TP_FW;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n",
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n",
              chip_info->tp_type, panel_data->test_limit_name, panel_data->fw_name);
     return 0;
 }
@@ -6138,7 +6138,7 @@ static uint32_t hx83112a_nf_get_fw_id(struct chip_data_hx83112a_nf *chip_info)
     TPD_DEBUG("%s : data[0] = 0x%2.2X, data[1] = 0x%2.2X, data[2] = 0x%2.2X, data[3] = 0x%2.2X\n", __func__, data[0], data[1], data[2], data[3]);
 
     current_firmware = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-    TPD_INFO("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
+    TPD_DEBUG("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
 
     return current_firmware;
 
@@ -6188,7 +6188,7 @@ static int hx83112a_nf_reset_for_prepare(void *chip_data)
     //int i2c_error_number = 0;
     //struct chip_data_hx83112a_nf *chip_info = (struct chip_data_hx83112a_nf *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     //hx83112a_nf_resetgpio_set(chip_info->hw_res, true); // reset gpio
 
     return ret;
@@ -6222,7 +6222,7 @@ static void hx83112a_nf_resume_prepare(void *chip_data)
 */
 static void hx83112a_nf_exit_esd_mode(void *chip_data)
 {
-    TPD_INFO("exit esd mode ok\n");
+    TPD_DEBUG("exit esd mode ok\n");
     return;
 }
 
@@ -6235,10 +6235,10 @@ static int hx83112a_nf_reset(void *chip_data)
     int ret = 0;
     int load_fw_times = 10;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
 
     if (!chip_info->first_download_finished) {
-        TPD_INFO("%s:First download has not finished, don't do reset.\n", __func__);
+        TPD_DEBUG("%s:First download has not finished, don't do reset.\n", __func__);
         return 0;
     }
 
@@ -6259,7 +6259,7 @@ static int hx83112a_nf_reset(void *chip_data)
     } while (!ret && load_fw_times > 0);
 
     if (!load_fw_times) {
-        TPD_INFO("%s: load_fw_times over 10 times\n", __func__);
+        TPD_DEBUG("%s: load_fw_times over 10 times\n", __func__);
     }
     hx83112a_nf_sense_on(0x00);
 
@@ -6277,26 +6277,26 @@ void hx83112a_nf_ultra_enter(void)
     uint8_t tmp_data[4];
     int rtimes = 0;
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
 
     /* 34 -> 11 */
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:1/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:1/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x11;
         if (hx83112a_nf_bus_write(0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x34, correct 0x11 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x34, correct 0x11 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x11);
 
@@ -6304,21 +6304,21 @@ void hx83112a_nf_ultra_enter(void)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:2/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:2/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x33;
         if (hx83112a_nf_bus_write(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x33, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x33, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x33);
 
@@ -6326,21 +6326,21 @@ void hx83112a_nf_ultra_enter(void)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:3/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:3/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x22;
         if (hx83112a_nf_bus_write(0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x34, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x34, correct 0x22 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x34, correct 0x22 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x22);
 
@@ -6348,21 +6348,21 @@ void hx83112a_nf_ultra_enter(void)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:4/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:4/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0xAA;
         if (hx83112a_nf_bus_write(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x33, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x33, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0xAA);
 
@@ -6370,21 +6370,21 @@ void hx83112a_nf_ultra_enter(void)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:5/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:5/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0x33;
         if (hx83112a_nf_bus_write(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x33, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x33, correct 0x33 = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0x33);
 
@@ -6392,25 +6392,25 @@ void hx83112a_nf_ultra_enter(void)
     rtimes = 0;
     do {
         if (rtimes > 10) {
-            TPD_INFO("%s:6/6 retry over 10 times!\n", __func__);
+            TPD_DEBUG("%s:6/6 retry over 10 times!\n", __func__);
             return;
         }
         tmp_data[0] = 0xAA;
         if (hx83112a_nf_bus_write(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi write fail!\n", __func__);
+            TPD_DEBUG("%s: spi write fail!\n", __func__);
             continue;
         }
         tmp_data[0] = 0x00;
         if (hx83112a_nf_bus_read(0x33, 1, tmp_data) < 0) {
-            TPD_INFO("%s: spi read fail!\n", __func__);
+            TPD_DEBUG("%s: spi read fail!\n", __func__);
             continue;
         }
 
-        TPD_INFO("%s:retry times %d, addr = 0x33, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
+        TPD_DEBUG("%s:retry times %d, addr = 0x33, correct 0xAA = current 0x%2.2X\n", __func__, rtimes, tmp_data[0]);
         rtimes++;
     } while (tmp_data[0] != 0xAA);
 
-    TPD_INFO("%s:END\n", __func__);
+    TPD_DEBUG("%s:END\n", __func__);
 }
 
 static int hx83112a_nf_enable_black_gesture(struct chip_data_hx83112a_nf *chip_info, bool enable)
@@ -6418,7 +6418,7 @@ static int hx83112a_nf_enable_black_gesture(struct chip_data_hx83112a_nf *chip_i
     int ret = 0;
     struct touchpanel_data *ts = spi_get_drvdata(chip_info->hx_spi);
 
-    TPD_INFO("%s:enable=%d, ts->is_suspended=%d \n", __func__, enable, ts->is_suspended);
+    TPD_DEBUG("%s:enable=%d, ts->is_suspended=%d \n", __func__, enable, ts->is_suspended);
 
     if (ts->is_suspended) {
         if (enable) {
@@ -6436,25 +6436,25 @@ static int hx83112a_nf_enable_black_gesture(struct chip_data_hx83112a_nf *chip_i
             /*if (!HX83112A_NF_RESET_STATE) {
                 ret =  hx83112a_nf_resetgpio_set(chip_info->hw_res, true); // reset gpio
                 if (ret < 0) {
-                    TPD_INFO("%s: hx83112a_nf reset gpio failed.\n", __func__);
+                    TPD_DEBUG("%s: hx83112a_nf reset gpio failed.\n", __func__);
                     return ret;
                 }
             }*/
             /*ret = hx83112a_nf_enable_interrupt(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf enable interrupt failed.\n", __func__);
                 return ret;
             }*/
         } else {
             /*ret = hx83112a_nf_enable_interrupt(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: hx83112a_nf enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: hx83112a_nf enable interrupt failed.\n", __func__);
                 return ret;
             }*/
             /*if (HX83112A_NF_RESET_STATE) {
                 ret =  hx83112a_nf_resetgpio_set(chip_info->hw_res, false); // reset gpio
                 if (ret < 0) {
-                    TPD_INFO("%s: hx83112a_nf reset gpio failed.\n", __func__);
+                    TPD_DEBUG("%s: hx83112a_nf reset gpio failed.\n", __func__);
                     return ret;
                 }
             }*/
@@ -6479,7 +6479,7 @@ static int hx83112a_nf_enable_charge_mode(struct chip_data_hx83112a_nf *chip_inf
     int ret = 0;
     uint8_t tmp_addr[4];
     uint8_t tmp_data[4];
-    TPD_INFO("%s, charge mode enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, charge mode enable = %d\n", __func__, enable);
 
     /*Enable:0x10007F38 = 0xA55AA55A  */
     if (enable) {
@@ -6515,13 +6515,13 @@ static int hx83112a_nf_jitter_switch (struct chip_data_hx83112a_nf *chip_info, b
     int rtimes = 0;
     int ret = 0;
 
-    TPD_INFO("%s:entering\n", __func__);
+    TPD_DEBUG("%s:entering\n", __func__);
 
     if (!on) {//jitter off
         do {
             if (rtimes > 10) {
-                TPD_INFO("%s:retry over 10, jitter off failed!\n", __func__);
-                TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
+                TPD_DEBUG("%s:retry over 10, jitter off failed!\n", __func__);
+                TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
                 ret = -1;
                 break;
             }
@@ -6538,17 +6538,17 @@ static int hx83112a_nf_jitter_switch (struct chip_data_hx83112a_nf *chip_info, b
 
             hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
 
-            TPD_INFO("%s:retry times %d, current tmp_data[0, 1, 2, 3] = 0x%2.2X, 0x%2.2X, 0x%2.2X, 0x%2.2X\n", __func__,
+            TPD_DEBUG("%s:retry times %d, current tmp_data[0, 1, 2, 3] = 0x%2.2X, 0x%2.2X, 0x%2.2X, 0x%2.2X\n", __func__,
                      rtimes, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
             rtimes++;
         } while (tmp_data[3] != 0xA5 || tmp_data[2] != 0x5A
                  || tmp_data[1] != 0xA5 || tmp_data[0] != 0x5A);
-        TPD_INFO("%s:jitter off success!\n", __func__);
+        TPD_DEBUG("%s:jitter off success!\n", __func__);
     } else { //jitter on
         do {
             if (rtimes > 10) {
-                TPD_INFO("%s:retry over 10, jitter on failed!\n", __func__);
-                TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x00, 0x00, 0x00, 0x00\n", __func__);
+                TPD_DEBUG("%s:retry over 10, jitter on failed!\n", __func__);
+                TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x00, 0x00, 0x00, 0x00\n", __func__);
                 ret = -1;
                 break;
             }
@@ -6565,14 +6565,14 @@ static int hx83112a_nf_jitter_switch (struct chip_data_hx83112a_nf *chip_info, b
 
             hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
 
-            TPD_INFO("%s:retry times %d, current tmp_data[0, 1, 2, 3] = 0x%2.2X, 0x%2.2X, 0x%2.2X, 0x%2.2X\n", __func__,
+            TPD_DEBUG("%s:retry times %d, current tmp_data[0, 1, 2, 3] = 0x%2.2X, 0x%2.2X, 0x%2.2X, 0x%2.2X\n", __func__,
                      rtimes, tmp_data[0], tmp_data[1], tmp_data[2], tmp_data[3]);
             rtimes++;
         } while (tmp_data[3] == 0xA5 && tmp_data[2] == 0x5A
                  && tmp_data[1] == 0xA5 && tmp_data[0] == 0x5A);
-        TPD_INFO("%s:jitter on success!\n", __func__);
+        TPD_DEBUG("%s:jitter on success!\n", __func__);
     }
-    TPD_INFO("%s:END\n", __func__);
+    TPD_DEBUG("%s:END\n", __func__);
     return ret;
 }
 
@@ -6588,8 +6588,8 @@ static int hx83112a_nf_enable_headset_mode(struct chip_data_hx83112a_nf *chip_in
         if (enable) {/* insert headset */
             do {
                 if (rtimes > 10) {
-                    TPD_INFO("%s:insert headset failed!\n", __func__);
-                    TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
+                    TPD_DEBUG("%s:insert headset failed!\n", __func__);
+                    TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
                     ret = -1;
                     break;
                 }
@@ -6611,12 +6611,12 @@ static int hx83112a_nf_enable_headset_mode(struct chip_data_hx83112a_nf *chip_in
             } while (tmp_data[3] != 0xA5 || tmp_data[2] != 0x5A
                      || tmp_data[1] != 0xA5 || tmp_data[0] != 0x5A);
 
-            TPD_INFO("%s:insert headset success!\n", __func__);
+            TPD_DEBUG("%s:insert headset success!\n", __func__);
         } else {/* remove headset  */
             do {
                 if (rtimes > 10) {
-                    TPD_INFO("%s:remove headset failed!\n", __func__);
-                    TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
+                    TPD_DEBUG("%s:remove headset failed!\n", __func__);
+                    TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
                     ret = -1;
                     break;
                 }
@@ -6638,7 +6638,7 @@ static int hx83112a_nf_enable_headset_mode(struct chip_data_hx83112a_nf *chip_in
             } while (tmp_data[3] != 0x00 || tmp_data[2] != 0x00
                      || tmp_data[1] != 0x00 || tmp_data[0] != 0x00);
 
-            TPD_INFO("%s:remove headset success!\n", __func__);
+            TPD_DEBUG("%s:remove headset success!\n", __func__);
         }
     }
     return ret;
@@ -6659,8 +6659,8 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
         if (mode == 1 || VERTICAL_SCREEN == chip_info->touch_direction) {/* vertical */
             do {
                 if (rtimes > 10) {
-                    TPD_INFO("%s:rotative normal failed!\n", __func__);
-                    TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
+                    TPD_DEBUG("%s:rotative normal failed!\n", __func__);
+                    TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
                     ret = -1;
                     break;
                 }
@@ -6682,15 +6682,15 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
             } while (tmp_data[3] != 0xA5 || tmp_data[2] != 0x5A
                      || tmp_data[1] != 0xA5 || tmp_data[0] != 0x5A);
 
-            TPD_INFO("%s:rotative normal success!\n", __func__);
+            TPD_DEBUG("%s:rotative normal success!\n", __func__);
 
         } else {
             rtimes = 0;
             if (LANDSCAPE_SCREEN_270 == chip_info->touch_direction) { //turn right
                 do {
                     if (rtimes > 10) {
-                        TPD_INFO("%s:rotative right failed!\n", __func__);
-                        TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x3A, 0xA3, 0x3A, 0xA3\n", __func__);
+                        TPD_DEBUG("%s:rotative right failed!\n", __func__);
+                        TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x3A, 0xA3, 0x3A, 0xA3\n", __func__);
                         ret = -1;
                         break;
                     }
@@ -6713,13 +6713,13 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
                 } while (tmp_data[3] != 0xA3 || tmp_data[2] != 0x3A
                          || tmp_data[1] != 0xA3 || tmp_data[0] != 0x3A);
 
-                TPD_INFO("%s:rotative right success!\n", __func__);
+                TPD_DEBUG("%s:rotative right success!\n", __func__);
 
             } else if(LANDSCAPE_SCREEN_90 == chip_info->touch_direction) { //turn left
                 do {
                     if (rtimes > 10) {
-                        TPD_INFO("%s:rotative left failed!\n", __func__);
-                        TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x1A, 0xA1, 0x1A, 0xA1\n", __func__);
+                        TPD_DEBUG("%s:rotative left failed!\n", __func__);
+                        TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x1A, 0xA1, 0x1A, 0xA1\n", __func__);
                         ret = -1;
                         break;
                     }
@@ -6742,7 +6742,7 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
                 } while (tmp_data[3] != 0xA1 || tmp_data[2] != 0x1A
                          || tmp_data[1] != 0xA1 || tmp_data[0] != 0x1A);
 
-                TPD_INFO("%s:rotative left success!\n", __func__);
+                TPD_DEBUG("%s:rotative left success!\n", __func__);
 
             }
         }
@@ -6750,8 +6750,8 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
         if (mode) {//open
             do {
                 if (rtimes > 10) {
-                    TPD_INFO("%s:open edge limit failed!\n", __func__);
-                    TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
+                    TPD_DEBUG("%s:open edge limit failed!\n", __func__);
+                    TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x5A, 0xA5, 0x5A, 0xA5\n", __func__);
                     ret = -1;
                     break;
                 }
@@ -6773,13 +6773,13 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
             } while (tmp_data[3] != 0xA5 || tmp_data[2] != 0x5A
                      || tmp_data[1] != 0xA5 || tmp_data[0] != 0x5A);
 
-            TPD_INFO("%s:open edge limit success!\n", __func__);
+            TPD_DEBUG("%s:open edge limit success!\n", __func__);
 
         } else {//close
             do {
                 if (rtimes > 10) {
-                    TPD_INFO("%s:close edge limit failed!\n", __func__);
-                    TPD_INFO("%s:correct tmp_data[0, 1, 2, 3] = 0x9A, 0xA9, 0x9A, 0xA9\n", __func__);
+                    TPD_DEBUG("%s:close edge limit failed!\n", __func__);
+                    TPD_DEBUG("%s:correct tmp_data[0, 1, 2, 3] = 0x9A, 0xA9, 0x9A, 0xA9\n", __func__);
                     ret = -1;
                     break;
                 }
@@ -6801,7 +6801,7 @@ static int hx83112a_nf_rotative_switch(struct chip_data_hx83112a_nf *chip_info, 
             } while (tmp_data[3] != 0xA9 || tmp_data[2] != 0x9A
                      || tmp_data[1] != 0xA9 || tmp_data[0] != 0x9A);
 
-            TPD_INFO("%s:close edge limit success!\n", __func__);
+            TPD_DEBUG("%s:close edge limit success!\n", __func__);
         }
     }
     TPD_DETAIL("%s:END\n", __func__);
@@ -6817,7 +6817,7 @@ static int hx83112a_nf_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_NORMAL:
         ret = hx83112a_nf_configuration_init(chip_info, true);
         if (ret < 0) {
-            TPD_INFO("%s: hx83112a_nf configuration init failed.\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf configuration init failed.\n", __func__);
             return ret;
         }
 
@@ -6827,7 +6827,7 @@ static int hx83112a_nf_mode_switch(void *chip_data, work_mode mode, bool flag)
         /*device control: sleep mode*/
         ret = hx83112a_nf_configuration_init(chip_info, false) ;
         if (ret < 0) {
-            TPD_INFO("%s: hx83112a_nf configuration init failed.\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf configuration init failed.\n", __func__);
             return ret;
         }
 
@@ -6836,7 +6836,7 @@ static int hx83112a_nf_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_GESTURE:
         ret = hx83112a_nf_enable_black_gesture(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: hx83112a_nf enable gesture failed.\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf enable gesture failed.\n", __func__);
             return ret;
         }
 
@@ -6850,7 +6850,7 @@ static int hx83112a_nf_mode_switch(void *chip_data, work_mode mode, bool flag)
         //ret = hx83112a_nf_enable_edge_limit(chip_info, flag);
         ret = hx83112a_nf_rotative_switch(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: hx83112a_nf enable edg & corner limit failed.\n", __func__);
+            TPD_DEBUG("%s: hx83112a_nf enable edg & corner limit failed.\n", __func__);
             return ret;
         }
 
@@ -6859,26 +6859,26 @@ static int hx83112a_nf_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_CHARGE:
         ret = hx83112a_nf_enable_charge_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
         }
         break;
 
     case MODE_HEADSET:
         ret = hx83112a_nf_enable_headset_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable headset mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable headset mode : %d failed\n", __func__, flag);
         }
         break;
 
     case MODE_GAME:
         ret = hx83112a_nf_jitter_switch(chip_info, !flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable game mode : %d failed\n", __func__, !flag);
+            TPD_DEBUG("%s: enable game mode : %d failed\n", __func__, !flag);
         }
         break;
 
     default:
-        TPD_INFO("%s: Wrong mode.\n", __func__);
+        TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -6925,7 +6925,7 @@ void hx83112a_nf_set_SMWP_enable(uint8_t SMWP_enable, bool suspended)
             back_data[0] = 0x00;
         }
         hx83112a_nf_register_read(tmp_addr, 4, tmp_data, false);
-        TPD_INFO("%s: tmp_data[0]=%d, SMWP_enable=%d, retry_cnt=%d \n", __func__, tmp_data[0], SMWP_enable, retry_cnt);
+        TPD_DEBUG("%s: tmp_data[0]=%d, SMWP_enable=%d, retry_cnt=%d \n", __func__, tmp_data[0], SMWP_enable, retry_cnt);
         retry_cnt++;
     } while ((tmp_data[3] != back_data[3] || tmp_data[2] != back_data[2] || tmp_data[1] != back_data[1] || tmp_data[0] != back_data[0]) && retry_cnt < 10);
 
@@ -6950,13 +6950,13 @@ static int hx83112a_nf_get_gesture_info(void *chip_data, struct gesture_info *ge
 
     buf = kzalloc(hx83112a_nf_touch_data->event_size * sizeof(uint8_t), GFP_KERNEL);
     if (!buf) {
-        TPD_INFO("%s:%d kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d kzalloc buf error\n", __func__, __LINE__);
         return -1;
     }
 
     hx83112a_nf_burst_enable(0);
     if (!hx83112a_nf_read_event_stack(buf, hx83112a_nf_touch_data->event_size)) {
-        TPD_INFO("%s: can't read data from chip in gesture!\n", __func__);
+        TPD_DEBUG("%s: can't read data from chip in gesture!\n", __func__);
         kfree(buf);
         return -1;
     }
@@ -7156,7 +7156,7 @@ static int hx83112a_nf_int_pin_test(struct seq_file *s, void *chip_data, struct 
 {
     int eint_status, eint_count = 0, read_gpio_num = 10;
 
-    TPD_INFO("%s, step 0: begin to check INT-GND short item\n", __func__);
+    TPD_DEBUG("%s, step 0: begin to check INT-GND short item\n", __func__);
     while (read_gpio_num--) {
         msleep(5);
         eint_status = gpio_get_value(syna_testdata->irq_gpio);
@@ -7164,11 +7164,11 @@ static int hx83112a_nf_int_pin_test(struct seq_file *s, void *chip_data, struct 
             eint_count--;
         else
             eint_count++;
-        TPD_INFO("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
+        TPD_DEBUG("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
     }
-    TPD_INFO("TP EINT PIN direct short! eint_count = %d\n", eint_count);
+    TPD_DEBUG("TP EINT PIN direct short! eint_count = %d\n", eint_count);
     if (eint_count == 10) {
-        TPD_INFO("error :  TP EINT PIN direct short!\n");
+        TPD_DEBUG("error :  TP EINT PIN direct short!\n");
         seq_printf(s, "TP EINT direct stort\n");
         hx83112a_nf_fail_write_count += snprintf(g_Test_list_log + hx83112a_nf_fail_write_count, 45, "eint_status is low, TP EINT direct stort, \n");
         //store_to_file(syna_testdata->fd, "eint_status is low, TP EINT direct stort, \n");
@@ -7201,7 +7201,7 @@ static void hx83112a_nf_auto_test(struct seq_file *s, void *chip_data, struct sy
     hx83112a_nf_rslt_data_len = 0;
     fw_name_test = kzalloc(MAX_FW_NAME_LENGTH, GFP_KERNEL);
     if (fw_name_test == NULL) {
-        TPD_INFO("fw_name_test kzalloc error!\n");
+        TPD_DEBUG("fw_name_test kzalloc error!\n");
         goto RET_OUT;
     }
 
@@ -7217,21 +7217,21 @@ static void hx83112a_nf_auto_test(struct seq_file *s, void *chip_data, struct sy
     hx83112a_nf_fail_write_count = 0;
     hx83112a_nf_file_path_OK = kcalloc(256, sizeof(char), GFP_KERNEL);
     if (!hx83112a_nf_file_path_OK) {
-        TPD_INFO("%s:%d hx83112a_nf_file_path_OK kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_file_path_OK kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
     hx83112a_nf_file_path_NG = kcalloc(256, sizeof(char), GFP_KERNEL);
     if (!hx83112a_nf_file_path_NG) {
-        TPD_INFO("%s:%d hx83112a_nf_file_path_NG kzalloc buf error\n", __func__, __LINE__);
+        TPD_DEBUG("%s:%d hx83112a_nf_file_path_NG kzalloc buf error\n", __func__, __LINE__);
         goto RET_OUT;
     }
 
     if (hx83112a_nf_rslt_data == NULL) {
-        TPD_INFO("hx83112a_nf_rslt_data is NULL");
+        TPD_DEBUG("hx83112a_nf_rslt_data is NULL");
         hx83112a_nf_rslt_data = kcalloc(hx83112a_nf_1kind_raw_size * HX83112A_NF_CRITERIA_ITEM,
                               sizeof(char), GFP_KERNEL);
         if (!hx83112a_nf_rslt_data) {
-            TPD_INFO("%s:%d hx83112a_nf_rslt_data kzalloc buf error\n", __func__, __LINE__);
+            TPD_DEBUG("%s:%d hx83112a_nf_rslt_data kzalloc buf error\n", __func__, __LINE__);
             goto RET_OUT;
         }
     } else {
@@ -7244,7 +7244,7 @@ static void hx83112a_nf_auto_test(struct seq_file *s, void *chip_data, struct sy
     copy_len = p_node - hx83112a_nf_pri_ts->panel_data.fw_name;
     memcpy(fw_name_test, hx83112a_nf_pri_ts->panel_data.fw_name, copy_len);
     strlcat(fw_name_test, postfix, MAX_FW_NAME_LENGTH);
-    TPD_INFO("%s : fw_name_test is %s\n", __func__, fw_name_test);
+    TPD_DEBUG("%s : fw_name_test is %s\n", __func__, fw_name_test);
 
     hx83112a_nf_mcu_0f_operation_test_dirly(fw_name_test);
     msleep(5);
@@ -7284,7 +7284,7 @@ static void hx83112a_nf_auto_test(struct seq_file *s, void *chip_data, struct sy
 
     seq_printf(s, "imageid = 0x%llx, deviceid = 0x%llx\n", syna_testdata->TP_FW, syna_testdata->TP_FW);
     seq_printf(s, "%d error(s). %s\n", error_count, error_count ? "" : "All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", error_count, error_count ? "" : "All test passed.");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", error_count, error_count ? "" : "All test passed.");
 
 RET_OUT:
     if (fw_name_test) {
@@ -7301,9 +7301,9 @@ RET_OUT:
         }
         kfree(hx83112a_nf_inspection_criteria);
         hx83112a_nf_inspection_criteria = NULL;
-        TPD_INFO("Now it have free the hx83112a_nf_inspection_criteria!\n");
+        TPD_DEBUG("Now it have free the hx83112a_nf_inspection_criteria!\n");
     } else {
-        TPD_INFO("No Need to free hx83112a_nf_inspection_criteria!\n");
+        TPD_DEBUG("No Need to free hx83112a_nf_inspection_criteria!\n");
     }
 
     if (hx83112a_nf_inspt_crtra_flag) {
@@ -7368,27 +7368,27 @@ static void hx83112a_nf_read_debug_data(struct seq_file *s, void *chip_data, int
     switch (debug_data_type) {
     case DEBUG_DATA_BASELINE:
         seq_printf(s, "Baseline data: \n");
-        TPD_INFO("Baseline data: \n");
+        TPD_DEBUG("Baseline data: \n");
         break;
 
     case DEBUG_DATA_RAW:
         seq_printf(s, "Raw data: \n");
-        TPD_INFO("Raw data: \n");
+        TPD_DEBUG("Raw data: \n");
         break;
 
     case DEBUG_DATA_DELTA:
         seq_printf(s, "Delta data: \n");
-        TPD_INFO("Delta data: \n");
+        TPD_DEBUG("Delta data: \n");
         break;
 
     case DEBUG_DATA_DOWN:
         seq_printf(s, "Finger down data: \n");
-        TPD_INFO("Finger down data: \n");
+        TPD_DEBUG("Finger down data: \n");
         break;
 
     default :
         seq_printf(s, "No this debug datatype \n");
-        TPD_INFO("No this debug datatype \n");
+        TPD_DEBUG("No this debug datatype \n");
         goto RET_OUT;
         break;
     }
@@ -7407,7 +7407,7 @@ static void hx83112a_nf_read_debug_data(struct seq_file *s, void *chip_data, int
     } else {
         hx83112a_nf_diag_register_set(debug_data_type);
     }
-    TPD_INFO("%s: Start get debug data in DSRAM\n", __func__);
+    TPD_DEBUG("%s: Start get debug data in DSRAM\n", __func__);
     HX83112A_NF_DSRAM_Flag = true;
 
     hx83112a_nf_ts_diag_func(chip_info, data_mutual_sram);
@@ -7433,7 +7433,7 @@ static void hx83112a_nf_read_debug_data(struct seq_file *s, void *chip_data, int
     seq_printf(s, "ChannelEnd");
     seq_printf(s, "\n");
 
-    TPD_INFO("%s, here:%d\n", __func__, __LINE__);
+    TPD_DEBUG("%s, here:%d\n", __func__, __LINE__);
 
     if (debug_data_type == DEBUG_DATA_DOWN) {
         tmp_addr[3] = 0x10;
@@ -7504,18 +7504,18 @@ static fw_update_state hx83112a_nf_fw_update(void *chip_data, const struct firmw
         }
     }
     if (fw == NULL) {
-        TPD_INFO("fw is NULL\n");
+        TPD_DEBUG("fw is NULL\n");
         return FW_NO_NEED_UPDATE;
     }
 
     p_fw_id = fw->data + 49172;
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return 0;
     }
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     //step 1:fill Fw related header, get all data.
 
@@ -7531,20 +7531,20 @@ static fw_update_state hx83112a_nf_fw_update(void *chip_data, const struct firmw
     cmd[0] = 0x14;
     hx83112a_nf_register_read(cmd, 4, data, false);
     FIRMWARE_ID = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
-    TPD_INFO("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
+    TPD_DEBUG("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
 
     //disable_irq_nosync(chip_info->hx_irq);
 
     //step 3:Get into program mode
     /********************get into prog end************/
     //step 4:flash firmware zone
-    TPD_INFO("update-----------------firmware ------------------update!\n");
+    TPD_DEBUG("update-----------------firmware ------------------update!\n");
     // hx83112a_nf_fts_ctpm_fw_upgrade_with_sys_fs_64k((unsigned char *)fw->data, fw->size, false);
     g_hx83112a_nf_core_fp.fp_firmware_update_0f(fw);
     g_hx83112a_nf_core_fp.fp_reload_disable(0);
     msleep (10);
 
-    TPD_INFO("Firmware && configuration flash over\n");
+    TPD_DEBUG("Firmware && configuration flash over\n");
     hx83112a_nf_read_OPLUS_FW_ver(chip_info);
     hx83112a_nf_sense_on(0x00);
     msleep (10);
@@ -7575,7 +7575,7 @@ static int hx83112a_nf_reset_gpio_control(void *chip_data, bool enable)
 {
     struct chip_data_hx83112a_nf *chip_info = (struct chip_data_hx83112a_nf *)chip_data;
     if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
-        TPD_INFO("%s: set reset state %d\n", __func__, enable);
+        TPD_DEBUG("%s: set reset state %d\n", __func__, enable);
         hx83112a_nf_resetgpio_set(hx83112a_nf_chip_info->hw_res, enable);
         TPD_DETAIL("%s: set reset state END\n", __func__);
     }
@@ -7604,13 +7604,13 @@ void hx83112a_nf_freq_hop_trigger(void *chip_data)
     uint8_t tmp_data[4];
     int rtimes = 0;
 
-    TPD_INFO("send cmd to tigger frequency hopping here!!!\n");
+    TPD_DEBUG("send cmd to tigger frequency hopping here!!!\n");
     hx83112a_nf_freq_point = 1 - hx83112a_nf_freq_point;
     if (hx83112a_nf_freq_point) {//hop to frequency 130K
         do {
             if (rtimes > 10) {
-                TPD_INFO("%s:frequency hopping failed!\n", __func__);
-                TPD_INFO("%s:correct tmp_data[0,1,2,3] = 0x5A,0xA5,0x5A,0xA5\n", __func__);
+                TPD_DEBUG("%s:frequency hopping failed!\n", __func__);
+                TPD_DEBUG("%s:correct tmp_data[0,1,2,3] = 0x5A,0xA5,0x5A,0xA5\n", __func__);
                 break;
             }
 
@@ -7632,13 +7632,13 @@ void hx83112a_nf_freq_hop_trigger(void *chip_data)
                  || tmp_data[1] != 0xA5 || tmp_data[0] != 0x5A);
 
         if (rtimes <= 10) {
-            TPD_INFO("%s:hopping frequency to 130K success!\n", __func__);
+            TPD_DEBUG("%s:hopping frequency to 130K success!\n", __func__);
         }
     } else {//hop to frequency 75K
         do {
             if (rtimes > 10) {
-                TPD_INFO("%s:frequency hopping failed!\n", __func__);
-                TPD_INFO("%s:correct tmp_data[0,1,2,3] = 0x3A,0xA3,0x3A,0xA3\n", __func__);
+                TPD_DEBUG("%s:frequency hopping failed!\n", __func__);
+                TPD_DEBUG("%s:correct tmp_data[0,1,2,3] = 0x3A,0xA3,0x3A,0xA3\n", __func__);
                 break;
             }
 
@@ -7660,7 +7660,7 @@ void hx83112a_nf_freq_hop_trigger(void *chip_data)
                  || tmp_data[1] != 0xA3 || tmp_data[0] != 0x3A);
 
         if (rtimes <= 10) {
-            TPD_INFO("%s:hopping frequency to 75K success!\n", __func__);
+            TPD_DEBUG("%s:hopping frequency to 75K success!\n", __func__);
         }
     }
 }
@@ -7742,7 +7742,7 @@ static void hx83112a_nf_enter_hopping_write(bool on_off)
         tmp_data[1] = 0xA1;
         tmp_data[0] = 0x1A;
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
-        TPD_INFO("%s: open himax enter hopping write.\n", __func__);
+        TPD_DEBUG("%s: open himax enter hopping write.\n", __func__);
     } else {
         tmp_addr[3] = 0x10;
         tmp_addr[2] = 0x00;
@@ -7766,7 +7766,7 @@ static void hx83112a_nf_enter_hopping_write(bool on_off)
         tmp_data[0] = 0;
         hx83112a_nf_register_write(tmp_addr, 4, tmp_data, 0);
 
-        TPD_INFO("%s: close himax hopping write.\n", __func__);
+        TPD_DEBUG("%s: close himax hopping write.\n", __func__);
     }
 
 }
@@ -7858,7 +7858,7 @@ static int  hx83112a_nf_apk_gesture_info(void *chip_data, char *buf, int len)
         y = y * hx83112a_nf_pri_ts->resolution_info.max_y / 255;
 
 
-        //TPD_INFO("nova_apk_gesture_info:gesture x is %d,y is %d.\n", x, y);
+        //TPD_DEBUG("nova_apk_gesture_info:gesture x is %d,y is %d.\n", x, y);
 
         if (len < i * 4 + 2) {
             break;
@@ -7973,7 +7973,7 @@ static void hx83112a_nf_init_oplus_apk_op(struct touchpanel_data *ts)
         //apk_op->apk_debug_info = ili_apk_debug_info;
 
     } else {
-        TPD_INFO("Can not kzalloc apk op.\n");
+        TPD_DEBUG("Can not kzalloc apk op.\n");
     }
 }
 #endif // end of CONFIG_OPLUS_TP_APK
@@ -7985,12 +7985,12 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     //step1:Alloc chip_info
     chip_info = kzalloc(sizeof(struct chip_data_hx83112a_nf), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -8006,14 +8006,14 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
     //step2:Alloc common ts
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto err_register_driver;
     }
     memset(ts, 0, sizeof(*ts));
 
     chip_info->g_fw_buf = vmalloc(128 * 1024);
     if (chip_info->g_fw_buf == NULL) {
-        TPD_INFO("fw buf vmalloc error\n");
+        TPD_DEBUG("fw buf vmalloc error\n");
         //ret = -ENOMEM;
         goto err_g_fw_buf;
     }
@@ -8035,7 +8035,7 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
     chip_info->first_download_finished = false;
 
     if (ts->s_client->master->flags & SPI_MASTER_HALF_DUPLEX) {
-        TPD_INFO("Full duplex not supported by master\n");
+        TPD_DEBUG("Full duplex not supported by master\n");
         ret = -EIO;
         goto err_spi_setup;
     }
@@ -8054,7 +8054,7 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
 
     ret = spi_setup(ts->s_client);
     if (ret < 0) {
-        TPD_INFO("Failed to perform SPI setup\n");
+        TPD_DEBUG("Failed to perform SPI setup\n");
         goto err_spi_setup;
     }
 #endif
@@ -8078,7 +8078,7 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
     }
     disable_irq_nosync(chip_info->hx_irq);
     if (hx83112a_nf_ic_package_check() == false) {
-        TPD_INFO("Himax chip doesn NOT EXIST");
+        TPD_DEBUG("Himax chip doesn NOT EXIST");
         goto err_register_driver;
     }
     chip_info->test_limit_name = ts->panel_data.test_limit_name;
@@ -8109,7 +8109,7 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
     //step7:create hx83112a_nf related proc files
     himax_create_proc(ts, chip_info->syna_ops);
     hx83112a_nf_irq_en_cnt = 1;
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
 
 #ifdef CONFIG_TOUCHPANEL_MTK_PLATFORM
     if (ts->boot_mode == RECOVERY_BOOT)
@@ -8118,11 +8118,11 @@ static int hx83112a_nf_tp_probe(struct spi_device *spi)
 #endif
     {
         enable_irq(chip_info->hx_irq);
-        TPD_INFO("In Recovery mode, no-flash download fw by headfile\n");
+        TPD_DEBUG("In Recovery mode, no-flash download fw by headfile\n");
         queue_delayed_work(chip_info->himax_0f_update_wq, &chip_info->work_0f_update, msecs_to_jiffies(500));
     } else if (is_oem_unlocked()) {
         enable_irq(chip_info->hx_irq);
-        TPD_INFO("It's oem unlocked, download fw in probe\n");
+        TPD_DEBUG("It's oem unlocked, download fw in probe\n");
         queue_delayed_work(chip_info->himax_0f_update_wq, &chip_info->work_0f_update, msecs_to_jiffies(5000));
     } else {
         //disable_irq_nosync(chip_info->hx_irq);
@@ -8156,7 +8156,7 @@ err_register_driver:
 
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
 
     return ret;
 }
@@ -8169,7 +8169,7 @@ static int hx83112a_nf_tp_remove(struct spi_device *spi)
     /* spin_unlock_irq(&ts->spi_lock); */
     spi_set_drvdata(spi, NULL);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -8179,7 +8179,7 @@ static int hx83112a_nf_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called gesture_enable =%d\n", __func__, ts->gesture_enable);
+    TPD_DEBUG("%s: is called gesture_enable =%d\n", __func__, ts->gesture_enable);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -8189,12 +8189,12 @@ static int hx83112a_nf_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     /* if (ts->black_gesture_support) {
          if (ts->gesture_enable == 1) {
-             TPD_INFO("hx83112a_nf_set_SMWP_enable 1\n");
+             TPD_DEBUG("hx83112a_nf_set_SMWP_enable 1\n");
              hx83112a_nf_set_SMWP_enable(1, ts->is_suspended);
          }
      }*/
@@ -8243,7 +8243,7 @@ static int __init tp_driver_init(void)
 {
     int status = 0;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     if (!tp_judge_ic_match(TPD_DEVICE)) {
         return -1;
     }
@@ -8253,7 +8253,7 @@ static int __init tp_driver_init(void)
 
     status = spi_register_driver(&hx83112a_nf_common_driver);
     if (status < 0) {
-        TPD_INFO("%s, Failed to register SPI driver.\n", __func__);
+        TPD_DEBUG("%s, Failed to register SPI driver.\n", __func__);
         return -EINVAL;
     }
 

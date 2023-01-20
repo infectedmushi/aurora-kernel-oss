@@ -65,13 +65,13 @@ static int goodix_set_i2c_doze_mode(struct i2c_client *client, int enable)
         if (doze_mode_set_count == 1) {
             w_data = DOZE_DISABLE_FLAG;
             if (touch_i2c_write_block(client, GTP_REG_DOZE_CTRL, 1, &w_data) < 0) {
-                TPD_INFO("doze mode comunition disable FAILED\n");
+                TPD_DEBUG("doze mode comunition disable FAILED\n");
                 goto exit;
             }
             usleep_range(8000, 8100);
             for (i = 0; i < 20; i++) {
                 if (touch_i2c_read_block(client, GTP_REG_DOZE_STAT, 1, &r_data) < 0) {
-                    TPD_INFO("doze mode comunition disable FAILED\n");
+                    TPD_DEBUG("doze mode comunition disable FAILED\n");
                     goto exit;
                 }
                 if (DOZE_CLOSE_OK_FLAG == r_data) {
@@ -80,19 +80,19 @@ static int goodix_set_i2c_doze_mode(struct i2c_client *client, int enable)
                 } else if (DOZE_DISABLE_FLAG != r_data) {
                     w_data = DOZE_DISABLE_FLAG;
                     if (touch_i2c_write_block(client, GTP_REG_DOZE_CTRL, 1, &w_data) < 0) {
-                        TPD_INFO("doze mode comunition disable FAILED, 0x%x!=0x%x\n", r_data, DOZE_DISABLE_FLAG);
+                        TPD_DEBUG("doze mode comunition disable FAILED, 0x%x!=0x%x\n", r_data, DOZE_DISABLE_FLAG);
                         goto exit;
                     }
                 }
                 retry_times++;
                 if(retry_times > 5) {
-                    TPD_INFO("doze mode wait flag timeout,should clear int\n");
+                    TPD_DEBUG("doze mode wait flag timeout,should clear int\n");
                     w_data = 0;
                     touch_i2c_write_block(client, 0x4100, 1, &w_data);
                 }
                 usleep_range(10000, 11000);
             }
-            TPD_INFO("doze mode disable FAILED\n");
+            TPD_DEBUG("doze mode disable FAILED\n");
         } else {
             result = 0;
             goto exit;
@@ -113,12 +113,12 @@ static int gt9886_i2c_read(struct i2c_client *client, u16 addr, s32 len, u8 *buf
     int ret = -EINVAL;
 
     if (goodix_set_i2c_doze_mode(client, false) != 0) {
-        TPD_INFO("gtx8 i2c read:0x%04x ERROR, disable doze mode FAILED\n", addr);
+        TPD_DEBUG("gtx8 i2c read:0x%04x ERROR, disable doze mode FAILED\n", addr);
     }
     ret = touch_i2c_read_block(client, addr, len, buffer);
 
     if (goodix_set_i2c_doze_mode(client, true) != 0)
-        TPD_INFO("gtx8 i2c read:0x%04x ERROR, enable doze mode FAILED\n", addr);
+        TPD_DEBUG("gtx8 i2c read:0x%04x ERROR, enable doze mode FAILED\n", addr);
 
     return ret;
 }
@@ -128,12 +128,12 @@ static int gt9886_i2c_write(struct i2c_client *client, u16 addr, s32 len, u8 *bu
     int ret = -EINVAL;
 
     if (goodix_set_i2c_doze_mode(client, false) != 0) {
-        TPD_INFO("gtx8 i2c write:0x%04x ERROR, disable doze mode FAILED\n", addr);
+        TPD_DEBUG("gtx8 i2c write:0x%04x ERROR, disable doze mode FAILED\n", addr);
     }
     ret = touch_i2c_write_block(client, addr, len, buffer);
 
     if (goodix_set_i2c_doze_mode(client, true) != 0) {
-        TPD_INFO("gtx8 i2c write:0x%04x ERROR, enable doze mode FAILED\n", addr);
+        TPD_DEBUG("gtx8 i2c write:0x%04x ERROR, enable doze mode FAILED\n", addr);
     }
 
     return ret;
@@ -154,7 +154,7 @@ static int goodix_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 *bu
     int ret = -1;
 
     if (len > 16) {
-        TPD_INFO("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
+        TPD_DEBUG("i2c_read_dbl_check length %d is too long, exceed %zu\n", len, sizeof(buf));
         return ret;
     }
 
@@ -176,7 +176,7 @@ static int goodix_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 *bu
         return 0;
     }
 
-    TPD_INFO("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
+    TPD_DEBUG("i2c read 0x%04X, %d bytes, double check failed!\n", addr, len);
 
     return 1;
 }
@@ -187,7 +187,7 @@ static int goodix_i2c_read_dbl_check(struct i2c_client *client, u16 addr, u8 *bu
 //{
 //    int ret = 0;
 //    ret = upmu_get_rgs_chrdet();
-//    TPD_INFO("%s get usb status %d\n", __func__, ret);
+//    TPD_DEBUG("%s get usb status %d\n", __func__, ret);
 //    return ret;
 //}
 //#else
@@ -223,11 +223,11 @@ s32 goodix_send_cmd(void *chip_data, u8 cmd, u8 data)
     buffer[2] = (u8) ((0 - cmd - data) & 0xFF);
 
     if (goodix_set_i2c_doze_mode(chip_info->client, false) != 0) {
-        TPD_INFO("%s: disable doze mode FAILED\n", __func__);
+        TPD_DEBUG("%s: disable doze mode FAILED\n", __func__);
     }
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_CMD, 3, &buffer[0]);
     if (ret < 0) {
-        TPD_INFO("%s send cmd failed,ret:%d\n", __func__, ret);
+        TPD_DEBUG("%s send cmd failed,ret:%d\n", __func__, ret);
         goto exit;
     }
     usleep_range(8000, 8100);
@@ -235,7 +235,7 @@ s32 goodix_send_cmd(void *chip_data, u8 cmd, u8 data)
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_CMD, 1, &buf_read_back);
         if (ret < 0) {
             usleep_range(10000, 11000);
-            TPD_INFO("%s,read back failed\n", __func__);
+            TPD_DEBUG("%s,read back failed\n", __func__);
             continue;
         }
         if (buf_read_back != cmd || cmd == TS_CMD_REG_READY) {
@@ -245,7 +245,7 @@ s32 goodix_send_cmd(void *chip_data, u8 cmd, u8 data)
         }
         retry_times++;
         if (retry_times > 5) {
-            TPD_INFO("%s: wait cmd flag failed, clear int\n", __func__);
+            TPD_DEBUG("%s: wait cmd flag failed, clear int\n", __func__);
             buf_read_back = 0;
             touch_i2c_write_block(chip_info->client, 0x4100, 1, &buf_read_back);
             chip_info->send_cmd_err_count ++;
@@ -256,13 +256,13 @@ s32 goodix_send_cmd(void *chip_data, u8 cmd, u8 data)
     if (retry) {
         ret = 0;
     } else {
-        TPD_INFO("%s: cmd send to ic,but ic isn't handle it\n", __func__);
+        TPD_DEBUG("%s: cmd send to ic,but ic isn't handle it\n", __func__);
         ret = -1;
     }
 
 exit:
     if (goodix_set_i2c_doze_mode(chip_info->client, true) != 0) {
-        TPD_INFO("%s: enable doze mode FAILED\n", __func__);
+        TPD_DEBUG("%s: enable doze mode FAILED\n", __func__);
         ret = -1;
     }
 
@@ -283,7 +283,7 @@ static int goodix_clear_irq(void *chip_data)
     if (!gt8x_rawdiff_mode) {
         ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, &clean_flag);
         if (ret < 0) {
-            TPD_INFO("I2C write end_cmd  error!\n");
+            TPD_DEBUG("I2C write end_cmd  error!\n");
         }
     }
 
@@ -349,7 +349,7 @@ static int clockWise(uint8_t *buf, int n)
             count++;
     }
 
-    TPD_INFO("ClockWise count = %d\n", count);
+    TPD_DEBUG("ClockWise count = %d\n", count);
 
     if (count > 0)
         return 1;
@@ -359,7 +359,7 @@ static int clockWise(uint8_t *buf, int n)
 
 static void goodix_esd_check_enable(struct chip_data_gt9886 *chip_info, bool enable)
 {
-    TPD_INFO("%s %s\n", __func__, enable ? "enable" : "disable");
+    TPD_DEBUG("%s %s\n", __func__, enable ? "enable" : "disable");
     /* enable/disable esd check flag */
     chip_info->esd_check_enabled = enable;
 }
@@ -372,7 +372,7 @@ static int goodix_enter_sleep(struct chip_data_gt9886 *chip_info, bool config)
         while (retry++ < 3) {
             if (!goodix_send_cmd(chip_info, GTP_CMD_SLEEP, 0)) {
                 chip_info->halt_status = true;
-                TPD_INFO("enter sleep mode!\n");
+                TPD_DEBUG("enter sleep mode!\n");
                 return 0;
             }
             msleep(10);
@@ -380,7 +380,7 @@ static int goodix_enter_sleep(struct chip_data_gt9886 *chip_info, bool config)
     }
 
     if (retry >= 3) {
-        TPD_INFO("Enter sleep mode failed.\n");
+        TPD_DEBUG("Enter sleep mode failed.\n");
     }
 
     return -1;
@@ -390,7 +390,7 @@ static int goodix_enable_gesture(struct chip_data_gt9886 *chip_info, bool enable
 {
     int ret = -1;
 
-    TPD_INFO("%s, gesture enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, gesture enable = %d\n", __func__, enable);
 
     if (enable) {
         if (chip_info->single_tap_flag) {
@@ -410,7 +410,7 @@ static int goodix_enable_edge_limit(struct chip_data_gt9886 *chip_info, int stat
 {
     int ret = -1;
 
-    TPD_INFO("%s, edge limit enable = %d\n", __func__, state);
+    TPD_DEBUG("%s, edge limit enable = %d\n", __func__, state);
 
     if (state == 1 || VERTICAL_SCREEN == chip_info->touch_direction) {
         ret = goodix_send_cmd(chip_info, GTM_CMD_EDGE_LIMIT_VERTICAL, 0x00);
@@ -430,7 +430,7 @@ static int goodix_enable_charge_mode(struct chip_data_gt9886 *chip_info, bool en
 {
     int ret = -1;
 
-    TPD_INFO("%s, charge mode enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, charge mode enable = %d\n", __func__, enable);
 
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_CHARGER_ON, 0);
@@ -445,13 +445,13 @@ static int goodix_enable_game_mode(struct chip_data_gt9886 *chip_info, bool enab
 {
     int ret = 0;
 
-    TPD_INFO("%s, game mode enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, game mode enable = %d\n", __func__, enable);
     if(enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_GAME_MODE, 0x01);
-        TPD_INFO("%s: GTP_CMD_ENTER_GAME_MODE\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_ENTER_GAME_MODE\n", __func__);
     } else {
         ret = goodix_send_cmd(chip_info, GTP_CMD_GAME_MODE, 0x00);
-        TPD_INFO("%s: GTP_CMD_EXIT_GAME_MODE\n", __func__);
+        TPD_DEBUG("%s: GTP_CMD_EXIT_GAME_MODE\n", __func__);
     }
 
     return ret;
@@ -465,7 +465,7 @@ static int goodix_reset_esd_status(struct chip_data_gt9886 *chip_info)
 
     ret = gt9886_i2c_write(chip_info->client, chip_info->reg_info.GTP_REG_ESD_WRITE, 1, &value);
     if (ret < 0) {
-        TPD_INFO("%s: TP set_reset_status failed\n", __func__);
+        TPD_DEBUG("%s: TP set_reset_status failed\n", __func__);
         return ret;
     }
 
@@ -501,10 +501,10 @@ static s32 goodix_read_version(struct chip_data_gt9886 *chip_info, struct panel_
                 IS_NUM_OR_CHAR(buf[9]) && IS_NUM_OR_CHAR(buf[10]) && IS_NUM_OR_CHAR(buf[11]) && buf[21] != 0xFF) {    /*sensor id == 0xFF, retry */
                 break;
             } else {
-                TPD_INFO("product version data is error\n");
+                TPD_DEBUG("product version data is error\n");
             }
         } else {
-            TPD_INFO("Read product version from 0x452C failed\n");
+            TPD_DEBUG("Read product version from 0x452C failed\n");
         }
 
         TPD_DEBUG("Read product version retry = %d\n", retry);
@@ -514,7 +514,7 @@ static s32 goodix_read_version(struct chip_data_gt9886 *chip_info, struct panel_
     if (retry <= 0) {
         if (ver_info)
             ver_info->sensor_id = 0;
-        TPD_INFO("Maybe the firmware of ic is error\n");
+        TPD_DEBUG("Maybe the firmware of ic is error\n");
         goodix_set_i2c_doze_mode(chip_info->client, true);
         return -1;
     }
@@ -525,7 +525,7 @@ static s32 goodix_read_version(struct chip_data_gt9886 *chip_info, struct panel_
     sensor_id = buf[21] & 0x0F;
     //match_opt = (buf[10] >> 4) & 0x0F;
 
-    TPD_INFO("goodix fw VERSION:GT%s(Product)_%08X(Patch)_%06X(MaskID)_%02X(SensorID)\n", product_id, patch_id, mask_id, sensor_id);
+    TPD_DEBUG("goodix fw VERSION:GT%s(Product)_%08X(Patch)_%06X(MaskID)_%02X(SensorID)\n", product_id, patch_id, mask_id, sensor_id);
 
     if (ver_info != NULL) {
         ver_info->mask_id = mask_id;
@@ -550,7 +550,7 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
     int bag_start = 0;
     int bag_end = 0;
     if (!cfg || length < TS_CFG_HEAD_LEN) {
-        TPD_INFO("cfg is INVALID, len:%d", length);
+        TPD_DEBUG("cfg is INVALID, len:%d", length);
         ret = -EINVAL;
         goto exit;
     }
@@ -559,7 +559,7 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
     for (i = 0; i < TS_CFG_HEAD_LEN; i++)
         checksum += cfg[i];
     if (checksum != 0) {
-        TPD_INFO("cfg head checksum ERROR, ic type:normandy, checksum:0x%02x",
+        TPD_DEBUG("cfg head checksum ERROR, ic type:normandy, checksum:0x%02x",
                  checksum);
         ret = -EINVAL;
         goto exit;
@@ -567,12 +567,12 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
     bag_num = cfg[TS_CFG_BAG_NUM_INDEX];
     bag_start = TS_CFG_BAG_START_INDEX;
 
-    TPD_INFO("cfg bag_num:%d, cfg length:%d", bag_num, length);
+    TPD_DEBUG("cfg bag_num:%d, cfg length:%d", bag_num, length);
 
     /*check each bag's checksum*/
     for (j = 0; j < bag_num; j++) {
         if (bag_start >= length - 1) {
-            TPD_INFO("ERROR, overflow!!bag_start:%d, cfg_len:%d", bag_start, length);
+            TPD_DEBUG("ERROR, overflow!!bag_start:%d, cfg_len:%d", bag_start, length);
             ret = -EINVAL;
             goto exit;
         }
@@ -581,7 +581,7 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
 
         checksum = 0;
         if (bag_end > length) {
-            TPD_INFO("ERROR, overflow!!bag:%d, bag_start:%d,  bag_end:%d, cfg length:%d",
+            TPD_DEBUG("ERROR, overflow!!bag:%d, bag_start:%d,  bag_end:%d, cfg length:%d",
                      j, bag_start, bag_end, length);
             ret = -EINVAL;
             goto exit;
@@ -589,7 +589,7 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
         for (i = bag_start; i < bag_end; i++)
             checksum += cfg[i];
         if (checksum != 0) {
-            TPD_INFO("cfg INVALID, bag:%d checksum ERROR:0x%02x", j, checksum);
+            TPD_DEBUG("cfg INVALID, bag:%d checksum ERROR:0x%02x", j, checksum);
             ret = -EINVAL;
             goto exit;
         }
@@ -597,7 +597,7 @@ static int goodix_check_cfg_valid(u8 *cfg, int length)
     }
 
     ret = 0;
-    TPD_INFO("configuration check SUCCESS");
+    TPD_DEBUG("configuration check SUCCESS");
 
 exit:
     return ret;
@@ -614,17 +614,17 @@ static int goodix_wait_cfg_cmd_ready(struct chip_data_gt9886 *chip_info,
 
     for (try_times = 0; try_times < TS_WAIT_CFG_READY_RETRY_TIMES; try_times++) {
         if (gt9886_i2c_read(chip_info->client, command_reg, 3, cmd_buf) < 0) {
-            TPD_INFO("Read cmd_reg error");
+            TPD_DEBUG("Read cmd_reg error");
             return -EINVAL;
         }
         cmd_flag = cmd_buf[0];
         if (cmd_flag == right_cmd) {
             return 0;
         } else if (cmd_flag != send_cmd) {
-            TPD_INFO("Read cmd_reg data abnormal,return:0x%02X, 0x%02X, 0x%02X, send again",
+            TPD_DEBUG("Read cmd_reg data abnormal,return:0x%02X, 0x%02X, 0x%02X, send again",
                      cmd_buf[0], cmd_buf[1], cmd_buf[2]);
             if (goodix_send_cmd(chip_info, send_cmd, 0)) {
-                TPD_INFO("Resend cmd 0x%02X FAILED", send_cmd);
+                TPD_DEBUG("Resend cmd 0x%02X FAILED", send_cmd);
                 return -EINVAL;
             }
         }
@@ -652,7 +652,7 @@ RETRY:
         usleep_range(10000, 11000);
     }
     if (try_times >= TS_WAIT_CMD_FREE_RETRY_TIMES) {
-        TPD_INFO("Send large cfg FAILED, before send, reg:0x%04x is not 0xff", command_reg);
+        TPD_DEBUG("Send large cfg FAILED, before send, reg:0x%04x is not 0xff", command_reg);
         if (count == 1) {
             count = 0;
             buf = 0x00;
@@ -664,28 +664,28 @@ RETRY:
     }
     /*2. send "start write cfg" command*/
     if (goodix_send_cmd(chip_info, COMMAND_START_SEND_LARGE_CFG, 0)) {
-        TPD_INFO("Send large cfg FAILED, send COMMAND_START_SEND_LARGE_CFG ERROR");
+        TPD_DEBUG("Send large cfg FAILED, send COMMAND_START_SEND_LARGE_CFG ERROR");
         r = -EINVAL;
         goto exit;
     }
 
     /*3. wait ic set command_reg to 0x82*/
     if (goodix_wait_cfg_cmd_ready(chip_info, COMMAND_SEND_CFG_PREPARE_OK, COMMAND_START_SEND_LARGE_CFG)) {
-        TPD_INFO("Send large cfg FAILED, reg:0x%04x is not 0x82", command_reg);
+        TPD_DEBUG("Send large cfg FAILED, reg:0x%04x is not 0x82", command_reg);
         r = -EINVAL;
         goto exit;
     }
 
     /*4. write cfg*/
     if (gt9886_i2c_write(chip_info->client, cfg_reg, cfg_len, config) < 0) {
-        TPD_INFO("Send large cfg FAILED, write cfg to fw ERROR");
+        TPD_DEBUG("Send large cfg FAILED, write cfg to fw ERROR");
         r = -EINVAL;
         goto exit;
     }
 
     /*5. send "end send cfg" command*/
     if (goodix_send_cmd(chip_info, COMMAND_END_SEND_CFG, 0)) {
-        TPD_INFO("Send large cfg FAILED, send COMMAND_END_SEND_CFG ERROR");
+        TPD_DEBUG("Send large cfg FAILED, send COMMAND_END_SEND_CFG ERROR");
         r = -EINVAL;
         goto exit;
     }
@@ -697,12 +697,12 @@ RETRY:
         usleep_range(10000, 11000);
     }
     if (try_times >= TS_WAIT_CMD_FREE_RETRY_TIMES) {
-        TPD_INFO("Send large cfg FAILED, after send, reg:0x%04x is not 0xff", command_reg);
+        TPD_DEBUG("Send large cfg FAILED, after send, reg:0x%04x is not 0xff", command_reg);
         r = -EINVAL;
         goto exit;
     }
     msleep(100);
-    TPD_INFO("Send large cfg SUCCESS");
+    TPD_DEBUG("Send large cfg SUCCESS");
     r = 0;
 
 exit:
@@ -715,18 +715,18 @@ static s32 goodix_send_config(struct chip_data_gt9886 *chip_info, u8 *config, in
     static DEFINE_MUTEX(config_lock);
 
     if (!config) {
-        TPD_INFO("Null config data");
+        TPD_DEBUG("Null config data");
         return -EINVAL;
     }
 
     /*check configuration valid*/
     ret = goodix_check_cfg_valid(config, cfg_len);
     if (ret != 0) {
-        TPD_INFO("cfg check FAILED");
+        TPD_DEBUG("cfg check FAILED");
         return -EINVAL;
     }
 
-    TPD_INFO("ver:%02xh,size:%d", config[0], cfg_len);
+    TPD_DEBUG("ver:%02xh,size:%d", config[0], cfg_len);
 
     mutex_lock(&config_lock);
 
@@ -739,7 +739,7 @@ static s32 goodix_send_config(struct chip_data_gt9886 *chip_info, u8 *config, in
     goodix_set_i2c_doze_mode(chip_info->client, true);
 
     if (ret != 0)
-        TPD_INFO("send_cfg FAILED, cfg_len:%d", cfg_len);
+        TPD_DEBUG("send_cfg FAILED, cfg_len:%d", cfg_len);
 
     mutex_unlock(&config_lock);
 
@@ -753,47 +753,47 @@ static s32 goodix_request_event_handler(struct chip_data_gt9886 *chip_info)
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_RQST, 1, &rqst_data);
     if (ret < 0) {
-        TPD_INFO("%s: i2c transfer error.\n", __func__);
+        TPD_DEBUG("%s: i2c transfer error.\n", __func__);
         return -1;
     }
 
-    TPD_INFO("%s: request state:0x%02x.\n", __func__, rqst_data);
+    TPD_DEBUG("%s: request state:0x%02x.\n", __func__, rqst_data);
 
     switch (rqst_data) {
     case GTP_RQST_CONFIG:
-        TPD_INFO("HW request config.\n");
+        TPD_DEBUG("HW request config.\n");
         ret = goodix_send_config(chip_info, chip_info->normal_cfg.data, chip_info->normal_cfg.length);
         if (ret) {
-            TPD_INFO("request config, send config faild.\n");
+            TPD_DEBUG("request config, send config faild.\n");
         }
         break;
 
     case GTP_RQST_RESET:
-        TPD_INFO("%s: HW requset reset.\n", __func__);
+        TPD_DEBUG("%s: HW requset reset.\n", __func__);
         goodix_reset(chip_info);
         break;
 
     case GTP_RQST_BASELINE:
-        TPD_INFO("%s: HW request baseline.\n", __func__);
+        TPD_DEBUG("%s: HW request baseline.\n", __func__);
         break;
 
     case GTP_RQST_FRE:
-        TPD_INFO("%s: HW request frequence.\n", __func__);
+        TPD_DEBUG("%s: HW request frequence.\n", __func__);
         break;
 
     case GTP_RQST_IDLE:
-        TPD_INFO("%s: HW request idle.\n", __func__);
+        TPD_DEBUG("%s: HW request idle.\n", __func__);
         break;
 
     default:
-        TPD_INFO("%s: Unknown hw request:%d.\n", __func__, rqst_data);
+        TPD_DEBUG("%s: Unknown hw request:%d.\n", __func__, rqst_data);
         break;
     }
 
     rqst_data = GTP_RQST_RESPONDED;
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_RQST, 1, &rqst_data);
     if (ret) {
-        TPD_INFO("%s: failed to write rqst_data:%d.\n", __func__, rqst_data);
+        TPD_DEBUG("%s: failed to write rqst_data:%d.\n", __func__, rqst_data);
     }
 
     return 0;
@@ -822,7 +822,7 @@ void goodix_reset_via_gpio(struct chip_data_gt9886 *chip_info)
         msleep(10);
         chip_info->halt_status = false; //reset this flag when ic reset
     } else {
-        TPD_INFO("reset gpio is invalid\n");
+        TPD_DEBUG("reset gpio is invalid\n");
     }
 
     msleep(20);
@@ -833,13 +833,13 @@ static int goodix_reset(void *chip_data)
     int ret = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
 
     goodix_reset_via_gpio(chip_info);
 
     ret = goodix_reset_esd_status(chip_info);
     if (ret < 0) {
-        TPD_INFO("goodix reset esd status failed\n");
+        TPD_DEBUG("goodix reset esd status failed\n");
         return ret;
     }
 
@@ -853,7 +853,7 @@ int goodix_get_channel_num(struct i2c_client *client, u32 *sen_num, u32 *drv_num
 
     ret = gt9886_i2c_read(client, SENSOR_NUM_ADDR, 1, buf);
     if (ret < 0) {
-        TPD_INFO("Read sen_num fail.");
+        TPD_DEBUG("Read sen_num fail.");
         return ret;
     }
 
@@ -861,12 +861,12 @@ int goodix_get_channel_num(struct i2c_client *client, u32 *sen_num, u32 *drv_num
 
     ret = gt9886_i2c_read(client, DRIVER_GROUP_A_NUM_ADDR, 2, buf);
     if (ret < 0) {
-        TPD_INFO("Read drv_num fail.");
+        TPD_DEBUG("Read drv_num fail.");
         return ret;
     }
 
     *drv_num = buf[0] + buf[1];
-    TPD_INFO("sen_num : %d, drv_num : %d", *sen_num, *drv_num);
+    TPD_DEBUG("sen_num : %d, drv_num : %d", *sen_num, *drv_num);
 
     return 0;
 }
@@ -879,7 +879,7 @@ static int goodix_ftm_process(void *chip_data)
 {
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)chip_data;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     tp_powercontrol_2v8(chip_info->hw_res, false);
     tp_powercontrol_1v8(chip_info->hw_res, false);
     if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
@@ -900,7 +900,7 @@ static int goodix_get_vendor(void *chip_data, struct panel_info *panel_data)
     chip_info->p_tp_fw = panel_data->manufacture_info.version;
     strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -980,7 +980,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
         goodix_i2c_read_dbl_check(chip_info->client, chip_info->reg_info.GTP_REG_FW_CHK_MAINSYS, reg_val, 1);
 
         if (reg_val[0] != 0xFC) {
-            TPD_INFO("Check fw status failed: reg[0x21e4] = 0x%2X!\n", reg_val[0]);
+            TPD_DEBUG("Check fw status failed: reg[0x21e4] = 0x%2X!\n", reg_val[0]);
         } else {
             break;
         }
@@ -991,7 +991,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
 
     fw_ver = goodix_read_version(chip_info, panel_data);
     if (ret < 0) {
-        TPD_INFO("%s: goodix read version failed\n", __func__);
+        TPD_DEBUG("%s: goodix read version failed\n", __func__);
         return FW_ABNORMAL;
     }
 
@@ -1003,7 +1003,7 @@ static fw_check_state goodix_fw_check(void *chip_data, struct resolution_info *r
         strlcpy(&(panel_data->manufacture_info.version[7]), dev_version, 5);
     }
 
-    TPD_INFO("%s: panel_data->TP_FW = 0x%x \n", __func__, panel_data->TP_FW);
+    TPD_DEBUG("%s: panel_data->TP_FW = 0x%x \n", __func__, panel_data->TP_FW);
     return FW_NORMAL;
 }
 
@@ -1026,7 +1026,7 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
     int r = 0;
 
     if (!fw_data || !fw_data->firmware) {
-        TPD_INFO("Invalid firmware data");
+        TPD_DEBUG("Invalid firmware data");
         return -EINVAL;
     }
     fw_info = &fw_data->fw_info;
@@ -1034,7 +1034,7 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
     /* copy firmware head info */
     firmware = fw_data->firmware;
     if (firmware->size < FW_SUBSYS_INFO_OFFSET) {
-        TPD_INFO("Invalid firmware size:%zu", firmware->size);
+        TPD_DEBUG("Invalid firmware size:%zu", firmware->size);
         r = -EINVAL;
         goto err_size;
     }
@@ -1043,7 +1043,7 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
     /* check firmware size */
     fw_info->size = be32_to_cpu(fw_info->size);            // Notice here
     if (firmware->size != fw_info->size + 6) {
-        TPD_INFO("Bad firmware, size not match");
+        TPD_DEBUG("Bad firmware, size not match");
         r = -EINVAL;
         goto err_size;
     }
@@ -1056,13 +1056,13 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
     /* byte order change, and check */
     fw_info->checksum = be16_to_cpu(fw_info->checksum);
     if (checksum != fw_info->checksum) {
-        TPD_INFO("Bad firmware, cheksum error");
+        TPD_DEBUG("Bad firmware, cheksum error");
         r = -EINVAL;
         goto err_size;
     }
 
     if (fw_info->subsys_num > FW_SUBSYS_MAX_NUM) {
-        TPD_INFO("Bad firmware, invalid subsys num: %d", fw_info->subsys_num);
+        TPD_DEBUG("Bad firmware, invalid subsys num: %d", fw_info->subsys_num);
         r = -EINVAL;
         goto err_size;
     }
@@ -1076,7 +1076,7 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
         fw_info->subsys[i].flash_addr = be16_to_cpup((__be16 *)&firmware->data[info_offset + 5]);
 
         if (fw_offset > firmware->size) {
-            TPD_INFO("Sybsys offset exceed Firmware size");
+            TPD_DEBUG("Sybsys offset exceed Firmware size");
             goto err_size;
         }
 
@@ -1084,12 +1084,12 @@ static int goodix_parse_firmware(struct firmware_data *fw_data)
         fw_offset += fw_info->subsys[i].size;
     }
 
-    TPD_INFO("Firmware package protocol: V%u", fw_info->protocol_ver);
-    TPD_INFO("Fimware PID:GT%s", fw_info->fw_pid);
-    TPD_INFO("Fimware VID:%02X%02X%02X%02X", fw_info->fw_vid[0], fw_info->fw_vid[1], fw_info->fw_vid[2], fw_info->fw_vid[3]);
-    TPD_INFO("Firmware chip type:%02X", fw_info->chip_type);
-    TPD_INFO("Firmware size:%u", fw_info->size);
-    TPD_INFO("Firmware subsystem num:%u", fw_info->subsys_num);
+    TPD_DEBUG("Firmware package protocol: V%u", fw_info->protocol_ver);
+    TPD_DEBUG("Fimware PID:GT%s", fw_info->fw_pid);
+    TPD_DEBUG("Fimware VID:%02X%02X%02X%02X", fw_info->fw_vid[0], fw_info->fw_vid[1], fw_info->fw_vid[2], fw_info->fw_vid[3]);
+    TPD_DEBUG("Firmware chip type:%02X", fw_info->chip_type);
+    TPD_DEBUG("Firmware size:%u", fw_info->size);
+    TPD_DEBUG("Firmware subsystem num:%u", fw_info->subsys_num);
     for (i = 0; i < fw_info->subsys_num; i++) {
         TPD_DEBUG("------------------------------------------");
         TPD_DEBUG("Index:%d", i);
@@ -1137,37 +1137,37 @@ static int goodix_check_update(struct i2c_client *client,
     /*read and compare PID*/
     r = gt9886_i2c_read(client, PID_REG, PID_LEN, buffer);
     if (r < 0) {
-        TPD_INFO("Read pid failed");
+        TPD_DEBUG("Read pid failed");
         goto exit;
     }
-    TPD_INFO("PID:%02x %02x %02x %02x", buffer[0], buffer[1],
+    TPD_DEBUG("PID:%02x %02x %02x %02x", buffer[0], buffer[1],
              buffer[2], buffer[3]);
 
     if (memcmp(buffer, fw_info->fw_pid, PID_LEN)) {
-        TPD_INFO("Product is not match,may header's fw is other product's");
+        TPD_DEBUG("Product is not match,may header's fw is other product's");
         goto need_update;
     }
 
     /*read and compare VID*/
     r = gt9886_i2c_read(client, VID_REG, VID_LEN, buffer);
     if (r < 0) {
-        TPD_INFO("Read vid failed");
+        TPD_DEBUG("Read vid failed");
         goto exit;
     }
-    TPD_INFO("VID:%02x %02x %02x %02x", buffer[0], buffer[1],
+    TPD_DEBUG("VID:%02x %02x %02x %02x", buffer[0], buffer[1],
              buffer[2], buffer[3]);
 
     res = memcmp(buffer, fw_info->fw_vid, VID_LEN);
     if (0 == res) {
-        TPD_INFO("FW version is equal tp IC's,skip update");
+        TPD_DEBUG("FW version is equal tp IC's,skip update");
         r = -EPERM;
         goto exit;
     } else if (res > 0) {
-        TPD_INFO("Warning: fw version is lower than IC's");
+        TPD_DEBUG("Warning: fw version is lower than IC's");
     }
 
 need_update:
-    TPD_INFO("Firmware needs tp be updated");
+    TPD_DEBUG("Firmware needs tp be updated");
     r = 0;
 exit:
     /*enable doze mode, just valid for normandy
@@ -1195,7 +1195,7 @@ static int goodix_reg_write_confirm(struct i2c_client *client,
     if (len > sizeof(cfm_buf)) {
         cfm = kzalloc(len, GFP_KERNEL);
         if (!cfm) {
-            TPD_INFO("Mem alloc failed");
+            TPD_DEBUG("Mem alloc failed");
             return -ENOMEM;
         }
     } else {
@@ -1241,12 +1241,12 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
 
     fw_isp = &fw_data->fw_info.subsys[0];
 
-    TPD_INFO("Loading ISP start");
+    TPD_DEBUG("Loading ISP start");
     /* select bank0 */
     reg_val[0] = 0x00;
     r = touch_i2c_write_block(client, HW_REG_BANK_SELECT, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to select bank0");
+        TPD_DEBUG("Failed to select bank0");
         return r;
     }
     TPD_DEBUG("Success select bank0, Set 0x%x -->0x00", HW_REG_BANK_SELECT);
@@ -1255,14 +1255,14 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
     reg_val[0] = 0x01;
     r = touch_i2c_write_block(client, HW_REG_ACCESS_PATCH0, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to enable patch0 access");
+        TPD_DEBUG("Failed to enable patch0 access");
         return r;
     }
     TPD_DEBUG("Success select bank0, Set 0x%x -->0x01", HW_REG_ACCESS_PATCH0);
 
     r = goodix_reg_write_confirm(client, HW_REG_ISP_ADDR, (u8 *)fw_isp->data, fw_isp->size);
     if (r < 0) {
-        TPD_INFO("Loading ISP error");
+        TPD_DEBUG("Loading ISP error");
         return r;
     }
 
@@ -1272,7 +1272,7 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
     reg_val[0] = 0x00;
     r = goodix_reg_write_confirm(client, HW_REG_ACCESS_PATCH0, reg_val, 1);
     if (r < 0) {
-        TPD_INFO("Failed to disable patch0 access");
+        TPD_DEBUG("Failed to disable patch0 access");
         return r;
     }
     TPD_DEBUG("Success forbit bank0 accedd, set 0x%x -->0x00", HW_REG_ACCESS_PATCH0);
@@ -1282,7 +1282,7 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
     reg_val[1] = 0x00;
     r = touch_i2c_write_block(client, HW_REG_ISP_RUN_FLAG, 2, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to clear 0x%x", HW_REG_ISP_RUN_FLAG);
+        TPD_DEBUG("Failed to clear 0x%x", HW_REG_ISP_RUN_FLAG);
         return r;
     }
     TPD_DEBUG("Success clear 0x%x", HW_REG_ISP_RUN_FLAG);
@@ -1291,7 +1291,7 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
     memset(reg_val, 0x55, 8);
     r = touch_i2c_write_block(client, HW_REG_CPU_RUN_FROM, 8, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed set backdoor flag");
+        TPD_DEBUG("Failed set backdoor flag");
         return r;
     }
     TPD_DEBUG("Success write [8]0x55 to 0x%x", HW_REG_CPU_RUN_FROM);
@@ -1300,7 +1300,7 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
     reg_val[0] = 0x00;
     r = touch_i2c_write_block(client, HW_REG_CPU_CTRL, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to run isp");
+        TPD_DEBUG("Failed to run isp");
         return r;
     }
     TPD_DEBUG("Success run isp, set 0x%x-->0x00", HW_REG_CPU_CTRL);
@@ -1313,10 +1313,10 @@ static int goodix_load_isp(struct i2c_client *client, struct firmware_data *fw_d
         usleep_range(5000, 5100);
     }
     if (reg_val[0] == 0xAA && reg_val[1] == 0xBB) {
-        TPD_INFO("ISP working OK");
+        TPD_DEBUG("ISP working OK");
         return 0;
     } else {
-        TPD_INFO("ISP not work,0x%x=0x%x, 0x%x=0x%x",
+        TPD_DEBUG("ISP not work,0x%x=0x%x, 0x%x=0x%x",
                  HW_REG_ISP_RUN_FLAG, reg_val[0],
                  HW_REG_ISP_RUN_FLAG + 1, reg_val[1]);
         return -EFAULT;
@@ -1334,7 +1334,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     gt9886_i2c_write(chip_info->client, HW_REG_CPU_RUN_FROM, 8, temp_buf);
 
     /*reset IC*/
-    TPD_INFO("normandy firmware update, reset");
+    TPD_DEBUG("normandy firmware update, reset");
     gpio_direction_output(chip_info->hw_res->reset_gpio, 0);
     udelay(2000);
     gpio_direction_output(chip_info->hw_res->reset_gpio, 1);
@@ -1345,14 +1345,14 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
         reg_val[0] = 0x24;
         r = goodix_reg_write_confirm(chip_info->client, HW_REG_CPU_CTRL, reg_val, 1);
         if (r < 0) {
-            TPD_INFO("Failed to hold ss51, retry");
+            TPD_DEBUG("Failed to hold ss51, retry");
             msleep(20);
         } else {
             break;
         }
     } while (--retry);
     if (!retry) {
-        TPD_INFO("Failed hold ss51,return =%d", r);
+        TPD_DEBUG("Failed hold ss51,return =%d", r);
         return -EINVAL;
     }
     TPD_DEBUG("Success hold ss51");
@@ -1361,7 +1361,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     reg_val[0] = 0x00;
     r = goodix_reg_write_confirm(chip_info->client, HW_REG_DSP_MCU_POWER, reg_val, 1);
     if (r < 0) {
-        TPD_INFO("Failed enable DSP&MCU power");
+        TPD_DEBUG("Failed enable DSP&MCU power");
         return r;
     }
     TPD_DEBUG("Success enabled DSP&MCU power,set 0x%x-->0x00", HW_REG_DSP_MCU_POWER);
@@ -1370,7 +1370,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     reg_val[0] = 0x00;
     r = touch_i2c_write_block(chip_info->client, HW_REG_CACHE, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to clear cache");
+        TPD_DEBUG("Failed to clear cache");
         return r;
     }
     TPD_DEBUG("Success clear cache");
@@ -1383,7 +1383,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     reg_val[0] = 0x27;
     r |= touch_i2c_write_block(chip_info->client, HW_REG_ESD_KEY, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to disable watchdog");
+        TPD_DEBUG("Failed to disable watchdog");
         return r;
     }
     TPD_DEBUG("Success disable watchdog");
@@ -1392,7 +1392,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     reg_val[0] = 0x00;
     r = touch_i2c_write_block(chip_info->client, HW_REG_SCRAMBLE, 1, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed to set scramble");
+        TPD_DEBUG("Failed to set scramble");
         return r;
     }
     TPD_DEBUG("Succcess set scramble");
@@ -1400,7 +1400,7 @@ static int goodix_update_prepare(void *chip_data, struct fw_update_ctrl *fwu_ctr
     /* load ISP code and run form isp */
     r = goodix_load_isp(chip_info->client, &fwu_ctrl->fw_data);
     if (r < 0)
-        TPD_INFO("Failed lode and run isp");
+        TPD_DEBUG("Failed lode and run isp");
 
     return r;
 }
@@ -1468,10 +1468,10 @@ static int goodix_send_fw_packet(struct i2c_client *client, u8 type,
     total_size = len;
     while (total_size > 0) {
         data_size = total_size > I2C_DATA_MAX_BUFFERSIZE ? I2C_DATA_MAX_BUFFERSIZE : total_size;
-        TPD_INFO("I2C firmware to %08x,size:%u bytes all len:%u bytes", offset, data_size, len);
+        TPD_DEBUG("I2C firmware to %08x,size:%u bytes all len:%u bytes", offset, data_size, len);
         r = goodix_reg_write_confirm(client, HW_REG_ISP_BUFFER + offset, &pkt[offset], data_size);
         if (r < 0) {
-            TPD_INFO("Failed to write firmware packet");
+            TPD_DEBUG("Failed to write firmware packet");
             return r;
         }
 
@@ -1484,7 +1484,7 @@ static int goodix_send_fw_packet(struct i2c_client *client, u8 type,
     /* clear flash flag 0X6022 */
     r = goodix_reg_write_confirm(client, HW_REG_FLASH_FLAG, reg_val, 2);
     if (r < 0) {
-        TPD_INFO("Faile to clear flash flag");
+        TPD_DEBUG("Faile to clear flash flag");
         return r;
     }
 
@@ -1493,14 +1493,14 @@ static int goodix_send_fw_packet(struct i2c_client *client, u8 type,
     reg_val[1] = type;
     r = goodix_reg_write_confirm(client, HW_REG_SUBSYS_TYPE, reg_val, 2);
     if (r < 0) {
-        TPD_INFO("Failed write subsystem type to IC");
+        TPD_DEBUG("Failed write subsystem type to IC");
         return r;
     }
 
     for (i = 0; i < TS_READ_FLASH_STATE_RETRY_TIMES; i++) {
         r = touch_i2c_read_block(client, HW_REG_FLASH_FLAG, 2, reg_val);
         if (r < 0) {
-            TPD_INFO("Failed read flash state");
+            TPD_DEBUG("Failed read flash state");
             return r;
         }
 
@@ -1514,23 +1514,23 @@ static int goodix_send_fw_packet(struct i2c_client *client, u8 type,
             /* read twice to confirm the result */
             r = touch_i2c_read_block(client, HW_REG_FLASH_FLAG, 2, reg_val);
             if (r >= 0 && reg_val[0] == ISP_FLASH_SUCCESS && reg_val[1] == ISP_FLASH_SUCCESS) {
-                TPD_INFO("Flash subsystem ok");
+                TPD_DEBUG("Flash subsystem ok");
                 return 0;
             }
         }
         if (reg_val[0] == ISP_FLASH_ERROR && reg_val[1] == ISP_FLASH_ERROR) {
-            TPD_INFO(" Flash subsystem failed");
+            TPD_DEBUG(" Flash subsystem failed");
             return -EAGAIN;
         }
         if (reg_val[0] == ISP_FLASH_CHECK_ERROR) {
-            TPD_INFO("Subsystem checksum err");
+            TPD_DEBUG("Subsystem checksum err");
             return -EAGAIN;
         }
 
         usleep_range(250, 260);
     }
 
-    TPD_INFO("Wait for flash end timeout, 0x6022= %x %x", reg_val[0], reg_val[1]);
+    TPD_DEBUG("Wait for flash end timeout, 0x6022= %x %x", reg_val[0], reg_val[1]);
     return -EAGAIN;
 }
 
@@ -1560,19 +1560,19 @@ static int goodix_flash_subsystem(struct i2c_client *client, struct fw_subsys_in
     total_size = subsys->size;
     fw_packet = kzalloc(ISP_MAX_BUFFERSIZE + 6, GFP_KERNEL);
     if (!fw_packet) {
-        TPD_INFO("Failed alloc memory");
+        TPD_DEBUG("Failed alloc memory");
         return -EINVAL;
     }
 
     offset = 0;
     while (total_size > 0) {
         data_size = total_size > ISP_MAX_BUFFERSIZE ? ISP_MAX_BUFFERSIZE : total_size;
-        TPD_INFO("Flash firmware to %08x,size:%u bytes", subsys_base_addr + offset, data_size);
+        TPD_DEBUG("Flash firmware to %08x,size:%u bytes", subsys_base_addr + offset, data_size);
 
         /* format one firmware packet */
         r = goodix_format_fw_packet(fw_packet, subsys_base_addr + offset, data_size, &subsys->data[offset]);
         if (r < 0) {
-            TPD_INFO("Invalid packet params");
+            TPD_DEBUG("Invalid packet params");
             goto exit;
         }
 
@@ -1583,7 +1583,7 @@ static int goodix_flash_subsystem(struct i2c_client *client, struct fw_subsys_in
                 break;
         }
         if (r) {
-            TPD_INFO("Failed flash subsystem");
+            TPD_DEBUG("Failed flash subsystem");
             goto exit;
         }
         offset += data_size;
@@ -1621,18 +1621,18 @@ static int goodix_flash_firmware(struct i2c_client *client, struct firmware_data
     prog_step = 80 / (fw_num - 1);
 
     for (i = 1; i < fw_num && retry;) {
-        TPD_INFO("--- Start to flash subsystem[%d] ---", i);
+        TPD_DEBUG("--- Start to flash subsystem[%d] ---", i);
         fw_x = &fw_info->subsys[i];
         r = goodix_flash_subsystem(client, fw_x);
         if (r == 0) {
-            TPD_INFO("--- End flash subsystem[%d]: OK ---", i);
+            TPD_DEBUG("--- End flash subsystem[%d]: OK ---", i);
             fw_ctrl->progress += prog_step;
             i++;
         } else if (r == -EAGAIN) {
             retry--;
-            TPD_INFO("--- End flash subsystem%d: Fail, errno:%d, retry:%d ---", i, r, GOODIX_BUS_RETRY_TIMES - retry);
+            TPD_DEBUG("--- End flash subsystem%d: Fail, errno:%d, retry:%d ---", i, r, GOODIX_BUS_RETRY_TIMES - retry);
         } else if (r < 0) { /* bus error */
-            TPD_INFO("--- End flash subsystem%d: Fatal error:%d exit ---", i, r);
+            TPD_DEBUG("--- End flash subsystem%d: Fatal error:%d exit ---", i, r);
             goto exit_flash;
         }
     }
@@ -1657,13 +1657,13 @@ static int goodix_update_finish(void *chip_data, struct fw_update_ctrl *fwu_ctrl
     reg_val[0] = 0x24;
     r = touch_i2c_write_block(chip_info->client, HW_REG_CPU_CTRL, 1, reg_val);
     if (r < 0)
-        TPD_INFO("Failed to hold ss51");
+        TPD_DEBUG("Failed to hold ss51");
 
     /* clear back door flag */
     memset(reg_val, 0, sizeof(reg_val));
     r = touch_i2c_write_block(chip_info->client, HW_REG_CPU_RUN_FROM, 8, reg_val);
     if (r < 0) {
-        TPD_INFO("Failed set CPU run from normal firmware");
+        TPD_DEBUG("Failed set CPU run from normal firmware");
         return r;
     }
 
@@ -1671,7 +1671,7 @@ static int goodix_update_finish(void *chip_data, struct fw_update_ctrl *fwu_ctrl
     reg_val[0] = 0x00;
     r = touch_i2c_write_block(chip_info->client, HW_REG_CPU_CTRL, 1, reg_val);
     if (r < 0)
-        TPD_INFO("Failed to run ss51");
+        TPD_DEBUG("Failed to run ss51");
 
     /*reset*/
     r = goodix_reset(chip_info);
@@ -1704,7 +1704,7 @@ static int gtx8_parse_cfg_data(const struct firmware *cfg_bin, char *cfg_type, u
 
     cfgPackageLen = getU32(cfg_bin->data) + BIN_CFG_START_LOCAL;
     if ( cfgPackageLen > cfg_bin->size) {
-        TPD_INFO("%s:Bad firmware!,cfg package len:%d,firmware size:%d\n",
+        TPD_DEBUG("%s:Bad firmware!,cfg package len:%d,firmware size:%d\n",
                  __func__, cfgPackageLen, (int)cfg_bin->size);
         goto exit;
     }
@@ -1716,7 +1716,7 @@ static int gtx8_parse_cfg_data(const struct firmware *cfg_bin, char *cfg_type, u
         checksum += cfg_bin->data[i];
 
     if ((checksum) != cfg_checksum) {
-        TPD_INFO("%s:Bad firmware!(checksum: 0x%04X, header define: 0x%04X)\n",
+        TPD_DEBUG("%s:Bad firmware!(checksum: 0x%04X, header define: 0x%04X)\n",
                  __func__, checksum, cfg_checksum);
         goto exit;
     }
@@ -1743,7 +1743,7 @@ static int gtx8_parse_cfg_data(const struct firmware *cfg_bin, char *cfg_type, u
     else if (!strncmp(cfg_type, GTX8_NOISE_TEST_CONFIG, strlen(GTX8_NOISE_TEST_CONFIG)))
         config_status = 7;
     else {
-        TPD_INFO("%s: invalid config text field\n", __func__);
+        TPD_DEBUG("%s: invalid config text field\n", __func__);
         goto exit;
     }
 
@@ -1765,7 +1765,7 @@ static int gtx8_parse_cfg_data(const struct firmware *cfg_bin, char *cfg_type, u
     }
 
     if (i >= bin_group_num * bin_cfg_num) {
-        TPD_INFO("%s:(not find config ,config_status: %d)\n", __func__, config_status);
+        TPD_DEBUG("%s:(not find config ,config_status: %d)\n", __func__, config_status);
         goto exit;
     }
 
@@ -1787,7 +1787,7 @@ static int gtx8_get_cfg_data(void *chip_data_info, const struct firmware *cfg_bi
 
     cfg_data = kzalloc(GOODIX_CFG_MAX_SIZE, GFP_KERNEL);
     if (cfg_data == NULL) {
-        TPD_INFO("Memory allco err\n");
+        TPD_DEBUG("Memory allco err\n");
         goto exit;
     }
 
@@ -1799,7 +1799,7 @@ static int gtx8_get_cfg_data(void *chip_data_info, const struct firmware *cfg_bi
     ret = gtx8_parse_cfg_data(cfg_bin, config_name, cfg_data,
                               &cfg_len, chip_info->ver_info.sensor_id);
     if (ret < 0) {
-        TPD_INFO("%s: parse %s data failed\n", __func__, config_name);
+        TPD_DEBUG("%s: parse %s data failed\n", __func__, config_name);
         ret = -EINVAL;
         goto exit;
     }
@@ -1828,34 +1828,34 @@ static int gtx8_get_cfg_parms(void *chip_data_info, const struct firmware *firmw
 
     TPD_DEBUG("%s run\n", __func__);
     if(firmware == NULL) {
-        TPD_INFO("%s: firmware is null\n", __func__);
+        TPD_DEBUG("%s: firmware is null\n", __func__);
         ret = -1;
         goto exit;
     }
 
     if (firmware->data == NULL) {
-        TPD_INFO("%s:Bad firmware!(config firmware data is null: )\n", __func__);
+        TPD_DEBUG("%s:Bad firmware!(config firmware data is null: )\n", __func__);
         ret = -1;
         goto exit;
     }
 
-    TPD_INFO("%s: cfg_bin_size:%d\n", __func__, (int)firmware->size);
+    TPD_DEBUG("%s: cfg_bin_size:%d\n", __func__, (int)firmware->size);
     if (firmware->size > 56) {
-        TPD_INFO("cfg_bin head info:%*ph\n", 32, firmware->data);
-        TPD_INFO("cfg_bin head info:%*ph\n", 24, firmware->data + 32);
+        TPD_DEBUG("cfg_bin head info:%*ph\n", 32, firmware->data);
+        TPD_DEBUG("cfg_bin head info:%*ph\n", 24, firmware->data + 32);
     }
 
     /* parse normal config data */
     ret = gtx8_get_cfg_data(chip_info, firmware, GTX8_NORMAL_CONFIG, &chip_info->normal_cfg);
     if (ret < 0) {
-        TPD_INFO("%s: Failed to parse normal_config data:%d\n", __func__, ret);
+        TPD_DEBUG("%s: Failed to parse normal_config data:%d\n", __func__, ret);
     } else {
         TPD_DEBUG("%s: parse normal_config data success\n", __func__);
     }
 
     ret = gtx8_get_cfg_data(chip_info, firmware, GTX8_TEST_CONFIG, &chip_info->test_cfg);
     if (ret < 0) {
-        TPD_INFO("%s: Failed to parse test_config data:%d\n", __func__, ret);
+        TPD_DEBUG("%s: Failed to parse test_config data:%d\n", __func__, ret);
     } else {
         TPD_DEBUG("%s: parse test_config data success\n", __func__);
     }
@@ -1863,7 +1863,7 @@ static int gtx8_get_cfg_parms(void *chip_data_info, const struct firmware *firmw
     /* parse normal noise config data */
     ret = gtx8_get_cfg_data(chip_info, firmware, GTX8_NORMAL_NOISE_CONFIG, &chip_info->normal_noise_cfg);
     if (ret < 0) {
-        TPD_INFO("%s: Failed to parse normal_noise_config data\n", __func__);
+        TPD_DEBUG("%s: Failed to parse normal_noise_config data\n", __func__);
     } else {
         TPD_DEBUG("%s: parse normal_noise_config data success\n", __func__);
     }
@@ -1872,7 +1872,7 @@ static int gtx8_get_cfg_parms(void *chip_data_info, const struct firmware *firmw
     ret = gtx8_get_cfg_data(chip_info, firmware, GTX8_NOISE_TEST_CONFIG, &chip_info->noise_test_cfg);
     if (ret < 0) {
         memcpy(&chip_info->noise_test_cfg, &chip_info->normal_cfg, sizeof(chip_info->noise_test_cfg));
-        TPD_INFO("%s: Failed to parse noise_test_config data,use normal_config data\n", __func__);
+        TPD_DEBUG("%s: Failed to parse noise_test_config data,use normal_config data\n", __func__);
     } else {
         TPD_DEBUG("%s: parse noise_test_config data success\n", __func__);
     }
@@ -1894,19 +1894,19 @@ static int gtx8_get_fw_parms(void *chip_data_info, const struct firmware *firmwa
 
     TPD_DEBUG("%s run\n", __func__);
     if(firmware == NULL) {
-        TPD_INFO("%s: firmware is null\n", __func__);
+        TPD_DEBUG("%s: firmware is null\n", __func__);
         ret = -1;
         goto exit;
     }
 
     if (firmware->data == NULL) {
-        TPD_INFO("%s:Bad firmware!(config firmware data si null)\n", __func__);
+        TPD_DEBUG("%s:Bad firmware!(config firmware data si null)\n", __func__);
         ret = -1;
         goto exit;
     }
 
     if(fw_firmware == NULL) {
-        TPD_INFO("%s:fw_firmware is null\n", __func__);
+        TPD_DEBUG("%s:fw_firmware is null\n", __func__);
         ret = -1;
         goto exit;
     }
@@ -1918,16 +1918,16 @@ static int gtx8_get_fw_parms(void *chip_data_info, const struct firmware *firmwa
     TPD_DEBUG("%s cfg package len:%d\n", __func__, cfgPackageLen);
 
     if(firmware->size <= (cfgPackageLen + 16)) {
-        TPD_INFO("%s current firmware does not contain goodix fw\n", __func__);
-        TPD_INFO("%s cfg package len:%d,firmware size:%d\n", __func__, cfgPackageLen, (int)firmware->size);
+        TPD_DEBUG("%s current firmware does not contain goodix fw\n", __func__);
+        TPD_DEBUG("%s cfg package len:%d,firmware size:%d\n", __func__, cfgPackageLen, (int)firmware->size);
         ret = -1;
         goto exit;
     }
 
     if(!(firmware->data[cfgPackageLen + 0] == 'G' && firmware->data[cfgPackageLen + 1] == 'X' &&
          firmware->data[cfgPackageLen + 2] == 'F' && firmware->data[cfgPackageLen + 3] == 'W')) {
-        TPD_INFO("%s can't find fw package\n", __func__);
-        TPD_INFO("Data type:%c %c %c %c,dest type is:GXFW\n", firmware->data[cfgPackageLen + 0],
+        TPD_DEBUG("%s can't find fw package\n", __func__);
+        TPD_DEBUG("Data type:%c %c %c %c,dest type is:GXFW\n", firmware->data[cfgPackageLen + 0],
                  firmware->data[cfgPackageLen + 1], firmware->data[cfgPackageLen + 2],
                  firmware->data[cfgPackageLen + 3]);
         ret = -1;
@@ -1935,7 +1935,7 @@ static int gtx8_get_fw_parms(void *chip_data_info, const struct firmware *firmwa
     }
 
     if(firmware->data[cfgPackageLen + 4] != 1) {
-        TPD_INFO("%s can't support this ver:%d\n", __func__, firmware->data[cfgPackageLen + 4]);
+        TPD_DEBUG("%s can't support this ver:%d\n", __func__, firmware->data[cfgPackageLen + 4]);
         ret = -1;
         goto exit;
     }
@@ -1944,7 +1944,7 @@ static int gtx8_get_fw_parms(void *chip_data_info, const struct firmware *firmwa
 
     TPD_DEBUG("%s fw package len:%d\n", __func__, fwPackageLen);
     if((fwPackageLen + 16 + cfgPackageLen) > firmware->size ) {
-        TPD_INFO("%s bad firmware,need len:%d,actual firmware size:%d\n",
+        TPD_DEBUG("%s bad firmware,need len:%d,actual firmware size:%d\n",
                  __func__, fwPackageLen + 16 + cfgPackageLen, (int)firmware->size);
         ret = -1;
         goto exit;
@@ -1980,26 +1980,26 @@ static fw_update_state goodix_fw_update(void *chip_data, const struct firmware *
     fwu_ctrl = kzalloc(sizeof(struct fw_update_ctrl), GFP_KERNEL);
     if (!fwu_ctrl) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FWU_CTRL_KZL_failed");
-        TPD_INFO("Failed to alloc memory for fwu_ctrl");
+        TPD_DEBUG("Failed to alloc memory for fwu_ctrl");
         return -ENOMEM;
     }
 
     r = gtx8_get_cfg_parms(chip_data, cfg_fw_firmware);
     if(r < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "GET_CFG_failed");
-        TPD_INFO("%s Failed get cfg from firmware\n", __func__);
+        TPD_DEBUG("%s Failed get cfg from firmware\n", __func__);
         //return -ENOMEM;
     } else {
-        TPD_INFO("%s success get ic cfg from firmware\n", __func__);
+        TPD_DEBUG("%s success get ic cfg from firmware\n", __func__);
     }
 
     r = gtx8_get_fw_parms(chip_data, cfg_fw_firmware, &fw_firmware);
     if(r < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "GET_FW_failed");
-        TPD_INFO("%s Failed get ic fw from firmware\n", __func__);
+        TPD_DEBUG("%s Failed get ic fw from firmware\n", __func__);
         goto err_parse_fw;
     } else {
-        TPD_INFO("%s success get ic fw from firmware\n", __func__);
+        TPD_DEBUG("%s success get ic fw from firmware\n", __func__);
     }
 
     retry0 = FW_UPDATE_RETRY;
@@ -2034,11 +2034,11 @@ start_update:
     r = goodix_update_prepare(chip_info, fwu_ctrl);
 
     if ((r == -EBUS || r == -5) && --retry0 > 0) {
-        TPD_INFO("Bus error, retry prepare ISP:%d", FW_UPDATE_RETRY - retry0);
+        TPD_DEBUG("Bus error, retry prepare ISP:%d", FW_UPDATE_RETRY - retry0);
         goto start_update;
     } else if (r < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "PPR_ISP_failed");
-        TPD_INFO("Failed to prepare ISP, exit update:%d", r);
+        TPD_DEBUG("Failed to prepare ISP, exit update:%d", r);
         fwu_ctrl->status = UPSTA_FAILED;
         goto err_fw_prepare;
     }
@@ -2050,11 +2050,11 @@ start_update:
          * we will do hardware reset and re-prepare ISP and then retry
          * flashing
          */
-        TPD_INFO("Bus error, retry firmware update:%d", FW_UPDATE_RETRY - retry1);
+        TPD_DEBUG("Bus error, retry firmware update:%d", FW_UPDATE_RETRY - retry1);
         goto start_update;
     } else if (r < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FLSH_FW_failed");
-        TPD_INFO("Fatal error, exit update:%d", r);
+        TPD_DEBUG("Fatal error, exit update:%d", r);
         fwu_ctrl->status = UPSTA_FAILED;
         goto err_fw_flash;
     }
@@ -2070,19 +2070,19 @@ err_parse_fw:
     ret = goodix_send_config(chip_info, chip_info->normal_cfg.data, chip_info->normal_cfg.length);
     if(ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "SENT_NML_CFG_failed");
-        TPD_INFO("%s: send normal cfg failed:%d\n", __func__, ret);
+        TPD_DEBUG("%s: send normal cfg failed:%d\n", __func__, ret);
     } else {
-        TPD_INFO("%s: send normal cfg success\n", __func__);
+        TPD_DEBUG("%s: send normal cfg success\n", __func__);
         r = FW_UPDATE_SUCCESS;
     }
 
     msleep(200);
 
     if (fwu_ctrl->status == UPSTA_SUCCESS) {
-        TPD_INFO("Firmware update successfully");
+        TPD_DEBUG("Firmware update successfully");
         r = FW_UPDATE_SUCCESS;
     } else if (fwu_ctrl->status == UPSTA_FAILED) {
-        TPD_INFO("Firmware update failed");
+        TPD_DEBUG("Firmware update failed");
         r = FW_UPDATE_ERROR;
     }
 
@@ -2113,7 +2113,7 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR,  4 + BYTES_PER_COORD, chip_info->touch_data);
     if (ret < 0) {
-        TPD_INFO("%s: i2c transfer error!\n", __func__);
+        TPD_DEBUG("%s: i2c transfer error!\n", __func__);
         goto IGNORE_CLEAR_IRQ;
     }
 
@@ -2124,7 +2124,7 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
             if (touch_num > 0) {
                 ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_EDGE_INFO, BYTES_PER_EDGE * touch_num, chip_info->edge_data);
                 if (ret < 0) {
-                    TPD_INFO("%s: i2c transfer error!\n", __func__);
+                    TPD_DEBUG("%s: i2c transfer error!\n", __func__);
                     goto IGNORE_CLEAR_IRQ;
                 }
             }
@@ -2134,7 +2134,7 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
             ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR + 2, \
                     BYTES_PER_COORD * touch_num + 2, &chip_info->touch_data[2]); //read out point data
             if (ret < 0) {
-                TPD_INFO("read touch point data from coor_addr failed!\n");
+                TPD_DEBUG("read touch point data from coor_addr failed!\n");
                 goto IGNORE_CLEAR_IRQ;
             }
 
@@ -2145,7 +2145,7 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
             check_sum += chip_info->touch_data[i];
         }
         if (check_sum) {
-            TPD_INFO("irq touch_data checksum is invalid\n");
+            TPD_DEBUG("irq touch_data checksum is invalid\n");
             goto IGNORE_CLEAR_IRQ;
         }
 
@@ -2159,11 +2159,11 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
             }
         }
         if ((check_sum && chip_info->touch_data[0] == 0) || all_zero) {
-            TPD_INFO("data is clear by last irq or all zero!\n");
-            TPD_INFO("remaining coor data :%*ph\n", 12, chip_info->touch_data);
+            TPD_DEBUG("data is clear by last irq or all zero!\n");
+            TPD_DEBUG("remaining coor data :%*ph\n", 12, chip_info->touch_data);
             return IRQ_IGNORE;
         } else if (check_sum) {
-            TPD_INFO("irq checksum is invalid for first 12 bytes\n");
+            TPD_DEBUG("irq checksum is invalid for first 12 bytes\n");
             goto IGNORE_CLEAR_IRQ;
         }
     }
@@ -2201,7 +2201,7 @@ static u32 goodix_u32_trigger_reason(void *chip_data, int gesture_enable, int is
     return  result_event;
 
 IGNORE_CLEAR_IRQ:
-    TPD_INFO("error coor data :%*ph\n", 12, chip_info->touch_data);
+    TPD_DEBUG("error coor data :%*ph\n", 12, chip_info->touch_data);
     ret = goodix_clear_irq(chip_info);
     return IRQ_IGNORE;
 
@@ -2274,13 +2274,13 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info *gesture
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_WAKEUP_GESTURE, sizeof(doze_buf), doze_buf);
     if (ret < 0) {
-        TPD_INFO("%s: read gesture info i2c faild\n", __func__);
+        TPD_DEBUG("%s: read gesture info i2c faild\n", __func__);
         return -1;
     }
 
     gesture_id = doze_buf[2];
     if (gesture_id == 0 || ((doze_buf[0] & GOODIX_GESTURE_EVENT)  == 0)) { //no gesture type, no need handle
-        TPD_INFO("Read gesture data faild. doze_buf[0]=0x%x\n", doze_buf[0]);
+        TPD_DEBUG("Read gesture data faild. doze_buf[0]=0x%x\n", doze_buf[0]);
         goto END_GESTURE;
     }
 
@@ -2288,7 +2288,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info *gesture
         check_sum += doze_buf[i];
     }
     if (check_sum) {
-        TPD_INFO("gesture checksum error: %x\n", check_sum);
+        TPD_DEBUG("gesture checksum error: %x\n", check_sum);
         goto END_GESTURE;
     }
     /*For FP_DOWN_DETECT FP_UP_DETECT no need to read GTP_REG_GESTURE_COOR data*/
@@ -2328,7 +2328,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info *gesture
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_GESTURE_COOR, point_num * 4 +1, point_data); //havn't add checksum here.
     if (ret < 0) {
-        TPD_INFO("%s: read gesture data i2c faild\n", __func__);
+        TPD_DEBUG("%s: read gesture data i2c faild\n", __func__);
         goto END_GESTURE;
     }
     switch (gesture_id) {   //judge gesture type //Jarvis: need check with FW.protocol 3
@@ -2484,7 +2484,7 @@ static int goodix_get_gesture_info(void *chip_data, struct gesture_info *gesture
     }
 
 REPORT_GESTURE:
-    TPD_INFO("%s: gesture_id = 0x%x, gesture_type = %d, clockWise = %d, point:(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)\n",
+    TPD_DEBUG("%s: gesture_id = 0x%x, gesture_type = %d, clockWise = %d, point:(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)(%d %d)\n",
              __func__, gesture_id, gesture->gesture_type, gesture->clockwise,
              gesture->Point_start.x, gesture->Point_start.y, gesture->Point_end.x, gesture->Point_end.y,
              gesture->Point_1st.x, gesture->Point_1st.y, gesture->Point_2nd.x, gesture->Point_2nd.y,
@@ -2507,7 +2507,7 @@ static void goodix_get_health_info(void *chip_data, struct monitor_data *mon_dat
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_DEBUG, sizeof(struct goodix_health_info), (unsigned char *)&health_data);
     if (ret < 0) {
-        TPD_INFO("%s: read debug log data i2c faild\n", __func__);
+        TPD_DEBUG("%s: read debug log data i2c faild\n", __func__);
         goto END_HEALTH;
     }
     TPD_DEBUG("GTP_REG_DEBUG:%*ph\n", sizeof(struct goodix_health_info), &health_data);
@@ -2518,7 +2518,7 @@ static void goodix_get_health_info(void *chip_data, struct monitor_data *mon_dat
     if (health_info->shield_water) {
         mon_data->shield_water++;
         if (tp_debug != 0) {
-            TPD_INFO("%s: enter water mode\n", __func__);
+            TPD_DEBUG("%s: enter water mode\n", __func__);
         }
     }
     if (health_info->baseline_refresh) {
@@ -2545,13 +2545,13 @@ static void goodix_get_health_info(void *chip_data, struct monitor_data *mon_dat
                 break;
         }
         if (tp_debug != 0) {
-            TPD_INFO("%s: baseline refresh type: %d \n", __func__, health_info->baseline_refresh_type);
+            TPD_DEBUG("%s: baseline refresh type: %d \n", __func__, health_info->baseline_refresh_type);
         }
     }
     if (health_info->shield_freq != 0) {
         mon_data->noise_count++;
         if (tp_debug != 0) {
-            TPD_INFO("%s: freq before: %d HZ, freq after: %d HZ\n", __func__, health_info->freq_before, health_info->freq_after);
+            TPD_DEBUG("%s: freq before: %d HZ, freq after: %d HZ\n", __func__, health_info->freq_before, health_info->freq_after);
         }
     }
     if (health_info->fw_rst != 0) {
@@ -2579,7 +2579,7 @@ static void goodix_get_health_info(void *chip_data, struct monitor_data *mon_dat
         }
 
         if (tp_debug != 0) {
-            TPD_INFO("%s: fw reset type : %d\n", __func__, health_info->reset_reason);
+            TPD_DEBUG("%s: fw reset type : %d\n", __func__, health_info->reset_reason);
         }
     }
     if (health_info->shield_palm != 0) {
@@ -2592,7 +2592,7 @@ static void goodix_get_health_info(void *chip_data, struct monitor_data *mon_dat
 
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_DEBUG, 1, &clear_flag);
     if (ret < 0) {
-        TPD_INFO("%s: clear debug log data i2c faild\n", __func__);
+        TPD_DEBUG("%s: clear debug log data i2c faild\n", __func__);
     }
 
 END_HEALTH:
@@ -2613,7 +2613,7 @@ static void goodix_get_health_info_v2(void *chip_data, struct monitor_data_v2 *m
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_DEBUG, sizeof(struct goodix_health_info), (unsigned char *)&health_data);
     if (ret < 0) {
-        TPD_INFO("%s: read debug log data i2c faild\n", __func__);
+        TPD_DEBUG("%s: read debug log data i2c faild\n", __func__);
         goto END_HEALTH;
     }
     TPD_DEBUG("GTP_REG_DEBUG:%*ph\n", sizeof(struct goodix_health_info), &health_data);
@@ -2624,7 +2624,7 @@ static void goodix_get_health_info_v2(void *chip_data, struct monitor_data_v2 *m
     if (health_info->shield_water) {
         tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, HEALTH_REPORT_SHIELD_WATER);
         if (tp_debug != 0) {
-            TPD_INFO("%s: enter water mode\n", __func__);
+            TPD_DEBUG("%s: enter water mode\n", __func__);
         }
     }
     if (health_info->baseline_refresh) {
@@ -2651,13 +2651,13 @@ static void goodix_get_health_info_v2(void *chip_data, struct monitor_data_v2 *m
                 break;
         }
         if (tp_debug != 0) {
-            TPD_INFO("%s: baseline refresh type: %d \n", __func__, health_info->baseline_refresh_type);
+            TPD_DEBUG("%s: baseline refresh type: %d \n", __func__, health_info->baseline_refresh_type);
         }
     }
     if (health_info->shield_freq != 0) {
         tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, HEALTH_REPORT_NOISE);
         if (tp_debug != 0) {
-            TPD_INFO("%s: freq before: %d HZ, freq after: %d HZ\n", __func__, health_info->freq_before, health_info->freq_after);
+            TPD_DEBUG("%s: freq before: %d HZ, freq after: %d HZ\n", __func__, health_info->freq_before, health_info->freq_after);
         }
     }
     if (health_info->fw_rst != 0) {
@@ -2685,7 +2685,7 @@ static void goodix_get_health_info_v2(void *chip_data, struct monitor_data_v2 *m
         }
 
         if (tp_debug != 0) {
-            TPD_INFO("%s: fw reset type : %d\n", __func__, health_info->reset_reason);
+            TPD_DEBUG("%s: fw reset type : %d\n", __func__, health_info->reset_reason);
         }
     }
     if (health_info->shield_palm != 0) {
@@ -2696,7 +2696,7 @@ static void goodix_get_health_info_v2(void *chip_data, struct monitor_data_v2 *m
 
     ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_DEBUG, 1, &clear_flag);
     if (ret < 0) {
-        TPD_INFO("%s: clear debug log data i2c faild\n", __func__);
+        TPD_DEBUG("%s: clear debug log data i2c faild\n", __func__);
     }
 
 END_HEALTH:
@@ -2722,14 +2722,14 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_SLEEP:
         ret = goodix_enter_sleep(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: goodix enter sleep failed\n", __func__);
+            TPD_DEBUG("%s: goodix enter sleep failed\n", __func__);
         }
         break;
 
     case MODE_GESTURE:
         ret = goodix_enable_gesture(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: goodix enable:(%d) gesture failed.\n", __func__, flag);
+            TPD_DEBUG("%s: goodix enable:(%d) gesture failed.\n", __func__, flag);
             return ret;
         }
         break;
@@ -2737,7 +2737,7 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_EDGE:
         ret = goodix_enable_edge_limit(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: goodix enable:(%d) edge limit failed.\n", __func__, flag);
+            TPD_DEBUG("%s: goodix enable:(%d) edge limit failed.\n", __func__, flag);
             return ret;
         }
         break;
@@ -2745,19 +2745,19 @@ static int goodix_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_CHARGE:
         ret = goodix_enable_charge_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
         }
         break;
 
     case MODE_GAME:
         ret = goodix_enable_game_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable game mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable game mode : %d failed\n", __func__, flag);
         }
         break;
 
     default:
-        TPD_INFO("%s: mode %d not support.\n", __func__, mode);
+        TPD_DEBUG("%s: mode %d not support.\n", __func__, mode);
     }
 
     return ret;
@@ -2776,8 +2776,8 @@ static int goodix_esd_handle(void *chip_data) //Jarvis:have not finished
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_ESD_READ, 1, &esd_buf);
     if ((ret < 0) || esd_buf == 0xAA) {
-        TPD_INFO("%s: esd dynamic esd occur, ret = %d, esd_buf = %d.\n", __func__, ret, esd_buf);
-        TPD_INFO("%s: IC works abnormally! Process esd reset.", __func__);
+        TPD_DEBUG("%s: esd dynamic esd occur, ret = %d, esd_buf = %d.\n", __func__, ret, esd_buf);
+        TPD_DEBUG("%s: IC works abnormally! Process esd reset.", __func__);
         disable_irq_nosync(chip_info->client->irq);
 
         goodix_power_control(chip_info, false);
@@ -2790,7 +2790,7 @@ static int goodix_esd_handle(void *chip_data) //Jarvis:have not finished
         tp_touch_btnkey_release();
 
         enable_irq(chip_info->client->irq);
-        TPD_INFO("%s: Goodix esd reset over.", __func__);
+        TPD_DEBUG("%s: Goodix esd reset over.", __func__);
         chip_info->esd_err_count ++;
         tp_healthinfo_report(chip_info->monitor_data_v2, HEALTH_REPORT, HEALTH_REPORT_SHIELD_ESD);
         return -1;
@@ -2798,7 +2798,7 @@ static int goodix_esd_handle(void *chip_data) //Jarvis:have not finished
         esd_buf = 0xAA;
         ret = touch_i2c_write_block(chip_info->client, chip_info->reg_info.GTP_REG_ESD_WRITE, 1, &esd_buf);
         if (ret < 0) {
-            TPD_INFO("%s: Failed to reset esd reg.", __func__);
+            TPD_DEBUG("%s: Failed to reset esd reg.", __func__);
         }
     }
 
@@ -2810,7 +2810,7 @@ static void goodix_enable_fingerprint_underscreen(void *chip_data, uint32_t enab
     int ret = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)chip_data;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_FOD_FINGER_PRINT, 0);
     } else {
@@ -2825,7 +2825,7 @@ static void goodix_enable_gesture_mask(void *chip_data, uint32_t enable)
     int ret = -1;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)chip_data;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_GESTURE_MASK, 1);/* enable all gesture */
     } else {
@@ -2945,13 +2945,13 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
 
     ret = goodix_get_channel_num(chip_info->client, &RX_NUM, &TX_NUM);
     if (ret < 0) {
-        TPD_INFO("get channel num fail, quit!\n");
+        TPD_DEBUG("get channel num fail, quit!\n");
         goto read_data_exit;
     }
 
     kernel_buf = kzalloc(TX_NUM * RX_NUM * 2 > PAGE_SIZE ? TX_NUM * RX_NUM * 2 : PAGE_SIZE, GFP_KERNEL);
     if(kernel_buf == NULL) {
-        TPD_INFO("%s kmalloc error\n", __func__);
+        TPD_DEBUG("%s kmalloc error\n", __func__);
         goodix_set_i2c_doze_mode(chip_info->client, true);
         return;
     }
@@ -2974,15 +2974,15 @@ static void goodix_debug_info_read(struct seq_file *s, void *chip_data, debug_ty
     //wait for data ready
     while(i++ < 10) {
         ret = gt9886_i2c_read(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, kernel_buf);
-        TPD_INFO("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
+        TPD_DEBUG("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
         if((ret > 0) && ((kernel_buf[0] & 0x80) == 0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             break;
         }
         msleep(20);
     }
     if(i >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
         goto read_data_exit;
     }
 
@@ -3027,13 +3027,13 @@ static void goodix_detailed_debug_info_read(struct seq_file *s, void *chip_data,
 
     ret = goodix_get_channel_num(chip_info->client, &RX_NUM, &TX_NUM);
     if (ret < 0) {
-        TPD_INFO("get channel num fail, quit!\n");
+        TPD_DEBUG("get channel num fail, quit!\n");
         goto read_data_exit;
     }
 
     kernel_buf = kzalloc(PAGE_SIZE, GFP_KERNEL);
     if(kernel_buf == NULL) {
-        TPD_INFO("%s kmalloc error\n", __func__);
+        TPD_DEBUG("%s kmalloc error\n", __func__);
         goodix_set_i2c_doze_mode(chip_info->client, true);
         return;
     }
@@ -3066,16 +3066,16 @@ static void goodix_detailed_debug_info_read(struct seq_file *s, void *chip_data,
 
     while(retry++ < 10) {
         ret = gt9886_i2c_read(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, kernel_buf);
-        TPD_INFO("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
+        TPD_DEBUG("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
         if((ret > 0) && ((kernel_buf[0] & 0x80) == 0x80)) {
-            TPD_INFO("Data ready OK");
+            TPD_DEBUG("Data ready OK");
             retry = 0;
             break;
         }
         msleep(20);
     }
     if(retry >= 10) {
-        TPD_INFO("data not ready, quit!\n");
+        TPD_DEBUG("data not ready, quit!\n");
     }
 
     ret = gt9886_i2c_read(chip_info->client, addr, TX_NUM * RX_NUM * 2, kernel_buf);
@@ -3109,16 +3109,16 @@ static void goodix_detailed_debug_info_read(struct seq_file *s, void *chip_data,
         //wait for data ready
         while(retry++ < 10) {
             ret = gt9886_i2c_read(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR, 1, kernel_buf);
-            TPD_INFO("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
+            TPD_DEBUG("ret = %d  kernel_buf = %d\n", ret, kernel_buf[0]);
             if((ret > 0) && ((kernel_buf[0] & 0x80) == 0x80)) {
-                TPD_INFO("Data ready OK");
+                TPD_DEBUG("Data ready OK");
                 retry = 0;
                 break;
             }
             msleep(20);
         }
         if(retry >= 10) {
-            TPD_INFO("data not ready, quit!\n");
+            TPD_DEBUG("data not ready, quit!\n");
             goto read_data_exit;
         }
 
@@ -3163,13 +3163,13 @@ static void goodix_down_diff_info_read(struct seq_file *s, void *chip_data)
     kernel_buf = kzalloc(PAGE_SIZE, GFP_KERNEL);
     if(kernel_buf == NULL) {
         goodix_set_i2c_doze_mode(chip_info->client, true);
-        TPD_INFO("%s kmalloc error\n", __func__);
+        TPD_DEBUG("%s kmalloc error\n", __func__);
         return;
     }
 
     ret = gt9886_i2c_read(chip_info->client, chip_info->reg_info.GTP_REG_DOWN_DIFFDATA, 2, kernel_buf);
     if (ret < 0) {
-        TPD_INFO("%s failed to read down diff data.\n", __func__);
+        TPD_DEBUG("%s failed to read down diff data.\n", __func__);
         goto exit;
     }
 
@@ -3177,18 +3177,18 @@ static void goodix_down_diff_info_read(struct seq_file *s, void *chip_data)
     RX_NUM = kernel_buf[1];
 
     if (TX_NUM > 50 || RX_NUM > 50) {
-        TPD_INFO("%s first finger down diff data is invalid.\n", __func__);
+        TPD_DEBUG("%s first finger down diff data is invalid.\n", __func__);
         goto exit;
     }
 
     if ((TX_NUM * RX_NUM * 2+2) > PAGE_SIZE) {
-        TPD_INFO("%s: data invalid, tx:%d,rx :%d\n", __func__, TX_NUM, RX_NUM);
+        TPD_DEBUG("%s: data invalid, tx:%d,rx :%d\n", __func__, TX_NUM, RX_NUM);
         goto exit;
     }
 
     ret = gt9886_i2c_read(chip_info->client, chip_info->reg_info.GTP_REG_DOWN_DIFFDATA, TX_NUM * RX_NUM * 2 + 2, kernel_buf);
     if (ret < 0) {
-        TPD_INFO("%s failed to read down diff data.\n", __func__);
+        TPD_DEBUG("%s failed to read down diff data.\n", __func__);
         goto exit;
     }
 
@@ -3243,7 +3243,7 @@ static void goodix_main_register_read(struct seq_file *s, void *chip_data)//Jarv
     /*. alloc touch data space */
     touch_data = kzalloc(4 + BYTES_PER_COORD, GFP_KERNEL);
     if (touch_data == NULL) {
-        TPD_INFO("touch_data kzalloc error\n");
+        TPD_DEBUG("touch_data kzalloc error\n");
         return;
     }
 
@@ -3253,14 +3253,14 @@ static void goodix_main_register_read(struct seq_file *s, void *chip_data)//Jarv
     }
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.GTP_REG_READ_COOR,  4 + BYTES_PER_COORD, touch_data);
     if (ret < 0) {
-        TPD_INFO("%s: i2c transfer error!\n", __func__);
+        TPD_DEBUG("%s: i2c transfer error!\n", __func__);
         goto out;
     }
     seq_printf(s, "touch_data reg 4100: %*ph\n", 4 + BYTES_PER_COORD, chip_info->touch_data);
-    TPD_INFO("%s: touch_data reg 4100: %*ph\n", __func__, 4 + BYTES_PER_COORD, chip_info->touch_data);
+    TPD_DEBUG("%s: touch_data reg 4100: %*ph\n", __func__, 4 + BYTES_PER_COORD, chip_info->touch_data);
 
     seq_printf(s, "reg 4100: %*ph\n", 4 + BYTES_PER_COORD, touch_data);
-    TPD_INFO("%s: reg 4100: %*ph\n", __func__, 4 + BYTES_PER_COORD, touch_data);
+    TPD_DEBUG("%s: reg 4100: %*ph\n", __func__, 4 + BYTES_PER_COORD, touch_data);
     seq_printf(s, "====================================================\n");
 out:
     if (touch_data) {
@@ -3303,12 +3303,12 @@ static int goodix_do_read_config(void *chip_data, u32 base_addr, u8 *buf)
     sub_bags = buf[TS_CFG_BAG_NUM_INDEX];
     checksum = checksum_u8(buf, TS_CFG_HEAD_LEN);
     if (checksum) {
-        TPD_INFO("Config head checksum err:0x%x,data:%*ph", checksum, TS_CFG_HEAD_LEN, buf);
+        TPD_DEBUG("Config head checksum err:0x%x,data:%*ph", checksum, TS_CFG_HEAD_LEN, buf);
         ret = -EINVAL;
         goto err_out;
     }
 
-    TPD_INFO("config_version:%u, vub_bags:%u", buf[0], sub_bags);
+    TPD_DEBUG("config_version:%u, vub_bags:%u", buf[0], sub_bags);
     for (i = 0; i < sub_bags; i++) {
         /* read sub head [0]: sub bag num, [1]: sub bag length */
         ret = gt9886_i2c_read(chip_info->client, base_addr + offset, 2, buf + offset);
@@ -3324,7 +3324,7 @@ static int goodix_do_read_config(void *chip_data, u32 base_addr, u8 *buf)
             goto err_out;
         checksum = checksum_u8(buf + offset, subbag_len + 3);
         if (checksum) {
-            TPD_INFO("sub bag checksum err:0x%x", checksum);
+            TPD_DEBUG("sub bag checksum err:0x%x", checksum);
             ret = -EINVAL;
             goto err_out;
         }
@@ -3334,12 +3334,12 @@ static int goodix_do_read_config(void *chip_data, u32 base_addr, u8 *buf)
 
 
     ret = offset;
-    TPD_INFO("config_version,offset:%d ", offset);
+    TPD_DEBUG("config_version,offset:%d ", offset);
 
 err_out:
     /*enable doze mode*/
     goodix_set_i2c_doze_mode(chip_info->client, true);
-    TPD_INFO("config_version2,offset:%d ", offset);
+    TPD_DEBUG("config_version2,offset:%d ", offset);
 
     return ret;
 }
@@ -3365,46 +3365,46 @@ int goodix_read_config(void *chip_data, u8 *config_data, u32 config_len)
         usleep_range(10000, 11000);
     }
     if (cmd_flag != TS_CMD_REG_READY) {
-        TPD_INFO("Wait for IC ready IDEL state timeout:addr 0x%x\n", cmd_reg);
+        TPD_DEBUG("Wait for IC ready IDEL state timeout:addr 0x%x\n", cmd_reg);
         ret = -EAGAIN;
         goto exit;
     }
     /* 0x86 read config command */
     ret = goodix_send_cmd(chip_info, COMMAND_START_READ_CFG, 0);
     if (ret) {
-        TPD_INFO("Failed send read config command");
+        TPD_DEBUG("Failed send read config command");
         goto exit;
     }
     /* wait for config data ready */
     if (goodix_wait_cfg_cmd_ready(chip_info, COMMAND_READ_CFG_PREPARE_OK, COMMAND_START_READ_CFG)) {
-        TPD_INFO("Wait for config data ready timeout");
+        TPD_DEBUG("Wait for config data ready timeout");
         ret = -EAGAIN;
         goto exit;
     }
 
     if (config_len) {
-        TPD_INFO("%s:config_len:%d\n", __func__, config_len);
+        TPD_DEBUG("%s:config_len:%d\n", __func__, config_len);
         ret = gt9886_i2c_read(chip_info->client, cmd_reg + 16, config_len, config_data);
         if (ret < 0)
-            TPD_INFO("Failed read config data");
+            TPD_DEBUG("Failed read config data");
         else
             ret = config_len;
     } else {
         ret = goodix_do_read_config(chip_info, cmd_reg + 16, config_data);
         if (ret < 0)
-            TPD_INFO("Failed read config data");
+            TPD_DEBUG("Failed read config data");
         if (ret > 0)
-            TPD_INFO("success read config, len:%d", ret);
+            TPD_DEBUG("success read config, len:%d", ret);
     }
 
     /* clear command */
     goodix_send_cmd(chip_info, TS_CMD_REG_READY, 0);
-    TPD_INFO("goodix_send_cmd exit:%d\n", ret);
+    TPD_DEBUG("goodix_send_cmd exit:%d\n", ret);
 
 exit:
     /*enable doze mode*/
     goodix_set_i2c_doze_mode(chip_info->client, true);
-    TPD_INFO("goodix_read_config exit:%d\n", ret);
+    TPD_DEBUG("goodix_read_config exit:%d\n", ret);
     return ret;
 }
 
@@ -3439,13 +3439,13 @@ static void goodix_config_info_read(struct seq_file *s, void *chip_data)
     seq_printf(s, "==== Goodix config read from chip====\n");
 
     if (!chip_info->reg_info.GTP_REG_CMD) {
-        TPD_INFO("command register ERROR:0x%04x", chip_info->reg_info.GTP_REG_CMD);
+        TPD_DEBUG("command register ERROR:0x%04x", chip_info->reg_info.GTP_REG_CMD);
         return;
     }
 
     ret = goodix_read_config(chip_info, temp_data, 0);
     if(ret < 0) {
-        TPD_INFO("goodix_config_info_read goodix_read_config error:%d\n", ret);
+        TPD_DEBUG("goodix_config_info_read goodix_read_config error:%d\n", ret);
         goto exit;
     }
 
@@ -3473,7 +3473,7 @@ static u8 goodix_config_version_read(struct chip_data_gt9886 *chip_info)
     char temp_data[TS_CFG_MAX_LEN] = {0};
 
     if (!chip_info->reg_info.GTP_REG_CMD) {
-        TPD_INFO("command register ERROR:0x%04x", chip_info->reg_info.GTP_REG_CMD);
+        TPD_DEBUG("command register ERROR:0x%04x", chip_info->reg_info.GTP_REG_CMD);
         return -EINVAL;
     }
 
@@ -3489,28 +3489,28 @@ static u8 goodix_config_version_read(struct chip_data_gt9886 *chip_info)
         usleep_range(10000, 11000);
     }
     if (cmd_flag != TS_CMD_REG_READY) {
-        TPD_INFO("Wait for IC ready IDEL state timeout:addr 0x%x\n", cmd_reg);
+        TPD_DEBUG("Wait for IC ready IDEL state timeout:addr 0x%x\n", cmd_reg);
         ret = -EAGAIN;
         goto exit;
     }
     /* 0x86 read config command */
     ret = goodix_send_cmd(chip_info, COMMAND_START_READ_CFG, 0);
     if (ret) {
-        TPD_INFO("Failed send read config command");
+        TPD_DEBUG("Failed send read config command");
         goto exit;
     }
     /* wait for config data ready */
     if (goodix_wait_cfg_cmd_ready(chip_info, COMMAND_READ_CFG_PREPARE_OK, COMMAND_START_READ_CFG)) {
-        TPD_INFO("Wait for config data ready timeout");
+        TPD_DEBUG("Wait for config data ready timeout");
         ret = -EAGAIN;
         goto exit;
     }
 
     ret = goodix_do_read_config(chip_info, cmd_reg + 16, temp_data);
     if (ret < 0)
-        TPD_INFO("Failed read config data");
+        TPD_DEBUG("Failed read config data");
     if (ret > 0)
-        TPD_INFO("success read config, len:%d", ret);
+        TPD_DEBUG("success read config, len:%d", ret);
 
     /* clear command */
     goodix_send_cmd(chip_info, TS_CMD_REG_READY, 0);
@@ -3547,12 +3547,12 @@ static int gtx8_get_cfg_value(u8 *config, u8 *buf, u8 len, u8 sub_bag_num, u8 of
     }
 
     if (i >= config[2]) {
-        TPD_INFO("Cann't find the specifiled bag num %d\n", sub_bag_num);
+        TPD_DEBUG("Cann't find the specifiled bag num %d\n", sub_bag_num);
         return -EINVAL;
     }
 
     if (sub_bag_ptr[1] + 3 < offset + len) {
-        TPD_INFO("Sub bag len less then you want to read: %d < %d\n", sub_bag_ptr[1] + 3, offset + len);
+        TPD_DEBUG("Sub bag len less then you want to read: %d < %d\n", sub_bag_ptr[1] + 3, offset + len);
         return -EINVAL;
     }
 
@@ -3610,7 +3610,7 @@ static int disable_hopping(struct gtx8_ts_test *ts_test, struct goodix_ts_config
     u16 offset = 0;
     ret = gtx8_get_cfg_value(test_config->data, &value, 1, 10, 2);
     if (ret < 0 ) {
-        TPD_INFO("Failed parse hopping reg\n");
+        TPD_DEBUG("Failed parse hopping reg\n");
         return -EINVAL;
     }
     offset = ret;
@@ -3618,7 +3618,7 @@ static int disable_hopping(struct gtx8_ts_test *ts_test, struct goodix_ts_config
     value = test_config->data[offset];
     value &= 0xfe;
     test_config->data[offset] = value;
-    TPD_INFO("disable_hopping:0x%02x_%d", test_config->data[offset], offset);
+    TPD_DEBUG("disable_hopping:0x%02x_%d", test_config->data[offset], offset);
     cfg_update_chksum(test_config->data, test_config->length);
     return ret;
 }
@@ -3629,13 +3629,13 @@ static int init_test_config(struct gtx8_ts_test *ts_test)
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
     if (ts_test->test_config.length == 0) {
-        TPD_INFO("switch to orignal config!\n");
+        TPD_DEBUG("switch to orignal config!\n");
         memmove(ts_test->test_config.data, ts_test->orig_config.data, ts_test->orig_config.length);
         ts_test->test_config.length = ts_test->orig_config.length;
     } else {
         ts_test->test_config.data[0] = ts_test->orig_config.data[0];
         ts_test->test_config.data[1] |= 0x01;
-        TPD_INFO("switch to test config!\n");
+        TPD_DEBUG("switch to test config!\n");
     }
     ts_test->test_config.reg_base = chip_info->reg_info.GTP_REG_CONFIG_DATA;
     mutex_init(&(ts_test->test_config.lock));
@@ -3744,7 +3744,7 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
     test_params = &ts_test->test_params;
     test_params->drv_num = p_testdata->TX_NUM;
     test_params->sen_num = p_testdata->RX_NUM;
-    TPD_INFO("sen_num:%d,drv_num:%d\n", test_params->sen_num, test_params->drv_num);
+    TPD_DEBUG("sen_num:%d,drv_num:%d\n", test_params->sen_num, test_params->drv_num);
 
     para_data32 = getpara_for_item(p_testdata->fw, TYPE_NOISE_DATA_LIMIT, &para_num);
     if(para_data32) {
@@ -3754,7 +3754,7 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
             test_params->noise_threshold = para_data32[1];
         }
     } else {
-        TPD_INFO("%s: Failed get %s\n", __func__, CSV_TP_NOISE_LIMIT);
+        TPD_DEBUG("%s: Failed get %s\n", __func__, CSV_TP_NOISE_LIMIT);
         ret = -1;
         goto INIT_LIMIT_END;
     }
@@ -3762,7 +3762,7 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
     para_data32 = getpara_for_item(p_testdata->fw, TYPE_SHORT_THRESHOLD, &para_num);
     if(para_data32) {
         ts_test->is_item_support[TYPE_SHORT_THRESHOLD] = para_data32[0];
-        TPD_INFO("get TYPE_SHORT_THRESHOLD data,len:%d\n", para_num);
+        TPD_DEBUG("get TYPE_SHORT_THRESHOLD data,len:%d\n", para_num);
         if (para_num >= 8) {
             /* store data to test_parms */
             test_params->short_threshold = para_data32[1];
@@ -3774,7 +3774,7 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
             test_params->avdd_value = para_data32[7];
         }
     } else {
-        TPD_INFO("%s: Failed get %s\n", __func__, CSV_TP_SHORT_THRESHOLD);
+        TPD_DEBUG("%s: Failed get %s\n", __func__, CSV_TP_SHORT_THRESHOLD);
         ret = -1;
         goto INIT_LIMIT_END;
     }
@@ -3783,37 +3783,37 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
     if(p_test_item_info) {
         if (p_test_item_info->para_num) {
             if (p_test_item_info->p_buffer[0]) {
-                TPD_INFO("get TYPE_SPECIAL_RAW_MAX_MIN data,len:%d\n", para_num);
+                TPD_DEBUG("get TYPE_SPECIAL_RAW_MAX_MIN data,len:%d\n", para_num);
                 ts_test->is_item_support[TYPE_SPECIAL_RAW_MAX_MIN] = p_test_item_info->p_buffer[0];
                 if (p_test_item_info->item_limit_type == LIMIT_TYPE_MAX_MIN_DATA) {
                     test_params->max_limits = (uint32_t *)(p_testdata->fw->data + p_test_item_info->top_limit_offset);
                     test_params->min_limits = (uint32_t *)(p_testdata->fw->data + p_test_item_info->floor_limit_offset);
                 } else {
-                    TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_MAX_MIN);
+                    TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_MAX_MIN);
                 }
             }
         }
     } else {
         ret = -1;
-        TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_MAX_MIN);
+        TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_MAX_MIN);
     }
 
     p_test_item_info = get_test_item_info(p_testdata->fw, TYPE_SPECIAL_RAW_DELTA);
     if (p_test_item_info) {
         if (p_test_item_info->para_num) {
             if (p_test_item_info->p_buffer[0]) {
-                TPD_INFO("get TYPE_SPECIAL_RAW_DELTA data,len:%d\n", para_num);
+                TPD_DEBUG("get TYPE_SPECIAL_RAW_DELTA data,len:%d\n", para_num);
                 ts_test->is_item_support[TYPE_SPECIAL_RAW_DELTA] = p_test_item_info->p_buffer[0];
                 if (p_test_item_info->item_limit_type == LIMIT_TYPE_MAX_MIN_DATA) {
                     test_params->deviation_limits = (uint32_t *)(p_testdata->fw->data + p_test_item_info->top_limit_offset);
                 } else {
-                    TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_DELTA);
+                    TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_DELTA);
                 }
             }
         }
     } else {
         ret = -1;
-        TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_DELTA);
+        TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_RAW_DELTA);
     }
 
     para_data32 = getpara_for_item(p_testdata->fw, TYPE_NOISE_SLEFDATA_LIMIT, &para_num);
@@ -3824,7 +3824,7 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
             test_params->self_noise_threshold = para_data32[1];
         }
     } else {
-        TPD_INFO("%s: Failed get %s\n", __func__, CSV_TP_SELFNOISE_LIMIT);
+        TPD_DEBUG("%s: Failed get %s\n", __func__, CSV_TP_SELFNOISE_LIMIT);
         ret = -1;
         goto INIT_LIMIT_END;
     }
@@ -3835,19 +3835,19 @@ static int gtx8_init_testlimits(struct gtx8_ts_test *ts_test)
             if (p_test_item_info->p_buffer[0]) {
                 ts_test->is_item_support[TYPE_SPECIAL_SELFRAW_MAX_MIN] = p_test_item_info->p_buffer[0];
                 if (p_test_item_info->item_limit_type == IMIT_TYPE_SLEFRAW_DATA) {
-                    TPD_INFO("get IMIT_TYPE_SLEFRAW_DATA data\n");
+                    TPD_DEBUG("get IMIT_TYPE_SLEFRAW_DATA data\n");
                     test_params->self_max_limits = (int32_t *)(p_testdata->fw->data + p_test_item_info->top_limit_offset);
                     test_params->self_min_limits = (int32_t *)(p_testdata->fw->data + p_test_item_info->floor_limit_offset);
                 } else {
-                    TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_SELFRAW_MAX_MIN);
+                    TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_SELFRAW_MAX_MIN);
                 }
             } else {
-                TPD_INFO("TYPE_SPECIAL_SELFRAW_MAX_MIN para_num is invalid\n");
+                TPD_DEBUG("TYPE_SPECIAL_SELFRAW_MAX_MIN para_num is invalid\n");
             }
         }
     } else {
         ret = -1;
-        TPD_INFO("item: %d get_test_item_info fail\n", TYPE_SPECIAL_SELFRAW_MAX_MIN);
+        TPD_DEBUG("item: %d get_test_item_info fail\n", TYPE_SPECIAL_SELFRAW_MAX_MIN);
     }
 
     ret |= init_test_config(ts_test);
@@ -3864,7 +3864,7 @@ static int gtx8_init_params(struct gtx8_ts_test *ts_test)
     int ret = 0;
     struct ts_test_params *test_params = &ts_test->test_params;
 
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
 
     test_params->rawdata_addr = GTP_RAWDATA_ADDR_9886;
     test_params->noisedata_addr = GTP_NOISEDATA_ADDR_9886;
@@ -3875,7 +3875,7 @@ static int gtx8_init_params(struct gtx8_ts_test *ts_test)
     test_params->max_sen_num = MAX_SEN_NUM;
     test_params->drv_map = gt9886_drv_map;
     test_params->sen_map = gt9886_sen_map;
-    TPD_INFO("%s exit:%d\n", __func__, ret);
+    TPD_DEBUG("%s exit:%d\n", __func__, ret);
     return ret;
 }
 
@@ -3902,7 +3902,7 @@ static int gtx8_init_cmds(struct gtx8_ts_test *ts_test)
     ts_test->normal_cmd.cmds[2] = (u8)((0 - ts_test->normal_cmd.cmds[0] -
                                         ts_test->normal_cmd.cmds[1]) & 0xff);
 
-    TPD_INFO("cmd addr.0x%04x\n", ts_test->rawdata_cmd.cmd_reg);
+    TPD_DEBUG("cmd addr.0x%04x\n", ts_test->rawdata_cmd.cmd_reg);
     return ret;
 }
 
@@ -3917,14 +3917,14 @@ static int gtx8_cache_origconfig(struct gtx8_ts_test *ts_test)
 
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("gtx8_cache_origconfig run\n");
+    TPD_DEBUG("gtx8_cache_origconfig run\n");
 
     ret = goodix_read_config(chip_info, &ts_test->orig_config.data[0], 0);
     if (ret < 0) {
-        TPD_INFO("Failed to read original config data\n");
+        TPD_DEBUG("Failed to read original config data\n");
         return ret;
     }
-    TPD_INFO("gtx8_cache_origconfig read original config success\n");
+    TPD_DEBUG("gtx8_cache_origconfig read original config success\n");
 
     ts_test->orig_config.data[1] |= GTX8_CONFIG_REFRESH_DATA;
     checksum = checksum_u8(&ts_test->orig_config.data[0], 3);
@@ -3935,7 +3935,7 @@ static int gtx8_cache_origconfig(struct gtx8_ts_test *ts_test)
     strcpy(ts_test->orig_config.name, "original_config");
     ts_test->orig_config.initialized = true;
 
-    TPD_INFO("gtx8_cache_origconfig exit\n");
+    TPD_DEBUG("gtx8_cache_origconfig exit\n");
     return NO_ERR;
 }
 
@@ -3948,38 +3948,38 @@ static int gtx8_tptest_prepare(struct gtx8_ts_test *ts_test)
     int ret = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("TP test preparation\n");
+    TPD_DEBUG("TP test preparation\n");
     ret = gtx8_cache_origconfig(ts_test);
     if (ret) {
-        TPD_INFO("Failed cache origin config\n");
+        TPD_DEBUG("Failed cache origin config\n");
         return ret;
     }
 
     /* init cmd*/
     ret = gtx8_init_cmds(ts_test);
     if (ret) {
-        TPD_INFO("Failed init cmd\n");
+        TPD_DEBUG("Failed init cmd\n");
         return ret;
     }
 
     /* init reg addr and short cal map */
     ret = gtx8_init_params(ts_test);
     if (ret) {
-        TPD_INFO("Failed init register address\n");
+        TPD_DEBUG("Failed init register address\n");
         return ret;
     }
     /* parse test limits from csv */
     ret = gtx8_init_testlimits(ts_test);
     if (ret < 0) {
-        TPD_INFO("Failed to init testlimits from csv:%d\n", ret);
+        TPD_DEBUG("Failed to init testlimits from csv:%d\n", ret);
         ts_test->error_count ++;
         seq_printf(ts_test->p_seq_file, "Failed to init testlimits from csv\n");
     }
     ret = goodix_send_config(chip_info, chip_info->noise_test_cfg.data, chip_info->noise_test_cfg.length);
     if (ret < 0) {
-       TPD_INFO("Failed to send noise test config config:%d,noise_config len:%d\n", ret, chip_info->noise_test_cfg.length);
+       TPD_DEBUG("Failed to send noise test config config:%d,noise_config len:%d\n", ret, chip_info->noise_test_cfg.length);
     }
-    TPD_INFO("send noise test config success :%d,noise_config len:%d\n", ret, chip_info->noise_test_cfg.length);
+    TPD_DEBUG("send noise test config success :%d,noise_config len:%d\n", ret, chip_info->noise_test_cfg.length);
     //msleep(50);
 
     return ret;
@@ -3994,16 +3994,16 @@ static int gtx8_tptest_finish(struct gtx8_ts_test *ts_test)
     int ret = RESULT_ERR;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("TP test finish\n");
+    TPD_DEBUG("TP test finish\n");
     goodix_reset_via_gpio(chip_info);
 
     //    if (goodix_set_i2c_doze_mode(core_data->ts_dev,true))
     //        ts_info("WRNING: doze may enabled after reset\n");
     ret = goodix_send_config(chip_info, ts_test->orig_config.data, ts_test->orig_config.length);
     if(ret < 0) {
-        TPD_INFO("gtx8_tptest_finish:Failed to send normal config:%d\n", ret);
+        TPD_DEBUG("gtx8_tptest_finish:Failed to send normal config:%d\n", ret);
     } else {
-        TPD_INFO("gtx8_tptest_finish send normal config succesful\n");
+        TPD_DEBUG("gtx8_tptest_finish send normal config succesful\n");
     }
 
     return ret;
@@ -4019,7 +4019,7 @@ static int normandy_sync_read_rawdata(struct i2c_client *client,
     unsigned char sync_data[0];
 
 
-    TPD_INFO("%s run,reg_addr:0x%04x,len:%d,sync_addr:0x%04x,sync_mask:0x%x\n",
+    TPD_DEBUG("%s run,reg_addr:0x%04x,len:%d,sync_addr:0x%04x,sync_mask:0x%x\n",
              __func__, reg_addr, len, sync_addr, sync_mask);
 
     while(retry_times ++ < 200) {
@@ -4027,33 +4027,33 @@ static int normandy_sync_read_rawdata(struct i2c_client *client,
         msleep(10);
         ret = touch_i2c_read_block(client, sync_addr, 1, sync_data);
         if(ret < 0 || ((sync_data[0] & sync_mask) == 0)) {
-            TPD_INFO("%s sync invalid,ret:%d,sync data:0x%x\n",
+            TPD_DEBUG("%s sync invalid,ret:%d,sync data:0x%x\n",
                      __func__, ret, sync_data[0]);
             continue;
         }
 
-        TPD_INFO("%s sync is valid:0x%x\n", __func__, sync_data[0]);
+        TPD_DEBUG("%s sync is valid:0x%x\n", __func__, sync_data[0]);
 
         ret = touch_i2c_read_block(client, reg_addr, len, data);
         if(ret < 0) {
-            TPD_INFO("sync read rawdata failed:%d\n", ret);
+            TPD_DEBUG("sync read rawdata failed:%d\n", ret);
         } else {
             break;
         }
     }
 
     if(retry_times >= 200) {
-        TPD_INFO("sync read rawdata timeout\n");
+        TPD_DEBUG("sync read rawdata timeout\n");
         ret = -1;
     } else {
-        TPD_INFO("sync read rawdata,get rawdata success\n");
+        TPD_DEBUG("sync read rawdata,get rawdata success\n");
         sync_data[0] = 0x00;
         ret = touch_i2c_write_block(client, sync_addr, 1, sync_data);
-        TPD_INFO("sync read rawdata,clear sync\n");
+        TPD_DEBUG("sync read rawdata,clear sync\n");
         ret = 0;
     }
 
-    TPD_INFO("%s exit:%d\n", __func__, ret);
+    TPD_DEBUG("%s exit:%d\n", __func__, ret);
     return ret;
 }
 
@@ -4068,17 +4068,17 @@ static int gtx8_cache_rawdata(struct gtx8_ts_test *ts_test)
     u32 rawdata_size = 0;
     u16 rawdata_addr = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
-    TPD_INFO("Cache rawdata\n");
+    TPD_DEBUG("Cache rawdata\n");
     ts_test->rawdata.size = 0;
     rawdata_size = ts_test->test_params.sen_num * ts_test->test_params.drv_num;
 
     if (rawdata_size > MAX_DRV_NUM * MAX_SEN_NUM || rawdata_size <= 0) {
-        TPD_INFO("Invalid rawdata size(%u)\n", rawdata_size);
+        TPD_DEBUG("Invalid rawdata size(%u)\n", rawdata_size);
         return ret;
     }
 
     rawdata_addr = ts_test->test_params.rawdata_addr;
-    TPD_INFO("Rawdata address=0x%x\n", rawdata_addr);
+    TPD_DEBUG("Rawdata address=0x%x\n", rawdata_addr);
 
     for (j = 0; j < GTX8_RETRY_NUM_3; j++) {
         /* read rawdata */
@@ -4087,7 +4087,7 @@ static int gtx8_cache_rawdata(struct gtx8_ts_test *ts_test)
                                          (u8 *)&ts_test->rawdata.data[0], rawdata_size * sizeof(u16));
         if (ret < 0) {
             if (j == GTX8_RETRY_NUM_3 - 1) {
-                TPD_INFO("Failed to read rawdata:%d,at:%d\n", ret, j);
+                TPD_DEBUG("Failed to read rawdata:%d,at:%d\n", ret, j);
                 goto cache_exit;
             } else {
                 continue;
@@ -4096,7 +4096,7 @@ static int gtx8_cache_rawdata(struct gtx8_ts_test *ts_test)
         for (i = 0; i < rawdata_size; i++)
             ts_test->rawdata.data[i] = be16_to_cpu(ts_test->rawdata.data[i]);
         ts_test->rawdata.size = rawdata_size;
-        TPD_INFO("Rawdata ready\n");
+        TPD_DEBUG("Rawdata ready\n");
         break;
     }
 
@@ -4114,17 +4114,17 @@ static int gtx8_cache_self_rawdata(struct gtx8_ts_test *ts_test)
     u16 self_rawdata_size = 0;
     u16 self_rawdata_addr = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
-    TPD_INFO("Cache selfrawdata\n");
+    TPD_DEBUG("Cache selfrawdata\n");
     ts_test->self_rawdata.size = 0;
     self_rawdata_size = ts_test->test_params.sen_num + ts_test->test_params.drv_num;
 
     if (self_rawdata_size > MAX_DRV_NUM + MAX_SEN_NUM || self_rawdata_size <= 0) {
-        TPD_INFO("Invalid selfrawdata size(%u)\n", self_rawdata_size);
+        TPD_DEBUG("Invalid selfrawdata size(%u)\n", self_rawdata_size);
         return ret;
     }
 
     self_rawdata_addr = ts_test->test_params.self_rawdata_addr;
-    TPD_INFO("Selfraw address=0x%x\n", self_rawdata_addr);
+    TPD_DEBUG("Selfraw address=0x%x\n", self_rawdata_addr);
 
     for (j = 0; j < GTX8_RETRY_NUM_3; j++) {
         /* read selfrawdata */
@@ -4134,7 +4134,7 @@ static int gtx8_cache_self_rawdata(struct gtx8_ts_test *ts_test)
                                          self_rawdata_size * sizeof(u16));
         if (ret < 0) {
             if (j == GTX8_RETRY_NUM_3 - 1) {
-                TPD_INFO("Failed to read self_rawdata:%d\n", ret);
+                TPD_DEBUG("Failed to read self_rawdata:%d\n", ret);
                 goto cache_exit;
             } else {
                 continue;
@@ -4143,12 +4143,12 @@ static int gtx8_cache_self_rawdata(struct gtx8_ts_test *ts_test)
         for (i = 0; i < self_rawdata_size; i++)
             ts_test->self_rawdata.data[i] = be16_to_cpu(ts_test->self_rawdata.data[i]);
         ts_test->self_rawdata.size = self_rawdata_size;
-        TPD_INFO("self_Rawdata ready\n");
+        TPD_DEBUG("self_Rawdata ready\n");
         break;
     }
 
 cache_exit:
-    TPD_INFO("%s exit:%d\n", __func__, ret);
+    TPD_DEBUG("%s exit:%d\n", __func__, ret);
     return ret;
 }
 
@@ -4162,18 +4162,18 @@ static int gtx8_noisetest_prepare(struct gtx8_ts_test *ts_test)
     u32 self_noise_data_size = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
     noise_data_size = ts_test->test_params.sen_num * ts_test->test_params.drv_num;
     self_noise_data_size = ts_test->test_params.sen_num + ts_test->test_params.drv_num;
 
     if (noise_data_size <= 0 || noise_data_size > MAX_DRV_NUM * MAX_SEN_NUM) {
-        TPD_INFO("%s: Bad noise_data_size[%d]\n", __func__, noise_data_size);
+        TPD_DEBUG("%s: Bad noise_data_size[%d]\n", __func__, noise_data_size);
         ts_test->test_result[GTP_NOISE_TEST] = SYS_SOFTWARE_REASON;
         return -EINVAL;
     }
 
     if (self_noise_data_size <= 0 || self_noise_data_size > MAX_DRV_NUM + MAX_SEN_NUM) {
-        TPD_INFO("%s: Bad self_noise_data_size[%d]\n", __func__, self_noise_data_size);
+        TPD_DEBUG("%s: Bad self_noise_data_size[%d]\n", __func__, self_noise_data_size);
         ts_test->test_result[GTP_SELFNOISE_TEST] = SYS_SOFTWARE_REASON;
         return -EINVAL;
     }
@@ -4181,21 +4181,21 @@ static int gtx8_noisetest_prepare(struct gtx8_ts_test *ts_test)
     ts_test->noisedata.size = noise_data_size;
     ts_test->self_noisedata.size = self_noise_data_size;
 
-    TPD_INFO("%s: noise test prepare rawdata addr:0x%04x,len:%d",
+    TPD_DEBUG("%s: noise test prepare rawdata addr:0x%04x,len:%d",
              __func__, ts_test->rawdata_cmd.cmd_reg,
              ts_test->rawdata_cmd.length);
     /* change to rawdata mode */
     ret = touch_i2c_write_block(chip_info->client, ts_test->rawdata_cmd.cmd_reg,
                                 ts_test->rawdata_cmd.length, ts_test->rawdata_cmd.cmds);
     if (ret < 0) {
-        TPD_INFO("%s: Failed send rawdata command:ret%d\n", __func__, ret);
+        TPD_DEBUG("%s: Failed send rawdata command:ret%d\n", __func__, ret);
         ts_test->test_result[GTP_NOISE_TEST] = SYS_SOFTWARE_REASON;
         ts_test->test_result[GTP_SELFNOISE_TEST] = SYS_SOFTWARE_REASON;
         return ret;
     }
     msleep(50);
 
-    TPD_INFO("%s: Enter rawdata mode\n", __func__);
+    TPD_DEBUG("%s: Enter rawdata mode\n", __func__);
 
     return ret;
 }
@@ -4224,7 +4224,7 @@ static int gtx8_cache_noisedata(struct gtx8_ts_test *ts_test)
                                      noisedata_addr, (u8 *)&ts_test->noisedata.data[0],
                                      noise_data_size * sizeof(u16));
     if (ret < 0) {
-        TPD_INFO("%s: Failed read noise data\n", __func__);
+        TPD_DEBUG("%s: Failed read noise data\n", __func__);
         ts_test->noisedata.size = 0;
         ts_test->test_result[GTP_NOISE_TEST] = SYS_SOFTWARE_REASON;
     }
@@ -4235,12 +4235,12 @@ static int gtx8_cache_noisedata(struct gtx8_ts_test *ts_test)
                                       self_noisedata_addr, (u8 *)&ts_test->self_noisedata.data[0],
                                       self_noise_data_size * sizeof(u16));
     if (ret1 < 0) {
-        TPD_INFO("%s: Failed read self noise data\n", __func__);
+        TPD_DEBUG("%s: Failed read self noise data\n", __func__);
         ts_test->self_noisedata.size = 0;
         ts_test->test_result[GTP_SELFNOISE_TEST] = SYS_SOFTWARE_REASON;
     }
 
-    TPD_INFO("%s exit:%d\n", __func__, ret | ret1);
+    TPD_DEBUG("%s exit:%d\n", __func__, ret | ret1);
     return ret | ret1;
 }
 
@@ -4259,7 +4259,7 @@ static void gtx8_analyse_noisedata(struct gtx8_ts_test *ts_test)
 
         if (ts_test->noisedata.data[i] > ts_test->test_params.noise_threshold) {
             find_bad_node++;
-            TPD_INFO("noise check failed: niose[%d][%d]:%u, > %u\n",
+            TPD_DEBUG("noise check failed: niose[%d][%d]:%u, > %u\n",
                     (u32)div_s64(i, ts_test->test_params.sen_num),
                     i % ts_test->test_params.sen_num,
                     ts_test->noisedata.data[i],
@@ -4267,11 +4267,11 @@ static void gtx8_analyse_noisedata(struct gtx8_ts_test *ts_test)
         }
     }
     if (find_bad_node) {
-        TPD_INFO("%s:noise test find bad node\n", __func__);
+        TPD_DEBUG("%s:noise test find bad node\n", __func__);
         ts_test->test_result[GTP_NOISE_TEST] = GTP_PANEL_REASON;
     } else {
         ts_test->test_result[GTP_NOISE_TEST] = GTP_TEST_PASS;
-        TPD_INFO("noise test check pass\n");
+        TPD_DEBUG("noise test check pass\n");
     }
 
     return;
@@ -4285,14 +4285,14 @@ static void gtx8_analyse_self_noisedata(struct gtx8_ts_test *ts_test)
     int i = 0;
     u32 self_find_bad_node = 0;
     s16 self_noise_value = 0;
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
     for (i = 0; i < ts_test->self_noisedata.size; i++) {
         self_noise_value = (s16)be16_to_cpu(ts_test->self_noisedata.data[i]);
         ts_test->self_noisedata.data[i] = abs(self_noise_value);
 
         if (ts_test->self_noisedata.data[i] > ts_test->test_params.self_noise_threshold) {
             self_find_bad_node++;
-            TPD_INFO("self noise check failed: self_noise[%d][%d]:%u, > %u\n",
+            TPD_DEBUG("self noise check failed: self_noise[%d][%d]:%u, > %u\n",
                     (u32)div_s64(i, ts_test->test_params.drv_num),
                     i % ts_test->test_params.drv_num,
                     ts_test->self_noisedata.data[i],
@@ -4301,13 +4301,13 @@ static void gtx8_analyse_self_noisedata(struct gtx8_ts_test *ts_test)
     }
 
     if (self_find_bad_node) {
-        TPD_INFO("%s:self_noise test find bad node", __func__);
+        TPD_DEBUG("%s:self_noise test find bad node", __func__);
         ts_test->test_result[GTP_SELFNOISE_TEST] = GTP_PANEL_REASON;
     } else {
         ts_test->test_result[GTP_SELFNOISE_TEST] = GTP_TEST_PASS;
-        TPD_INFO("self noise test check passed\n");
+        TPD_DEBUG("self noise test check passed\n");
     }
-    TPD_INFO("%s exit\n", __func__);
+    TPD_DEBUG("%s exit\n", __func__);
     return;
 }
 
@@ -4320,10 +4320,10 @@ static void gtx8_test_noisedata(struct gtx8_ts_test *ts_test)
     u8 buf[1];
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
     ret = gtx8_noisetest_prepare(ts_test);
     if (ret < 0) {
-        TPD_INFO("%s :Noisetest prepare failed\n", __func__);
+        TPD_DEBUG("%s :Noisetest prepare failed\n", __func__);
         goto soft_err_out;
     }
 
@@ -4332,7 +4332,7 @@ static void gtx8_test_noisedata(struct gtx8_ts_test *ts_test)
         ret = gtx8_cache_noisedata(ts_test);
         if (ret) {
             if (test_cnt == RAWDATA_TEST_TIMES - 1) {
-                TPD_INFO("%s: Cache noisedata failed\n", __func__);
+                TPD_DEBUG("%s: Cache noisedata failed\n", __func__);
                 goto soft_err_out;
             } else {
                 continue;
@@ -4344,7 +4344,7 @@ static void gtx8_test_noisedata(struct gtx8_ts_test *ts_test)
         break;
     }
 
-    TPD_INFO("%s: Noisedata and Self_noisedata test end\n", __func__);
+    TPD_DEBUG("%s: Noisedata and Self_noisedata test end\n", __func__);
     goto noise_test_exit;
 
 soft_err_out:
@@ -4370,14 +4370,14 @@ static int gtx8_self_rawcapacitance_test(struct ts_test_self_rawdata *rawdata,
 
     for (i = 0; i < rawdata->size; i++) {
         if (rawdata->data[i] > test_params->self_max_limits[i]) {
-            TPD_INFO("self_rawdata[%d][%d]:%u >self_max_limit:%u, NG\n",
+            TPD_DEBUG("self_rawdata[%d][%d]:%u >self_max_limit:%u, NG\n",
                     (u32)div_s64(i, test_params->drv_num), i % test_params->drv_num,
                     rawdata->data[i], test_params->self_max_limits[i]);
             ret = RESULT_ERR;
         }
 
         if (rawdata->data[i] < test_params->self_min_limits[i]) {
-            TPD_INFO("self_rawdata[%d][%d]:%u < min_limit:%u, NG\n",
+            TPD_DEBUG("self_rawdata[%d][%d]:%u < min_limit:%u, NG\n",
                     (u32)div_s64(i, test_params->drv_num), i % test_params->drv_num,
                     rawdata->data[i], test_params->self_min_limits[i]);
             ret = RESULT_ERR;
@@ -4396,15 +4396,15 @@ static int gtx8_captest_prepare(struct gtx8_ts_test *ts_test)
 {
     int ret = -EINVAL;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
 
     ret = goodix_send_config(chip_info, chip_info->test_cfg.data, chip_info->test_cfg.length);
     if (ret)
-        TPD_INFO("Failed to send test config:%d\n", ret);
+        TPD_DEBUG("Failed to send test config:%d\n", ret);
     else
-        TPD_INFO("Success send test config");
+        TPD_DEBUG("Success send test config");
 
-    TPD_INFO("%s exit:%d\n", __func__, ret);
+    TPD_DEBUG("%s exit:%d\n", __func__, ret);
     return ret;
 }
 
@@ -4416,14 +4416,14 @@ static int gtx8_rawcapacitance_test(struct ts_test_rawdata *rawdata,
 
     for (i = 0; i < rawdata->size; i++) {
         if (rawdata->data[i] > test_params->max_limits[i]) {
-            TPD_INFO("rawdata[%d][%d]:%u > max_limit:%u, NG\n",
+            TPD_DEBUG("rawdata[%d][%d]:%u > max_limit:%u, NG\n",
                     (u32)div_s64(i, test_params->sen_num), i % test_params->sen_num,
                     rawdata->data[i], test_params->max_limits[i]);
             ret = RESULT_ERR;
         }
 
         if (rawdata->data[i] < test_params->min_limits[i]) {
-            TPD_INFO("rawdata[%d][%d]:%u < min_limit:%u, NG\n",
+            TPD_DEBUG("rawdata[%d][%d]:%u < min_limit:%u, NG\n",
                     (u32)div_s64(i, test_params->sen_num), i % test_params->sen_num,
                     rawdata->data[i], test_params->min_limits[i]);
             ret = RESULT_ERR;
@@ -4447,7 +4447,7 @@ static int gtx8_deltacapacitance_test(struct ts_test_rawdata *rawdata,
     cols = test_params->sen_num;
     sc_data_num = test_params->drv_num * test_params->sen_num;
     if (cols <= 0) {
-        TPD_INFO("%s: parmas invalid\n", __func__);
+        TPD_DEBUG("%s: parmas invalid\n", __func__);
         return RESULT_ERR;
     }
 
@@ -4491,13 +4491,13 @@ static int gtx8_deltacapacitance_test(struct ts_test_rawdata *rawdata,
             max_val *= FLOAT_AMPLIFIER;
             max_val = (u32)div_s64(max_val, rawdata_val);
             if (max_val > test_params->deviation_limits[i]) {
-                TPD_INFO("deviation[%d][%d]:%u > delta_limit:%u, NG\n",
+                TPD_DEBUG("deviation[%d][%d]:%u > delta_limit:%u, NG\n",
                         (u32)div_s64(i, cols), i % cols, max_val,
                         test_params->deviation_limits[i]);
                 ret = RESULT_ERR;
             }
         } else {
-            TPD_INFO("Find rawdata=0 when calculate deltacapacitance:[%d][%d]\n",
+            TPD_DEBUG("Find rawdata=0 when calculate deltacapacitance:[%d][%d]\n",
                     (u32)div_s64(i, cols), i % cols);
             ret = RESULT_ERR;
         }
@@ -4516,26 +4516,26 @@ static void gtx8_rawdata_test(struct gtx8_ts_test *ts_test)
     ret = gtx8_cache_rawdata(ts_test);
     if (ret < 0) {
         /* Failed read rawdata */
-        TPD_INFO("Read rawdata failed\n");
+        TPD_DEBUG("Read rawdata failed\n");
         ts_test->test_result[GTP_CAP_TEST] = SYS_SOFTWARE_REASON;
         ts_test->test_result[GTP_DELTA_TEST] = SYS_SOFTWARE_REASON;
     } else {
         ret = gtx8_rawcapacitance_test(&ts_test->rawdata, &ts_test->test_params);
         if (!ret) {
             ts_test->test_result[GTP_CAP_TEST] = GTP_TEST_PASS;
-            TPD_INFO("Rawdata test pass\n");
+            TPD_DEBUG("Rawdata test pass\n");
         } else {
             ts_test->test_result[GTP_CAP_TEST] = GTP_PANEL_REASON;
-            TPD_INFO("RawCap test failed\n");
+            TPD_DEBUG("RawCap test failed\n");
         }
 
         ret = gtx8_deltacapacitance_test(&ts_test->rawdata, &ts_test->test_params);
         if (!ret)  {
             ts_test->test_result[GTP_DELTA_TEST] = GTP_TEST_PASS;
-            TPD_INFO("DeltaCap test pass\n");
+            TPD_DEBUG("DeltaCap test pass\n");
         } else {
             ts_test->test_result[GTP_DELTA_TEST] = GTP_PANEL_REASON;
-            TPD_INFO("DeltaCap test failed\n");
+            TPD_DEBUG("DeltaCap test failed\n");
         }
     }
 }
@@ -4546,10 +4546,10 @@ static void gtx8_capacitance_test(struct gtx8_ts_test *ts_test)
     u8 buf[1];
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)ts_test->ts;
 
-    TPD_INFO("%s run\n", __func__);
+    TPD_DEBUG("%s run\n", __func__);
     ret = gtx8_captest_prepare(ts_test);
     if (ret) {
-        TPD_INFO("Captest prepare failed\n");
+        TPD_DEBUG("Captest prepare failed\n");
         ts_test->test_result[GTP_CAP_TEST] = SYS_SOFTWARE_REASON;
         ts_test->test_result[GTP_DELTA_TEST] = SYS_SOFTWARE_REASON;
         ts_test->test_result[GTP_SELFCAP_TEST] = SYS_SOFTWARE_REASON;
@@ -4559,10 +4559,10 @@ static void gtx8_capacitance_test(struct gtx8_ts_test *ts_test)
     ret = touch_i2c_write_block(chip_info->client, ts_test->rawdata_cmd.cmd_reg,
                                 ts_test->rawdata_cmd.length, ts_test->rawdata_cmd.cmds);
     if (ret < 0) {
-        TPD_INFO("%s:Failed send rawdata cmd:ret%d\n", __func__, ret);
+        TPD_DEBUG("%s:Failed send rawdata cmd:ret%d\n", __func__, ret);
         goto capac_test_exit;
     } else {
-        TPD_INFO("%s: Success change to rawdata mode\n", __func__);
+        TPD_DEBUG("%s: Success change to rawdata mode\n", __func__);
     }
     msleep(50);
 
@@ -4572,17 +4572,17 @@ static void gtx8_capacitance_test(struct gtx8_ts_test *ts_test)
     ret = gtx8_cache_self_rawdata(ts_test);
     if (ret < 0) {
         /* Failed read selfrawdata */
-        TPD_INFO("Read selfrawdata failed\n");
+        TPD_DEBUG("Read selfrawdata failed\n");
         ts_test->test_result[GTP_SELFCAP_TEST] = SYS_SOFTWARE_REASON;
         goto capac_test_exit;
     } else {
         ret = gtx8_self_rawcapacitance_test(&ts_test->self_rawdata, &ts_test->test_params);
         if (!ret) {
             ts_test->test_result[GTP_SELFCAP_TEST] = GTP_TEST_PASS;
-            TPD_INFO("selfrawdata test pass\n");
+            TPD_DEBUG("selfrawdata test pass\n");
         } else {
             ts_test->test_result[GTP_SELFCAP_TEST] = GTP_PANEL_REASON;
-            TPD_INFO("selfrawCap test failed\n");
+            TPD_DEBUG("selfrawCap test failed\n");
         }
     }
 capac_test_exit:
@@ -4599,7 +4599,7 @@ static void gtx8_intgpio_test(struct gtx8_ts_test *p_gtx8_ts_test)
     /*for interrupt pin test*/
     int eint_status = 0, eint_count = 0, read_gpio_num = 0;//not test int pin
 
-    TPD_INFO("%s, step 0: begin to check INT-GND short item\n", __func__);
+    TPD_DEBUG("%s, step 0: begin to check INT-GND short item\n", __func__);
 
     while (read_gpio_num--) {
         msleep(5);
@@ -4609,11 +4609,11 @@ static void gtx8_intgpio_test(struct gtx8_ts_test *p_gtx8_ts_test)
         } else {
             eint_count++;
         }
-        TPD_INFO("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
+        TPD_DEBUG("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
     }
-    TPD_INFO("TP EINT PIN %s direct short! eint_count = %d\n", eint_count == 10 ? "is" : "not", eint_count);
+    TPD_DEBUG("TP EINT PIN %s direct short! eint_count = %d\n", eint_count == 10 ? "is" : "not", eint_count);
     if (eint_count == 10) {
-        TPD_INFO("error :  TP EINT PIN direct short!\n");
+        TPD_DEBUG("error :  TP EINT PIN direct short!\n");
         seq_printf(p_gtx8_ts_test->p_seq_file, "eint_status is low, TP EINT direct stort\n");
         eint_count = 0;
         p_gtx8_ts_test->error_count ++;
@@ -4637,25 +4637,25 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     short_cmd[2] = (u8)((0 - short_cmd[0] - short_cmd[1]) & 0xff);
     short_cmd_reg = chip_info->reg_info.GTP_REG_CMD;
 
-    TPD_INFO("Short test prepare+\n");
+    TPD_DEBUG("Short test prepare+\n");
     while (--retry) {
         /* switch to shrot test system */
         ret = gt9886_i2c_write(chip_info->client, short_cmd_reg, 3, short_cmd);
         if (ret < 0) {
-            TPD_INFO("Can not switch to short test system\n");
+            TPD_DEBUG("Can not switch to short test system\n");
             return ret;
         }
         msleep(50);
 
         /* check firmware running */
         for (i = 0; i < 20; i++) {
-            TPD_INFO("Check firmware running..");
+            TPD_DEBUG("Check firmware running..");
             ret = touch_i2c_read_block(chip_info->client, SHORT_STATUS_REG, 1, &data[0]);
             if (ret < 0) {
-                TPD_INFO("Check firmware running failed\n");
+                TPD_DEBUG("Check firmware running failed\n");
                 return ret;
             } else if (data[0] == 0xaa) {
-                TPD_INFO("Short firmware is running\n");
+                TPD_DEBUG("Short firmware is running\n");
                 break;
             }
             msleep(10);
@@ -4670,7 +4670,7 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     }
     if (retry <= 0) {
         ret = -EINVAL;
-        TPD_INFO("Switch to short test mode timeout\n");
+        TPD_DEBUG("Switch to short test mode timeout\n");
         return ret;
     }
 
@@ -4678,11 +4678,11 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     /* turn off watch dog timer */
     ret = touch_i2c_write_block(chip_info->client, WATCH_DOG_TIMER_REG, 1, data);
     if (ret < 0) {
-        TPD_INFO("Failed turn off watch dog timer\n");
+        TPD_DEBUG("Failed turn off watch dog timer\n");
         return ret;
     }
 
-    TPD_INFO("Firmware in short test mode\n");
+    TPD_DEBUG("Firmware in short test mode\n");
 
     data[0] = (ts_test->test_params.short_threshold >> 8) & 0xff;
     data[1] = ts_test->test_params.short_threshold & 0xff;
@@ -4690,7 +4690,7 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     /* write tx/tx, tx/rx, rx/rx short threshold value to 0x8408 */
     ret = touch_i2c_write_block(chip_info->client, TXRX_THRESHOLD_REG, 2, data);
     if (ret < 0) {
-        TPD_INFO("Failed write tx/tx, tx/rx, rx/rx short threshold value\n");
+        TPD_DEBUG("Failed write tx/tx, tx/rx, rx/rx short threshold value\n");
         return ret;
     }
     data[0] = (GNDAVDD_SHORT_VALUE >> 8) & 0xff;
@@ -4698,7 +4698,7 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     /* write default txrx/gndavdd short threshold value 16 to 0x804A*/
     ret = touch_i2c_write_block(chip_info->client, GNDVDD_THRESHOLD_REG, 2, data);
     if (ret < 0) {
-        TPD_INFO("Failed write txrx/gndavdd short threshold value\n");
+        TPD_DEBUG("Failed write txrx/gndavdd short threshold value\n");
         return ret;
     }
 
@@ -4707,7 +4707,7 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     data[1] = ADC_DUMP_NUM & 0xff;
     ret = touch_i2c_write_block(chip_info->client, ADC_DUMP_NUM_REG, 2, data);
     if (ret < 0) {
-        TPD_INFO("Failed write ADC dump data number\n");
+        TPD_DEBUG("Failed write ADC dump data number\n");
         return ret;
     }
 
@@ -4715,11 +4715,11 @@ static int gtx8_short_test_prepare(struct gtx8_ts_test *ts_test)
     data[0] = 0x01;
     ret = touch_i2c_write_block(chip_info->client, SHORT_STATUS_REG, 1, data);
     if (ret < 0) {
-        TPD_INFO("Failed write running dsp reg\n");
+        TPD_DEBUG("Failed write running dsp reg\n");
         return ret;
     }
 
-    TPD_INFO("Short test prepare-\n");
+    TPD_DEBUG("Short test prepare-\n");
     return 0;
 }
 
@@ -4750,7 +4750,7 @@ static u32 map_die2pin(struct ts_test_params *test_params, u32 chn_num)
         }
     }
     if (i >= test_params->max_drv_num)
-        TPD_INFO("Faild found corrresponding channel num:%d\n", chn_num);
+        TPD_DEBUG("Faild found corrresponding channel num:%d\n", chn_num);
     else
         res |= DRV_CHANNEL_FLAG;
 
@@ -4791,7 +4791,7 @@ static int gtx8_check_resistance_to_gnd(struct ts_test_params *test_params,
 
     if (r < r_th) {
         pin_num = map_die2pin(test_params, chn_id_tmp);
-        TPD_INFO("%s%d shortcircut to %s,R=%ldK,R_Threshold=%dK\n",
+        TPD_DEBUG("%s%d shortcircut to %s,R=%ldK,R_Threshold=%dK\n",
                 (pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
                 (pin_num & ~DRV_CHANNEL_FLAG),
                 (adc_signal & 0x8000) ? "VDD" : "GND",
@@ -4858,17 +4858,17 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
 
     ret = touch_i2c_read_block(chip_info->client, TEST_RESTLT_REG, 1, &short_flag);
     if (ret < 0) {
-        TPD_INFO("Read TEST_TESULT_REG falied\n");
+        TPD_DEBUG("Read TEST_TESULT_REG falied\n");
         goto shortcircut_analysis_error;
     } else if ((short_flag & 0x0F) == 0x00) {
-        TPD_INFO("No shortcircut\n");
+        TPD_DEBUG("No shortcircut\n");
         return NO_ERR;
     }
-    TPD_INFO("short test flag:0x%x\n", short_flag);
+    TPD_DEBUG("short test flag:0x%x\n", short_flag);
 
     data_buf = kzalloc((MAX_DRV_NUM + MAX_SEN_NUM) * 2, GFP_KERNEL);
     if (!data_buf) {
-        TPD_INFO("Failed to alloc memory\n");
+        TPD_DEBUG("Failed to alloc memory\n");
         goto shortcircut_analysis_error;
     }
 
@@ -4879,7 +4879,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         size = (MAX_DRV_NUM + MAX_SEN_NUM) * 2;
         ret = touch_i2c_read_block(chip_info->client, DIFF_CODE_REG, size, data_buf);
         if (ret < 0) {
-            TPD_INFO("Failed read to-gnd rawdata\n");
+            TPD_DEBUG("Failed read to-gnd rawdata\n");
             goto shortcircut_analysis_error;
         }
         for (i = 0; i < size; i += 2) {
@@ -4887,7 +4887,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
             ret = gtx8_check_resistance_to_gnd(test_params,
                                                adc_signal, i >> 1); /* i >> 1 = i / 2 */
             if (ret) {
-                TPD_INFO("Resistance to-gnd test failed\n");
+                TPD_DEBUG("Resistance to-gnd test failed\n");
                 err |= ret;
             }
         }
@@ -4897,7 +4897,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
     size = (MAX_DRV_NUM + MAX_SEN_NUM) * 2;
     ret = touch_i2c_read_block(chip_info->client, DRV_SELF_CODE_REG, size, data_buf);
     if (ret < 0) {
-        TPD_INFO("Failed read selfcap rawdata\n");
+        TPD_DEBUG("Failed read selfcap rawdata\n");
         goto shortcircut_analysis_error;
     }
     for (i = 0; i < MAX_DRV_NUM + MAX_SEN_NUM; i++)
@@ -4911,10 +4911,10 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
     */
     ret = touch_i2c_read_block(chip_info->client, TX_SHORT_NUM, 3, &short_status[0]);
     if (ret < 0) {
-        TPD_INFO("Failed read tx-to-tx short rawdata\n");
+        TPD_DEBUG("Failed read tx-to-tx short rawdata\n");
         goto shortcircut_analysis_error;
     }
-    TPD_INFO("Tx&Tx:%d,Rx&Rx:%d,Tx&Rx:%d\n", short_status[0], short_status[1], short_status[2]);
+    TPD_DEBUG("Tx&Tx:%d,Rx&Rx:%d,Tx&Rx:%d\n", short_status[0], short_status[1], short_status[2]);
 
     /* drv&drv shortcircut check */
     data_addr = 0x8460;
@@ -4922,7 +4922,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         size = SHORT_CAL_SIZE(MAX_DRV_NUM);    /* 4 + MAX_DRV_NUM * 2 + 2; */
         ret = touch_i2c_read_block(chip_info->client, data_addr, size, data_buf);
         if (ret < 0) {
-            TPD_INFO("Failed read drv-to-drv short rawdata\n");
+            TPD_DEBUG("Failed read drv-to-drv short rawdata\n");
             goto shortcircut_analysis_error;
         }
 
@@ -4930,7 +4930,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         short_die_num = be16_to_cpup((__be16 *)&data_buf[0]);
         if (short_die_num > MAX_DRV_NUM + MAX_SEN_NUM ||
             short_die_num < MAX_SEN_NUM) {
-            TPD_INFO("invalid short pad num:%d\n", short_die_num);
+            TPD_DEBUG("invalid short pad num:%d\n", short_die_num);
             continue;
         }
 
@@ -4947,7 +4947,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
 
                 if (self_capdata[short_die_num] == 0xffff ||
                     self_capdata[short_die_num] == 0) {
-                    TPD_INFO("invalid self_capdata:0x%x\n", self_capdata[short_die_num]);
+                    TPD_DEBUG("invalid self_capdata:0x%x\n", self_capdata[short_die_num]);
                     continue;
                 }
 
@@ -4956,9 +4956,9 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
                 if (short_r < r_threshold) {
                     master_pin_num = map_die2pin(test_params, temp_short_info.master);
                     slave_pin_num = map_die2pin(test_params, temp_short_info.slave);
-                    TPD_INFO("Tx/Tx short circut:R=%dK,R_Threshold=%dK\n",
+                    TPD_DEBUG("Tx/Tx short circut:R=%dK,R_Threshold=%dK\n",
                             short_r, r_threshold);
-                    TPD_INFO("%s%d--%s%d shortcircut\n",
+                    TPD_DEBUG("%s%d--%s%d shortcircut\n",
                             (master_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
                             (master_pin_num & ~DRV_CHANNEL_FLAG),
                             (slave_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
@@ -4976,7 +4976,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         size =   SHORT_CAL_SIZE(MAX_SEN_NUM);     /* 4 + MAX_SEN_NUM * 2 + 2; */
         ret = touch_i2c_read_block(chip_info->client, data_addr, size, data_buf);
         if (ret < 0) {
-            TPD_INFO("Failed read sen-to-sen short rawdata\n");
+            TPD_DEBUG("Failed read sen-to-sen short rawdata\n");
             goto shortcircut_analysis_error;
         }
 
@@ -4995,7 +4995,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
 
                 if (self_capdata[short_die_num + test_params->max_drv_num] == 0xffff ||
                     self_capdata[short_die_num + test_params->max_drv_num] == 0) {
-                    TPD_INFO("invalid self_capdata:0x%x\n",
+                    TPD_DEBUG("invalid self_capdata:0x%x\n",
                              self_capdata[short_die_num + test_params->max_drv_num]);
                     continue;
                 }
@@ -5005,9 +5005,9 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
                 if (short_r < r_threshold) {
                     master_pin_num = map_die2pin(test_params, temp_short_info.master);
                     slave_pin_num = map_die2pin(test_params, temp_short_info.slave);
-                    TPD_INFO("Rx/Rx short circut:R=%dK,R_Threshold=%dK\n",
+                    TPD_DEBUG("Rx/Rx short circut:R=%dK,R_Threshold=%dK\n",
                             short_r, r_threshold);
-                    TPD_INFO("%s%d--%s%d shortcircut\n",
+                    TPD_DEBUG("%s%d--%s%d shortcircut\n",
                             (master_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
                             (master_pin_num & ~DRV_CHANNEL_FLAG),
                             (slave_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
@@ -5025,7 +5025,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         size =  SHORT_CAL_SIZE(MAX_DRV_NUM);                        /* size = 4 + MAX_SEN_NUM * 2 + 2; */
         ret = touch_i2c_read_block(chip_info->client, data_addr, size, data_buf);
         if (ret < 0) {
-            TPD_INFO("Failed read sen-to-drv short rawdata\n");
+            TPD_DEBUG("Failed read sen-to-drv short rawdata\n");
             goto shortcircut_analysis_error;
         }
 
@@ -5044,7 +5044,7 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
 
                 if (self_capdata[short_die_num + test_params->max_drv_num] == 0xffff ||
                     self_capdata[short_die_num + test_params->max_drv_num] == 0) {
-                    TPD_INFO("invalid self_capdata:0x%x\n",
+                    TPD_DEBUG("invalid self_capdata:0x%x\n",
                              self_capdata[short_die_num + test_params->max_drv_num]);
                     continue;
                 }
@@ -5054,9 +5054,9 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
                 if (short_r < r_threshold) {
                     master_pin_num = map_die2pin(test_params, temp_short_info.master);
                     slave_pin_num = map_die2pin(test_params, temp_short_info.slave);
-                    TPD_INFO("Rx/Tx short circut:R=%dK,R_Threshold=%dK\n",
+                    TPD_DEBUG("Rx/Tx short circut:R=%dK,R_Threshold=%dK\n",
                             short_r, r_threshold);
-                    TPD_INFO("%s%d--%s%d shortcircut\n",
+                    TPD_DEBUG("%s%d--%s%d shortcircut\n",
                             (master_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
                             (master_pin_num & ~DRV_CHANNEL_FLAG),
                             (slave_pin_num & DRV_CHANNEL_FLAG) ? "DRV" : "SEN",
@@ -5073,14 +5073,14 @@ static int gtx8_shortcircut_analysis(struct gtx8_ts_test *ts_test)
         data_buf = NULL;
     }
 
-    TPD_INFO("%s exit:%d\n", __func__, err);
+    TPD_DEBUG("%s exit:%d\n", __func__, err);
     return err ? -EFAULT :  NO_ERR;
 shortcircut_analysis_error:
     if (data_buf != NULL) {
         kfree(data_buf);
         data_buf = NULL;
     }
-    TPD_INFO("%s exit with some error\n", __func__);
+    TPD_DEBUG("%s exit with some error\n", __func__);
     return -EINVAL;
 }
 
@@ -5097,22 +5097,22 @@ static void gtx8_shortcircut_test(struct gtx8_ts_test *ts_test)
 
     wait_time = ((N * (N + 1)) + (M * (M + 1))) / 2 + M * N + N + M;
     wait_time = (int)(86 * wait_time /100 + 100);
-    TPD_INFO("wait_time:%d(ms),tx:%d,rx:%d\n", wait_time, test_params->drv_num, test_params->sen_num);
+    TPD_DEBUG("wait_time:%d(ms),tx:%d,rx:%d\n", wait_time, test_params->drv_num, test_params->sen_num);
 
     ts_test->test_result[GTP_SHORT_TEST] = GTP_TEST_PASS;
     ret = gtx8_short_test_prepare(ts_test);
     if (ret < 0) {
-        TPD_INFO("Failed enter short test mode\n");
+        TPD_DEBUG("Failed enter short test mode\n");
         ts_test->test_result[GTP_SHORT_TEST] = SYS_SOFTWARE_REASON;
         return;
     }
     msleep(wait_time);
     for (i = 0; i < 150; i++) {
         msleep(50);
-        TPD_INFO("waitting for short test end...:retry=%d\n", i);
+        TPD_DEBUG("waitting for short test end...:retry=%d\n", i);
         ret = touch_i2c_read_block(chip_info->client, SHORT_TESTEND_REG, 1, data);
         if (ret < 0 )
-            TPD_INFO("Failed get short test result: retry%d\n", i);
+            TPD_DEBUG("Failed get short test result: retry%d\n", i);
         else if (data[0] == 0x88)  /* test ok*/
             break;
     }
@@ -5121,22 +5121,22 @@ static void gtx8_shortcircut_test(struct gtx8_ts_test *ts_test)
         ret = gtx8_shortcircut_analysis(ts_test);
         if (ret) {
             ts_test->test_result[GTP_SHORT_TEST] = GTP_PANEL_REASON;
-            TPD_INFO("Short test failed\n");
+            TPD_DEBUG("Short test failed\n");
         } else {
-            TPD_INFO("Short test success\n");
+            TPD_DEBUG("Short test success\n");
         }
     } else {
-        TPD_INFO("Wait short test finish timeout:reg_val=0x%x\n", data[0]);
+        TPD_DEBUG("Wait short test finish timeout:reg_val=0x%x\n", data[0]);
         ts_test->test_result[GTP_SHORT_TEST] = SYS_SOFTWARE_REASON;
         for (i = 0; i < 8 ; i++) {
             udelay(1000);
             data[0] = 0x00;
             ret = touch_i2c_read_block(chip_info->client,0x2244,2,data);
             if(ret < 0){
-                TPD_INFO("short test,read 0x2244 failed:%d\n",ret);
+                TPD_DEBUG("short test,read 0x2244 failed:%d\n",ret);
                 continue;
             }
-            TPD_INFO("short test,i:%d,0x2244:0x%x,0x%x\n",i,data[0],data[1]);
+            TPD_DEBUG("short test,i:%d,0x2244:0x%x,0x%x\n",i,data[0],data[1]);
         }
     }
     return;
@@ -5262,7 +5262,7 @@ static void gtx8_put_test_result(
                 ts_test->error_count ++;
             }
         }
-        TPD_INFO("test_result_info %s[%d]%d\n", test_item_name[i], i, ts_test->test_result[i]);
+        TPD_DEBUG("test_result_info %s[%d]%d\n", test_item_name[i], i, ts_test->test_result[i]);
     }
     //step2: create a file to store test data in /sdcard/Tp_Test
     getnstimeofday(&now_time);
@@ -5293,7 +5293,7 @@ static void gtx8_put_test_result(
 #endif
     filp = filp_open(file_data_buf, O_RDWR | O_CREAT, 0644);
     if (IS_ERR(filp)) {
-        TPD_INFO("Open log file '%s' failed. %ld\n", file_data_buf, PTR_ERR(filp));
+        TPD_DEBUG("Open log file '%s' failed. %ld\n", file_data_buf, PTR_ERR(filp));
         set_fs(old_fs);
         /*add for *#899# test for it can not acess sdcard*/
     }
@@ -5405,7 +5405,7 @@ static void gtx8_put_test_result(
         filp_close(p_testdata->fp, NULL);
         set_fs(old_fs);
     }
-    TPD_INFO("%s exit\n", __func__);
+    TPD_DEBUG("%s exit\n", __func__);
     return;
 }
 
@@ -5422,34 +5422,34 @@ static void goodix_auto_test(struct seq_file *s, void *chip_data, struct goodix_
     u32 fw_ver = 0;
     u8 cfg_ver = 0;
 
-    TPD_INFO("%s: enter\n", __func__);
+    TPD_DEBUG("%s: enter\n", __func__);
 
     if (!chip_data) {
-        TPD_INFO("%s: chip_data is NULL\n", __func__);
+        TPD_DEBUG("%s: chip_data is NULL\n", __func__);
         return;
     }
     if (!p_testdata) {
-        TPD_INFO("%s: goodix_testdata is null\n", __func__);
+        TPD_DEBUG("%s: goodix_testdata is null\n", __func__);
         return;
     }
 
     gts_test = kzalloc(sizeof(struct gtx8_ts_test), GFP_KERNEL);
     if (!gts_test) {
-        TPD_INFO("%s: goodix_testdata is null\n", __func__);
+        TPD_DEBUG("%s: goodix_testdata is null\n", __func__);
         seq_printf(s, "1 error(s).\n");
         return;
     }
 
     p_rawdata = kzalloc(sizeof(u16) * (p_testdata->TX_NUM * p_testdata->RX_NUM), GFP_KERNEL);
     if (!p_rawdata) {
-        TPD_INFO("Failed to alloc rawdata info memory\n");
+        TPD_DEBUG("Failed to alloc rawdata info memory\n");
         gts_test->error_count ++;
         ret = -1;
         goto exit_finish;
     }
     p_noisedata = kzalloc(sizeof(u16) * (p_testdata->TX_NUM * p_testdata->RX_NUM), GFP_KERNEL);
     if (!p_noisedata) {
-        TPD_INFO("Failed to alloc rawdata info memory\n");
+        TPD_DEBUG("Failed to alloc rawdata info memory\n");
         gts_test->error_count ++;
         ret = -1;
         goto exit_finish;
@@ -5457,19 +5457,19 @@ static void goodix_auto_test(struct seq_file *s, void *chip_data, struct goodix_
 
     p_self_rawdata = kzalloc(sizeof(u16) * (p_testdata->TX_NUM + p_testdata->RX_NUM), GFP_KERNEL);
     if (!p_self_rawdata) {
-        TPD_INFO("Failed to alloc rawdata info memory\n");
+        TPD_DEBUG("Failed to alloc rawdata info memory\n");
         gts_test->error_count ++;
         ret = -1;
         goto exit_finish;
     }
     p_self_noisedata  = kzalloc(sizeof(u16) * (p_testdata->TX_NUM + p_testdata->RX_NUM), GFP_KERNEL);
     if (!p_self_noisedata) {
-        TPD_INFO("Failed to alloc rawdata info memory\n");
+        TPD_DEBUG("Failed to alloc rawdata info memory\n");
         gts_test->error_count ++;
         ret = -1;
         goto exit_finish;
     }
-    TPD_INFO("%s: alloc mem:%ld\n", __func__, sizeof(struct gtx8_ts_test) + 4 * (sizeof(u16) * (p_testdata->TX_NUM * p_testdata->RX_NUM)));
+    TPD_DEBUG("%s: alloc mem:%ld\n", __func__, sizeof(struct gtx8_ts_test) + 4 * (sizeof(u16) * (p_testdata->TX_NUM * p_testdata->RX_NUM)));
 
     gts_test->p_seq_file = s;
     gts_test->ts = chip_info;
@@ -5483,11 +5483,11 @@ static void goodix_auto_test(struct seq_file *s, void *chip_data, struct goodix_
     gtx8_intgpio_test(gts_test);
     ret = gtx8_tptest_prepare(gts_test);
     if (ret) {
-        TPD_INFO("%s: Failed parse test peremeters, exit test\n", __func__);
+        TPD_DEBUG("%s: Failed parse test peremeters, exit test\n", __func__);
         gts_test->error_count ++;
         goto exit_finish;
     }
-    TPD_INFO("%s: TP test prepare OK\n", __func__);
+    TPD_DEBUG("%s: TP test prepare OK\n", __func__);
 
     goodix_set_i2c_doze_mode(chip_info->client, false);
 
@@ -5508,10 +5508,10 @@ static void goodix_auto_test(struct seq_file *s, void *chip_data, struct goodix_
 exit_finish:
     tp_healthinfo_report(chip_info->monitor_data_v2, HEALTH_TEST_AUTO, &gts_test->error_count);
     seq_printf(s, "imageid = %lld, deviceid = %lld\n", p_testdata->TP_FW, gts_test->device_tp_fw);
-    TPD_INFO("imageid= %lld, deviceid= %lld\n", p_testdata->TP_FW, gts_test->device_tp_fw);
+    TPD_DEBUG("imageid= %lld, deviceid= %lld\n", p_testdata->TP_FW, gts_test->device_tp_fw);
     seq_printf(s, "%d error(s). %s\n", gts_test->error_count, gts_test->error_count ? "" : "All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", gts_test->error_count, gts_test->error_count ? "" : "All test passed.");
-    TPD_INFO("%s exit:%d\n", __func__, ret);
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", gts_test->error_count, gts_test->error_count ? "" : "All test passed.");
+    TPD_DEBUG("%s exit:%d\n", __func__, ret);
     if (p_rawdata) {
         kfree(p_rawdata);
         p_rawdata = NULL;
@@ -5541,15 +5541,15 @@ static int goodix_set_health_info_state (void *chip_data, uint8_t enable)
     int ret = 0;
     struct chip_data_gt9886 *chip_info = (struct chip_data_gt9886 *)chip_data;
 
-    TPD_INFO("%s, enable : %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable : %d\n", __func__, enable);
     if (enable) {
         ret = goodix_send_cmd(chip_info, GTP_CMD_DEBUG, 0x55);
         ret |= goodix_send_cmd(chip_info, GTP_CMD_DOWN_DELTA, 0x55);
-        TPD_INFO("%s: enable debug log %s\n", __func__, ret < 0 ? "failed" : "success");
+        TPD_DEBUG("%s: enable debug log %s\n", __func__, ret < 0 ? "failed" : "success");
     } else {
         ret = goodix_send_cmd(chip_info, GTP_CMD_DEBUG, 0x00);
         ret |= goodix_send_cmd(chip_info, GTP_CMD_DOWN_DELTA, 0x55);
-        TPD_INFO("%s: disable debug log %s\n", __func__, ret < 0 ? "failed" : "success");
+        TPD_DEBUG("%s: disable debug log %s\n", __func__, ret < 0 ? "failed" : "success");
     }
 
     return ret;
@@ -5557,7 +5557,7 @@ static int goodix_set_health_info_state (void *chip_data, uint8_t enable)
 
 static int goodix_get_health_info_state (void *chip_data)
 {
-    TPD_INFO("%s enter\n", __func__);
+    TPD_DEBUG("%s enter\n", __func__);
     return 0;
 }
 
@@ -5576,10 +5576,10 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     u64 time_counter = 0;
     int ret = -1;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (tp_register_times > 0) {
-        TPD_INFO("TP driver have success loaded %d times, exit\n", tp_register_times);
+        TPD_DEBUG("TP driver have success loaded %d times, exit\n", tp_register_times);
         return -1;
     }
     reset_healthinfo_time_counter(&time_counter);
@@ -5587,7 +5587,7 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     /* 1. Alloc chip_info */
     chip_info = kzalloc(sizeof(struct chip_data_gt9886), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -5595,19 +5595,19 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
 
     /* 3. alloc touch data space */
     chip_info->touch_data = kzalloc(MAX_GT_IRQ_DATA_LENGTH, GFP_KERNEL);
     if (chip_info->touch_data == NULL) {
-        TPD_INFO("touch_data kzalloc error\n");
+        TPD_DEBUG("touch_data kzalloc error\n");
         goto err_register_driver;
     }
     chip_info->edge_data = kzalloc(MAX_GT_EDGE_DATA_LENGTH, GFP_KERNEL);
     if (chip_info->edge_data == NULL) {
-        TPD_INFO("edge_data kzalloc error\n");
+        TPD_DEBUG("edge_data kzalloc error\n");
         goto err_touch_data_alloc;
     }
 
@@ -5645,7 +5645,7 @@ static int goodix_tp_probe(struct i2c_client *client, const struct i2c_device_id
     if (ts->health_monitor_v2_support) {
         tp_healthinfo_report(&ts->monitor_data_v2, HEALTH_PROBE, &time_counter);
     }
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_edge_data_alloc:
@@ -5669,7 +5669,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -5677,7 +5677,7 @@ static int goodix_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -5687,7 +5687,7 @@ static int goodix_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -5697,7 +5697,7 @@ static int goodix_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -5736,13 +5736,13 @@ static struct i2c_driver tp_i2c_driver = {
 /***********************Start of module init and exit****************************/
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&tp_i2c_driver) != 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
 

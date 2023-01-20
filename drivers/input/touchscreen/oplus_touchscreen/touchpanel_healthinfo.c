@@ -199,7 +199,7 @@ int update_value_count_list (struct list_head *list, void *value, value_record_t
                 TPD_DETAIL("%s int=%d, count=%d\n", __func__, *value_int, vc->count);
                 return vc->count;
             } else {
-                TPD_INFO("vc->value kzalloc failed.\n");
+                TPD_DEBUG("vc->value kzalloc failed.\n");
                 kfree(vc);
                 return -1;
             }
@@ -213,7 +213,7 @@ int update_value_count_list (struct list_head *list, void *value, value_record_t
                 TPD_DETAIL("%s str=%s, count=%d\n", __func__, (char *)vc->value, vc->count);
                 return vc->count;
             } else {
-                TPD_INFO("vc->value kzalloc failed.\n");
+                TPD_DEBUG("vc->value kzalloc failed.\n");
                 kfree(vc);
                 return -1;
             }
@@ -221,7 +221,7 @@ int update_value_count_list (struct list_head *list, void *value, value_record_t
             break;
         }
     } else {
-        TPD_INFO("kzalloc failed.\n");
+        TPD_DEBUG("kzalloc failed.\n");
         return -1;
     }
 
@@ -280,17 +280,17 @@ char *print_as_matrix(struct seq_file *s, void *value, int len, int linebreak, b
 
     tmp_uint8 = kzalloc(len, GFP_KERNEL);
     if (!tmp_uint8) {
-        TPD_INFO("tmp_uint8 kzalloc failed.\n");
+        TPD_DEBUG("tmp_uint8 kzalloc failed.\n");
         goto out;
     }
     tmp_str = kzalloc(linebreak * DEFAULT_CHILD_STR_LEN, GFP_KERNEL);
     if (!tmp_str) {
-        TPD_INFO("tmp_str kzalloc failed.\n");
+        TPD_DEBUG("tmp_str kzalloc failed.\n");
         goto out;
     }
     tmp_str_child = kzalloc(DEFAULT_CHILD_STR_LEN, GFP_KERNEL);
     if (!tmp_str_child) {
-        TPD_INFO("tmp_str_child kzalloc failed.\n");
+        TPD_DEBUG("tmp_str_child kzalloc failed.\n");
         goto out;
     }
     if (need_feedback) {
@@ -356,7 +356,7 @@ char *record_buffer_data(struct list_head *list, char *record,  uint16_t recordl
                 TPD_DETAIL("len = %d\n", vc->count);
                 feedback = print_as_matrix(NULL, vc->value, vc->count, DEFAULT_BUF_MATRIX_LINEBREAK, true);
             } else {
-                TPD_INFO("vc->value kzalloc failed.\n");
+                TPD_DEBUG("vc->value kzalloc failed.\n");
                 vc->value = next_str;
                 return feedback;
             }
@@ -386,7 +386,7 @@ char *record_buffer_data(struct list_head *list, char *record,  uint16_t recordl
                     TPD_DETAIL("len = %d\n", vc->count);
                     feedback = print_as_matrix(NULL, vc->value, vc->count, DEFAULT_BUF_MATRIX_LINEBREAK, true);
                 } else {
-                    TPD_INFO("vc->value kzalloc failed.\n");
+                    TPD_DEBUG("vc->value kzalloc failed.\n");
                     kfree(vc);
                     return feedback;
                 }
@@ -401,7 +401,7 @@ char *record_buffer_data(struct list_head *list, char *record,  uint16_t recordl
             list_num++;
 
         } else {
-            TPD_INFO("kzalloc failed.\n");
+            TPD_DEBUG("kzalloc failed.\n");
             return feedback;
         }
     } else {
@@ -434,18 +434,18 @@ void print_delta_data(struct seq_file *s, int32_t *delta_data, int TX_NUM, int R
     int i = 0, j = 0;
 
     if (!delta_data) {
-        TPD_INFO("delta data hasn't alloc space.\n");
+        TPD_DEBUG("delta data hasn't alloc space.\n");
         return;
     }
 
     tmp_str = kzalloc(DEFAULT_CHILD_STR_LEN * (RX_NUM + 1), GFP_KERNEL);
     if (!tmp_str) {
-        TPD_INFO("tmp_str kzaloc failed\n");
+        TPD_DEBUG("tmp_str kzaloc failed\n");
         return;
     }
     tmp_str_child = kzalloc(DEFAULT_CHILD_STR_LEN, GFP_KERNEL);
     if (!tmp_str_child) {
-        TPD_INFO("tmp_str_child kzaloc failed\n");
+        TPD_DEBUG("tmp_str_child kzaloc failed\n");
         kfree(tmp_str);
         return;
     }
@@ -497,17 +497,17 @@ int catch_delta_data(struct monitor_data_v2 *monitor_data, int32_t *delta_data)
     }
 
     if (!debug_info_ops) {
-        TPD_INFO("debug info procs is not supported.\n");
+        TPD_DEBUG("debug info procs is not supported.\n");
         return -1;
     }
 
     if (!debug_info_ops->get_delta_data) {
-        TPD_INFO("catching delta data is not supported.\n");
+        TPD_DEBUG("catching delta data is not supported.\n");
         return -1;
     }
 
     if (!delta_data) {
-        TPD_INFO("delta data hasn't alloc space.\n");
+        TPD_DEBUG("delta data hasn't alloc space.\n");
         return -1;
     }
 
@@ -666,7 +666,7 @@ int tp_touch_healthinfo_handle(struct monitor_data_v2 *monitor_data, int obj_att
                         upload_touchpanel_kevent_data(report);
                         kfree(report);
                     } else {
-                        TPD_INFO("alloc report kzalloc failed.\n");
+                        TPD_DEBUG("alloc report kzalloc failed.\n");
                     }
                     */
                     monitor_data->points_state[i].is_down_handled = true;
@@ -913,7 +913,7 @@ int tp_test_healthinfo_handle(struct monitor_data_v2 *monitor_data, healthinfo_t
         }
         ret = monitor_data->auto_test_failed_times;
 
-        TPD_INFO("TEST FAILED RATE:%d/%d.\n", monitor_data->auto_test_failed_times, monitor_data->auto_test_total_times);
+        TPD_DEBUG("TEST FAILED RATE:%d/%d.\n", monitor_data->auto_test_failed_times, monitor_data->auto_test_total_times);
         break;
     case HEALTH_TEST_BLACKSCREEN:
         monitor_data->blackscreen_test_total_times++;
@@ -922,7 +922,7 @@ int tp_test_healthinfo_handle(struct monitor_data_v2 *monitor_data, healthinfo_t
         }
         ret = monitor_data->blackscreen_test_failed_times;
 
-        TPD_INFO("TEST FAILED RATE:%d/%d.\n", monitor_data->blackscreen_test_failed_times, monitor_data->blackscreen_test_total_times);
+        TPD_DEBUG("TEST FAILED RATE:%d/%d.\n", monitor_data->blackscreen_test_failed_times, monitor_data->blackscreen_test_total_times);
         break;
     default:
         break;
@@ -949,7 +949,7 @@ int tp_bus_err_healthinfo_handle(struct monitor_data_v2 *monitor_data, int errno
             upload_touchpanel_kevent_data(report);
             kfree(report);
         } else {
-            TPD_INFO("alloc report kzalloc failed.\n");
+            TPD_DEBUG("alloc report kzalloc failed.\n");
         }
         kfree(buff_part);
     }
@@ -981,7 +981,7 @@ int tp_alloc_healthinfo_handle(struct monitor_data_v2 *monitor_data, long alloc_
         } else if (alloc_size < monitor_data->min_alloc_err_size) {
             monitor_data->min_alloc_err_size = alloc_size;
         }
-        TPD_INFO("alloc_err_size [%ld - %ld].\n", monitor_data->min_alloc_err_size, monitor_data->max_alloc_err_size);
+        TPD_DEBUG("alloc_err_size [%ld - %ld].\n", monitor_data->min_alloc_err_size, monitor_data->max_alloc_err_size);
 
         frame.fp = (unsigned long)__builtin_frame_address(0);
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(4,9,0)
@@ -1001,7 +1001,7 @@ int tp_alloc_healthinfo_handle(struct monitor_data_v2 *monitor_data, long alloc_
         }
         report = kzalloc(DEFAULT_REPORT_STR_LEN, GFP_KERNEL);
         if (report) {
-            TPD_INFO("%pS alloc %ld failed\n", (void *)frame.pc, alloc_size);
+            TPD_DEBUG("%pS alloc %ld failed\n", (void *)frame.pc, alloc_size);
             snprintf(report, DEFAULT_REPORT_STR_LEN, "AllocErr$$Func@@%pS$$Size@@%ld", (void *)frame.pc, alloc_size);
             upload_touchpanel_kevent_data(report);
 
@@ -1015,7 +1015,7 @@ int tp_alloc_healthinfo_handle(struct monitor_data_v2 *monitor_data, long alloc_
             kfree(report);
             kfree(func);
         } else {
-            TPD_INFO("alloc report kzalloc failed.\n");
+            TPD_DEBUG("alloc report kzalloc failed.\n");
         }
     }
 
@@ -1315,19 +1315,19 @@ int tp_healthinfo_init(struct device *dev, void *tp_monitor_data)
     struct monitor_data_v2 *monitor_data = (struct monitor_data_v2 *)tp_monitor_data;
 
     if (!monitor_data) {
-        TPD_INFO("monitor_data is NULL.\n");
+        TPD_DEBUG("monitor_data is NULL.\n");
         return -1;
     }
 
     ret = of_property_read_u32(dev->of_node, "touchpanel,max-num-support", &monitor_data->max_finger_support);
     if (ret) {
-        TPD_INFO("monitor_data->max_finger_support not specified\n");
+        TPD_DEBUG("monitor_data->max_finger_support not specified\n");
         monitor_data->max_finger_support = 10;
     }
 
     ret = of_property_read_u32_array(dev->of_node, "touchpanel,tx-rx-num", temp_array, 2);
     if (ret) {
-        TPD_INFO("tx-rx-num not set\n");
+        TPD_DEBUG("tx-rx-num not set\n");
         monitor_data->TX_NUM = 0;
         monitor_data->RX_NUM = 0;
     } else {
@@ -1339,7 +1339,7 @@ int tp_healthinfo_init(struct device *dev, void *tp_monitor_data)
     if (ret) {
         monitor_data->max_x = 1080;
         monitor_data->max_y = 2340;
-        TPD_INFO("panel coords using default.\n");
+        TPD_DEBUG("panel coords using default.\n");
     } else {
         monitor_data->max_x = temp_array[0];
         monitor_data->max_y = temp_array[1];
@@ -1347,91 +1347,91 @@ int tp_healthinfo_init(struct device *dev, void *tp_monitor_data)
     monitor_data->long_swipe_judge_distance = int_sqrt(monitor_data->max_x * monitor_data->max_x + monitor_data->max_y * monitor_data->max_y) / LONG_SWIPE_JUDGE_RATIO;
     monitor_data->swipe_broken_judge_distance = int_sqrt(monitor_data->max_x * monitor_data->max_x + monitor_data->max_y * monitor_data->max_y) / SWIPE_BROKEN_JUDGE_RATIO;
     monitor_data->jumping_point_judge_distance = int_sqrt(monitor_data->max_x * monitor_data->max_x + monitor_data->max_y * monitor_data->max_y) / JUMPING_POINT_JUDGE_RATIO;
-    TPD_INFO("long_swipe_judge_distance=%d swipe_broken_judge_distance=%d jumping_point_judge_distance=%d\n",
+    TPD_DEBUG("long_swipe_judge_distance=%d swipe_broken_judge_distance=%d jumping_point_judge_distance=%d\n",
             monitor_data->long_swipe_judge_distance, monitor_data->swipe_broken_judge_distance, monitor_data->jumping_point_judge_distance);
 
     ret = of_property_read_u32_array(dev->of_node, "touchpanel,report-rate", temp_array, 2);
     if (ret) {
         monitor_data->report_rate = 120;
         monitor_data->report_rate_in_game = 120;
-        TPD_INFO("report rate using default.\n");
+        TPD_DEBUG("report rate using default.\n");
     } else {
         monitor_data->report_rate = temp_array[0];
         monitor_data->report_rate_in_game = temp_array[1];
-        TPD_INFO("report rate %d-%d.\n", monitor_data->report_rate, monitor_data->report_rate_in_game);
+        TPD_DEBUG("report rate %d-%d.\n", monitor_data->report_rate, monitor_data->report_rate_in_game);
     }
 
     ret = of_property_read_string(dev->of_node, "chip-name", &monitor_data->tp_ic);
     if (ret) {
-        TPD_INFO("failed to get tp ic\n");
+        TPD_DEBUG("failed to get tp ic\n");
     }
 
     monitor_data->fw_version = kzalloc(MAX_DEVICE_VERSION_LENGTH, GFP_KERNEL);
     if (!monitor_data->fw_version) {
-        TPD_INFO("kzalloc fw_version failed.\n");
+        TPD_DEBUG("kzalloc fw_version failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->jumping_point_delta_data = kzalloc(sizeof(int32_t) * monitor_data->TX_NUM * monitor_data->RX_NUM, GFP_KERNEL);
     if (!monitor_data->jumping_point_delta_data) {
-        TPD_INFO("kzalloc jumping_point_delta_data failed.\n");
+        TPD_DEBUG("kzalloc jumping_point_delta_data failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->stuck_point_delta_data = kzalloc(sizeof(int32_t) * monitor_data->TX_NUM * monitor_data->RX_NUM, GFP_KERNEL);
     if (!monitor_data->stuck_point_delta_data) {
-        TPD_INFO("kzalloc stuck_point_delta_data failed.\n");
+        TPD_DEBUG("kzalloc stuck_point_delta_data failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->points_state = kzalloc(sizeof(struct point_state_monitor) * monitor_data->max_finger_support, GFP_KERNEL);
     if (!monitor_data->points_state) {
-        TPD_INFO("kzalloc points_state failed.\n");
+        TPD_DEBUG("kzalloc points_state failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->click_count_array = kzalloc(sizeof(int32_t) * CLICK_COUNT_ARRAY_HEIGHT * CLICK_COUNT_ARRAY_WIDTH, GFP_KERNEL);
     if (!monitor_data->click_count_array) {
-        TPD_INFO("kzalloc click_count_array failed.\n");
+        TPD_DEBUG("kzalloc click_count_array failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->jumping_points_count_array = kzalloc(sizeof(int32_t) * (monitor_data->TX_NUM / 2) * (monitor_data->RX_NUM / 2), GFP_KERNEL);
     if (!monitor_data->jumping_points_count_array) {
-        TPD_INFO("kzalloc jumping_points_count_array failed.\n");
+        TPD_DEBUG("kzalloc jumping_points_count_array failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->stuck_points_count_array = kzalloc(sizeof(int32_t) * (monitor_data->TX_NUM / 2) * (monitor_data->RX_NUM / 2), GFP_KERNEL);
     if (!monitor_data->stuck_points_count_array) {
-        TPD_INFO("kzalloc stuck_points_count_array failed.\n");
+        TPD_DEBUG("kzalloc stuck_points_count_array failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->lanscape_stuck_points_count_array = kzalloc(sizeof(int32_t) * (monitor_data->TX_NUM / 2) * (monitor_data->RX_NUM / 2), GFP_KERNEL);
     if (!monitor_data->lanscape_stuck_points_count_array) {
-        TPD_INFO("kzalloc lanscape_stuck_points_count_array failed.\n");
+        TPD_DEBUG("kzalloc lanscape_stuck_points_count_array failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->broken_swipes_count_array = kzalloc(sizeof(int32_t) * (monitor_data->TX_NUM / 2) * (monitor_data->RX_NUM / 2), GFP_KERNEL);
     if (!monitor_data->broken_swipes_count_array) {
-        TPD_INFO("kzalloc broken_swipes_count_array failed.\n");
+        TPD_DEBUG("kzalloc broken_swipes_count_array failed.\n");
         ret = -1;
         goto err;
     }
 
     monitor_data->total_touch_time_in_game = kzalloc(sizeof(u64) * (monitor_data->max_finger_support + 1), GFP_KERNEL);
     if (!monitor_data->total_touch_time_in_game) {
-        TPD_INFO("kzalloc total_touch_time_in_game failed.\n");
+        TPD_DEBUG("kzalloc total_touch_time_in_game failed.\n");
         ret = -1;
         goto err;
     }

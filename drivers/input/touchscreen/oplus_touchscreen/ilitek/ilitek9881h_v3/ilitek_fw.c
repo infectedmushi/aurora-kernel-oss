@@ -235,7 +235,7 @@ out:
     ilitek_ice_mode_ctrl(DISABLE, OFF);
     filp_close(f, NULL);
     ipio_vfree((void **)&buf);
-    TPD_INFO("dump iram data success\n");
+    TPD_DEBUG("dump iram data success\n");
     return 0;
 }
 
@@ -245,7 +245,7 @@ static int ilitek_tddi_fw_iram_program(u32 start, u32 size, u8 *w_buf)
     u32 array[1];
 
     if (idev->fw_buf_dma == NULL) {
-        TPD_INFO("The dma fw buf is null!");
+        TPD_DEBUG("The dma fw buf is null!");
         return -ENOMEM;
     }
 
@@ -306,7 +306,7 @@ static int ilitek_tddi_fw_iram_upgrade(u8 *pfw)
     /* Program data to iram acorrding to each block */
     for (i = 0; i < ARRAY_SIZE(fbi); i++) {
         if (fbi[i].mode == mode && fbi[i].len != 0) {
-            TPD_INFO("Download %s code from hex 0x%x to IRAM 0x%x, len = 0x%x\n",
+            TPD_DEBUG("Download %s code from hex 0x%x to IRAM 0x%x, len = 0x%x\n",
                      fbi[i].name, fbi[i].start, fbi[i].mem_start, fbi[i].len);
 
 
@@ -316,7 +316,7 @@ static int ilitek_tddi_fw_iram_upgrade(u8 *pfw)
             dma = 0;
             ret = host_download_dma_check(fbi[i].mem_start, fbi[i].len - 4, &dma);
 
-            TPD_INFO("%s CRC is %s (%x) : (%x)\n",
+            TPD_DEBUG("%s CRC is %s (%x) : (%x)\n",
                      fbi[i].name, (crc != dma ? "Invalid !" : "Correct !"), crc, dma);
 
             if (ret < 0 || crc != dma) {
@@ -338,7 +338,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw)
 {
     u32 ges_area_section, ges_info_addr, ges_fw_start, ges_fw_end;
 
-    TPD_INFO("Upgarde = IRAM, Tag = %x\n", tfd.hex_tag);
+    TPD_DEBUG("Upgarde = IRAM, Tag = %x\n", tfd.hex_tag);
 
 
     if (tfd.hex_tag == BLOCK_TAG_AF) {
@@ -357,7 +357,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw)
         ges_fw_end = (pfw[ges_info_addr + 19] << 24) + (pfw[ges_info_addr + 18] << 16) + (pfw[ges_info_addr + 17] << 8) + pfw[ges_info_addr + 16];
         fbi[GESTURE].len = ges_fw_end - ges_fw_start + 1;
         if (fbi[GESTURE].len > 8 * K) {
-            TPD_INFO("WARRING!!!The gesture len is too long!!!The size is %d.\n", fbi[GESTURE].len);
+            TPD_DEBUG("WARRING!!!The gesture len is too long!!!The size is %d.\n", fbi[GESTURE].len);
             fbi[GESTURE].len = 8 * K;
         }
         fbi[GESTURE].start = 0;
@@ -383,7 +383,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw)
         ges_fw_end = (pfw[ges_info_addr + 19] << 24) + (pfw[ges_info_addr + 18] << 16) + (pfw[ges_info_addr + 17] << 8) + pfw[ges_info_addr + 16];
         fbi[GESTURE].len = ges_fw_end - ges_fw_start + 1;
         if (fbi[GESTURE].len > 8 * K) {
-            TPD_INFO("WARRING!!!The gesture len is too long!!!The size is %d.\n", fbi[GESTURE].len);
+            TPD_DEBUG("WARRING!!!The gesture len is too long!!!The size is %d.\n", fbi[GESTURE].len);
             fbi[GESTURE].len = 8 * K;
         }
         fbi[GESTURE].start = 0;
@@ -397,7 +397,7 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw)
     else
         ipio_err("There is no gesture data inside fw\n");
 
-    TPD_INFO("gesture memory start = 0x%x, upgrade lenth = 0x%x, hex area = %d, ges_start_addr = 0x%x, ges_end_addr = 0x%x",
+    TPD_DEBUG("gesture memory start = 0x%x, upgrade lenth = 0x%x, hex area = %d, ges_start_addr = 0x%x, ges_end_addr = 0x%x",
              fbi[GESTURE].mem_start, MAX_GESTURE_FIRMWARE_SIZE, ges_area_section, ges_fw_start, ges_fw_end);
 
     fbi[AP].name = "AP";
@@ -417,8 +417,8 @@ static void ilitek_tddi_fw_update_block_info(u8 *pfw)
                     (pfw[FW_VER_ADDR + 2] << 8) | (pfw[FW_VER_ADDR + 3]);
 
     /* Calculate update adress    */
-    TPD_INFO("New FW ver = 0x%x\n", tfd.new_fw_cb);
-    TPD_INFO("star_addr = 0x%06X, end_addr = 0x%06X, Block Num = %d\n", tfd.start_addr, tfd.end_addr, tfd.block_number);
+    TPD_DEBUG("New FW ver = 0x%x\n", tfd.new_fw_cb);
+    TPD_DEBUG("star_addr = 0x%06X, end_addr = 0x%06X, Block Num = %d\n", tfd.start_addr, tfd.end_addr, tfd.block_number);
 }
 
 static int ilitek_tddi_fw_ili_convert(u8 *pfw)
@@ -438,9 +438,9 @@ static int ilitek_tddi_fw_ili_convert(u8 *pfw)
         ipio_err("get idev->p_firmware_headfile error\n");
         return -1;
     }
-    TPD_INFO("p_firmware_headfile->firmware_size = 0x%X\n", (int)idev->p_firmware_headfile->firmware_size);
+    TPD_DEBUG("p_firmware_headfile->firmware_size = 0x%X\n", (int)idev->p_firmware_headfile->firmware_size);
     CTPM_FW = idev->p_firmware_headfile->firmware_data;
-    TPD_INFO("Start to parse ILI file, type = %d, block_count = %d\n", CTPM_FW[32], CTPM_FW[33]);
+    TPD_DEBUG("Start to parse ILI file, type = %d, block_count = %d\n", CTPM_FW[32], CTPM_FW[33]);
 
     memset(fbi, 0x0, sizeof(fbi));
 
@@ -469,7 +469,7 @@ static int ilitek_tddi_fw_ili_convert(u8 *pfw)
                 fbi[num].fix_mem_start = INT_MAX;
             }
             fbi[num].len = fbi[num].end - fbi[num].start + 1;
-            TPD_INFO("Block[%d]: start_addr = %x, end = %x\n", num, fbi[num].start, fbi[num].end);
+            TPD_DEBUG("Block[%d]: start_addr = %x, end = %x\n", num, fbi[num].start, fbi[num].end);
         }
     }
 
@@ -480,7 +480,7 @@ static int ilitek_tddi_fw_ili_convert(u8 *pfw)
 
             if ((block != 0) && (Addr != 0x000000)) {
                 fbi[block].fix_mem_start = Addr;
-                TPD_INFO("Tag 0xB0: change Block[%d] to addr = 0x%x\n", block, fbi[block].fix_mem_start);
+                TPD_DEBUG("Tag 0xB0: change Block[%d] to addr = 0x%x\n", block, fbi[block].fix_mem_start);
             }
         }
     }
@@ -531,13 +531,13 @@ static int ilitek_tddi_fw_hex_convert(u8 *pfw)
             fbi[num].end = HexToDec(&phex[i + 9 + 6], 6);
             fbi[num].fix_mem_start = INT_MAX;
             fbi[num].len = fbi[num].end - fbi[num].start + 1;
-            TPD_INFO("Block[%d]: start_addr = %x, end = %x", num, fbi[num].start, fbi[num].end);
+            TPD_DEBUG("Block[%d]: start_addr = %x, end = %x", num, fbi[num].start, fbi[num].end);
 
             block++;
         } else if (type == BLOCK_TAG_B0 && tfd.hex_tag == BLOCK_TAG_AF) {
             num = HexToDec(&phex[i + 9 + 6], 2);
             fbi[num].fix_mem_start = HexToDec(&phex[i + 9], 6);
-            TPD_INFO("Tag 0xB0: change Block[%d] to addr = 0x%x\n", num, fbi[num].fix_mem_start);
+            TPD_DEBUG("Tag 0xB0: change Block[%d] to addr = 0x%x\n", num, fbi[num].fix_mem_start);
         }
 
         addr = addr + (ex_addr << 16);
@@ -578,7 +578,7 @@ static int ilitek_tddi_fw_hex_convert(u8 *pfw)
         }
     }
 
-    TPD_INFO("Contect of hex file is correct\n");
+    TPD_DEBUG("Contect of hex file is correct\n");
     tfd.start_addr = start_addr;
     tfd.end_addr = end_addr;
     tfd.block_number = block;

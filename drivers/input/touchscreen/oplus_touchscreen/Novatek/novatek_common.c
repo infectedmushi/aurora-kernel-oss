@@ -33,12 +33,12 @@ static ssize_t nvt_flash_read(struct file *filp, char __user *buff, size_t count
     struct touchpanel_data *ts = PDE_DATA(file_inode(filp));
 
     if (count > sizeof(str)) {
-        TPD_INFO("error count=%zu\n", count);
+        TPD_DEBUG("error count=%zu\n", count);
         return -EFAULT;
     }
 
     if (copy_from_user(str, buff, count)) {
-        TPD_INFO("copy from user error\n");
+        TPD_DEBUG("copy from user error\n");
         return -EFAULT;
     }
 
@@ -57,13 +57,13 @@ static ssize_t nvt_flash_read(struct file *filp, char __user *buff, size_t count
             if (ret == 1)
                 break;
             else
-                TPD_INFO("error, retries=%d, ret=%d\n", retries, ret);
+                TPD_DEBUG("error, retries=%d, ret=%d\n", retries, ret);
 
             retries++;
         }
 
         if (unlikely(retries == 20)) {
-            TPD_INFO("error, ret = %d\n", ret);
+            TPD_DEBUG("error, ret = %d\n", ret);
             return -EIO;
         }
 
@@ -77,7 +77,7 @@ static ssize_t nvt_flash_read(struct file *filp, char __user *buff, size_t count
             if (ret == 2)
                 break;
             else
-                TPD_INFO("error, retries=%d, ret=%d\n", retries, ret);
+                TPD_DEBUG("error, retries=%d, ret=%d\n", retries, ret);
 
             retries++;
         }
@@ -89,13 +89,13 @@ static ssize_t nvt_flash_read(struct file *filp, char __user *buff, size_t count
         }
 
         if (unlikely(retries == 20)) {
-            TPD_INFO("error, ret = %d\n", ret);
+            TPD_DEBUG("error, ret = %d\n", ret);
             return -EIO;
         }
 
         return ret;
     } else {
-        TPD_INFO("Call error, str[0]=%d\n", str[0]);
+        TPD_DEBUG("Call error, str[0]=%d\n", str[0]);
         return -EFAULT;
     }
 }
@@ -123,20 +123,20 @@ static ssize_t nvt_noflash_read(struct file *filp, char __user *buff, size_t cou
     /* allocate buffer for spi transfer */
     str = (uint8_t *)kzalloc((count), GFP_KERNEL | GFP_DMA);
     if(str == NULL) {
-        TPD_INFO("kzalloc for buf failed!\n");
+        TPD_DEBUG("kzalloc for buf failed!\n");
         ret = -ENOMEM;
         goto out;
     }
 
     buf = (uint8_t *)kzalloc((count), GFP_KERNEL | GFP_DMA);
     if(buf == NULL) {
-        TPD_INFO("kzalloc for buf failed!\n");
+        TPD_DEBUG("kzalloc for buf failed!\n");
         ret = -ENOMEM;
         goto out;
     }
 
     if (copy_from_user(str, (u8 *)buff, count)) {
-        TPD_INFO("copy from user error\n");
+        TPD_DEBUG("copy from user error\n");
         ret = -EFAULT;
         goto out;
     }
@@ -158,13 +158,13 @@ static ssize_t nvt_noflash_read(struct file *filp, char __user *buff, size_t cou
             if (!ret)
                 break;
             else
-                TPD_INFO("error, retries=%d, ret=%d\n", retries, ret);
+                TPD_DEBUG("error, retries=%d, ret=%d\n", retries, ret);
 
             retries++;
         }
 
         if (unlikely(retries == 20)) {
-            TPD_INFO("error, ret = %d\n", ret);
+            TPD_DEBUG("error, ret = %d\n", ret);
             ret = -EIO;
             goto out;
         }
@@ -174,7 +174,7 @@ static ssize_t nvt_noflash_read(struct file *filp, char __user *buff, size_t cou
             if (!ret)
                 break;
             else
-                TPD_INFO("error, retries=%d, ret=%d\n", retries, ret);
+                TPD_DEBUG("error, retries=%d, ret=%d\n", retries, ret);
 
             retries++;
         }
@@ -189,12 +189,12 @@ static ssize_t nvt_noflash_read(struct file *filp, char __user *buff, size_t cou
         }
 
         if (unlikely(retries == 20)) {
-            TPD_INFO("error, ret = %d\n", ret);
+            TPD_DEBUG("error, ret = %d\n", ret);
             ret = -EIO;
             goto out;
         }
     } else {
-        TPD_INFO("Call error, str[0]=%d\n", str[0]);
+        TPD_DEBUG("Call error, str[0]=%d\n", str[0]);
         ret = -EFAULT;
         goto out;
     }
@@ -222,22 +222,22 @@ void nvt_flash_proc_init(struct touchpanel_data *ts, const char *name)
     struct proc_dir_entry *nvt_proc_entry;
 
     if (strstr(name, "SPI")) {
-        TPD_INFO("create /proc/NVTSPI!\n");
+        TPD_DEBUG("create /proc/NVTSPI!\n");
         nvt_proc_entry = proc_create_data(name, 0444, NULL, &nvt_noflash_fops, ts);
         if (nvt_proc_entry == NULL) {
-            TPD_INFO("%s Failed!\n", __func__);
+            TPD_DEBUG("%s Failed!\n", __func__);
             return;
         } else {
-            TPD_INFO("%s Succeeded!\n", __func__);
+            TPD_DEBUG("%s Succeeded!\n", __func__);
         }
     } else {
-        TPD_INFO("create /proc/NVTflash!\n");
+        TPD_DEBUG("create /proc/NVTflash!\n");
         nvt_proc_entry = proc_create_data(name, 0444, NULL, &nvt_flash_fops, ts);
         if (nvt_proc_entry == NULL) {
-            TPD_INFO("%s Failed!\n", __func__);
+            TPD_DEBUG("%s Failed!\n", __func__);
             return;
         } else {
-            TPD_INFO("%s Succeeded!\n", __func__);
+            TPD_DEBUG("%s Succeeded!\n", __func__);
         }
     }
 
@@ -278,7 +278,7 @@ void nvt_limit_read(struct seq_file *s, struct touchpanel_data *ts)
 
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "Request failed, Check the path %d", temp);
         return;
     }
@@ -813,14 +813,14 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         set_fs(old_fs);
     }
 
     //step3:request test limit data from userspace
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "No limit IMG\n");
         if (fd >= 0) {
 #ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
@@ -898,7 +898,7 @@ int nvt_create_proc(struct touchpanel_data *ts, struct nvt_proc_operations *nvt_
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &tp_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
     return ret;
 }

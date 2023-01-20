@@ -55,7 +55,7 @@ int gt1x_init_tool_node(struct touchpanel_data *ts, struct fw_update_info *updat
     struct Goodix_tool_info *gt_tool_info;
     gt_tool_info = kzalloc(sizeof(struct Goodix_tool_info), GFP_KERNEL);
 	 if (NULL == gt_tool_info) {
-		 TPD_INFO("Apply for memory gt_tool_info failed.");
+		 TPD_DEBUG("Apply for memory gt_tool_info failed.");
 		goto OUT3;
 	}
     gt_tool_info->is_suspended = &ts->is_suspended;
@@ -71,17 +71,17 @@ int gt1x_init_tool_node(struct touchpanel_data *ts, struct fw_update_info *updat
     gt_tool_info->update_info = update_info;
 
     if (NULL == gt_tool_info->cmd_head.data) {
-        TPD_INFO("Apply for memory failed.");
+        TPD_DEBUG("Apply for memory failed.");
         goto OUT2;
     }
-    TPD_INFO("Alloc memory size:%d.", DATA_LENGTH_UINT);
+    TPD_DEBUG("Alloc memory size:%d.", DATA_LENGTH_UINT);
 
     gt1x_tool_proc_entry = proc_create_data("goodix_tool", 0666, NULL, &gt1x_tool_fops, gt_tool_info);
     if (gt1x_tool_proc_entry == NULL) {
-        TPD_INFO("CAN't create proc entry /proc/goodix_tool.");
+        TPD_DEBUG("CAN't create proc entry /proc/goodix_tool.");
         goto OUT1;
     } else {
-        TPD_INFO("Created proc entry /proc/goodix_tool.");
+        TPD_DEBUG("Created proc entry /proc/goodix_tool.");
     }
     return 0;
 
@@ -183,7 +183,7 @@ static u8 comfirm(struct Goodix_tool_info *gt_tool_info)
 
     for (i = 0; i < gt_tool_info->cmd_head.times; i++) {
         if (tool_i2c_read(gt_tool_info->client, buf, 1) <= 0) {
-            TPD_INFO("Read flag data failed!");
+            TPD_DEBUG("Read flag data failed!");
             return -1;
         }
 
@@ -197,7 +197,7 @@ static u8 comfirm(struct Goodix_tool_info *gt_tool_info)
     }
 
     if (i >= gt_tool_info->cmd_head.times) {
-        TPD_INFO("Didn't get the flag to continue!");
+        TPD_DEBUG("Didn't get the flag to continue!");
         return -1;
     }
 
@@ -222,7 +222,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
     TPD_DEBUG_ARRAY((u8 *) buff, len);
 
     if (*(gt_tool_info->is_suspended)) {
-        TPD_INFO("IC halt");
+        TPD_DEBUG("IC halt");
         gt1x_rawdiff_mode = 0;
 
         return -1;
@@ -230,7 +230,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
 
     ret = copy_from_user(cmd_head, (struct st_cmd_head __user *)buff, CMD_HEAD_LENGTH);
     if (ret) {
-        TPD_INFO("copy_from_user failed.");
+        TPD_DEBUG("copy_from_user failed.");
     }
 
     TPD_DEBUG("wr  :0x%02x.", cmd_head->wr);
@@ -256,7 +256,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
 
         if (1 == cmd_head->flag) {
             if (comfirm(gt_tool_info)) {
-                TPD_INFO("[WRITE]Comfirm fail!");
+                TPD_DEBUG("[WRITE]Comfirm fail!");
                 return -1;
             }
         } else if (2 == cmd_head->flag) {
@@ -270,7 +270,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
             len = data_len > DATA_LENGTH ? DATA_LENGTH : data_len;
             ret = copy_from_user(&cmd_head->data[GTP_ADDR_LENGTH], &buff[CMD_HEAD_LENGTH + pos], len);
             if (ret) {
-                TPD_INFO("[WRITE]copy_from_user failed.");
+                TPD_DEBUG("[WRITE]copy_from_user failed.");
                 return -1;
             }
             cmd_head->data[0] = ((addr >> 8) & 0xFF);
@@ -279,7 +279,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
             TPD_DEBUG_ARRAY(cmd_head->data, len + GTP_ADDR_LENGTH);
 
             if (tool_i2c_write(client, cmd_head->data, len + GTP_ADDR_LENGTH) <= 0) {
-                TPD_INFO("[WRITE]Write data failed!");
+                TPD_DEBUG("[WRITE]Write data failed!");
                 return -1;
             }
             addr += len;
@@ -316,7 +316,7 @@ static ssize_t gt1x_tool_write(struct file *filp, const char __user * buff, size
         cmd_head->data_len = cmd_head->data_len > DATA_LENGTH ? DATA_LENGTH : cmd_head->data_len;
         ret = copy_from_user(&cmd_head->data[GTP_ADDR_LENGTH], &buff[CMD_HEAD_LENGTH], cmd_head->data_len);
         if (ret) {
-            TPD_INFO("copy_from_user failed.");
+            TPD_DEBUG("copy_from_user failed.");
             return -1;
         }
 
@@ -360,7 +360,7 @@ static int gt1x_tool_open(struct inode *inode, struct file *file)
 
     if (gt_tool_info->devicecount > 0) {
         return -ERESTARTSYS;
-        TPD_INFO("tools open failed!");
+        TPD_DEBUG("tools open failed!");
     }
     gt_tool_info->devicecount++;
 
@@ -396,13 +396,13 @@ static ssize_t gt1x_tool_read(struct file *filp, char __user * buffer, size_t co
     }
 
     if (*(gt_tool_info->is_suspended)) {
-        TPD_INFO("IC halt");
+        TPD_DEBUG("IC halt");
         gt1x_rawdiff_mode = 0;
 
         return  -1;
     }
     if (cmd_head->wr % 2) {
-        TPD_INFO("[READ] invaild operator fail!");
+        TPD_DEBUG("[READ] invaild operator fail!");
         return -1;
     } else if (!cmd_head->wr) {
         /* general  i2c read  */
@@ -410,7 +410,7 @@ static ssize_t gt1x_tool_read(struct file *filp, char __user * buffer, size_t co
 
         if (1 == cmd_head->flag) {
             if (comfirm(gt_tool_info)) {
-                TPD_INFO("[READ]Comfirm fail!");
+                TPD_DEBUG("[READ]Comfirm fail!");
                 return -1;
             }
         } else if (2 == cmd_head->flag) {
@@ -433,7 +433,7 @@ static ssize_t gt1x_tool_read(struct file *filp, char __user * buffer, size_t co
             cmd_head->data[0] = (addr >> 8) & 0xFF;
             cmd_head->data[1] = (addr & 0xFF);
             if (tool_i2c_read(gt_tool_info->client, cmd_head->data, len) <= 0) {
-                TPD_INFO("[READ]Read data failed!");
+                TPD_DEBUG("[READ]Read data failed!");
                 return -1;
             }
 

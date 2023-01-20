@@ -85,7 +85,7 @@ static int zeroflash_check_f35(void)
             &fn_number,
             sizeof(fn_number));
     if (fn_number != UBL_FN_NUMBER) {
-        TPD_INFO("Failed to find F$35\n");
+        TPD_DEBUG("Failed to find F$35\n");
         return -ENODEV;
     } else {
         return 0;
@@ -107,7 +107,7 @@ static int zeroflash_check_uboot(void)
             &fn_number,
             sizeof(fn_number));
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to read RMI function number\n");
         goto check_uboot_failed;
     }
@@ -117,7 +117,7 @@ static int zeroflash_check_uboot(void)
             fn_number);
 
     if (fn_number != UBL_FN_NUMBER) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to find F$35, but F$%02x\n", fn_number);
         retval = -ENODEV;
         goto check_uboot_failed;
@@ -133,7 +133,7 @@ static int zeroflash_check_uboot(void)
             (unsigned char *)&p_entry,
             sizeof(p_entry));
     if (retval < 0) {
-        TPD_INFO("Failed to read PDT entry\n");
+        TPD_DEBUG("Failed to read PDT entry\n");
         goto check_uboot_failed;
     }
 
@@ -147,7 +147,7 @@ static int zeroflash_check_uboot(void)
             (unsigned char *)&query,
             sizeof(query));
     if (retval < 0) {
-        TPD_INFO("Failed to read F$35 query\n");
+        TPD_DEBUG("Failed to read F$35 query\n");
         goto check_uboot_failed;
     }
 
@@ -156,7 +156,7 @@ static int zeroflash_check_uboot(void)
     if (query.has_query2 && query.has_ctrl7 && query.has_host_download) {
         g_zeroflash_hcd->has_hdl = true;
     } else {
-        TPD_INFO("Host download not supported\n");
+        TPD_DEBUG("Host download not supported\n");
         g_zeroflash_hcd->has_hdl = false;
         retval = -ENODEV;
         goto check_uboot_failed;
@@ -199,7 +199,7 @@ int zeroflash_parse_fw_image(void)
 
     magic_value = le4_to_uint(header->magic_value);
     if (magic_value != IMAGE_FILE_MAGIC_VALUE) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Invalid image file magic value\n");
         return -EINVAL;
     }
@@ -227,41 +227,41 @@ int zeroflash_parse_fw_image(void)
                 BOOT_CONFIG_ID,
                 strlen(BOOT_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                TPD_INFO(
+                TPD_DEBUG(
                         "Boot config checksum error\n");
                 return -EINVAL;
             }
             image_info->boot_config.size = length;
             image_info->boot_config.data = content;
             image_info->boot_config.flash_addr = flash_addr;
-            TPD_INFO(
+            TPD_DEBUG(
                     "Boot config size = %d\n",
                     length);
-            TPD_INFO(
+            TPD_DEBUG(
                     "Boot config flash address = 0x%08x\n",
                     flash_addr);
         } else if (0 == strncmp((char *)descriptor->id_string,
                 F35_APP_CODE_ID,
                 strlen(F35_APP_CODE_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                TPD_INFO(
+                TPD_DEBUG(
                         "Application firmware checksum error\n");
                 return -EINVAL;
             }
             image_info->app_firmware.size = length;
             image_info->app_firmware.data = content;
             image_info->app_firmware.flash_addr = flash_addr;
-            TPD_INFO(
+            TPD_DEBUG(
                     "Application firmware size = %d\n",
                     length);
-            TPD_INFO(
+            TPD_DEBUG(
                     "Application firmware flash address = 0x%08x\n",
                     flash_addr);
         } else if (0 == strncmp((char *)descriptor->id_string,
                 APP_CONFIG_ID,
                 strlen(APP_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                TPD_INFO(
+                TPD_DEBUG(
                         "Application config checksum error\n");
                 return -EINVAL;
             }
@@ -269,27 +269,27 @@ int zeroflash_parse_fw_image(void)
             image_info->app_config.data = content;
             image_info->app_config.flash_addr = flash_addr;
             image_info->packrat_number = le4_to_uint(&content[14]);
-            TPD_INFO(
+            TPD_DEBUG(
                     "Application config size = %d\n",
                     length);
-            TPD_INFO(
+            TPD_DEBUG(
                     "Application config flash address = 0x%08x\n",
                     flash_addr);
         } else if (0 == strncmp((char *)descriptor->id_string,
                 DISP_CONFIG_ID,
                 strlen(DISP_CONFIG_ID))) {
             if (checksum != (crc32(~0, content, length) ^ ~0)) {
-                TPD_INFO(
+                TPD_DEBUG(
                         "Display config checksum error\n");
                 return -EINVAL;
             }
             image_info->disp_config.size = length;
             image_info->disp_config.data = content;
             image_info->disp_config.flash_addr = flash_addr;
-            TPD_INFO(
+            TPD_DEBUG(
                     "Display config size = %d\n",
                     length);
-            TPD_INFO(
+            TPD_DEBUG(
                     "Display config flash address = 0x%08x\n",
                     flash_addr);
         }
@@ -317,7 +317,7 @@ static int zeroflash_get_fw_image(void)
         if (tcm_hcd->using_fae) {
             fw_name_fae = kzalloc(MAX_FW_NAME_LENGTH, GFP_KERNEL);
             if(fw_name_fae == NULL) {
-                TPD_INFO("fw_name_fae kzalloc error!\n");
+                TPD_DEBUG("fw_name_fae kzalloc error!\n");
             } else {
                 p_node  = strstr(ts->panel_data.fw_name, ".");
                 if (p_node) {
@@ -326,7 +326,7 @@ static int zeroflash_get_fw_image(void)
                     strlcat(fw_name_fae, postfix, MAX_FW_NAME_LENGTH);
                     strlcat(fw_name_fae, p_node, MAX_FW_NAME_LENGTH);
                     //memcpy(private_ts->panel_data.fw_name, fw_name_fae, MAX_FW_NAME_LENGTH);
-                    //TPD_INFO("update fw_name to %s\n", fw_name_fae);
+                    //TPD_DEBUG("update fw_name to %s\n", fw_name_fae);
                     retval = request_firmware(&g_zeroflash_hcd->fw_entry,  fw_name_fae, &tcm_hcd->s_client->dev);
                 }
             }
@@ -346,7 +346,7 @@ static int zeroflash_get_fw_image(void)
             fw_name_fae = NULL;
         }
         if (retval < 0) {
-            TPD_INFO(
+            TPD_DEBUG(
                     "Failed to request %s\n",
                     g_zeroflash_hcd->fw_name);
             msleep(100);
@@ -356,7 +356,7 @@ static int zeroflash_get_fw_image(void)
     } while (1);
 
     if (g_zeroflash_hcd->fw_entry != NULL) {
-        TPD_INFO(
+        TPD_DEBUG(
             "Firmware image size = %d\n",
             (unsigned int)g_zeroflash_hcd->fw_entry->size);
 
@@ -365,7 +365,7 @@ static int zeroflash_get_fw_image(void)
 
     retval = zeroflash_parse_fw_image();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
             "Failed to parse firmware image\n");
         if (g_zeroflash_hcd->fw_entry != NULL){
             release_firmware(g_zeroflash_hcd->fw_entry);
@@ -395,7 +395,7 @@ void zeroflash_check_download_config(void)
             queue_work(tcm_hcd->helper.workqueue,
                     &tcm_hcd->helper.work);
         }*/
-        TPD_INFO(
+        TPD_DEBUG(
                 "zero reflash done..............\n");
 
         atomic_set(&tcm_hcd->host_downloading, 0);
@@ -423,10 +423,10 @@ void zeroflash_download_config(void)
         tcm_hcd->report.buffer.buf_size,
         sizeof(g_zeroflash_hcd->fw_status));
     if (retval < 0) {
-        TPD_INFO("Failed to copy fw status\n");
+        TPD_DEBUG("Failed to copy fw status\n");
     }
 
-    TPD_INFO("zeroflash_download_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
+    TPD_DEBUG("zeroflash_download_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
         g_zeroflash_hcd->fw_status.need_disp_config);
     if (!fw_status->need_app_config && !fw_status->need_disp_config) {
         /*
@@ -436,7 +436,7 @@ void zeroflash_download_config(void)
             queue_work(tcm_hcd->helper.workqueue,
                     &tcm_hcd->helper.work);
         }*/
-        TPD_INFO(
+        TPD_DEBUG(
                 "zero reflash done..............\n");
         atomic_set(&tcm_hcd->host_downloading, 0);
         //wake_up_interruptible(&tcm_hcd->hdl_wq);
@@ -454,7 +454,7 @@ void zeroflash_download_firmware(void)
             if (g_zeroflash_hcd->tcm_hcd->health_monitor_support) {
                 g_zeroflash_hcd->tcm_hcd->monitor_data->reserve1++;
             }
-            TPD_INFO(
+            TPD_DEBUG(
                     "uboot check fail\n");
             msleep(50);
             enable_irq(g_zeroflash_hcd->tcm_hcd->s_client->irq);
@@ -481,7 +481,7 @@ static int zeroflash_download_disp_config(void)
     image_info = &g_zeroflash_hcd->image_info;
 
     if (image_info->disp_config.size == 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "No display config in image file\n");
         return -EINVAL;
     }
@@ -492,7 +492,7 @@ static int zeroflash_download_disp_config(void)
             &g_zeroflash_hcd->out,
             image_info->disp_config.size + 2);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to allocate memory for zeroflash_hcd->out.buf\n");
         goto unlock_out;
     }
@@ -506,7 +506,7 @@ static int zeroflash_download_disp_config(void)
             image_info->disp_config.size,
             image_info->disp_config.size);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to copy display config data\n");
         goto unlock_out;
     }
@@ -525,7 +525,7 @@ static int zeroflash_download_disp_config(void)
             &response_code,
             0);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to write command %s\n",
                 STR(CMD_DOWNLOAD_CONFIG));
         if (response_code != STATUS_ERROR)
@@ -542,16 +542,16 @@ static int zeroflash_download_disp_config(void)
             g_zeroflash_hcd->resp.buf,
             g_zeroflash_hcd->resp.buf_size,
             sizeof(g_zeroflash_hcd->fw_status));
-    TPD_INFO("zeroflash_download_disp_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
+    TPD_DEBUG("zeroflash_download_disp_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
         g_zeroflash_hcd->fw_status.need_disp_config);
     
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to copy firmware status\n");
         goto unlock_resp;
     }
 
-    TPD_INFO("Display config downloaded\n");
+    TPD_DEBUG("Display config downloaded\n");
 
     retval = 0;
 
@@ -578,7 +578,7 @@ static int zeroflash_download_app_config(void)
     image_info = &g_zeroflash_hcd->image_info;
 
     if (image_info->app_config.size == 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "No application config in image file\n");
         return -EINVAL;
     }
@@ -593,7 +593,7 @@ static int zeroflash_download_app_config(void)
             &g_zeroflash_hcd->out,
             image_info->app_config.size + 2 + padding);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to allocate memory for zeroflash_hcd->out.buf\n");
         goto unlock_out;
     }
@@ -607,7 +607,7 @@ static int zeroflash_download_app_config(void)
             image_info->app_config.size,
             image_info->app_config.size);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to copy application config data\n");
         goto unlock_out;
     }
@@ -627,7 +627,7 @@ static int zeroflash_download_app_config(void)
             &response_code,
             0);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to write command %s\n",
                 STR(CMD_DOWNLOAD_CONFIG));
         if (response_code != STATUS_ERROR)
@@ -646,16 +646,16 @@ static int zeroflash_download_app_config(void)
             sizeof(g_zeroflash_hcd->fw_status));
 
     
-    TPD_INFO("zeroflash_download_app_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
+    TPD_DEBUG("zeroflash_download_app_config fw status:need app:%d need display:%d\n", g_zeroflash_hcd->fw_status.need_app_config,
         g_zeroflash_hcd->fw_status.need_disp_config);
 
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to copy firmware status\n");
         goto unlock_resp;
     }
 
-    TPD_INFO("Application config downloaded\n");
+    TPD_DEBUG("Application config downloaded\n");
 
     retval = 0;
 
@@ -675,7 +675,7 @@ static void zeroflash_download_config_work(struct work_struct *work)
 
     retval = zeroflash_get_fw_image();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to get firmware image\n");
         return;
     }
@@ -689,7 +689,7 @@ static void zeroflash_download_config_work(struct work_struct *work)
             if (tcm_hcd->health_monitor_support) {
                 tcm_hcd->monitor_data->reserve2++;
             }
-            TPD_INFO(
+            TPD_DEBUG(
                     "Failed to download application config\n");
             return;
         }
@@ -702,7 +702,7 @@ static void zeroflash_download_config_work(struct work_struct *work)
             if (tcm_hcd->health_monitor_support) {
                 tcm_hcd->monitor_data->reserve2++;
             }
-            TPD_INFO(
+            TPD_DEBUG(
                     "Failed to download display config\n");
             return;
         }
@@ -738,7 +738,7 @@ static int zeroflash_download_app_fw(void)
     image_info = &g_zeroflash_hcd->image_info;
 
     if (image_info->app_firmware.size == 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "No application firmware in image file\n");
         return -EINVAL;
     }
@@ -749,7 +749,7 @@ static int zeroflash_download_app_fw(void)
             &g_zeroflash_hcd->out,
             image_info->app_firmware.size);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to allocate memory for zeroflash_hcd->out.buf\n");
         UNLOCK_BUFFER(g_zeroflash_hcd->out);
         return retval;
@@ -761,7 +761,7 @@ static int zeroflash_download_app_fw(void)
             image_info->app_firmware.size,
             image_info->app_firmware.size);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to copy application firmware data\n");
         UNLOCK_BUFFER(g_zeroflash_hcd->out);
         return retval;
@@ -790,10 +790,10 @@ retry_app_download:
     if (retval < 0) {
         retry_cnt++;
         if (retry_cnt <= 3) {
-            TPD_INFO("can not read F35, goto retry\n");
+            TPD_DEBUG("can not read F35, goto retry\n");
             goto retry_app_download;
         } else {
-            TPD_INFO("retry three times, but still fail,return\n");
+            TPD_DEBUG("retry three times, but still fail,return\n");
             return retval;
         }
     }
@@ -804,7 +804,7 @@ retry_app_download:
             &command,
             sizeof(command));
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to write F$35 command\n");
         UNLOCK_BUFFER(g_zeroflash_hcd->out);
         return retval;
@@ -815,7 +815,7 @@ retry_app_download:
             g_zeroflash_hcd->out.buf,
             g_zeroflash_hcd->out.data_length);
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to write application firmware data\n");
         UNLOCK_BUFFER(g_zeroflash_hcd->out);
         return retval;
@@ -829,7 +829,7 @@ retry_app_download:
     if ((tmp_buf[0] != MESSAGE_MARKER) && (tmp_buf[1] != REPORT_IDENTIFY)) {
         retry_cnt++;
         if (retry_cnt <= 3) {
-            TPD_INFO("can not read a identify report, goto retry\n");
+            TPD_DEBUG("can not read a identify report, goto retry\n");
 
 #if RESET_TO_HDL_DELAY_MS
             //gpio_set_value(bdata->reset_gpio, bdata->reset_on_state);
@@ -843,10 +843,10 @@ retry_app_download:
     } else {
         //successful read message
         //tcm_hcd->host_download_mode = true;
-        TPD_INFO("download firmware success\n");
+        TPD_DEBUG("download firmware success\n");
     }
 #endif
-    TPD_INFO("Application firmware downloaded\n");
+    TPD_DEBUG("Application firmware downloaded\n");
 
     return 0;
 }
@@ -865,12 +865,12 @@ int zeroflash_download_firmware_directly(void *chip_data, const struct firmware 
 
 
     if(fw == NULL){
-        TPD_INFO("zeroflash_download_firmware_directly get NULL fw\n");
+        TPD_DEBUG("zeroflash_download_firmware_directly get NULL fw\n");
     }
 
     retval = zeroflash_check_uboot();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Microbootloader support unavailable\n");
         goto exit;
     }
@@ -882,13 +882,13 @@ int zeroflash_download_firmware_directly(void *chip_data, const struct firmware 
             (unsigned char *)&data,
             sizeof(data));
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to read F$35 data\n");
         goto exit;
     }
 
     if (data.error_code != REQUESTING_FIRMWARE) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Microbootloader error code = 0x%02x\n",
                 data.error_code);
         if (data.error_code != CHECKSUM_FAILURE) {
@@ -915,10 +915,10 @@ int zeroflash_download_firmware_directly(void *chip_data, const struct firmware 
             retval = zeroflash_get_fw_image();
         }
         if (retval < 0) {
-            TPD_INFO("Get FW from headfile\n");
+            TPD_DEBUG("Get FW from headfile\n");
             request_fw_headfile = kzalloc(sizeof(struct firmware), GFP_KERNEL);
             if(request_fw_headfile == NULL) {
-                TPD_INFO("%s kzalloc failed!\n", __func__);
+                TPD_DEBUG("%s kzalloc failed!\n", __func__);
                 retval = FW_UPDATE_ERROR;
                 goto exit;
             }else if(tcm_hcd->p_firmware_headfile->firmware_data) {
@@ -933,17 +933,17 @@ reload_fw:
             g_zeroflash_hcd->image = fw->data;
     } else {
             if(request_fw_headfile == NULL) {
-                TPD_INFO("Get FW from headfile\n");
+                TPD_DEBUG("Get FW from headfile\n");
                 request_fw_headfile = kzalloc(sizeof(struct firmware), GFP_KERNEL);
                 if(request_fw_headfile == NULL) {
-                    TPD_INFO("%s kzalloc failed!\n", __func__); 
+                    TPD_DEBUG("%s kzalloc failed!\n", __func__); 
                     retval = FW_UPDATE_ERROR;
                     goto exit;
                 }else if(tcm_hcd->p_firmware_headfile->firmware_data) {
                     request_fw_headfile->size = tcm_hcd->p_firmware_headfile->firmware_size;
                     request_fw_headfile->data = tcm_hcd->p_firmware_headfile->firmware_data;
                 } else {
-                    TPD_INFO("firmware_data is NULL! exit firmware update!\n");
+                    TPD_DEBUG("firmware_data is NULL! exit firmware update!\n");
                     retval = FW_UPDATE_ERROR;
                     goto exit;
                 }
@@ -954,7 +954,7 @@ reload_fw:
     retval = zeroflash_parse_fw_image();
 
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to get firmware image\n");
         goto update_fail;
     }
@@ -963,7 +963,7 @@ reload_fw:
 
     retval = zeroflash_download_app_fw();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to download application firmware\n");
         goto update_fail;
     }
@@ -1004,7 +1004,7 @@ static void zeroflash_download_firmware_work(struct work_struct *work)
     atomic_set(&tcm_hcd->host_downloading, 1);
     retval = zeroflash_check_uboot();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Microbootloader support unavailable\n");
         goto exit;
     }
@@ -1016,13 +1016,13 @@ static void zeroflash_download_firmware_work(struct work_struct *work)
             (unsigned char *)&data,
             sizeof(data));
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to read F$35 data\n");
         goto exit;
     }
 
     if (data.error_code != REQUESTING_FIRMWARE) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Microbootloader error code = 0x%02x\n",
                 data.error_code);
         if (data.error_code != CHECKSUM_FAILURE) {
@@ -1037,7 +1037,7 @@ static void zeroflash_download_firmware_work(struct work_struct *work)
 
     retval = zeroflash_get_fw_image();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to get firmware image\n");
         goto exit;
     }
@@ -1046,7 +1046,7 @@ static void zeroflash_download_firmware_work(struct work_struct *work)
 
     retval = zeroflash_download_app_fw();
     if (retval < 0) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to download application firmware\n");
         goto exit;
     }
@@ -1076,7 +1076,7 @@ exit:
             msleep(20);
             syna_reset_gpio(tcm_hcd, 1);
             msleep(20);
-            TPD_INFO("something wrong happen, add hw reset try to download\n");
+            TPD_DEBUG("something wrong happen, add hw reset try to download\n");
         }
         //msleep(20);
         enable_irq(tcm_hcd->s_client->irq);
@@ -1091,7 +1091,7 @@ static int zeroflash_init(struct syna_tcm_hcd *tcm_hcd)
 {
     g_zeroflash_hcd = kzalloc(sizeof(*g_zeroflash_hcd), GFP_KERNEL);
     if (!g_zeroflash_hcd) {
-        TPD_INFO(
+        TPD_DEBUG(
                 "Failed to allocate memory for zeroflash_hcd\n");
         return -ENOMEM;
     }
@@ -1178,7 +1178,7 @@ static int syna_remote_zeroflash_syncbox(struct syna_tcm_hcd *tcm_hcd)
                 tcm_hcd->report.buffer.buf_size,
                 sizeof(g_zeroflash_hcd->fw_status));
         if (retval < 0) {
-            TPD_INFO(
+            TPD_DEBUG(
                     "Failed to copy firmware status\n");
             return retval;
         }
@@ -1187,7 +1187,7 @@ static int syna_remote_zeroflash_syncbox(struct syna_tcm_hcd *tcm_hcd)
     case REPORT_HDL:
         retval = tcm_hcd->enable_irq(tcm_hcd, false, true);
         if (retval < 0) {
-            TPD_INFO(
+            TPD_DEBUG(
                     "Failed to disable interrupt\n");
             return retval;
         }

@@ -86,21 +86,21 @@ static void i2cuart_recv_packet(void)
 	if (need_read_len > actual_len) {
 		g_fr_uart = kmalloc(sizeof(*g_fr_uart), GFP_ATOMIC);
 		if (ERR_ALLOC_MEM(g_fr_uart)) {
-			TPD_INFO("Failed to allocate g_fr_uart memory %ld\n", PTR_ERR(g_fr_uart));
+			TPD_DEBUG("Failed to allocate g_fr_uart memory %ld\n", PTR_ERR(g_fr_uart));
 			return;
 		}
 
 		g_fr_uart->len = need_read_len - actual_len;
 		g_fr_uart->data = kzalloc(g_fr_uart->len, GFP_ATOMIC);
 		if (ERR_ALLOC_MEM(g_fr_uart->data)) {
-			TPD_INFO("Failed to allocate g_fr_uart memory %ld\n", PTR_ERR(g_fr_uart->data));
+			TPD_DEBUG("Failed to allocate g_fr_uart memory %ld\n", PTR_ERR(g_fr_uart->data));
 			return;
 		}
 
 		g_total_len += g_fr_uart->len;
 		res = core_read(core_config->slave_i2c_addr, g_fr_uart->data, g_fr_uart->len);
 		if (res < 0)
-			TPD_INFO("Failed to read finger report packet\n");
+			TPD_DEBUG("Failed to read finger report packet\n");
 	}
 }
 #endif
@@ -167,13 +167,13 @@ EXPORT_SYMBOL(core_fr_touch_release);
 
 static int parse_touch_package_v3_2(void)
 {
-	TPD_INFO("Not implemented yet\n");
+	TPD_DEBUG("Not implemented yet\n");
 	return 0;
 }
 
 static int finger_report_ver_3_2(void)
 {
-	TPD_INFO("Not implemented yet\n");
+	TPD_DEBUG("Not implemented yet\n");
 	parse_touch_package_v3_2();
 	return 0;
 }
@@ -197,9 +197,9 @@ static int parse_touch_package_v5_0(uint8_t pid)
 	TPD_DEBUG("data = %x  ;  check_sum : %x\n", g_fr_node->data[g_fr_node->len - 1], check_sum);
 
 	if (g_fr_node->data[g_fr_node->len - 1] != check_sum) {
-		TPD_INFO("Wrong checksum set pointid info = -1\n");
+		TPD_DEBUG("Wrong checksum set pointid info = -1\n");
 		//memcpy(&g_mutual_data, &pre_touch_info, sizeof(struct mutual_touch_info));
-		TPD_INFO("check sum error data is:");
+		TPD_DEBUG("check sum error data is:");
 		for (i = 0; i < g_fr_node->len; i++) {
 			TPD_DEBUG_NTAG("0x%02X, ", g_fr_node->data[i]);
 		}
@@ -237,7 +237,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
 
 			g_mutual_data.mtp[g_mutual_data.touch_num].pressure = g_fr_node->data[(4 * i) + 4];
 			if (g_mutual_data.mtp[g_mutual_data.touch_num].pressure == 0) {
-				TPD_INFO("pressure = 0 force set 1\n");
+				TPD_DEBUG("pressure = 0 force set 1\n");
 				g_mutual_data.mtp[g_mutual_data.touch_num].pressure = 1;
 			}
             g_mutual_data.pointid_info = g_mutual_data.pointid_info | (1 << i);
@@ -290,7 +290,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
 
 			g_mutual_data.mtp[g_mutual_data.touch_num].pressure = g_fr_node->data[(4 * i) + 4];
 			if (g_mutual_data.mtp[g_mutual_data.touch_num].pressure == 0) {
-				TPD_INFO("pressure = 0 force set 1\n");
+				TPD_DEBUG("pressure = 0 force set 1\n");
 				g_mutual_data.mtp[g_mutual_data.touch_num].pressure = 1;
 			}
             g_mutual_data.pointid_info = g_mutual_data.pointid_info | (1 << i);
@@ -333,7 +333,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
 	} else {
 		if (pid != 0) {
 			/* ignore the pid with 0x0 after enable irq at once */
-			TPD_INFO(" **** Unknown PID : 0x%x ****\n", pid);
+			TPD_DEBUG(" **** Unknown PID : 0x%x ****\n", pid);
 			res = -1;
 		}
 	}
@@ -360,7 +360,7 @@ static int finger_report_ver_5_0(void)
 #endif
 #endif
 	if (res < 0) {
-		TPD_INFO("Failed to read finger report packet\n");
+		TPD_DEBUG("Failed to read finger report packet\n");
 		g_mutual_data.pointid_info = -1;
 		goto out;
 	}
@@ -387,7 +387,7 @@ static int finger_report_ver_5_0(void)
 
 	res = parse_touch_package_v5_0(pid);
 	if (res < 0) {
-		TPD_INFO("Failed to parse packet of finger touch\n");
+		TPD_DEBUG("Failed to parse packet of finger touch\n");
 		goto out;
 	}
 
@@ -443,11 +443,11 @@ static int calc_packet_length(void)
 				rlen += 35;
 			}
 		} else {
-			TPD_INFO("Unknown firmware mode : %d\n", core_fr->actual_fw_mode);
+			TPD_DEBUG("Unknown firmware mode : %d\n", core_fr->actual_fw_mode);
 			rlen = 0;
 		}
 	} else {
-		TPD_INFO("Wrong the major version of protocol, 0x%x\n", protocol->major);
+		TPD_DEBUG("Wrong the major version of protocol, 0x%x\n", protocol->major);
 		return -1;
 	}
 #endif
@@ -482,7 +482,7 @@ int core_fr_get_gesture_data(uint8_t * data)
 	res = core_read(core_config->slave_i2c_addr, data, GESTURE_INFO_LENGTH);
 	//res = core_read(core_config->slave_i2c_addr, data, GESTURE_MORMAL_LENGTH);
 	if (data[0] != protocol->ges_pid) {
-		TPD_INFO("get gesture packet id error data[0] = 0x%X", data[0]);
+		TPD_DEBUG("get gesture packet id error data[0] = 0x%X", data[0]);
 		res = -1;
 	}
 	return res;
@@ -506,13 +506,13 @@ void core_fr_handler(void)
 		if (g_total_len > 0) {
 			g_fr_node = kmalloc(sizeof(*g_fr_node), GFP_ATOMIC);
 			if (ERR_ALLOC_MEM(g_fr_node)) {
-				TPD_INFO("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node));
+				TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node));
 				goto out;
 			}
 
 			g_fr_node->data = kcalloc(g_total_len, sizeof(uint8_t), GFP_ATOMIC);
 			if (ERR_ALLOC_MEM(g_fr_node->data)) {
-				TPD_INFO("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node->data));
+				TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node->data));
 				goto out;
 			}
 
@@ -523,7 +523,7 @@ void core_fr_handler(void)
 				if (protocol->major == fr_t[i].protocol_marjor_ver) {
 					res = fr_t[i].finger_report();
                     if (res < 0) {
-                        TPD_INFO("set pointid_info = -1\n");
+                        TPD_DEBUG("set pointid_info = -1\n");
                         g_mutual_data.pointid_info = -1;
                     }
 					/* 2048 is referred to the defination by user */
@@ -531,7 +531,7 @@ void core_fr_handler(void)
 						//tdata = kmalloc(g_total_len, GFP_ATOMIC);
 						tdata = kmalloc(2048, GFP_ATOMIC);
 						if (ERR_ALLOC_MEM(tdata)) {
-							TPD_INFO("Failed to allocate g_fr_node memory %ld\n",
+							TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n",
 								PTR_ERR(tdata));
 							goto out;
 						}
@@ -541,7 +541,7 @@ void core_fr_handler(void)
 						if (g_fr_uart != NULL)
 							memcpy(tdata + g_fr_node->len, g_fr_uart->data, g_fr_uart->len);
 					} else {
-						TPD_INFO("total length (%d) is too long than user can handle\n",
+						TPD_DEBUG("total length (%d) is too long than user can handle\n",
 							g_total_len);
 						goto out;
 					}
@@ -559,14 +559,14 @@ void core_fr_handler(void)
 							memcpy(ipd->debug_buf[ipd->debug_data_frame], tdata, g_total_len);
 						}
 						else {
-							TPD_INFO("Failed to malloc debug_buf\n");
+							TPD_DEBUG("Failed to malloc debug_buf\n");
 						}
 						ipd->debug_data_frame++;
 						if (ipd->debug_data_frame > 1) {
-							TPD_INFO("ipd->debug_data_frame = %d\n", ipd->debug_data_frame);
+							TPD_DEBUG("ipd->debug_data_frame = %d\n", ipd->debug_data_frame);
 						}
 						if (ipd->debug_data_frame > 1023) {
-							TPD_INFO("ipd->debug_data_frame = %d > 1023\n",
+							TPD_DEBUG("ipd->debug_data_frame = %d > 1023\n",
 								ipd->debug_data_frame);
 							ipd->debug_data_frame = 1023;
 						}
@@ -579,24 +579,24 @@ void core_fr_handler(void)
 			}
 
 			if (i >= ARRAY_SIZE(fr_t))
-				TPD_INFO("Can't find any callback functions to handle INT event\n");
+				TPD_DEBUG("Can't find any callback functions to handle INT event\n");
 		}
 		else {
-			TPD_INFO("Wrong the length of packet\n");
+			TPD_DEBUG("Wrong the length of packet\n");
 		}
 	} else {
-		TPD_INFO("The figner report was disabled\n");
+		TPD_DEBUG("The figner report was disabled\n");
 		core_fr->handleint = true;
 	}
 
 out:
 	mutex_unlock(&ipd->plat_mutex);
 	if (CHECK_RECOVER == g_total_len) {
-			TPD_INFO("==================Recover=================\n");
+			TPD_DEBUG("==================Recover=================\n");
 		#ifdef CHECK_REG
 			res = core_config_ice_mode_enable();
 			if (res < 0) {
-				TPD_INFO("Failed to enter ICE mode, res = %d\n", res);
+				TPD_DEBUG("Failed to enter ICE mode, res = %d\n", res);
 			}
 			core_get_tp_register();
 		#ifdef CHECK_DDI_REG
@@ -656,8 +656,8 @@ void core_fr_input_set_param(struct input_dev *input_device)
 		max_tp = MAX_TOUCH_NUM;
 	}
 
-	TPD_INFO("input resolution : max_x = %d, max_y = %d, min_x = %d, min_y = %d\n", max_x, max_y, min_x, min_y);
-	TPD_INFO("input touch number: max_tp = %d\n", max_tp);
+	TPD_DEBUG("input resolution : max_x = %d, max_y = %d, min_x = %d, min_y = %d\n", max_x, max_y, min_x, min_y);
+	TPD_DEBUG("input touch number: max_tp = %d\n", max_tp);
 
 #if (TP_PLATFORM != PT_MTK)
 	input_set_abs_params(core_fr->input_device, ABS_MT_POSITION_X, min_x, max_x - 1, 0, 0);
@@ -666,7 +666,7 @@ void core_fr_input_set_param(struct input_dev *input_device)
 	input_set_abs_params(core_fr->input_device, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
 	input_set_abs_params(core_fr->input_device, ABS_MT_WIDTH_MAJOR, 0, 255, 0, 0);
 #endif /* PT_MTK */
-	TPD_INFO("\n");
+	TPD_DEBUG("\n");
 	if (core_fr->isEnablePressure)
 		input_set_abs_params(core_fr->input_device, ABS_MT_PRESSURE, 0, 255, 0, 0);
 
@@ -679,7 +679,7 @@ void core_fr_input_set_param(struct input_dev *input_device)
 #else
 	input_set_abs_params(core_fr->input_device, ABS_MT_TRACKING_ID, 0, max_tp, 0, 0);
 #endif /* MT_B_TYPE */
-	TPD_INFO("\n");
+	TPD_DEBUG("\n");
 	/* Set up virtual key with gesture code */
 	//core_gesture_init(core_fr);
 }
@@ -691,7 +691,7 @@ int core_fr_init(void)
 
 	core_fr = kzalloc(sizeof(*core_fr), GFP_KERNEL);
 	if (ERR_ALLOC_MEM(core_fr)) {
-		TPD_INFO("Failed to allocate core_fr mem, %ld\n", PTR_ERR(core_fr));
+		TPD_DEBUG("Failed to allocate core_fr mem, %ld\n", PTR_ERR(core_fr));
 		core_fr_remove();
 		return -ENOMEM;
 	}
@@ -709,14 +709,14 @@ int core_fr_init(void)
 	}
     core_fr->input_device = ipd->ts->input_dev;
 
-	TPD_INFO("Can't find this chip in support list\n");
+	TPD_DEBUG("Can't find this chip in support list\n");
 	return 0;
 }
 EXPORT_SYMBOL(core_fr_init);
 
 void core_fr_remove(void)
 {
-	TPD_INFO("Remove core-FingerReport members\n");
+	TPD_DEBUG("Remove core-FingerReport members\n");
 	ipio_kfree((void **)&core_fr);
 }
 EXPORT_SYMBOL(core_fr_remove);

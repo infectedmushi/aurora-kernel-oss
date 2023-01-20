@@ -308,7 +308,7 @@ static void dump_benchmark_data(s32 *max_ptr, s32 *min_ptr)
     int i;
 
     if (ipio_debug_level) {
-        TPD_INFO("Dump Benchmark Max\n");
+        TPD_DEBUG("Dump Benchmark Max\n");
 
         for (i = 0; i < core_mp.frame_len; i++) {
             pr_cont("%d, ", max_ptr[i]);
@@ -331,7 +331,7 @@ static void dump_node_type_buffer(s32 *node_ptr, u8 *name)
     int i;
 
     if (ipio_debug_level) {
-        TPD_INFO("Dump NodeType\n");
+        TPD_DEBUG("Dump NodeType\n");
         for (i = 0; i < core_mp.frame_len; i++) {
             pr_cont("%d, ", node_ptr[i]);
             if (i % core_mp.xch_len == core_mp.xch_len - 1)
@@ -487,7 +487,7 @@ static int parser_get_u8_array(char *key, u8 *buf, u16 base, int len)
             if (ret == 0)
                 buf[conut] = s_to_long;
             else
-                TPD_INFO("convert string too long, ret = %d\n", ret);
+                TPD_DEBUG("convert string too long, ret = %d\n", ret);
             conut++;
 
             if (conut >= len)
@@ -743,22 +743,22 @@ static int ilitek_tddi_mp_ini_parser(const char *path)
     char *tmp = NULL;
 
     const struct firmware *fw = NULL;
-    TPD_INFO("path = %s\n", path);
+    TPD_DEBUG("path = %s\n", path);
 
     ret = request_firmware(&fw, path, &(idev->spi->dev));
     if (ret != 0) {
-        TPD_INFO("%s : request mp file failed! ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s : request mp file failed! ret = %d\n", __func__, ret);
         goto out;
     }
 
-    TPD_INFO("fw->size = %d\n", (int)fw->size);
+    TPD_DEBUG("fw->size = %d\n", (int)fw->size);
     if (fw->size <= 0) {
-        TPD_INFO("The size of file is invaild\n");
+        TPD_DEBUG("The size of file is invaild\n");
         ret = -EINVAL;
         goto out;
     }
 
-    TPD_INFO("ini file path = %s\n", path);
+    TPD_DEBUG("ini file path = %s\n", path);
 
     tmp = vmalloc((fw->size) + 1);
     if (ERR_ALLOC_MEM(tmp)) {
@@ -791,7 +791,7 @@ static int ilitek_tddi_mp_ini_parser(const char *path)
         goto out;
     }
 
-    TPD_INFO("Parsed ini file done\n");
+    TPD_DEBUG("Parsed ini file done\n");
 out:
     ipio_vfree((void **)&tmp);
     if(fw != NULL) {
@@ -1431,7 +1431,7 @@ static int mp_cdc_get_pv5_4_command(u8 *cmd, int len, int index)
     char str[128] = {0};
     char *key = tItems[index].desp;
 
-    TPD_INFO("Get cdc command for %s\n", key);
+    TPD_DEBUG("Get cdc command for %s\n", key);
 
     slen = parser_get_int_data("pv5_4 command", key, str, 128);
     if (slen < 0)
@@ -2378,7 +2378,7 @@ static int mp_get_timing_info(void)
 
     core_mp.isLongV = info[6];
 
-    TPD_INFO("DDI Mode = %s\n", (core_mp.isLongV ? "Long V" : "Long H"));
+    TPD_DEBUG("DDI Mode = %s\n", (core_mp.isLongV ? "Long V" : "Long H"));
 
     return 0;
 }
@@ -2588,11 +2588,11 @@ fail_alloc:
 static void mp_do_retry(int index, int count)
 {
     if (count == 0) {
-        TPD_INFO("Finish retry action\n");
+        TPD_DEBUG("Finish retry action\n");
         return;
     }
 
-    TPD_INFO("retry = %d, item = %s\n", count, tItems[index].desp);
+    TPD_DEBUG("retry = %d, item = %s\n", count, tItems[index].desp);
 
     tItems[index].do_test(index);
 
@@ -2605,7 +2605,7 @@ static int dev_mkdir(char *name, umode_t mode)
     int err = -1;
     mm_segment_t fs;
 
-    TPD_INFO("mkdir: %s\n", name);
+    TPD_DEBUG("mkdir: %s\n", name);
     fs = get_fs();
     set_fs(KERNEL_DS);
 #ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
@@ -2834,7 +2834,7 @@ static void mp_show_result(bool lcm_on)
     else
         snprintf(csv_name, 128, "%s/%s_%s_%s_%s.csv", csv_path, tp_module, lcm_on ? "lcm_on" : "lcm_off", ret_pass_name, get_date_time_str());
 
-    TPD_INFO("Open CSV : %s\n", csv_name);
+    TPD_DEBUG("Open CSV : %s\n", csv_name);
 
 
     f = filp_open(csv_name, O_WRONLY | O_CREAT | O_TRUNC, 644);
@@ -2844,7 +2844,7 @@ static void mp_show_result(bool lcm_on)
         goto fail_open;
     }
 
-    TPD_INFO("Open CSV succeed, its length = %d\n ", csv_len);
+    TPD_DEBUG("Open CSV succeed, its length = %d\n ", csv_len);
 
     if (csv_len >= CSV_FILE_SIZE) {
         ipio_err("The length saved to CSV is too long !\n");
@@ -2858,7 +2858,7 @@ static void mp_show_result(bool lcm_on)
     set_fs(fs);
     filp_close(f, NULL);
 
-    TPD_INFO("Writing Data into CSV succeed\n");
+    TPD_DEBUG("Writing Data into CSV succeed\n");
 
 fail_open:
     ipio_vfree((void **)&csv);
@@ -2890,13 +2890,13 @@ static void ilitek_tddi_mp_init_item(void)
     core_mp.retry = false;
     core_mp.final_result = MP_FAIL;
 
-    TPD_INFO("CHIP = 0x%x\n", core_mp.chip_pid);
-    TPD_INFO("Firmware version = %x\n", core_mp.fw_ver);
-    TPD_INFO("Protocol version = %x\n", core_mp.protocol_ver);
-    TPD_INFO("Read CDC Length = %d\n", core_mp.cdc_len);
-    TPD_INFO("X length = %d, Y length = %d\n", core_mp.xch_len, core_mp.ych_len);
-    TPD_INFO("Frame length = %d\n", core_mp.frame_len);
-    TPD_INFO("Check busy method = %d\n", core_mp.busy_cdc);
+    TPD_DEBUG("CHIP = 0x%x\n", core_mp.chip_pid);
+    TPD_DEBUG("Firmware version = %x\n", core_mp.fw_ver);
+    TPD_DEBUG("Protocol version = %x\n", core_mp.protocol_ver);
+    TPD_DEBUG("Read CDC Length = %d\n", core_mp.cdc_len);
+    TPD_DEBUG("X length = %d, Y length = %d\n", core_mp.xch_len, core_mp.ych_len);
+    TPD_DEBUG("Frame length = %d\n", core_mp.frame_len);
+    TPD_DEBUG("Check busy method = %d\n", core_mp.busy_cdc);
 
     for (i = 0; i < MP_TEST_ITEM; i++) {
         tItems[i].spec_option = 0;
@@ -3074,13 +3074,13 @@ static void mp_test_run(char *item)
             if (!tItems[i].run)
                 continue;
 
-            TPD_INFO("Run MP Test Item : %s\n", tItems[i].desp);
+            TPD_DEBUG("Run MP Test Item : %s\n", tItems[i].desp);
             tItems[i].do_test(i);
 
             /* Check result before do retry (if enabled)  */
             if (mp_comp_result_before_retry(i) == MP_FAIL) {
                 if (core_mp.retry) {
-                    TPD_INFO("MP failed, doing retry\n");
+                    TPD_DEBUG("MP failed, doing retry\n");
                     mp_do_retry(i, RETRY_COUNT);
                 }
             }
@@ -3092,7 +3092,7 @@ static void mp_test_free(void)
 {
     int i;
 
-    TPD_INFO("Free all allocated mem for MP\n");
+    TPD_DEBUG("Free all allocated mem for MP\n");
 
     core_mp.final_result = MP_FAIL;
 
@@ -3176,7 +3176,7 @@ int ilitek_tddi_mp_test_main(char *apk, struct seq_file *s, char *message, bool 
     int ret = 0;
     ilitek_ini_file_data = (struct ini_file_data *)vmalloc(sizeof(struct ini_file_data) * PARSER_MAX_KEY_NUM);
     if (ERR_ALLOC_MEM(ilitek_ini_file_data)) {
-        TPD_INFO("Failed to malloc ilitek_ini_file_data\n");
+        TPD_DEBUG("Failed to malloc ilitek_ini_file_data\n");
         if (!ERR_ALLOC_MEM(message)) {
             snprintf(message, MESSAGE_SIZE, "malloc ilitek_ini_file_data failed\n");
         }

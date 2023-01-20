@@ -119,9 +119,9 @@ int fts_pinctrl_select_active(struct fts_ts_data *fts_data)
 
 	if (fts_data->hw_res->pinctrl && fts_data->hw_res->pin_set_reset_high) {
 		ret = pinctrl_select_state(fts_data->hw_res->pinctrl, fts_data->hw_res->pin_set_reset_high);
-		TPD_INFO("%s : ret = %d\n", __func__, ret);
+		TPD_DEBUG("%s : ret = %d\n", __func__, ret);
 		if (ret < 0) {
-			TPD_INFO("Set active pin state error:%d", ret);
+			TPD_DEBUG("Set active pin state error:%d", ret);
 			devm_pinctrl_put(fts_data->hw_res->pinctrl);
 			fts_data->hw_res->pinctrl = NULL;
 		}
@@ -136,9 +136,9 @@ int fts_pinctrl_select_suspend(struct fts_ts_data *fts_data)
 
 	if (fts_data->hw_res->pinctrl && fts_data->hw_res->pin_set_reset_low) {
 		ret = pinctrl_select_state(fts_data->hw_res->pinctrl , fts_data->hw_res->pin_set_reset_low);
-		TPD_INFO("%s : ret = %d\n", __func__, ret);
+		TPD_DEBUG("%s : ret = %d\n", __func__, ret);
 		if (ret < 0) {
-			TPD_INFO("Set suspend pin state error:%d", ret);
+			TPD_DEBUG("Set suspend pin state error:%d", ret);
 			devm_pinctrl_put(fts_data->hw_res->pinctrl);
 			fts_data->hw_res->pinctrl = NULL;
 		}
@@ -163,10 +163,10 @@ static int fts_rstgpio_set(struct hw_resource *hw_res, bool on)
 		}
 	} else {
 		if (gpio_is_valid(hw_res->reset_gpio)) {
-			TPD_INFO("Set the reset_gpio \n");
+			TPD_DEBUG("Set the reset_gpio \n");
 			gpio_direction_output(hw_res->reset_gpio, on);
 		} else {
-			TPD_INFO("reset is invalid!!\n");
+			TPD_DEBUG("reset is invalid!!\n");
 		}
 	}
 
@@ -178,7 +178,7 @@ static int fts_rstgpio_set(struct hw_resource *hw_res, bool on)
  */
 static int fts_hw_reset(struct fts_ts_data *ts_data, u32 delayms)
 {
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     fts_rstgpio_set(ts_data->hw_res, false); /* reset gpio*/
     msleep(5);
     fts_rstgpio_set(ts_data->hw_res, true); /* reset gpio*/
@@ -267,7 +267,7 @@ static int fts_esd_handle(void *chip_data)
     for (i = 0; i < 3; i++) {
         ret = touch_i2c_read_byte(ts_data->client, FTS_REG_CHIP_ID);
         if (ret != 0x54) {
-            TPD_INFO("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
+            TPD_DEBUG("%s: read chip_id failed!(ret:%d)\n", __func__, ret);
             msleep(10);
             i2c_err++;
         } else {
@@ -277,7 +277,7 @@ static int fts_esd_handle(void *chip_data)
     }
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_FLOW_WORK_CNT);
     if (ret < 0) {
-        TPD_INFO("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
+        TPD_DEBUG("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
         i2c_err++;
     }
 
@@ -289,7 +289,7 @@ static int fts_esd_handle(void *chip_data)
     flow_work_cnt_last = ret;
 
     if ((err_cnt >= 5) || (i2c_err >= 3)) {
-        TPD_INFO("esd check failed, start reset!\n");
+        TPD_DEBUG("esd check failed, start reset!\n");
         disable_irq_nosync(ts_data->client->irq);
         tp_touch_btnkey_release();
         fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
@@ -337,14 +337,14 @@ static int fts_fwupg_enter_into_boot(struct fts_ts_data *ts_data)
         /*reset to boot*/
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_UPGRADE, FTS_UPGRADE_AA);
         if (ret < 0) {
-            TPD_INFO("write FC=0xAA fail");
+            TPD_DEBUG("write FC=0xAA fail");
             return ret;
         }
         msleep(FTS_DELAY_UPGRADE_AA);
 
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_UPGRADE, FTS_UPGRADE_55);
         if (ret < 0) {
-            TPD_INFO("write FC=0x55 fail");
+            TPD_DEBUG("write FC=0x55 fail");
             return ret;
         }
         msleep(FTS_DELAY_UPGRADE_RESET);
@@ -353,18 +353,18 @@ static int fts_fwupg_enter_into_boot(struct fts_ts_data *ts_data)
         cmd = FTS_CMD_START;
         ret = touch_i2c_write_block(ts_data->client, cmd, 0, NULL);
         if (ret < 0) {
-            TPD_INFO("write 0x55 fail");
+            TPD_DEBUG("write 0x55 fail");
             return ret;
         }
 
         cmd = FTS_CMD_READ_ID;
         ret = touch_i2c_read_block(ts_data->client, cmd, 2, id);
         if (ret < 0) {
-            TPD_INFO("read boot id fail");
+            TPD_DEBUG("read boot id fail");
             return ret;
         }
 
-        TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+        TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
         if ((id[0] == FTS_VAL_BL_ID) && (id[1] == FTS_VAL_BL_ID2)) {
             break;
         }
@@ -379,13 +379,13 @@ static int fts_fwupg_erase(struct fts_ts_data *ts_data, u32 delay)
     u8 cmd = 0;
     bool flag = false;
 
-    TPD_INFO("**********erase now**********");
+    TPD_DEBUG("**********erase now**********");
 
     /*send to erase flash*/
     cmd = FTS_CMD_ERASE_APP;
     ret = touch_i2c_write_block(ts_data->client, cmd, 0, NULL);
     if (ret < 0) {
-        TPD_INFO("send erase cmd fail");
+        TPD_DEBUG("send erase cmd fail");
         return ret;
     }
     msleep(delay);
@@ -394,7 +394,7 @@ static int fts_fwupg_erase(struct fts_ts_data *ts_data, u32 delay)
     flag = fts_fwupg_check_flash_status(ts_data, FTS_CMD_FLASH_STATUS_ERASE_OK,
                                         FTS_RETRIES_REASE, FTS_RETRIES_DELAY_REASE);
     if (!flag) {
-        TPD_INFO("check ecc flash status fail");
+        TPD_DEBUG("check ecc flash status fail");
         return -EIO;
     }
 
@@ -418,14 +418,14 @@ static int fts_flash_write_buf(struct fts_ts_data *ts_data, u32 saddr, u8 *buf, 
     u16 read_status = 0;
     u16 wr_ok = 0;
 
-    TPD_INFO( "**********write data to flash**********");
-    TPD_INFO("data buf start addr=0x%x, len=0x%x", saddr, len);
+    TPD_DEBUG( "**********write data to flash**********");
+    TPD_DEBUG("data buf start addr=0x%x, len=0x%x", saddr, len);
     packet_number = len / BYTES_PER_TIME;
     remainder = len % BYTES_PER_TIME;
     if (remainder > 0)
         packet_number++;
     packet_len = BYTES_PER_TIME;
-    TPD_INFO("write data, num:%d remainder:%d", packet_number, remainder);
+    TPD_DEBUG("write data, num:%d remainder:%d", packet_number, remainder);
 
     for (i = 0; i < packet_number; i++) {
         offset = i * BYTES_PER_TIME;
@@ -443,7 +443,7 @@ static int fts_flash_write_buf(struct fts_ts_data *ts_data, u32 saddr, u8 *buf, 
         memcpy(&packet_buf[cmdlen], &buf[offset], packet_len);
         ret = touch_i2c_write_block(ts_data->client, packet_buf[0], packet_len + cmdlen - 1, &packet_buf[1]);
         if (ret < 0) {
-            TPD_INFO("app write fail");
+            TPD_DEBUG("app write fail");
             return ret;
         }
         mdelay(delay);
@@ -484,12 +484,12 @@ int fts_fwupg_ecc_cal_tp(struct fts_ts_data *ts_data, u32 saddr, u32 len)
     u8 ecc = 0;
     bool bflag = false;
 
-    TPD_INFO( "**********read out checksum**********");
+    TPD_DEBUG( "**********read out checksum**********");
     /* check sum init */
     wbuf[0] = FTS_CMD_ECC_INIT;
     ret = touch_i2c_write_block(ts_data->client, wbuf[0] & 0xff, 0, NULL);
     if (ret < 0) {
-        TPD_INFO("ecc init cmd write fail");
+        TPD_DEBUG("ecc init cmd write fail");
         return ret;
     }
 
@@ -504,7 +504,7 @@ int fts_fwupg_ecc_cal_tp(struct fts_ts_data *ts_data, u32 saddr, u32 len)
     TPD_DEBUG("ecc calc startaddr:0x%04x, len:%d", saddr, len);
     ret = touch_i2c_write_block(ts_data->client, wbuf[0] & 0xff, 6, &wbuf[1]);
     if (ret < 0) {
-        TPD_INFO("ecc calc cmd write fail");
+        TPD_DEBUG("ecc calc cmd write fail");
         return ret;
     }
     msleep(len / 256);
@@ -514,7 +514,7 @@ int fts_fwupg_ecc_cal_tp(struct fts_ts_data *ts_data, u32 saddr, u32 len)
                                          FTS_RETRIES_ECC_CAL,
                                          FTS_RETRIES_DELAY_ECC_CAL);
     if (!bflag) {
-        TPD_INFO("ecc flash status read fail");
+        TPD_DEBUG("ecc flash status read fail");
         return -EIO;
     }
 
@@ -522,7 +522,7 @@ int fts_fwupg_ecc_cal_tp(struct fts_ts_data *ts_data, u32 saddr, u32 len)
     wbuf[0] = FTS_CMD_ECC_READ;
     ret = touch_i2c_read_block(ts_data->client, wbuf[0], 1, &ecc);
     if (ret < 0) {
-        TPD_INFO( "ecc read cmd write fail");
+        TPD_DEBUG( "ecc read cmd write fail");
         return ret;
     }
 
@@ -539,7 +539,7 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     int ecc_in_tp = 0;
 
     if (!buf) {
-        TPD_INFO("fw_buf is invalid");
+        TPD_DEBUG("fw_buf is invalid");
         return -EINVAL;
     }
 
@@ -547,7 +547,7 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     ret = fts_fwupg_enter_into_boot(ts_data);
     if (ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "Enter pramboot/bootloader failed");
-        TPD_INFO("enter into pramboot/bootloader fail,ret=%d", ret);
+        TPD_DEBUG("enter into pramboot/bootloader fail,ret=%d", ret);
         goto fw_reset;
     }
 
@@ -558,7 +558,7 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     ret = touch_i2c_write_block(ts_data->client, cmd[0], 3, &cmd[1]);
     if (ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FTS_CMD_DATA_LEN failed");
-        TPD_INFO("data len cmd write fail");
+        TPD_DEBUG("data len cmd write fail");
         goto fw_reset;
     }
 
@@ -566,7 +566,7 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     ret = fts_fwupg_erase(ts_data, FTS_REASE_APP_DELAY);
     if (ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FTS_REASE_APP_DELAY failed");
-        TPD_INFO("erase cmd write fail");
+        TPD_DEBUG("erase cmd write fail");
         goto fw_reset;
     }
 
@@ -575,7 +575,7 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     ret = fts_flash_write_buf(ts_data, start_addr, buf, len, 1);
     if (ret < 0 ) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "Flash Write failed");
-        TPD_INFO("flash write fail");
+        TPD_DEBUG("flash write fail");
         goto fw_reset;
     }
 
@@ -583,35 +583,35 @@ static int fts_upgrade(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     ecc_in_tp = fts_fwupg_ecc_cal_tp(ts_data, start_addr, len);
     if (ecc_in_tp < 0 ) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "ECC Read failed");
-        TPD_INFO("ecc read fail");
+        TPD_DEBUG("ecc read fail");
         goto fw_reset;
     }
 
-    TPD_INFO("ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
+    TPD_DEBUG("ecc in tp:%x, host:%x", ecc_in_tp, ecc_in_host);
     if (ecc_in_tp != ecc_in_host) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "ECC Check failed");
-        TPD_INFO("ecc check fail");
+        TPD_DEBUG("ecc check fail");
         goto fw_reset;
     }
 
-    TPD_INFO("upgrade success, reset to normal boot");
+    TPD_DEBUG("upgrade success, reset to normal boot");
     cmd[0] = FTS_CMD_RESET;
     ret = touch_i2c_write_block(ts_data->client, cmd[0], 0, NULL);
     if (ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FTS_CMD_RESET failed");
-        TPD_INFO("reset to normal boot fail");
+        TPD_DEBUG("reset to normal boot fail");
     }
 
     msleep(200);
     return 0;
 
 fw_reset:
-    TPD_INFO("upgrade fail, reset to normal boot");
+    TPD_DEBUG("upgrade fail, reset to normal boot");
     cmd[0] = FTS_CMD_RESET;
     ret = touch_i2c_write_block(ts_data->client, cmd[0], 0, NULL);
     if (ret < 0) {
         tp_healthinfo_report(monitor_data, HEALTH_FW_UPDATE, "FTS_CMD_RESET failed");
-        TPD_INFO("reset to normal boot fail");
+        TPD_DEBUG("reset to normal boot fail");
     }
     return -EIO;
 }
@@ -636,10 +636,10 @@ static int fts_enter_factory_work_mode(struct fts_ts_data *ts_data, u8 mode_val)
     int retry = 20;
     u8 regval = 0;
 
-    TPD_INFO("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
+    TPD_DEBUG("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
     ret = touch_i2c_write_byte(ts_data->client, DEVIDE_MODE_ADDR, mode_val);
     if (ret < 0) {
-        TPD_INFO("%s:write mode(val:0x%x) fail", __func__, mode_val);
+        TPD_DEBUG("%s:write mode(val:0x%x) fail", __func__, mode_val);
         return ret;
     }
 
@@ -651,7 +651,7 @@ static int fts_enter_factory_work_mode(struct fts_ts_data *ts_data, u8 mode_val)
     }
 
     if (!retry) {
-        TPD_INFO("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
+        TPD_DEBUG("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
         return -EIO;
     }
 
@@ -666,10 +666,10 @@ static int fts_start_scan(struct fts_ts_data *ts_data)
     u8 regval = 0;
     u8 scanval = FTS_FACTORY_MODE_VALUE | (1 << 7);
 
-    TPD_INFO("%s: start to scan a frame", __func__);
+    TPD_DEBUG("%s: start to scan a frame", __func__);
     ret = touch_i2c_write_byte(ts_data->client, DEVIDE_MODE_ADDR, scanval);
     if (ret < 0) {
-        TPD_INFO("%s:start to scan a frame fail", __func__);
+        TPD_DEBUG("%s:start to scan a frame fail", __func__);
         return ret;
     }
 
@@ -681,7 +681,7 @@ static int fts_start_scan(struct fts_ts_data *ts_data)
     }
 
     if (!retry) {
-        TPD_INFO("%s:scan a frame timeout", __func__);
+        TPD_DEBUG("%s:scan a frame timeout", __func__);
         return -EIO;
     }
 
@@ -705,7 +705,7 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff, 
     u8 regval = 0;
     u8 *buf = NULL;
 
-    TPD_INFO("%s:call", __func__);
+    TPD_DEBUG("%s:call", __func__);
     if (data_type == FTS_MUTUAL_CAP_DATA_DELTA) {
         byte_num = ts_data->hw_res->TX_NUM * ts_data->hw_res->RX_NUM * 2;
     } else {
@@ -718,13 +718,13 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff, 
     /*kzalloc buffer*/
     buf = kzalloc(byte_num, GFP_KERNEL);
     if (!buf) {
-        TPD_INFO("%s:kzalloc for raw byte buf fail", __func__);
+        TPD_DEBUG("%s:kzalloc for raw byte buf fail", __func__);
         return -ENOMEM;
     }
 
     ret = fts_enter_factory_work_mode(ts_data, FTS_FACTORY_MODE_VALUE);
     if (ret < 0) {
-        TPD_INFO("%s:enter factory mode fail", __func__);
+        TPD_DEBUG("%s:enter factory mode fail", __func__);
         goto raw_err;
     }
 
@@ -732,20 +732,20 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff, 
         regval = touch_i2c_read_byte(ts_data->client, FACTORY_REG_DATA_SELECT);
         ret = touch_i2c_write_byte(ts_data->client, FACTORY_REG_DATA_SELECT, FTS_CAP_DATA_TYPE_DELTA);
         if (ret < 0) {
-            TPD_INFO("%s:write 0x01 to reg0x06 fail", __func__);
+            TPD_DEBUG("%s:write 0x01 to reg0x06 fail", __func__);
             goto reg_restore;
         }
     } else if (!is_diff) {
         regval = touch_i2c_read_byte(ts_data->client, FACTORY_REG_DATA_SELECT);
         ret = touch_i2c_write_byte(ts_data->client, FACTORY_REG_DATA_SELECT, FTS_CAP_DATA_TYPE_RAW);
         if (ret < 0) {
-            TPD_INFO("%s:write 0x01 to reg0x06 fail", __func__);
+            TPD_DEBUG("%s:write 0x01 to reg0x06 fail", __func__);
             goto reg_restore;
         }
 
         ret = fts_start_scan(ts_data);
         if (ret < 0) {
-            TPD_INFO("%s:scan a frame fail", __func__);
+            TPD_DEBUG("%s:scan a frame fail", __func__);
             goto reg_restore;
         }
     }
@@ -758,7 +758,7 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff, 
         ret = touch_i2c_write_byte(ts_data->client, FACTORY_REG_LINE_ADDR, FTS_SELF_CAP_DATA_DELTA_WP);
     }
     if (ret < 0) {
-        TPD_INFO("%s:write [data_type] to reg0x01 fail", __func__);
+        TPD_DEBUG("%s:write [data_type] to reg0x01 fail", __func__);
         goto reg_restore;
     }
 
@@ -774,7 +774,7 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff, 
 
         ret = touch_i2c_read(ts_data->client, NULL, 0, buf + offset, packet_len);
         if (ret < 0) {
-            TPD_INFO("%s:read raw data(packet:%d) fail", __func__, offset / MAX_PACKET_SIZE);
+            TPD_DEBUG("%s:read raw data(packet:%d) fail", __func__, offset / MAX_PACKET_SIZE);
             goto reg_restore;
         }
 
@@ -790,7 +790,7 @@ reg_restore:
     if (is_diff) {
         ret = touch_i2c_write_byte(ts_data->client, FACTORY_REG_DATA_SELECT, regval);
         if (ret < 0) {
-            TPD_INFO("%s:restore reg0x06 fail", __func__);
+            TPD_DEBUG("%s:restore reg0x06 fail", __func__);
         }
     }
 
@@ -798,7 +798,7 @@ raw_err:
     kfree(buf);
     ret = fts_enter_factory_work_mode(ts_data, FTS_WORK_MODE_VALUE);
     if (ret < 0) {
-        TPD_INFO("%s:enter work mode fail", __func__);
+        TPD_DEBUG("%s:enter work mode fail", __func__);
     }
 
     return ret;
@@ -817,7 +817,7 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
 	unsigned char *Pstr = NULL;
 	int lsize = tx_num * rx_num;
 
-    TPD_INFO("%s:start to read diff data", __func__);
+    TPD_DEBUG("%s:start to read diff data", __func__);
     focal_esd_check_enable(ts_data, false);   //no allowed esd check
 
     raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -826,25 +826,25 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
 			seq_printf(s, "kzalloc for raw fail\n");
 		}
 		else {
-			TPD_INFO("kzalloc for raw fail\n");
+			TPD_DEBUG("kzalloc for raw fail\n");
 		}
         goto raw_fail;
     }
 	if(s == NULL) {
-		TPD_INFO("start to read JCQ data: \n");
-		TPD_INFO("0xD0 = %d: \n", touch_i2c_read_byte(ts_data->client, 0xD0));
-		TPD_INFO("0x86 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x86));
-		TPD_INFO("0xCF = %d: \n", touch_i2c_read_byte(ts_data->client, 0xCF));
+		TPD_DEBUG("start to read JCQ data: \n");
+		TPD_DEBUG("0xD0 = %d: \n", touch_i2c_read_byte(ts_data->client, 0xD0));
+		TPD_DEBUG("0x86 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x86));
+		TPD_DEBUG("0xCF = %d: \n", touch_i2c_read_byte(ts_data->client, 0xCF));
 		fts_read_fod_info(ts_data);
 		fts_get_gesture_info(ts_data, NULL);
-		TPD_INFO("0x8F = %d: \n", touch_i2c_read_byte(ts_data->client, 0x8F));
-		TPD_INFO("0x91 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x91));
+		TPD_DEBUG("0x8F = %d: \n", touch_i2c_read_byte(ts_data->client, 0x8F));
+		TPD_DEBUG("0x91 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x91));
 	}
 
 
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_AUTOCLB_ADDR, 0x01);
     if (ret < 0) {
-        TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+        TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
     }
 
     ret = fts_get_rawdata(ts_data, raw, true, FTS_MUTUAL_CAP_DATA_DELTA);
@@ -853,12 +853,12 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
 			seq_printf(s, "get diff data fail\n");
 		}
 		else {
-			TPD_INFO("get diff data fail\n");
+			TPD_DEBUG("get diff data fail\n");
 		}
         goto raw_fail;
     }
     
-	TPD_INFO("now is reading delta\n");
+	TPD_DEBUG("now is reading delta\n");
 	if(s == NULL) {
 		Pstr = kzalloc(lsize * (sizeof(int)), GFP_KERNEL);
 	}
@@ -881,14 +881,14 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
 			}
 		}
 		if(s == NULL) {
-			TPD_INFO("%s\n", Pstr);
+			TPD_DEBUG("%s\n", Pstr);
         }
     }
 	if (s) {
 		seq_printf(s, "\n");
 	}
 	else {
-		TPD_INFO("0x91 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x91));
+		TPD_DEBUG("0x91 = %d: \n", touch_i2c_read_byte(ts_data->client, 0x91));
 		kfree(Pstr);
 	}
 
@@ -907,7 +907,7 @@ static void fts_self_delta_read(struct seq_file *s, void *chip_data)
     int tx_num = ts_data->hw_res->TX_NUM;
     int rx_num = ts_data->hw_res->RX_NUM;
 
-    TPD_INFO("%s:start to read self-cap diff data", __func__);
+    TPD_DEBUG("%s:start to read self-cap diff data", __func__);
     focal_esd_check_enable(ts_data, false);   //no allowed esd check
 
     raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -918,7 +918,7 @@ static void fts_self_delta_read(struct seq_file *s, void *chip_data)
 
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_AUTOCLB_ADDR, 0x01);
     if (ret < 0) {
-        TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+        TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
     }
 
     ret = fts_get_rawdata(ts_data, raw, true, FTS_SELF_CAP_DATA_DELTA_WP);
@@ -937,7 +937,7 @@ static void fts_self_delta_read(struct seq_file *s, void *chip_data)
 
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_AUTOCLB_ADDR, 0x01);
     if (ret < 0) {
-        TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+        TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
     }
 
     ret = fts_get_rawdata(ts_data, raw, true, FTS_SELF_CAP_DATA_DELTA_WP);
@@ -969,7 +969,7 @@ static void fts_baseline_read(struct seq_file *s, void *chip_data)
     int tx_num = ts_data->hw_res->TX_NUM;
     int rx_num = ts_data->hw_res->RX_NUM;
 
-    TPD_INFO("%s:start to read raw data", __func__);
+    TPD_DEBUG("%s:start to read raw data", __func__);
     focal_esd_check_enable(ts_data, false);
 
     raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1083,10 +1083,10 @@ static int fts_enable_black_gesture(struct fts_ts_data *ts_data, bool enable)
             config4 = 0;
         }
     }
-    TPD_INFO("MODE_GESTURE, write 0xD0=%d", enable);
-    TPD_INFO("MODE_GESTURE, config1=%x", config1);
-    TPD_INFO("MODE_GESTURE, config2=%x", config2);
-    TPD_INFO("MODE_GESTURE, config4=%x", config4);
+    TPD_DEBUG("MODE_GESTURE, write 0xD0=%d", enable);
+    TPD_DEBUG("MODE_GESTURE, config1=%x", config1);
+    TPD_DEBUG("MODE_GESTURE, config2=%x", config2);
+    TPD_DEBUG("MODE_GESTURE, config4=%x", config4);
     if (enable) {
         for (i = 0; i < 5 ; i++) {
             ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GESTURE_CONFIG1, config1);
@@ -1102,7 +1102,7 @@ static int fts_enable_black_gesture(struct fts_ts_data *ts_data, bool enable)
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GESTURE_EN, enable);
     }
     if (i >= 5)
-        TPD_INFO("MODE_GESTURE, write 0x%x[%d] failed \n", FTS_REG_GESTURE_EN, enable);
+        TPD_DEBUG("MODE_GESTURE, write 0x%x[%d] failed \n", FTS_REG_GESTURE_EN, enable);
     return ret;
 }
 
@@ -1119,13 +1119,13 @@ static int fts_enable_edge_limit(struct fts_ts_data *ts_data, bool enable)
         else if (LANDSCAPE_SCREEN_270 == ts_data->touch_direction)
             edge_mode = 2;
     }
-    TPD_INFO("MODE_EDGE, write 0x8C=%d", edge_mode);
+    TPD_DEBUG("MODE_EDGE, write 0x8C=%d", edge_mode);
     return touch_i2c_write_byte(ts_data->client, FTS_REG_EDGE_LIMIT, edge_mode);
 }
 
 static int fts_enable_charge_mode(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_CHARGE, write 0x8B=%d", enable);
+    TPD_DEBUG("MODE_CHARGE, write 0x8B=%d", enable);
     return touch_i2c_write_byte(ts_data->client, FTS_REG_CHARGER_MODE_EN, enable);
 }
 
@@ -1134,20 +1134,20 @@ static int fts_enable_game_mode(struct fts_ts_data *ts_data, bool enable)
     int ret = 0;
 
     /*TODO, based on test result*/
-    TPD_INFO("MODE_GAME, write 0x86=%d", enable);
+    TPD_DEBUG("MODE_GAME, write 0x86=%d", enable);
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GAME_MODE_EN, !enable);
     if (ret < 0) {
-        TPD_INFO("%s: enable MODE_GAME failed.\n", __func__);
+        TPD_DEBUG("%s: enable MODE_GAME failed.\n", __func__);
     }
     if (enable) {
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_REPORT_RATE, FTS_180HZ_REPORT_RATE);
         if (ret < 0) {
-            TPD_INFO("%s: enable 180hz failed.\n", __func__);
+            TPD_DEBUG("%s: enable 180hz failed.\n", __func__);
         }
     } else {
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_REPORT_RATE, FTS_120HZ_REPORT_RATE);
         if (ret < 0) {
-            TPD_INFO("%s: enable 120hz failed.\n", __func__);
+            TPD_DEBUG("%s: enable 120hz failed.\n", __func__);
         }
     }
     return ret;
@@ -1155,7 +1155,7 @@ static int fts_enable_game_mode(struct fts_ts_data *ts_data, bool enable)
 
 static int fts_enable_headset_mode(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_HEADSET, write 0xC3=%d \n", enable);
+    TPD_DEBUG("MODE_HEADSET, write 0xC3=%d \n", enable);
     return touch_i2c_write_byte(ts_data->client, FTS_REG_HEADSET_MODE_EN, enable);
 }
 
@@ -1166,20 +1166,20 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
 
     switch (mode) {
     case MODE_NORMAL:
-        TPD_INFO("MODE_NORMAL");
+        TPD_DEBUG("MODE_NORMAL");
         break;
 
     case MODE_SLEEP:
-        TPD_INFO("MODE_SLEEP, write 0xA5=3");
+        TPD_DEBUG("MODE_SLEEP, write 0xA5=3");
         ret = touch_i2c_write_byte(ts_data->client, FTS_REG_POWER_MODE, 0x03);
         if (ret < 0) {
-            TPD_INFO("%s: enter into sleep failed.\n", __func__);
+            TPD_DEBUG("%s: enter into sleep failed.\n", __func__);
             goto mode_err;
         }
         break;
 
     case MODE_GESTURE:
-        TPD_INFO("MODE_GESTURE, ts->is_suspended = %d \n", ts_data->ts->is_suspended);
+        TPD_DEBUG("MODE_GESTURE, ts->is_suspended = %d \n", ts_data->ts->is_suspended);
         if (ts_data->ts->is_suspended) {                             // do not pull up reset when doing resume
             if (ts_data->last_mode == MODE_SLEEP) {
                 fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
@@ -1187,7 +1187,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
         }
         ret = fts_enable_black_gesture(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable gesture failed.\n", __func__);
+            TPD_DEBUG("%s: enable gesture failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1198,7 +1198,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_EDGE:
         ret = fts_enable_edge_limit(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable edg limit failed.\n", __func__);
+            TPD_DEBUG("%s: enable edg limit failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1209,7 +1209,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_CHARGE:
         ret = fts_enable_charge_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable charge mode failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1217,7 +1217,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_GAME:
         ret = fts_enable_game_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable game mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable game mode failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1225,13 +1225,13 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_HEADSET:
         ret = fts_enable_headset_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable headset mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable headset mode failed.\n", __func__);
             goto mode_err;
         }
         break;
 
     default:
-        TPD_INFO("%s: Wrong mode.\n", __func__);
+        TPD_DEBUG("%s: Wrong mode.\n", __func__);
         goto mode_err;
     }
 
@@ -1282,7 +1282,7 @@ static int fts_reset(void *chip_data)
 {
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s:call\n", __func__);
+    TPD_DEBUG("%s:call\n", __func__);
     fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
 
     return 0;
@@ -1310,11 +1310,11 @@ static int fts_get_vendor(void *chip_data, struct panel_info *panel_data)
         //panel_data->fw_name[len-3] = 'b';
         //panel_data->fw_name[len-2] = 'i';
         //panel_data->fw_name[len-1] = 'n';
-        TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
+        TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
     }
     //strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     //strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
+    TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -1327,14 +1327,14 @@ static int fts_get_chip_info(void *chip_data)
 
     id[0] = touch_i2c_read_byte(ts_data->client, FTS_REG_CHIP_ID);
     id[1] = touch_i2c_read_byte(ts_data->client, FTS_REG_CHIP_ID2);
-    TPD_INFO("read chip id:0x%02x%02x", id[0], id[1]);
+    TPD_DEBUG("read chip id:0x%02x%02x", id[0], id[1]);
     if ((id[0] == FTS_VAL_CHIP_ID) && (id[1] == FTS_VAL_CHIP_ID2)) {
         return 0;
     }
 
-    TPD_INFO("fw is invalid, need read boot id");
+    TPD_DEBUG("fw is invalid, need read boot id");
     touch_i2c_read_block(ts_data->client, cmd, 2, id);
-    TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+    TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
     if ((id[0] == FTS_VAL_BL_ID) && (id[1] == FTS_VAL_BL_ID2)) {
         return 0;
     }
@@ -1350,7 +1350,7 @@ static int fts_ftm_process(void *chip_data)
 
     ret = fts_mode_switch(chip_data, MODE_SLEEP, true);
     if (ret < 0) {
-        TPD_INFO("%s:switch mode to MODE_SLEEP fail", __func__);
+        TPD_DEBUG("%s:switch mode to MODE_SLEEP fail", __func__);
         return ret;
     }
 
@@ -1368,14 +1368,14 @@ static fw_check_state fts_fw_check(void *chip_data, struct resolution_info *reso
     id[1] = touch_i2c_read_byte(ts_data->client, FTS_REG_CHIP_ID2);
     if ((id[0] != FTS_VAL_CHIP_ID) || (id[1] != FTS_VAL_CHIP_ID2)) {
         touch_i2c_read_block(ts_data->client, cmd, 2, id);
-        TPD_INFO("boot id:0x%02x%02x, fw abnormal", id[0], id[1]);
+        TPD_DEBUG("boot id:0x%02x%02x, fw abnormal", id[0], id[1]);
         return FW_ABNORMAL;
     }
 
     /*fw check normal need update TP_FW  && device info*/
     panel_data->TP_FW = touch_i2c_read_byte(ts_data->client, FTS_REG_FW_VER);
     ts_data->fwver = panel_data->TP_FW;
-    TPD_INFO("FW VER:%d", panel_data->TP_FW);
+    TPD_DEBUG("FW VER:%d", panel_data->TP_FW);
     if (panel_data->manufacture_info.version) {
         sprintf(dev_version, "%04x", panel_data->TP_FW);
         strlcpy(&(panel_data->manufacture_info.version[7]), dev_version, 5);
@@ -1392,24 +1392,24 @@ static fw_update_state fts_fw_update(void *chip_data, const struct firmware *fw,
     u32 len = 0;
 
     if (!fw) {
-        TPD_INFO("fw is null");
+        TPD_DEBUG("fw is null");
         return FW_UPDATE_ERROR;
     }
 
     buf = (u8 *)fw->data;
     len = (int)fw->size;
     if ((len < 0x120) || (len > (116 * 1024))) {
-        TPD_INFO("fw_len(%d) is invalid", len);
+        TPD_DEBUG("fw_len(%d) is invalid", len);
         return FW_UPDATE_ERROR;
     }
 
     if (force || (buf[OFFSET_FW_DATA_FW_VER] != ts_data->fwver)) {
-        TPD_INFO("Need update, force(%d)/fwver:Host(0x%02x),TP(0x%02x)", force, buf[OFFSET_FW_DATA_FW_VER], ts_data->fwver);
+        TPD_DEBUG("Need update, force(%d)/fwver:Host(0x%02x),TP(0x%02x)", force, buf[OFFSET_FW_DATA_FW_VER], ts_data->fwver);
         focal_esd_check_enable(ts_data, false);
         ret = fts_upgrade(ts_data, buf, len);
         focal_esd_check_enable(ts_data, true);
         if (ret < 0) {
-            TPD_INFO("fw update fail");
+            TPD_DEBUG("fw update fail");
             return FW_UPDATE_ERROR;
         }
 
@@ -1427,7 +1427,7 @@ static void fts_read_fod_info(struct fts_ts_data *ts_data)
 
     ret = touch_i2c_read_block(ts_data->client, cmd, FTS_REG_FOD_INFO_LEN, val);
     if (ret < 0) {
-        TPD_INFO("%s:read FOD info fail", __func__);
+        TPD_DEBUG("%s:read FOD info fail", __func__);
         return ;
     }
 
@@ -1465,7 +1465,7 @@ static u32 fts_u32_trigger_reason(void *chip_data, int gesture_enable, int is_su
     }
     ret = touch_i2c_read_block(ts_data->client, cmd, FTS_POINTS_ONE, &buf[0]);
     if (ret < 0) {
-        TPD_INFO("read touch point one fail");
+        TPD_DEBUG("read touch point one fail");
         return IRQ_IGNORE;
     }
 
@@ -1477,7 +1477,7 @@ static u32 fts_u32_trigger_reason(void *chip_data, int gesture_enable, int is_su
     }
 
     if ((buf[0] == 0xFF) && (buf[1] == 0xFF) && (buf[2] == 0xFF) && (!is_suspended)) {
-        TPD_INFO("Need recovery TP state");
+        TPD_DEBUG("Need recovery TP state");
         ret = touch_i2c_read_byte(ts_data->client, FTS_REG_POINTS_LB);
         return IRQ_FW_AUTO_RESET;
     }
@@ -1561,7 +1561,7 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
     else
         ret = touch_i2c_read_block(ts_data->client, cmd, FTS_POINTS_TWO, &buf[FTS_POINTS_ONE]);
     if (ret < 0) {
-        TPD_INFO("read touch point two fail");
+        TPD_DEBUG("read touch point two fail");
         return ret;
     }
 
@@ -1569,7 +1569,7 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
 
     point_num = buf[1] & 0xFF;
     if (point_num > max_num) {
-        TPD_INFO("invalid point_num(%d),max_num(%d)", point_num, max_num);
+        TPD_DEBUG("invalid point_num(%d),max_num(%d)", point_num, max_num);
         return -EIO;
     }
 
@@ -1579,7 +1579,7 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
         if (pointid >= FTS_MAX_ID)
             break;
         else if (pointid >= max_num) {
-            TPD_INFO("ID(%d) beyond max_num(%d)", pointid, max_num);
+            TPD_DEBUG("ID(%d) beyond max_num(%d)", pointid, max_num);
             return -EINVAL;
         }
 
@@ -1620,14 +1620,14 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
             points[pointid].status = 1;
             obj_attention |= (1 << pointid);
             if (point_num == 0) {
-                TPD_INFO("abnormal touch data from fw");
+                TPD_DEBUG("abnormal touch data from fw");
                 return -EIO;
             }
         }
     }
 
     if (touch_point == 0) {
-        TPD_INFO("no touch point information");
+        TPD_DEBUG("no touch point information");
         return -EIO;
     }
 
@@ -1640,11 +1640,11 @@ static void fts_health_report(void *chip_data, struct monitor_data *mon_data)
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
     ret = touch_i2c_read_byte(ts_data->client, 0x01);
-    TPD_INFO("Health register(0x01):0x%x", ret);
+    TPD_DEBUG("Health register(0x01):0x%x", ret);
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_HEALTH_1);
-    TPD_INFO("Health register(0xFD):0x%x", ret);
+    TPD_DEBUG("Health register(0xFD):0x%x", ret);
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_HEALTH_2);
-    TPD_INFO("Health register(0xFE):0x%x", ret);
+    TPD_DEBUG("Health register(0xFE):0x%x", ret);
 }
 
 static void fts_health_report_v2(void *chip_data, struct monitor_data_v2 *mon_data_v2)
@@ -1654,7 +1654,7 @@ static void fts_health_report_v2(void *chip_data, struct monitor_data_v2 *mon_da
     char *freq_str = NULL;
 
     ret = touch_i2c_read_byte(ts_data->client, 0x01);
-    TPD_INFO("Health register(0x01):0x%x", ret);
+    TPD_DEBUG("Health register(0x01):0x%x", ret);
     if (ret & 0x01) {
         TPD_DETAIL("Health register(0x01):Water Shield");
         tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, HEALTH_REPORT_SHIELD_WATER);
@@ -1672,18 +1672,18 @@ static void fts_health_report_v2(void *chip_data, struct monitor_data_v2 *mon_da
         tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, HEALTH_REPORT_BASELINE_ERR);
     }
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_HEALTH_1);
-    TPD_INFO("Health register(0xFD):0x%x(water-flag:%d / noise-flag:%d / no-suitable-freq:%d)",
+    TPD_DEBUG("Health register(0xFD):0x%x(water-flag:%d / noise-flag:%d / no-suitable-freq:%d)",
             ret, (ret & 0x01), (ret & 0x02), ((ret & 0x10) >> 4));
     if (ret & 0x10 && !mon_data_v2->no_suitable_freq) {
         mon_data_v2->no_suitable_freq = true;
         tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, HEALTH_REPORT_NO_SUITABLE_FREQ);
     }
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_HEALTH_2);
-    TPD_INFO("Health register(0xFE):0x%x(work-freq:%d)", ret, ret);
+    TPD_DEBUG("Health register(0xFE):0x%x(work-freq:%d)", ret, ret);
     if (mon_data_v2->work_freq && mon_data_v2->work_freq != ret) {
         freq_str = kzalloc(10, GFP_KERNEL);
         if (!freq_str) {
-            TPD_INFO("freq_str kzalloc failed.\n");
+            TPD_DEBUG("freq_str kzalloc failed.\n");
         } else {
             snprintf(freq_str, 10, "freq_%d", ret);
             tp_healthinfo_report(mon_data_v2, HEALTH_REPORT, freq_str);
@@ -1704,15 +1704,15 @@ static int fts_get_gesture_info(void *chip_data, struct gesture_info *gesture)
 
     ret = touch_i2c_read_block(ts_data->client, cmd, FTS_GESTURE_DATA_LEN - 2, &buf[2]);
     if (ret < 0) {
-        TPD_INFO("read gesture data fail");
+        TPD_DEBUG("read gesture data fail");
         return ret;
     }
 
     gesture_id = buf[2];
     point_num = buf[3];
-    TPD_INFO("gesture_id=%d, point_num=%d", gesture_id, point_num);
+    TPD_DEBUG("gesture_id=%d, point_num=%d", gesture_id, point_num);
 	if (gesture == NULL) {
-		TPD_INFO("gesture == NULL, return\n\
+		TPD_DEBUG("gesture == NULL, return\n\
  			gesture->Point_start.x = %d\n;\
 			gesture->Point_start.y = %d\n;\
 			gesture->Point_end.x = %d\n;\
@@ -1786,7 +1786,7 @@ static int fts_get_gesture_info(void *chip_data, struct gesture_info *gesture)
         break;
     case GESTURE_FINGER_PRINT:
         fts_read_fod_info(ts_data);
-        TPD_INFO("FOD event type:0x%x", ts_data->fod_info.event_type);
+        TPD_DEBUG("FOD event type:0x%x", ts_data->fod_info.event_type);
         TPD_DEBUG("%s, fgerprint, touched = %d, fp_down = %d, fp_down_report = %d, \n", __func__, ts_data->ts->view_area_touched, ts_data->fod_info.fp_down, ts_data->fod_info.fp_down_report);
         if (ts_data->fod_info.event_type == FTS_EVENT_FOD) {
             if (ts_data->fod_info.fp_down && !ts_data->fod_info.fp_down_report) {
@@ -1836,10 +1836,10 @@ static void fts_enable_fingerprint_underscreen(void *chip_data, uint32_t enable)
     u8 val = 0;
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s:enable=%d", __func__, enable);
+    TPD_DEBUG("%s:enable=%d", __func__, enable);
     ret = touch_i2c_read_byte(ts_data->client, FTS_REG_FOD_EN);
     if (ret < 0) {
-        TPD_INFO("%s: read FOD enable(%x) fail", __func__, FTS_REG_FOD_EN);
+        TPD_DEBUG("%s: read FOD enable(%x) fail", __func__, FTS_REG_FOD_EN);
         return;
     }
 
@@ -1859,10 +1859,10 @@ static void fts_enable_fingerprint_underscreen(void *chip_data, uint32_t enable)
         ts_data->fod_info.event_type = 0;
         //        ts_data->fod_info.fp_down_report = 0;
     }
-    TPD_INFO("%s:write %x=%x.", __func__, FTS_REG_FOD_EN, val);
+    TPD_DEBUG("%s:write %x=%x.", __func__, FTS_REG_FOD_EN, val);
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_FOD_EN, val);
     if (ret < 0) {
-        TPD_INFO("%s: write FOD enable(%x=%x) fail", __func__, FTS_REG_FOD_EN, val);
+        TPD_DEBUG("%s: write FOD enable(%x=%x) fail", __func__, FTS_REG_FOD_EN, val);
     }
 }
 
@@ -1883,19 +1883,19 @@ static void fts_enable_gesture_mask(void *chip_data, uint32_t enable)
     }
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GESTURE_CONFIG1, config1);
     if (ret < 0) {
-        TPD_INFO("%s: write FTS_REG_GESTURE_CONFIG1 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG1, config1);
+        TPD_DEBUG("%s: write FTS_REG_GESTURE_CONFIG1 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG1, config1);
     }
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GESTURE_CONFIG2, config2);
     if (ret < 0) {
-        TPD_INFO("%s: write FTS_REG_GESTURE_CONFIG2 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG2, config2);
+        TPD_DEBUG("%s: write FTS_REG_GESTURE_CONFIG2 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG2, config2);
     }
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GESTURE_CONFIG4, config4);
     if (ret < 0) {
-        TPD_INFO("%s: write FTS_REG_GESTURE_CONFIG4 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG4, config4);
+        TPD_DEBUG("%s: write FTS_REG_GESTURE_CONFIG4 enable(%x=%x) fail", __func__, FTS_REG_GESTURE_CONFIG4, config4);
     }
 
     msleep(1);
-    TPD_INFO("%s, enable[%d] register[FTS_REG_GESTURE_CONFIG1. FTS_REG_GESTURE_CONFIG2. FTS_REG_GESTURE_CONFIG4]", __func__, enable);
+    TPD_DEBUG("%s, enable[%d] register[FTS_REG_GESTURE_CONFIG1. FTS_REG_GESTURE_CONFIG2. FTS_REG_GESTURE_CONFIG4]", __func__, enable);
 }
 
 static void fts_screenon_fingerprint_info(void *chip_data, struct fp_underscreen_info *fp_tpinfo)
@@ -1903,7 +1903,7 @@ static void fts_screenon_fingerprint_info(void *chip_data, struct fp_underscreen
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
     memset(fp_tpinfo, 0, sizeof(struct fp_underscreen_info));
-    TPD_INFO("FOD event type:0x%x", ts_data->fod_info.event_type);
+    TPD_DEBUG("FOD event type:0x%x", ts_data->fod_info.event_type);
     if (ts_data->fod_info.fp_down)
         fp_tpinfo->touch_state = FINGERPRINT_DOWN_DETECT;
     else
@@ -1913,7 +1913,7 @@ static void fts_screenon_fingerprint_info(void *chip_data, struct fp_underscreen
     fp_tpinfo->x = ts_data->fod_info.fp_x;
     fp_tpinfo->y = ts_data->fod_info.fp_y;
 
-    TPD_INFO("FOD Info:touch_state:%d,area_rate:%d,x:%d,y:%d[fp_down:%d]",
+    TPD_DEBUG("FOD Info:touch_state:%d,area_rate:%d,x:%d,y:%d[fp_down:%d]",
              fp_tpinfo->touch_state, fp_tpinfo->area_rate, fp_tpinfo->x,
              fp_tpinfo->y, ts_data->fod_info.fp_down);
 }
@@ -1942,7 +1942,7 @@ static int fts_refresh_switch(void *chip_data, int fps)
 {
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("lcd fps =%d", fps);
+    TPD_DEBUG("lcd fps =%d", fps);
 
     return touch_i2c_write_byte(ts_data->client, FTS_REG_REPORT_RATE,
                                 fps == 60 ? FTS_120HZ_REPORT_RATE : FTS_180HZ_REPORT_RATE);
@@ -1959,7 +1959,7 @@ static int fts_smooth_lv_set(void *chip_data, int level)
 {
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("set smooth lv to %d", level);
+    TPD_DEBUG("set smooth lv to %d", level);
 
     return touch_i2c_write_byte(ts_data->client, FTS_REG_SMOOTH_LEVEL, level);
 }
@@ -1968,7 +1968,7 @@ static int fts_sensitive_lv_set(void *chip_data, int level)
 {
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("set sensitive lv to %d", level);
+    TPD_DEBUG("set sensitive lv to %d", level);
 
     return touch_i2c_write_byte(ts_data->client, FTS_REG_SENSITIVE_LEVEL, level);
 }
@@ -1979,7 +1979,7 @@ static int fts_set_high_frame_rate(void *chip_data, int level, int time)
 	struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 	struct touchpanel_data *ts = i2c_get_clientdata(ts_data->client);
 
-	TPD_INFO("set high_frame_rate to %d, keep %ds", level, time);
+	TPD_DEBUG("set high_frame_rate to %d, keep %ds", level, time);
 	if (level != 0) {
 		level = 4;
 	}
@@ -2049,14 +2049,14 @@ static void ft3518_start_aging_test(void *chip_data)
     int ret = -1;
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s: start aging test \n", __func__);
+    TPD_DEBUG("%s: start aging test \n", __func__);
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GAME_MODE_EN, 2);
     if (ret < 0) {
-        TPD_INFO("%s: enable(%x=%x) fail", __func__, FTS_REG_GAME_MODE_EN, 2);
+        TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FTS_REG_GAME_MODE_EN, 2);
     }
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_POWER_MODE, 0);
     if (ret < 0) {
-        TPD_INFO("%s: enable(%x=%x) fail", __func__, FTS_REG_POWER_MODE, 0);
+        TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FTS_REG_POWER_MODE, 0);
     }
 }
 
@@ -2065,10 +2065,10 @@ static void ft3518_finish_aging_test(void *chip_data)
     int ret = -1;
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s: finish aging test \n", __func__);
+    TPD_DEBUG("%s: finish aging test \n", __func__);
     ret = touch_i2c_write_byte(ts_data->client, FTS_REG_GAME_MODE_EN, 1);
     if (ret < 0) {
-        TPD_INFO("%s: enable(%x=%x) fail", __func__, FTS_REG_GAME_MODE_EN, 1);
+        TPD_DEBUG("%s: enable(%x=%x) fail", __func__, FTS_REG_GAME_MODE_EN, 1);
     }
 }
 
@@ -2088,27 +2088,27 @@ static int ft3518_parse_dts(struct fts_ts_data *ts_data, struct i2c_client *clie
 
 	ts_data->high_resolution_support = of_property_read_bool(np, "high_resolution_support");
 	ts_data->high_resolution_support_x8 = of_property_read_bool(np, "high_resolution_support_x8");
-	TPD_INFO("%s:high_resolution_support is:%d %d\n", __func__, ts_data->high_resolution_support, ts_data->high_resolution_support_x8);
+	TPD_DEBUG("%s:high_resolution_support is:%d %d\n", __func__, ts_data->high_resolution_support, ts_data->high_resolution_support_x8);
 	ts_data->need_pinctrl_pull_up_reset = of_property_read_bool(np, "need_pinctrl_pull_up_reset");
-	TPD_INFO("%s:need_pinctrl_pull_up_reset is: %d\n", __func__, ts_data->need_pinctrl_pull_up_reset);
+	TPD_DEBUG("%s:need_pinctrl_pull_up_reset is: %d\n", __func__, ts_data->need_pinctrl_pull_up_reset);
 
 	if (ts_data->need_pinctrl_pull_up_reset) {
 		ts_data->hw_res->pinctrl = devm_pinctrl_get(dev);
 		if (IS_ERR_OR_NULL(ts_data->hw_res->pinctrl)) {
-			TPD_INFO("Getting pinctrl handle failed");
+			TPD_DEBUG("Getting pinctrl handle failed");
 			ret = PTR_ERR(ts_data->hw_res->pinctrl);
 			goto err_pinctrl_get;
 		} else {
 			ts_data->hw_res->pin_set_reset_high = pinctrl_lookup_state(ts_data->hw_res->pinctrl, "pin_set_reset_high");
 			if (IS_ERR_OR_NULL(ts_data->hw_res->pin_set_reset_high)) {
-				TPD_INFO("Failed to get reset high state pinctrl handle\n");
+				TPD_DEBUG("Failed to get reset high state pinctrl handle\n");
 				ret = PTR_ERR(ts_data->hw_res->pin_set_reset_high);
 				goto err_pinctrl_lookup;
 			}
 
 			ts_data->hw_res->pin_set_reset_low = pinctrl_lookup_state(ts_data->hw_res->pinctrl, "pin_set_reset_low");
 			if (IS_ERR_OR_NULL(ts_data->hw_res->pin_set_reset_low)) {
-				TPD_INFO(" Failed to get reset low state pinctrl handle\n");
+				TPD_DEBUG(" Failed to get reset low state pinctrl handle\n");
 				ret = PTR_ERR(ts_data->hw_res->pin_set_reset_low);
 				goto err_pinctrl_lookup;
 			}
@@ -2135,10 +2135,10 @@ static int fts_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     u64 time_counter = 0;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     if (tp_register_times > 0) {
-        TPD_INFO("TP driver have success loaded %d times, exit\n", tp_register_times);
+        TPD_DEBUG("TP driver have success loaded %d times, exit\n", tp_register_times);
         return -1;
     }
     reset_healthinfo_time_counter(&time_counter);
@@ -2146,7 +2146,7 @@ static int fts_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     /*step1:Alloc chip_info*/
     ts_data = kzalloc(sizeof(struct fts_ts_data), GFP_KERNEL);
     if (ts_data == NULL) {
-        TPD_INFO("ts_data kzalloc error\n");
+        TPD_DEBUG("ts_data kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -2156,7 +2156,7 @@ static int fts_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     /*step2:Alloc common ts*/
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -2201,7 +2201,7 @@ static int fts_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
         tp_healthinfo_report(&ts->monitor_data_v2, HEALTH_PROBE, &time_counter);
     }
     ts_data->probe_done = 1;
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
 
     return 0;
 
@@ -2214,7 +2214,7 @@ ts_malloc_failed:
     ts_data = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
 
     return ret;
 }
@@ -2223,7 +2223,7 @@ static int fts_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -2233,7 +2233,7 @@ static int fts_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -2243,7 +2243,7 @@ static int fts_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2279,13 +2279,13 @@ static struct i2c_driver tp_i2c_driver = {
 
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&tp_i2c_driver) != 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

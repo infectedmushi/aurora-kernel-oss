@@ -78,7 +78,7 @@ static int sec_enable_black_gesture(struct chip_data_s6d7at0 *chip_info, bool en
     int ret = -1;
     //int i = 0;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
 
     ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
 
@@ -87,11 +87,11 @@ static int sec_enable_black_gesture(struct chip_data_s6d7at0 *chip_info, bool en
         ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_SET_POWER_MODE, 0x01);
         ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_AFE_SENSING, 0x0D);
         sec_mdelay(50);
-        TPD_INFO("%s, last_state = %d,ret = %d\n", __func__, last_state, ret);
+        TPD_DEBUG("%s, last_state = %d,ret = %d\n", __func__, last_state, ret);
     } else {
         ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_WAKEUP_GESTURE_MODE, 0x01);
         ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_AFE_SENSING, 0x0C);
-        TPD_INFO("%s, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s, ret = %d\n", __func__, ret);
         return 0;
     }
 
@@ -120,11 +120,11 @@ static int sec_enable_edge_limit(struct chip_data_s6d7at0 *chip_info, bool enabl
         }
     }
     else {
-        TPD_INFO("%s: invalid fw version: %02X %02X %02X %02X\n", __func__, data[0], data[1], data[2], data[3]);
+        TPD_DEBUG("%s: invalid fw version: %02X %02X %02X %02X\n", __func__, data[0], data[1], data[2], data[3]);
     }
 
     //ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_EDGE_DEADZONE, 0x00);
-    TPD_INFO("%s: state: %d %d %s!\n", __func__, enable, chip_info->touch_direction, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %d %s!\n", __func__, enable, chip_info->touch_direction, ret < 0 ? "failed" : "success");
     return ret;
 }
 
@@ -154,7 +154,7 @@ static int sec_enable_charge_mode(struct chip_data_s6d7at0 *chip_info, bool enab
 
     }
 
-    TPD_INFO("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
     return ret;
 }
 
@@ -170,7 +170,7 @@ static int sec_enable_earsense_mode(struct chip_data_s6d7at0 *chip_info, bool en
         ret |= touch_i2c_write_byte(chip_info->client, SEC_CMD_MUTU_RAW_TYPE, TYPE_SIGNAL_DATA);
     }
 
-    TPD_INFO("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
     return ret;
 }
 
@@ -198,7 +198,7 @@ static int sec_enable_palm_reject(struct chip_data_s6d7at0 *chip_info, bool enab
         sec_mdelay(20);
     }
 
-    TPD_INFO("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
     return ret;
 }
 
@@ -207,7 +207,7 @@ static int sec_enable_game_mode(struct chip_data_s6d7at0 *chip_info, bool enable
     int ret = -1;
 
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_STOP_FILTER, enable ? 0x01 : 0x00);
-    TPD_INFO("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
     return ret;
 }
 
@@ -237,7 +237,7 @@ static int sec_enable_headset_mode(struct chip_data_s6d7at0 *chip_info, bool ena
         sec_mdelay(20);
     }
 
-    TPD_INFO("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
+    TPD_DEBUG("%s: state: %d %s!\n", __func__, enable, ret < 0 ? "failed" : "success");
     return ret;
 
 }
@@ -267,13 +267,13 @@ int sec_wait_for_ready(struct chip_data_s6d7at0 *chip_info, unsigned int ack)
         }
 
         if (retry++ > retry_cnt) {
-            TPD_INFO("%s: Time Over, event_buf: %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X \n", \
+            TPD_DEBUG("%s: Time Over, event_buf: %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X \n", \
                         __func__, tBuff[0], tBuff[1], tBuff[2], tBuff[3], tBuff[4], tBuff[5], tBuff[6], tBuff[7]);
             break;
         }
         sec_mdelay(20);
     }
-    TPD_INFO("%s: %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X \n", \
+    TPD_DEBUG("%s: %02X, %02X, %02X, %02X, %02X, %02X, %02X, %02X \n", \
                 __func__, tBuff[0], tBuff[1], tBuff[2], tBuff[3], tBuff[4], tBuff[5], tBuff[6], tBuff[7]);
 
     return rc;
@@ -300,7 +300,7 @@ static int sec_ts_flash_set_datanum(struct chip_data_s6d7at0 *chip_info, u16 num
 
     ret = touch_i2c_write_block(chip_info->client, SEC_CMD_FLASH_READ_SIZE, sizeof(tData), tData);
     if (ret < 0)
-        TPD_INFO("%s: Set datanum Fail %d\n", __func__, num);
+        TPD_DEBUG("%s: Set datanum Fail %d\n", __func__, num);
 
     return ret;
 }
@@ -314,7 +314,7 @@ static int sec_ts_flash_cs_control(struct chip_data_s6d7at0 *chip_info, bool cs_
 
     ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CS_CONTROL, 1, &tData);
     if (ret < 0)
-        TPD_INFO("%s: %s control Fail!\n", __func__, cs_level ? "CS High" : "CS Low");
+        TPD_DEBUG("%s: %s control Fail!\n", __func__, cs_level ? "CS High" : "CS Low");
 
     return ret;
 }
@@ -329,7 +329,7 @@ static int  sec_ts_wren(struct chip_data_s6d7at0 *chip_info)
     tData[0] = FLASH_CMD_WREN;
     ret =  touch_i2c_write_block(chip_info->client, SEC_CMD_FLASH_SEND_DATA, 1, tData);
     if (ret < 0)
-        TPD_INFO( "%s: Send WREN fail!\n", __func__);
+        TPD_DEBUG( "%s: Send WREN fail!\n", __func__);
 
     sec_ts_flash_cs_control(chip_info, CS_HIGH);
 
@@ -352,7 +352,7 @@ static u8 sec_ts_rdsr(struct chip_data_s6d7at0 *chip_info)
 
     sec_ts_flash_cs_control(chip_info, CS_HIGH);
 
-    //TPD_INFO("%s: %d\n",__func__, tData[0]);
+    //TPD_DEBUG("%s: %d\n",__func__, tData[0]);
     return tData[0];
 }
 
@@ -376,7 +376,7 @@ static int sec_ts_wait_for_flash_busy(struct chip_data_s6d7at0 *chip_info)
         sec_mdelay(10);
 
         if (retry_cnt++ > SEC_TS_WAIT_RETRY_CNT) {
-            TPD_INFO("%s: Retry Cnt over!\n", __func__);
+            TPD_DEBUG("%s: Retry Cnt over!\n", __func__);
             ret = -1;
         }
     }
@@ -391,7 +391,7 @@ static int sec_ts_cmd_flash_se(struct chip_data_s6d7at0 *chip_info, u32 flash_ad
 
     if( IsFlashBusy(chip_info) )
     {
-        TPD_INFO("%s: flash busy, flash_addr = %X\n", __func__, flash_addr);
+        TPD_DEBUG("%s: flash busy, flash_addr = %X\n", __func__, flash_addr);
         return false;
     }
 
@@ -411,13 +411,13 @@ static int sec_ts_cmd_flash_se(struct chip_data_s6d7at0 *chip_info, u32 flash_ad
     sec_ts_flash_cs_control(chip_info, CS_HIGH);
     if( ret < 0)
     {
-        TPD_INFO("%s: Send sector erase cmd fail!\n", __func__);
+        TPD_DEBUG("%s: Send sector erase cmd fail!\n", __func__);
         return ret;
     }
 
     ret = sec_ts_wait_for_flash_busy(chip_info);
     if( ret < 0 )
-        TPD_INFO("%s: Time out! - flash busy wait\n", __func__);
+        TPD_DEBUG("%s: Time out! - flash busy wait\n", __func__);
 
     return ret;
 }
@@ -431,7 +431,7 @@ static int sec_flash_sector_erase(struct chip_data_s6d7at0 *chip_info, u32 secto
 
     ret = sec_ts_cmd_flash_se(chip_info, addr);
     if (ret < 0)
-        TPD_INFO("%s : ret = %d, sector_idx = %d\n", __func__, ret, sector_idx);
+        TPD_DEBUG("%s : ret = %d, sector_idx = %d\n", __func__, ret, sector_idx);
     sec_mdelay(10);
 
     return ret;
@@ -466,7 +466,7 @@ static int sec_flash_page_write(struct chip_data_s6d7at0 *chip_info, u32 page_id
             tCmd[j+1] = copy_data[copy_size + j];
         ret = touch_i2c_write(chip_info->client, tCmd, 1+copy_cur);
         if (ret < 0) {
-            TPD_INFO("flash page write,iic write burst fail");
+            TPD_DEBUG("flash page write,iic write burst fail");
             break;
         }
         copy_size += copy_cur;
@@ -488,7 +488,7 @@ static int sec_block_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, int
     u8 *data;
 
     if (mem_size >= 64 * 1024) {
-        TPD_INFO("%s: mem size over 64K\n", __func__);
+        TPD_DEBUG("%s: mem size over 64K\n", __func__);
         return -EIO;
     }
 
@@ -502,7 +502,7 @@ static int sec_block_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, int
 
     ret = touch_i2c_write(chip_info->client, cmd, 5);
     if (ret < 0) {
-        TPD_INFO("%s: send command failed, %02X\n", __func__, cmd[0]);
+        TPD_DEBUG("%s: send command failed, %02X\n", __func__, cmd[0]);
         return -EIO;
     }
 
@@ -514,7 +514,7 @@ static int sec_block_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, int
 
     ret = touch_i2c_write(chip_info->client, cmd, 3);
     if (ret < 0) {
-        TPD_INFO("%s: send command failed, %02X\n", __func__, cmd[0]);
+        TPD_DEBUG("%s: send command failed, %02X\n", __func__, cmd[0]);
         return -EIO;
     }
 */
@@ -525,7 +525,7 @@ static int sec_block_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, int
 
     ret = touch_i2c_read(chip_info->client, cmd, 1, data, mem_size);
     if (ret < 0) {
-        TPD_INFO("%s: memory read failed\n", __func__);
+        TPD_DEBUG("%s: memory read failed\n", __func__);
         return -EIO;
     }
     //sec_mdelay(5);
@@ -547,7 +547,7 @@ static int sec_memory_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, u8
 
     tmp_data = kmalloc(max_size, GFP_KERNEL);
     if (!tmp_data) {
-        TPD_INFO("%s: failed to kmalloc\n", __func__);
+        TPD_DEBUG("%s: failed to kmalloc\n", __func__);
         return -ENOMEM;
     }
 
@@ -559,7 +559,7 @@ static int sec_memory_read(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, u8
             if (read_size == 0 && tmp_data[0] == 0)
                 ret = -1;
             if (retry-- == 0) {
-                TPD_INFO("%s: fw read fail mem_addr=%08X, unit_size=%d\n", __func__, mem_addr, unit_size);
+                TPD_DEBUG("%s: fw read fail mem_addr=%08X, unit_size=%d\n", __func__, mem_addr, unit_size);
                 kfree(tmp_data);
                 return -1;
             }
@@ -593,19 +593,19 @@ static int sec_flash_write(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, u8
     page_idx_end = (mem_addr + mem_size - 1) / flash_page_size;
     page_num = page_idx_end - page_idx_start + 1;
 
-    TPD_INFO("%s: page_idx_start=%X, page_idx_end=%X\n", __func__, page_idx_start, page_idx_end);
+    TPD_DEBUG("%s: page_idx_start=%X, page_idx_end=%X\n", __func__, page_idx_start, page_idx_end);
 
   sec_ts_flash_set_datanum(chip_info, 0xffff);
 
     for (page_idx = (int)((page_num - 1)/16); page_idx >= 0; page_idx--) {
         ret = sec_flash_sector_erase(chip_info, (u32)(page_idx_start + page_idx * 16));
         if (ret < 0) {
-            TPD_INFO("%s: Sector erase failed, sector_idx = %d\n", __func__, page_idx_start + page_idx * 16);
+            TPD_DEBUG("%s: Sector erase failed, sector_idx = %d\n", __func__, page_idx_start + page_idx * 16);
             return -EIO;
         }
     }
 
-    TPD_INFO("%s flash sector erase done\n", __func__);
+    TPD_DEBUG("%s flash sector erase done\n", __func__);
     sec_mdelay(page_num + 10);
 
     size_left = (int)mem_size;
@@ -622,7 +622,7 @@ static int sec_flash_write(struct chip_data_s6d7at0 *chip_info, u32 mem_addr, u8
             sec_mdelay(50);
             ret = sec_flash_page_write(chip_info, (page_idx + page_idx_start), page_buf);
             if (ret < 0) {
-                TPD_INFO("%s: fw write failed, page_idx = %u\n", __func__, page_idx);
+                TPD_DEBUG("%s: fw write failed, page_idx = %u\n", __func__, page_idx);
                 goto err;
             }
         }
@@ -649,16 +649,16 @@ static int sec_chunk_update(struct chip_data_s6d7at0 *chip_info, u32 addr, u32 s
 
     write_size = sec_flash_write(chip_info, addr, data, fw_size);
     if (write_size != fw_size) {
-        TPD_INFO("%s: fw write failed\n", __func__);
+        TPD_DEBUG("%s: fw write failed\n", __func__);
         ret = -1;
         goto err_write_fail;
     }
 
-    TPD_INFO("%s: flash write success\n", __func__);
+    TPD_DEBUG("%s: flash write success\n", __func__);
 
     mem_rb = vzalloc(fw_size);
     if (!mem_rb) {
-        TPD_INFO("%s: vzalloc failed\n", __func__);
+        TPD_DEBUG("%s: vzalloc failed\n", __func__);
         ret = -1;
         goto err_write_fail;
     }
@@ -670,7 +670,7 @@ static int sec_chunk_update(struct chip_data_s6d7at0 *chip_info, u32 addr, u32 s
         }
 
         if (fw_size != ii) {
-            TPD_INFO("%s: fw verify fail at data[%d](%d, %d)\n", __func__, ii, data[ii], mem_rb[ii]);
+            TPD_DEBUG("%s: fw verify fail at data[%d](%d, %d)\n", __func__, ii, data[ii], mem_rb[ii]);
             ret = -1;
             goto out;
         }
@@ -679,7 +679,7 @@ static int sec_chunk_update(struct chip_data_s6d7at0 *chip_info, u32 addr, u32 s
         goto out;
     }
 #endif
-    TPD_INFO("%s: verify done(%d)\n", __func__, ret);
+    TPD_DEBUG("%s: verify done(%d)\n", __func__, ret);
 
 out:
     vfree(mem_rb);
@@ -698,11 +698,11 @@ int sec_read_calibration_report(struct chip_data_s6d7at0 *chip_info)
 
     ret = touch_i2c_read(chip_info->client, &buf[0], 1, &buf[1], 4);
     if (ret < 0) {
-        TPD_INFO("%s: failed to read, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s: failed to read, ret = %d\n", __func__, ret);
         return ret;
     }
 
-    TPD_INFO("%s: count:%d, pass count:%d, fail count:%d, status:0x%X\n",
+    TPD_DEBUG("%s: count:%d, pass count:%d, fail count:%d, status:0x%X\n",
                 __func__, buf[1], buf[2], buf[3], buf[4]);
 
     return buf[4];
@@ -713,22 +713,22 @@ int sec_execute_force_calibration(struct chip_data_s6d7at0 *chip_info)
     int rc = -1;
 
     if (touch_i2c_write_block(chip_info->client, SEC_CMD_FACTORY_PANELCALIBRATION, 0, NULL) < 0) {
-        TPD_INFO("%s: Write Cal command failed!\n", __func__);
+        TPD_DEBUG("%s: Write Cal command failed!\n", __func__);
         return rc;
     }
 
     sec_mdelay(1000);
     rc = sec_wait_for_ready(chip_info, SEC_VENDOR_ACK_OFFSET_CAL_DONE);
     if (rc < 0) {
-        TPD_INFO("%s: Read Cal done Ack Failed!\n", __func__);
+        TPD_DEBUG("%s: Read Cal done Ack Failed!\n", __func__);
         return rc;
     }
 
-    TPD_INFO("%s: Mis Cal Check\n", __func__);
+    TPD_DEBUG("%s: Mis Cal Check\n", __func__);
 
     rc = touch_i2c_write_block(chip_info->client, SEC_CMD_MIS_CAL_CHECK, 0, NULL);    //set to verify calibration
     if (rc < 0) {
-        TPD_INFO("%s: Write Mis Cal command Failed!\n", __func__);
+        TPD_DEBUG("%s: Write Mis Cal command Failed!\n", __func__);
         return rc;
     }
     sec_mdelay(200);
@@ -770,7 +770,7 @@ static int sec_reset(void *chip_data)
 {
     struct chip_data_s6d7at0 *chip_info = (struct chip_data_s6d7at0 *)chip_data;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     if (chip_info->is_power_down) { //power off state, no need reset
         return 0;
     }
@@ -784,7 +784,7 @@ static int sec_reset(void *chip_data)
     sec_mdelay(50);
 
     touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
-    TPD_INFO("%s: clear event buffer\n", __func__);
+    TPD_DEBUG("%s: clear event buffer\n", __func__);
 
     enable_irq(chip_info->client->irq);
 
@@ -796,7 +796,7 @@ static int sec_vrom_reset(void *chip_data)
 //    int ret = -1;
     struct chip_data_s6d7at0 *chip_info = (struct chip_data_s6d7at0 *)chip_data;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     if (chip_info->is_power_down) { //power off state, no need reset
         return 0;
     }
@@ -815,7 +815,7 @@ static int sec_ftm_process(void *chip_data)
 {
     struct chip_data_s6d7at0 *chip_info = (struct chip_data_s6d7at0 *)chip_data;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     tp_powercontrol_2v8(chip_info->hw_res, false);
     tp_powercontrol_1v8(chip_info->hw_res, false);
     if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
@@ -841,7 +841,7 @@ static int sec_get_vendor(void *chip_data, struct panel_info *panel_data)
     chip_info->tp_type = panel_data->tp_type;
     strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -856,19 +856,19 @@ static int sec_power_control(void *chip_data, bool enable)
    /* int ret = 0;
     struct chip_data_s6d7at0 *chip_info = (struct chip_data_s6d7at0 *)chip_data;
 
-    TPD_INFO("%s enable :%d\n", __func__, enable);
+    TPD_DEBUG("%s enable :%d\n", __func__, enable);
     if (true == enable) {
         tp_powercontrol_1v8(chip_info->hw_res, true);
         tp_powercontrol_2v8(chip_info->hw_res, true);
 
         if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
-            TPD_INFO("Set the reset_gpio \n");
+            TPD_DEBUG("Set the reset_gpio \n");
             gpio_direction_output(chip_info->hw_res->reset_gpio, 1);
         }
         msleep(RESET_TO_NORMAL_TIME);
         sec_wait_for_ready(chip_info, SEC_ACK_BOOT_COMPLETE);
         ret = touch_i2c_write_block(chip_info->client, SEC_CMD_SENSE_ON, 0, NULL);
-        TPD_INFO("%s: write sense on %s\n", __func__, (ret < 0) ? "failed" : "success");
+        TPD_DEBUG("%s: write sense on %s\n", __func__, (ret < 0) ? "failed" : "success");
         chip_info->is_power_down = false;
 
         enable_irq(chip_info->client->irq);
@@ -879,7 +879,7 @@ static int sec_power_control(void *chip_data, bool enable)
         tp_powercontrol_1v8(chip_info->hw_res, false);
 
         if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
-            TPD_INFO("Set the reset_gpio \n");
+            TPD_DEBUG("Set the reset_gpio \n");
             gpio_direction_output(chip_info->hw_res->reset_gpio, 0);
         }
         chip_info->is_power_down = true;
@@ -897,27 +897,27 @@ static fw_check_state sec_fw_check(void *chip_data, struct resolution_info *reso
 
     ret = touch_i2c_read_byte(chip_info->client, SEC_READ_FIRMWARE_INTEGRITY);  //judge whether fw is right
     if (ret < 0) {
-        TPD_INFO("%s: failed to do integrity check (%d)\n", __func__, ret);
+        TPD_DEBUG("%s: failed to do integrity check (%d)\n", __func__, ret);
     } else {
         if (ret & 0x80) {
             valid_fw_integrity = true;
         } else {
             valid_fw_integrity = false;
-            TPD_INFO("invalid firmware integrity (%d)\n", ret);
+            TPD_DEBUG("invalid firmware integrity (%d)\n", ret);
         }
     }
 
     data[0] = touch_i2c_read_byte(chip_info->client, SEC_READ_BOOT_STATUS);
     if (data[0] < 0) {
-        TPD_INFO("%s: failed to read boot status\n", __func__);
+        TPD_DEBUG("%s: failed to read boot status\n", __func__);
     } else {
         ret = touch_i2c_read_block(chip_info->client, SEC_READ_TS_STATUS, 4, &data[1]);
         if (ret < 0) {
-            TPD_INFO("%s: failed to read touch status\n", __func__);
+            TPD_DEBUG("%s: failed to read touch status\n", __func__);
         }
     }
     if ((((data[0] == SEC_STATUS_APP_MODE) && (data[2] == TOUCH_SYSTEM_MODE_FLASH)) || (ret < 0)) && (valid_fw_integrity == false)) {
-        TPD_INFO("%s: fw id abnormal, need update\n", __func__);
+        TPD_DEBUG("%s: fw id abnormal, need update\n", __func__);
         return FW_ABNORMAL;
     }
 
@@ -928,7 +928,7 @@ static fw_check_state sec_fw_check(void *chip_data, struct resolution_info *reso
         sprintf(panel_data->manufacture_info.version, "0x%x", panel_data->TP_FW);
 
     // ret = touch_i2c_write_block(chip_info->client, SEC_CMD_SENSE_ON, 0, NULL);
-    // TPD_INFO("%s: write sense on %s\n", (ret < 0) ? "failed" : "success");
+    // TPD_DEBUG("%s: write sense on %s\n", (ret < 0) ? "failed" : "success");
     return FW_NORMAL;
 }
 
@@ -952,11 +952,11 @@ static fw_update_state sec_fw_update(void *chip_data, const struct firmware *fw,
     struct chip_data_s6d7at0 *chip_info = (struct chip_data_s6d7at0 *)chip_data;
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return 0;
     }
 
-    TPD_INFO("%s is called, force update:%d\n", __func__, force);
+    TPD_DEBUG("%s is called, force update:%d\n", __func__, force);
 
     fd = (u8 *)(fw->data);
     fw_hd = (sec_fw_header *)(fw->data);
@@ -971,7 +971,7 @@ static fw_update_state sec_fw_update(void *chip_data, const struct firmware *fw,
     fw_version_in_ic = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
     version_in_ic = buf[2];
     vers_in_ic = buf[3];
-    TPD_INFO("img version in bin is 0x%04x, img version in ic is 0x%04x\n", fw_version_in_bin, fw_version_in_ic);
+    TPD_DEBUG("img version in bin is 0x%04x, img version in ic is 0x%04x\n", fw_version_in_bin, fw_version_in_ic);
 
     para_ver = (u32 *)fw_hd + 0x701A;
 
@@ -985,12 +985,12 @@ static fw_update_state sec_fw_update(void *chip_data, const struct firmware *fw,
     touch_i2c_read_block(chip_info->client, SEC_READ_CONFIG_VERSION, 4, buf);
     config_version_in_ic = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
     config_in_ic = buf[3];
-    TPD_INFO("config version in bin is 0x%04x, config version in ic is 0x%04x\n", config_version_in_bin, config_version_in_ic);
+    TPD_DEBUG("config version in bin is 0x%04x, config version in ic is 0x%04x\n", config_version_in_bin, config_version_in_ic);
 
     ret = touch_i2c_read_byte(chip_info->client, SEC_READ_BOOT_STATUS);
     if (ret == SEC_STATUS_BOOT_MODE) {
         force = 1;
-        TPD_INFO("%s: still in bootloader mode, will do force update\n", __func__);
+        TPD_DEBUG("%s: still in bootloader mode, will do force update\n", __func__);
     }
 
     if (!force) {
@@ -1005,20 +1005,20 @@ static fw_update_state sec_fw_update(void *chip_data, const struct firmware *fw,
     for (i = 0; i < num_chunk; i++) {
         ret = sec_chunk_update(chip_info, 0x00, fw->size, fd);
         if (ret < 0) {
-            TPD_INFO("update chunk failed\n");
+            TPD_DEBUG("update chunk failed\n");
             goto UPDATE_ERR;
         }
     }
 
     ret = touch_i2c_read_byte(chip_info->client, SEC_READ_BOOT_STATUS);
     if (ret < 0) {
-        TPD_INFO("%s: read fail, read boot status = 0x%x\n", __func__, ret);
+        TPD_DEBUG("%s: read fail, read boot status = 0x%x\n", __func__, ret);
         goto UPDATE_ERR;
     }
 
     fw_status = ret;
     if (fw_status != SEC_STATUS_APP_MODE) {
-        TPD_INFO("%s: fw update sequence done, BUT read_boot_status = 0x%x\n", __func__, fw_status);
+        TPD_DEBUG("%s: fw update sequence done, BUT read_boot_status = 0x%x\n", __func__, fw_status);
         sec_vrom_reset(chip_info);
     }
     else
@@ -1028,44 +1028,44 @@ static fw_update_state sec_fw_update(void *chip_data, const struct firmware *fw,
     /*if (cal_status == 0xFF || ((version_in_bin == 0xD1) && (config_in_bin == 0x51)) || ((vers_in_ic == 0x05) && (version_in_ic == 0xE1))
         || ((version_in_bin == 0xB1) && (config_in_bin == 0x51)) || ((version_in_bin == 0xC1) && (config_in_bin == 0x51))) {*/
     if (cal_status == 0xFF || (config_in_bin !=  config_in_ic) || ((vers_in_ic == 0x05) && (version_in_ic == 0xE1))) {
-        TPD_INFO("start calibration.\n");
+        TPD_DEBUG("start calibration.\n");
         while (i < 2) {
             ret = sec_execute_force_calibration(chip_info);
             if (ret < 0) {
-                TPD_INFO("calibration failed(%d), try again.\n", i++);
+                TPD_DEBUG("calibration failed(%d), try again.\n", i++);
                 continue;
             }
 
             cal_status = sec_read_calibration_report(chip_info);
             if (cal_status != 0x00) {
-                TPD_INFO("calibration result(%02X) failed(%d), try again.\n", cal_status, i++);
+                TPD_DEBUG("calibration result(%02X) failed(%d), try again.\n", cal_status, i++);
                 continue;
             }
 
             break;
         }
 
-        TPD_INFO("calibration %s(%02X)\n", (ret < 0) ? "failed" : "success", cal_status);
+        TPD_DEBUG("calibration %s(%02X)\n", (ret < 0) ? "failed" : "success", cal_status);
     }
     sec_reset(chip_info);
 
     ret = touch_i2c_read_byte(chip_info->client, SEC_READ_BOOT_STATUS);
     if (ret < 0) {
-        TPD_INFO("%s: read fail, read_boot_status = 0x%x\n", __func__, ret);
+        TPD_DEBUG("%s: read fail, read_boot_status = 0x%x\n", __func__, ret);
         goto UPDATE_ERR;
     }
 
     fw_status = ret;
     if (fw_status != SEC_STATUS_APP_MODE) {
-        TPD_INFO("%s: fw update sequence done, BUT read_boot_status = 0x%x\n", __func__, fw_status);
+        TPD_DEBUG("%s: fw update sequence done, BUT read_boot_status = 0x%x\n", __func__, fw_status);
         goto UPDATE_ERR;
     }
 
-    TPD_INFO("%s: fw update sequence success! read_boot_status = 0x%x\n", __func__, fw_status);
+    TPD_DEBUG("%s: fw update sequence success! read_boot_status = 0x%x\n", __func__, fw_status);
     if (chip_info->sec_fw_watchdog_surport)
         ret = set_lsi_tp_watchdog_state(1);
 
-    TPD_INFO("%s: update success\n", __func__);
+    TPD_DEBUG("%s: update success\n", __func__);
     return FW_UPDATE_SUCCESS;
 
 UPDATE_ERR:
@@ -1100,10 +1100,10 @@ static u8 sec_trigger_reason(void *chip_data, int gesture_enable, int is_suspend
 
     left_event_cnt = chip_info->first_event[7] & 0x3F;
     if ((left_event_cnt > MAX_EVENT_COUNT - 1) || (left_event_cnt == 0xFF)) {
-        TPD_INFO("%s: event buffer overflow, do clear the buffer\n", __func__);
+        TPD_DEBUG("%s: event buffer overflow, do clear the buffer\n", __func__);
         ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
         if (ret < 0) {
-            TPD_INFO("%s: clear event buffer failed\n", __func__);
+            TPD_DEBUG("%s: clear event buffer failed\n", __func__);
         }
         return IRQ_IGNORE;
     }
@@ -1117,7 +1117,7 @@ static u8 sec_trigger_reason(void *chip_data, int gesture_enable, int is_suspend
 
             ret = touch_i2c_write_block(chip_info->client, SEC_CMD_SENSE_ON, 0, NULL);
             if (ret < 0) {
-                TPD_INFO("%s: write sense on failed\n", __func__);
+                TPD_DEBUG("%s: write sense on failed\n", __func__);
             }
             return IRQ_FW_AUTO_RESET;
         }
@@ -1125,25 +1125,25 @@ static u8 sec_trigger_reason(void *chip_data, int gesture_enable, int is_suspend
         if ((p_event_status->stype == TYPE_STATUS_EVENT_INFO) && (p_event_status->status_id == SEC_ACK_PALM_MODE)){
             ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
             if (ret < 0) {
-                TPD_INFO("%s: clear parm event stack failed\n", __func__);
+                TPD_DEBUG("%s: clear parm event stack failed\n", __func__);
             }
         }
         /* event queue full-> all finger release */
         if ((p_event_status->stype == TYPE_STATUS_EVENT_VENDOR_INFO) && (p_event_status->status_id == SEC_ERR_EVENT_QUEUE_FULL)) {
-            TPD_INFO("%s: IC Event Queue is full! Send Clear Event Queue\n", __func__);
+            TPD_DEBUG("%s: IC Event Queue is full! Send Clear Event Queue\n", __func__);
             ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
             if (ret < 0) {
-                TPD_INFO("%s: clear parm event stack failed\n", __func__);
+                TPD_DEBUG("%s: clear parm event stack failed\n", __func__);
             }
             tp_touch_btnkey_release();
         }
 
         if ((p_event_status->stype == TYPE_STATUS_EVENT_ERR) && (p_event_status->status_id == SEC_ERR_EVENT_ESD)) {
-            TPD_INFO("%s: ESD detected. run reset\n", __func__);
+            TPD_DEBUG("%s: ESD detected. run reset\n", __func__);
             return IRQ_EXCEPTION;
         }
         if ((p_event_status->stype == TYPE_STATUS_EVENT_VENDOR_INFO) && (p_event_status->status_id == SEC_STATUS_EARDETECTED)) {
-            TPD_INFO("%s: EAR detected. \n", __func__);
+            TPD_DEBUG("%s: EAR detected. \n", __func__);
             return IRQ_IGNORE;
         }
     } else if (event_id == SEC_COORDINATE_EVENT) {
@@ -1187,16 +1187,16 @@ static int sec_get_touch_points(void *chip_data, struct point_info *points, int 
     if (left_event == 0) {
         return obj_attention;
     } else if (left_event > max_num - 1) {
-        TPD_INFO("%s: read left event beyond max touch points\n", __func__);
+        TPD_DEBUG("%s: read left event beyond max touch points\n", __func__);
         ret = touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
         if (ret < 0) {
-            TPD_INFO("%s: clear event buffer failed\n", __func__);
+            TPD_DEBUG("%s: clear event buffer failed\n", __func__);
         }
         left_event = max_num - 1;
     }
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_ALL_EVENT, sizeof(u8) * (SEC_EVENT_BUFF_SIZE) * (left_event), (u8 *)event_buff[0]);
     if (ret < 0) {
-        TPD_INFO("%s: i2c read all event failed\n", __func__);
+        TPD_DEBUG("%s: i2c read all event failed\n", __func__);
         return obj_attention;
     }
 
@@ -1244,11 +1244,11 @@ static int sec_get_gesture_info(void *chip_data, struct gesture_info * gesture)
     }
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_GESTURE_EVENT, p_event_gesture->coordLen, coord);
     if (ret < 0) {
-        TPD_INFO("%s: read gesture data failed\n", __func__);
+        TPD_DEBUG("%s: read gesture data failed\n", __func__);
     }
 
     if (LEVEL_BASIC != tp_debug) {
-        TPD_INFO("gesture points:");
+        TPD_DEBUG("gesture points:");
         for (i = 0; i < p_event_gesture->coordLen/3; i++) {
             printk("(%d, %d) ",(coord[3*i] << 4) | ((coord[3*i+2] >> 0) & 0x0F), (coord[3*i+1] << 4) | ((coord[3*i+2] >> 4) & 0x0F));
         }
@@ -1402,7 +1402,7 @@ static int sec_get_gesture_info(void *chip_data, struct gesture_info * gesture)
             break;
     }
 
-    TPD_INFO("%s, gesture_id: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
+    TPD_DEBUG("%s, gesture_id: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
                 __func__, p_event_gesture->gestureId, gesture->gesture_type, gesture->clockwise, \
                 gesture->Point_start.x, gesture->Point_start.y, \
                 gesture->Point_end.x, gesture->Point_end.y, \
@@ -1429,22 +1429,22 @@ static int sec_mode_switch(void *chip_data, work_mode mode, bool flag)
             ret = 0;
             sec_mdelay(50);
             if (ret < 0) {
-                TPD_INFO("%s: power down failed\n", __func__);
+                TPD_DEBUG("%s: power down failed\n", __func__);
             }
             break;
 
         case MODE_SLEEP:
             ret = sec_power_control(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: power down failed\n", __func__);
+                TPD_DEBUG("%s: power down failed\n", __func__);
             }
             break;
 
         case MODE_GESTURE:
             ret = sec_enable_black_gesture(chip_info, flag);
-            TPD_INFO("%s, ret = %d\n", __func__, ret);
+            TPD_DEBUG("%s, ret = %d\n", __func__, ret);
             if (ret < 0) {
-                TPD_INFO("%s: sec enable gesture failed.\n", __func__);
+                TPD_DEBUG("%s: sec enable gesture failed.\n", __func__);
                 return ret;
             }
             break;
@@ -1452,7 +1452,7 @@ static int sec_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = sec_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: sec enable edg limit failed.\n", __func__);
+                TPD_DEBUG("%s: sec enable edg limit failed.\n", __func__);
                 return ret;
             }
             break;
@@ -1460,39 +1460,39 @@ static int sec_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_CHARGE:
             ret = sec_enable_charge_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
             }
             break;
 
         case MODE_EARSENSE:
             ret = sec_enable_earsense_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable earsense mode : %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable earsense mode : %d failed\n", __func__, flag);
             }
             break;
 
         case MODE_PALM_REJECTION:
             ret = sec_enable_palm_reject(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable palm rejection: %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable palm rejection: %d failed\n", __func__, flag);
             }
             break;
 
         case MODE_GAME:
             ret = sec_enable_game_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable game mode: %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable game mode: %d failed\n", __func__, flag);
             }
             break;
         case MODE_HEADSET:
             ret = sec_enable_headset_mode(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: enable headset mode: %d failed\n", __func__, flag);
+                TPD_DEBUG("%s: enable headset mode: %d failed\n", __func__, flag);
             }
             break;
 
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     last_state = mode;  //update the "last_state" value when the mode change sequence finish
@@ -1531,7 +1531,7 @@ static int sec_esd_handle(void *chip_data)
         sec_reset_esd(chip_info);
     }
     if (chip_info->irq_low_cnt >= SEC_TOUCH_IRQ_LOW_CNT) {
-        TPD_INFO("do ESD recovery, just clear event buffer\n");
+        TPD_DEBUG("do ESD recovery, just clear event buffer\n");
         touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);
         tp_touch_btnkey_release();
         /* update low count */
@@ -1539,7 +1539,7 @@ static int sec_esd_handle(void *chip_data)
         chip_info->esd_stay_cnt++;
     }
     if (chip_info->esd_stay_cnt >= SEC_TOUCH_ESD_CNT) {
-        TPD_INFO("do ESD recovery, do soft reset\n");
+        TPD_DEBUG("do ESD recovery, do soft reset\n");
         //touch_i2c_write_block(chip_info->client, SEC_CMD_SOFT_RESET, 0, NULL);
         sec_reset(chip_info);
         tp_touch_btnkey_release();
@@ -1622,28 +1622,28 @@ static int sec_read_self(struct chip_data_s6d7at0 *chip_info, u8 type, char *dat
 /*
     ret = sec_fix_tmode(chip_info, TOUCH_SYSTEM_MODE_TOUCH, TOUCH_MODE_STATE_TOUCH);
     if (ret < 0) {
-        TPD_INFO("%s: fix touch mode failed\n", __func__);
+        TPD_DEBUG("%s: fix touch mode failed\n", __func__);
         goto err_out;
     }
 */
 /*
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_SELF_RAW_TYPE, type);
     if (ret < 0) {
-        TPD_INFO("%s: Set self type failed\n", __func__);
+        TPD_DEBUG("%s: Set self type failed\n", __func__);
         goto err_out;
     }
 
     sec_mdelay(50);
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_TOUCH_SELF_RAWDATA, data_len, data);
     if (ret < 0) {
-        TPD_INFO("%s: read self failed!\n", __func__);
+        TPD_DEBUG("%s: read self failed!\n", __func__);
     }
 */
 
     /* release data monitory (unprepare AFE data memory) */
 /*    ret |= touch_i2c_write_byte(chip_info->client, SEC_CMD_SELF_RAW_TYPE, TYPE_INVALID_DATA);
     if (ret < 0) {
-        TPD_INFO("%s: Set self type failed\n", __func__);
+        TPD_DEBUG("%s: Set self type failed\n", __func__);
     }
 
 err_out:
@@ -1664,13 +1664,13 @@ static int sec_read_mutual(struct chip_data_s6d7at0 *chip_info, u8 type, char *d
 /*
     ret = sec_fix_tmode(chip_info, TOUCH_SYSTEM_MODE_TOUCH, TOUCH_MODE_STATE_TOUCH);
     if (ret < 0) {
-        TPD_INFO("%s: fix touch mode failed\n", __func__);
+        TPD_DEBUG("%s: fix touch mode failed\n", __func__);
         goto err_out;
     }
 */
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_MUTU_RAW_TYPE, type);
     if (ret < 0) {
-        TPD_INFO("%s: Set mutual type failed\n", __func__);
+        TPD_DEBUG("%s: Set mutual type failed\n", __func__);
         goto err_out;
     }
 
@@ -1680,13 +1680,13 @@ static int sec_read_mutual(struct chip_data_s6d7at0 *chip_info, u8 type, char *d
 //    touch_i2c_write_block(chip_info->client, SEC_CMD_TOUCH_RAWDATA_SETLEN, 2, buf);
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_TOUCH_RAWDATA, len, data);
     if (ret < 0) {
-        TPD_INFO("%s: read mutual failed!\n", __func__);
+        TPD_DEBUG("%s: read mutual failed!\n", __func__);
     }
 
     /* release data monitory (unprepare AFE data memory) */
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_MUTU_RAW_TYPE, TYPE_INVALID_DATA);
     if (ret < 0) {
-        TPD_INFO("%s: Set mutual type failed\n", __func__);
+        TPD_DEBUG("%s: Set mutual type failed\n", __func__);
     }
 
 err_out:
@@ -1947,7 +1947,7 @@ static void sec_earsese_rawdata_read(void *chip_data, char *rawdata, int read_le
     touch_i2c_write_block(chip_info->client, SEC_CMD_TOUCH_RAWDATA_SETLEN, 2, buf);
     ret = touch_i2c_read_block(chip_info->client, SEC_CMD_TOUCH_RAWDATA_READ, read_len, rawdata);
     if (ret < 0) {
-        TPD_INFO("read rawdata failed\n");
+        TPD_DEBUG("read rawdata failed\n");
         return;
     }
 
@@ -1987,7 +1987,7 @@ static void sec_earsese_delta_read(void *chip_data, char *earsense_delta, int re
         return ;
 
     if (!earsense_delta) {
-        TPD_INFO("earsense_delta is NULL\n");
+        TPD_DEBUG("earsense_delta is NULL\n");
         return;
     }
 
@@ -2006,7 +2006,7 @@ static void sec_earsese_delta_read(void *chip_data, char *earsense_delta, int re
     touch_i2c_write_block(chip_info->client, SEC_CMD_TOUCH_RAWDATA_SETLEN, 2, buf);
     ret = touch_i2c_read_block(chip_info->client, SEC_CMD_TOUCH_DELTA_READ, read_len, earsense_delta);
     if (ret < 0) {
-        TPD_INFO("read delta failed\n");
+        TPD_DEBUG("read delta failed\n");
         return;
     }
 
@@ -2043,7 +2043,7 @@ static void sec_earsese_selfdata_read( void *chip_data, char *self_data, int rea
 
     ret = touch_i2c_read_block(chip_info->client, SEC_CMD_TOUCH_SELFDATA_READ, read_len, self_data);
     if (ret < 0) {
-        TPD_INFO("read selfdata failed\n");
+        TPD_DEBUG("read selfdata failed\n");
         return;
     }
 
@@ -2097,14 +2097,14 @@ static int sec_execute_selftest(struct seq_file *s, struct chip_data_s6d7at0 *ch
     if (chip_info->sec_fw_watchdog_surport)
         ret = set_lsi_tp_watchdog_state(0);
 
-    TPD_INFO("%s: Selftest START!\n", __func__);
+    TPD_DEBUG("%s: Selftest START!\n", __func__);
     tData[0] = 0x1E;
     tData[1] = 0x7f;
     ret = touch_i2c_write_block(chip_info->client, SEC_CMD_SELFTEST_CHOICE, sizeof(tData), tData);
     /* execute selftest */
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_SELFTEST, 0x03);
     if (ret < 0) {
-        TPD_INFO("%s: Execute selftest failed\en", __func__);
+        TPD_DEBUG("%s: Execute selftest failed\en", __func__);
         seq_printf(s, "Send selftest cmd failed!\n");
         goto err_out;
     }
@@ -2113,11 +2113,11 @@ static int sec_execute_selftest(struct seq_file *s, struct chip_data_s6d7at0 *ch
     /* wait for selftest done ack */
     ret = sec_wait_for_ready(chip_info, SEC_VENDOR_ACK_SELF_TEST_DONE);
     if (ret < 0) {
-        TPD_INFO("%s: Wait for selftest done ack failed\n", __func__);
+        TPD_DEBUG("%s: Wait for selftest done ack failed\n", __func__);
         //seq_printf(s, "Wait for selftest done ack failed\n");
         goto err_out;
     }
-    TPD_INFO("%s: Selftest Done!\n", __func__);
+    TPD_DEBUG("%s: Selftest Done!\n", __func__);
 
     if (chip_info->sec_fw_watchdog_surport)
         ret = set_lsi_tp_watchdog_state(1);
@@ -2143,11 +2143,11 @@ static int sec_execute_lp_selftest(struct chip_data_s6d7at0 *chip_info, struct s
     touch_i2c_write_block(chip_info->client, SEC_CMD_CLEAR_EVENT_STACK, 0, NULL);   //clear event buffer
     touch_i2c_write_block(chip_info->client, SEC_CMD_CHG_SYSMODE, sizeof(tBuff), tBuff);
 
-    TPD_INFO("%s: LP Selftest START!\n", __func__);
+    TPD_DEBUG("%s: LP Selftest START!\n", __func__);
     /* execute selftest */
     ret = touch_i2c_write_byte(chip_info->client, SEC_CMD_LP_SELFTEST, 0x03);
     if (ret < 0) {
-        TPD_INFO("%s: Execute lp selftest failed\en", __func__);
+        TPD_DEBUG("%s: Execute lp selftest failed\en", __func__);
         goto err_out;
     }
     sec_mdelay(3000);
@@ -2155,11 +2155,11 @@ static int sec_execute_lp_selftest(struct chip_data_s6d7at0 *chip_info, struct s
     /* wait for lp selftest done ack */
     ret = sec_wait_for_ready(chip_info, SEC_VENDOR_ACK_SELF_TEST_DONE);
     if (ret < 0) {
-        TPD_INFO("%s: Wait for lp selftest done ack failed\n", __func__);
+        TPD_DEBUG("%s: Wait for lp selftest done ack failed\n", __func__);
         //seq_printf(s, "Wait for selftest done ack failed\n");
         goto err_out;
     }
-    TPD_INFO("%s: LP Selftest Done!\n", __func__);
+    TPD_DEBUG("%s: LP Selftest Done!\n", __func__);
 
 err_out:
     touch_i2c_write_byte(chip_info->client, SEC_CMD_INTERRUPT_LEVEL, 0);   //enable interrupt
@@ -2208,7 +2208,7 @@ static void sec_print_selftest_frame(struct chip_data_s6d7at0 *chip_info, int te
       snprintf(pTmp, sizeof(pTmp), ",Tx%02d", (gap_para_y - 1 - i));
       strlcat(pStr, pTmp, 6 * (gap_para_y + 1));
     }
-    TPD_INFO("%s\n", pStr);
+    TPD_DEBUG("%s\n", pStr);
     store_to_file(sec_testdata->fd, "%s\n", pStr);
 
     for (i = 0; i < gap_para_x; i++) {
@@ -2220,7 +2220,7 @@ static void sec_print_selftest_frame(struct chip_data_s6d7at0 *chip_info, int te
             snprintf(pTmp, sizeof(pTmp), ",%3d", frame[((gap_para_y - 1 - j) * gap_para_x) + i]);
             strlcat(pStr, pTmp, 6 * (gap_para_y + 1));
         }
-        TPD_INFO("%s\n", pStr);
+        TPD_DEBUG("%s\n", pStr);
         store_to_file(sec_testdata->fd, "%s\n", pStr);
     }
     store_to_file(sec_testdata->fd, "\n");
@@ -2234,7 +2234,7 @@ static int sec_read_flash(struct chip_data_s6d7at0 * chip_info, u32 mem_addr, u8
     u8 *data;
 
     if (mem_size >= 64 * 1024) {
-        TPD_INFO("%s: mem size over 64K\n", __func__);
+        TPD_DEBUG("%s: mem size over 64K\n", __func__);
         return -EIO;
     }
 
@@ -2248,7 +2248,7 @@ static int sec_read_flash(struct chip_data_s6d7at0 * chip_info, u32 mem_addr, u8
 
     ret = touch_i2c_write(chip_info->client, cmd, 5);
     if (ret < 0) {
-        TPD_INFO("%s: send command failed, %02X\n", __func__, cmd[0]);
+        TPD_DEBUG("%s: send command failed, %02X\n", __func__, cmd[0]);
         return -EIO;
     }
 
@@ -2260,7 +2260,7 @@ static int sec_read_flash(struct chip_data_s6d7at0 * chip_info, u32 mem_addr, u8
 
     ret = touch_i2c_write(chip_info->client, cmd, 3);
     if (ret < 0) {
-        TPD_INFO("%s: send command failed, %02X\n", __func__, cmd[0]);
+        TPD_DEBUG("%s: send command failed, %02X\n", __func__, cmd[0]);
         return -EIO;
     }
 
@@ -2271,7 +2271,7 @@ static int sec_read_flash(struct chip_data_s6d7at0 * chip_info, u32 mem_addr, u8
 
     ret = touch_i2c_read(chip_info->client, cmd, 1, data, mem_size);
     if (ret < 0) {
-        TPD_INFO("%s: memory read failed\n", __func__);
+        TPD_DEBUG("%s: memory read failed\n", __func__);
         return -EIO;
     }
     sec_mdelay(10);
@@ -2302,72 +2302,72 @@ static int sec_print_selftest_report(struct chip_data_s6d7at0 *chip_info, struct
     switch(test_type) {
     case TOUCH_SELFTEST_ITEM_SENSOR_UNI:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR;
-        TPD_INFO("%s: Sensor Uniformity: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: Sensor Uniformity: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: Sensor Uniformity: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_RAW_VAR_X:
         read_bytes /= 2;
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 10);
-        TPD_INFO("%s: Raw Variance X: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: Raw Variance X: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: Raw Variance X: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_RAW_VAR_Y:
         read_bytes /= 2;
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 11);
-        TPD_INFO("%s: Raw Variance Y: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: Raw Variance Y: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: Raw Variance Y: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_P2P_MIN:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 6);
-        TPD_INFO("%s: P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_P2P_MAX:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 8);
-        TPD_INFO("%s: P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_OPEN:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 4);
-        TPD_INFO("%s: Open: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: Open: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: Open: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_SHORT:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 2);
-        TPD_INFO("%s: Short: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
+        TPD_DEBUG("%s: Short: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         store_to_file(sec_testdata->fd, "%s: Short: %s\n", __func__, SELFTEST_RESULT(test_result, test_type));
         break;
     case TOUCH_SELFTEST_ITEM_OFFSET:
         read_bytes /= 2;
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 14);
-        TPD_INFO("%s: Offset\n", __func__);
+        TPD_DEBUG("%s: Offset\n", __func__);
         store_to_file(sec_testdata->fd, "%s: Offset\n", __func__);
         break;
     case TOUCH_SELFTEST_ITEM_RAWDATA:
         addr = SEC_FLASH_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_MAX_SIZE * 12);
-        TPD_INFO("%s: RawData\n", __func__);
+        TPD_DEBUG("%s: RawData\n", __func__);
         store_to_file(sec_testdata->fd, "%s: RawData\n", __func__);
         break;
     case TOUCH_SELFTEST_ITEM_LP_RAWDATA:
         addr = SEC_FLASH_LP_SELFTEST_REPORT_ADDR + (SELFTEST_FRAME_SIZE * 2);
-        TPD_INFO("%s: LP RawData: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
+        TPD_DEBUG("%s: LP RawData: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         store_to_file(sec_testdata->fd, "%s: LP RawData: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         break;
     case TOUCH_SELFTEST_ITEM_LP_P2P_MIN:
         addr = SEC_FLASH_LP_SELFTEST_REPORT_ADDR;
-        TPD_INFO("%s: LP P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
+        TPD_DEBUG("%s: LP P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         store_to_file(sec_testdata->fd, "%s: LP P2P min: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         break;
     case TOUCH_SELFTEST_ITEM_LP_P2P_MAX:
         addr = SEC_FLASH_LP_SELFTEST_REPORT_ADDR + SELFTEST_FRAME_SIZE;
-        TPD_INFO("%s: LP P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
+        TPD_DEBUG("%s: LP P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         store_to_file(sec_testdata->fd, "%s: LP P2P max: %s\n", __func__, SELFTEST_RESULT(test_result, test_type - 10));
         break;
     }
 
     ret = sec_read_flash(chip_info, addr, frame_buff, read_bytes);
     if (ret < 0) {
-        TPD_INFO("%s: Read frame data failed. test type:%d\n", __func__, test_type);
+        TPD_DEBUG("%s: Read frame data failed. test type:%d\n", __func__, test_type);
         goto err_out;
     }
 
@@ -2406,10 +2406,10 @@ static int sec_read_selftest_report(struct chip_data_s6d7at0 *chip_info, struct 
     /* read fw version */
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_IMG_VERSION, 4, report_buff);
     if (ret < 0) {
-        TPD_INFO("%s: read FW version failed\n", __func__);
+        TPD_DEBUG("%s: read FW version failed\n", __func__);
         return ret;
     }
-    TPD_INFO("%s: FW version: %02X%02X%02X%02X\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
+    TPD_DEBUG("%s: FW version: %02X%02X%02X%02X\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
     store_to_file(sec_testdata->fd, "FW version: %02X%02X%02X%02X\n", report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
 
     /* read selftest result */
@@ -2417,28 +2417,28 @@ static int sec_read_selftest_report(struct chip_data_s6d7at0 *chip_info, struct 
     for (i = 0; i < 2; i++) {
         ret = sec_read_flash(chip_info, addr, report_buff, 4);
         if (ret < 0) {
-            TPD_INFO("%s: read selftest report failed\n", __func__);
+            TPD_DEBUG("%s: read selftest report failed\n", __func__);
             return ret;
         }
     }
-    TPD_INFO("%s: Test Report: %02X%02X%02X%02X\n\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
+    TPD_DEBUG("%s: Test Report: %02X%02X%02X%02X\n\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
     store_to_file(sec_testdata->fd, "%s: Test Report: %02X%02X%02X%02X\n\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
 
     /* print each result */
     for (i = 0; i< 10; i++) {
         ret = sec_print_selftest_report(chip_info, sec_testdata, i, report_buff[0]);
         if (ret < 0) {
-            TPD_INFO("%s: Print selftest report %d failed\n", __func__, i);
+            TPD_DEBUG("%s: Print selftest report %d failed\n", __func__, i);
             return ret;
         }
         err_cnt += ret;
     }
 
     if ((report_buff[0] & 0xff) == 0) {
-        TPD_INFO("%s: TEST ALL PASSED!\n", __func__);
+        TPD_DEBUG("%s: TEST ALL PASSED!\n", __func__);
         store_to_file(sec_testdata->fd, "%s: TEST ALL PASSED!\n", __func__);
     } else {
-    TPD_INFO("%s: Test Result FAIL... Sensor_Uniformity: %s, Raw_Variance_X: %s, Raw_Variance_Y: %s, P2P_min: %s, P2P_max: %s, Open: %s, Short: %s, High-Z: %s\n",
+    TPD_DEBUG("%s: Test Result FAIL... Sensor_Uniformity: %s, Raw_Variance_X: %s, Raw_Variance_Y: %s, P2P_min: %s, P2P_max: %s, Open: %s, Short: %s, High-Z: %s\n",
               __func__, SELFTEST_RESULT(report_buff[0], 0), SELFTEST_RESULT(report_buff[0], 1), SELFTEST_RESULT(report_buff[0], 2), SELFTEST_RESULT(report_buff[0], 3),
             SELFTEST_RESULT(report_buff[0], 4), SELFTEST_RESULT(report_buff[0], 5), SELFTEST_RESULT(report_buff[0], 6), SELFTEST_RESULT(report_buff[0], 7));
     store_to_file(sec_testdata->fd, "%s: Test Result FAIL... Sensor_Uniformity: %s Raw_Variance_X: %s Raw_Variance_Y: %s P2P_min: %s P2P_max: %s Open: %s Short: %s High-Z: %s\n",
@@ -2460,10 +2460,10 @@ static int sec_read_lp_selftest_report(struct chip_data_s6d7at0 *chip_info, stru
     /* read fw version */
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_IMG_VERSION, 4, report_buff);
     if (ret < 0) {
-        TPD_INFO("%s: read FW version failed\n", __func__);
+        TPD_DEBUG("%s: read FW version failed\n", __func__);
         return ret;
     }
-    TPD_INFO("%s: FW version: %02X%02X%02X%02X\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
+    TPD_DEBUG("%s: FW version: %02X%02X%02X%02X\n", __func__, report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
     store_to_file(sec_testdata->fd, "FW version: %02X%02X%02X%02X\n", report_buff[0], report_buff[1], report_buff[2], report_buff[3]);
 
     sec_ts_flash_set_datanum(chip_info, 0xffff);
@@ -2474,28 +2474,28 @@ static int sec_read_lp_selftest_report(struct chip_data_s6d7at0 *chip_info, stru
     for (i = 0; i < 2; i++) {
         ret = sec_block_read(chip_info, addr, 2, report_buff);
         if (ret < 0) {
-            TPD_INFO("%s: read \n", __func__);
+            TPD_DEBUG("%s: read \n", __func__);
             return ret;
         }
     }
-    TPD_INFO("%s: LP Test Report: %02X%02X\n\n", __func__, report_buff[0], report_buff[1]);
+    TPD_DEBUG("%s: LP Test Report: %02X%02X\n\n", __func__, report_buff[0], report_buff[1]);
     store_to_file(sec_testdata->fd, "%s: LP Test Report: %02X%02X\n\n", __func__, report_buff[0], report_buff[1]);
 
     /* print each result */
     for (i = 10; i< 13; i++) {
         ret = sec_print_selftest_report(chip_info, sec_testdata, i, report_buff[0]);
         if (ret < 0) {
-            TPD_INFO("%s: Print selftest report %d failed\n", __func__, i);
+            TPD_DEBUG("%s: Print selftest report %d failed\n", __func__, i);
             return ret;
         }
         err_cnt += ret;
     }
 
     if ((report_buff[0] & 0xff) == 0) {
-        TPD_INFO("%s: TEST ALL PASSED!\n", __func__);
+        TPD_DEBUG("%s: TEST ALL PASSED!\n", __func__);
         store_to_file(sec_testdata->fd, "%s: TEST ALL PASSED!\n", __func__);
     } else {
-        TPD_INFO("%s: LP Test Result FAIL... RawData: %s, P2P_min: %s, P2P_max: %s\n",
+        TPD_DEBUG("%s: LP Test Result FAIL... RawData: %s, P2P_min: %s, P2P_max: %s\n",
             __func__, SELFTEST_RESULT(report_buff[0], 0), SELFTEST_RESULT(report_buff[0], 1), SELFTEST_RESULT(report_buff[0], 2));
         store_to_file(sec_testdata->fd, "%s: LP Test Result FAIL... RawData: %s, P2P_min: %s, P2P_max: %s\n",
             __func__, SELFTEST_RESULT(report_buff[0], 0), SELFTEST_RESULT(report_buff[0], 1), SELFTEST_RESULT(report_buff[0], 2));
@@ -2525,7 +2525,7 @@ static int sec_run_mis_cal(struct chip_data_s6d7at0 *chip_info)
 {
     int ret = -1;
 
-    TPD_INFO("%s: Mis cal Check\n", __func__);
+    TPD_DEBUG("%s: Mis cal Check\n", __func__);
     ret = touch_i2c_write_block(chip_info->client, SEC_CMD_MIS_CAL_CHECK, 0, NULL);    //set to verify calibration
     sec_mdelay(200);
     return ret;
@@ -2542,13 +2542,13 @@ static void sec_auto_test(struct seq_file *s, void *chip_data, struct sec_testda
     /*  check if screen has any finger or palm touch */
     do {
         ret = touch_i2c_read_block(chip_info->client, SEC_READ_ONE_EVENT, SEC_EVENT_BUFF_SIZE, tBuff);
-        TPD_INFO("%s: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+        TPD_DEBUG("%s: 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
             __func__, tBuff[0], tBuff[1], tBuff[2], tBuff[3], tBuff[4], tBuff[5], tBuff[6], tBuff[7]);
         if (tBuff[0] == 0x00) {
             break;
         } else if ((tBuff[0] & MASK_2_BITS) == SEC_COORDINATE_EVENT || ((tBuff[0] & MASK_2_BITS) == SEC_STATUS_EVENT
             && ((tBuff[0] >> 2) & 0xF) == TYPE_STATUS_EVENT_INFO && tBuff[1] == SEC_ACK_PALM_MODE)) {
-            TPD_INFO("%s: FAIL: DO NOT TOUCH SCREEN!\n", __func__);
+            TPD_DEBUG("%s: FAIL: DO NOT TOUCH SCREEN!\n", __func__);
             seq_printf(s, "FAIL: DO NOT TOUCH SCREEN!\n");
             return;
         }
@@ -2567,16 +2567,16 @@ static void sec_auto_test(struct seq_file *s, void *chip_data, struct sec_testda
             eint_count++;
         }
     }
-    TPD_INFO("%s: TP EINT PIN direct short test! eint_count = %d\n", __func__, eint_count);
+    TPD_DEBUG("%s: TP EINT PIN direct short test! eint_count = %d\n", __func__, eint_count);
     if (eint_count == 10) {
-        TPD_INFO("%s: error :  TP EINT PIN direct short!\n", __func__);
+        TPD_DEBUG("%s: error :  TP EINT PIN direct short!\n", __func__);
         seq_printf(s, "eint_status is low, TP EINT direct short\n");
     }
     touch_i2c_write_byte(chip_info->client, SEC_CMD_INTERRUPT_SWITCH, 0);   //enable interrupt
 
     ret = sec_execute_force_calibration(chip_info);
     if (ret < 0) {
-        TPD_INFO("%s: Calibration failed\n", __func__);
+        TPD_DEBUG("%s: Calibration failed\n", __func__);
         seq_printf(s, "Calibration failed\n");
         return;
     }
@@ -2584,7 +2584,7 @@ static void sec_auto_test(struct seq_file *s, void *chip_data, struct sec_testda
     /* get mis cal result */
     ret = sec_get_verify_result(chip_info);
     if (ret != 0) {
-        TPD_INFO("%s: Mis-Calibration result failed(0x%02x)\n", __func__, ret);
+        TPD_DEBUG("%s: Mis-Calibration result failed(0x%02x)\n", __func__, ret);
         seq_printf(s, "Mis-Calibration result failed(0x%02x)\n", ret);
         return;
     }
@@ -2592,7 +2592,7 @@ static void sec_auto_test(struct seq_file *s, void *chip_data, struct sec_testda
     /* execute selftest */
     ret = sec_execute_selftest(s, chip_info, sec_testdata);
     if (ret < 0) {
-        TPD_INFO("%s: execute selftest failed\n", __func__);
+        TPD_DEBUG("%s: execute selftest failed\n", __func__);
         return;
     }
     sec_mdelay(500);
@@ -2600,12 +2600,12 @@ static void sec_auto_test(struct seq_file *s, void *chip_data, struct sec_testda
     /* read and print selftest report */
     ret = sec_read_selftest_report(chip_info, sec_testdata);
     if (ret < 0) {
-        TPD_INFO("%s: Read selftest report failed\n", __func__);
+        TPD_DEBUG("%s: Read selftest report failed\n", __func__);
         return;
     }
 
     err_cnt += ret;
-    TPD_INFO("%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
+    TPD_DEBUG("%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
     seq_printf(s, "%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
 }
 
@@ -2645,7 +2645,7 @@ static void sec_black_screen_test(void *chip_data, char *message)
     sys_mkdir("/sdcard/TpTestReport/screenOff", 0666);
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         err_cnt++;
         goto out;
     }
@@ -2659,7 +2659,7 @@ static void sec_black_screen_test(void *chip_data, char *message)
     //step3: execute lp selftest
     ret = sec_execute_lp_selftest(chip_info, &sec_testdata);
     if (ret < 0) {
-        TPD_INFO("%s: execute lp selftest failed\n", __func__);
+        TPD_DEBUG("%s: execute lp selftest failed\n", __func__);
         err_cnt++;
         goto out;
     }
@@ -2668,7 +2668,7 @@ static void sec_black_screen_test(void *chip_data, char *message)
     //step4: read and print lp selftest report
     ret = sec_read_lp_selftest_report(chip_info, &sec_testdata);
     if (ret < 0) {
-        TPD_INFO("%s: Read selftest report failed\n", __func__);
+        TPD_DEBUG("%s: Read selftest report failed\n", __func__);
         err_cnt++;
         goto out;
     }
@@ -2679,7 +2679,7 @@ out:
     /* run mis cal */
     ret = sec_run_mis_cal(chip_info);
     if (ret < 0) {
-        TPD_INFO("%s: Write Mis Cal command Failed!\n", __func__);
+        TPD_DEBUG("%s: Write Mis Cal command Failed!\n", __func__);
         sprintf(message, "Write Mis Cal command Failed!\n");
         goto out_fd;
     }
@@ -2687,7 +2687,7 @@ out:
     /* get mis cal result */
     ret = sec_get_verify_result(chip_info);
     if (ret != 0) {
-        TPD_INFO("%s: Mis-Calibration result failed(0x%02x)\n", __func__, ret);
+        TPD_DEBUG("%s: Mis-Calibration result failed(0x%02x)\n", __func__, ret);
         sprintf(message, "Mis-Calibration result failed(0x%02x)\n", ret);
         goto out_fd;
     }
@@ -2698,7 +2698,7 @@ out_fd:
         set_fs(old_fs);
     }
     enable_irq(chip_info->client->irq);
-    TPD_INFO("%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
+    TPD_DEBUG("%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
     sprintf(message, "%d error(s). %s\n", err_cnt, err_cnt?"":"All Test Passed.");
     return;
 }
@@ -2709,7 +2709,7 @@ static int sec_get_verify_result(struct chip_data_s6d7at0 *chip_info)
 
     ret = touch_i2c_read_byte(chip_info->client, SEC_CMD_MIS_CAL_READ);
     //sec_release_tmode(chip_info);
-    TPD_INFO("%s: Mis cal Read: %02X", __func__, ret);
+    TPD_DEBUG("%s: Mis cal Read: %02X", __func__, ret);
 
     return ret;
 }
@@ -2758,12 +2758,12 @@ static int sec_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     unsigned char data[8] = { 0 };
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     /* 1. alloc chip info */
     chip_info = kzalloc(sizeof(struct chip_data_s6d7at0), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -2772,7 +2772,7 @@ static int sec_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -2809,33 +2809,33 @@ static int sec_tp_probe(struct i2c_client *client, const struct i2c_device_id *i
     if (ts->esd_handle_support) {
         sec_reset_esd(chip_info);
         ts->esd_info.esd_work_time = msecs_to_jiffies(SEC_TOUCH_ESD_CHECK_PERIOD); // change esd check interval to 0.2s
-        TPD_INFO("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
+        TPD_DEBUG("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
     }
 
     /* check touch firmware status*/
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_ID, 3, &data[0]);
     if (ret < 0)
-        TPD_INFO("%s: failed to read device ID(%d)\n", __func__, ret);
+        TPD_DEBUG("%s: failed to read device ID(%d)\n", __func__, ret);
     else
-        TPD_INFO("%s: TOUCH DEVICE ID : %02X, %02X, %02X\n", __func__, data[0], data[1], data[2]);
+        TPD_DEBUG("%s: TOUCH DEVICE ID : %02X, %02X, %02X\n", __func__, data[0], data[1], data[2]);
 
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_BOOT_STATUS, 1, &data[0]);
     if (ret < 0)
-        TPD_INFO("%s: failed to read touch status(%d)\n", __func__, ret);
+        TPD_DEBUG("%s: failed to read touch status(%d)\n", __func__, ret);
     else
-        TPD_INFO("%s: TOUCH BOOT STATUS: %02X\n", __func__,data[0]);
+        TPD_DEBUG("%s: TOUCH BOOT STATUS: %02X\n", __func__,data[0]);
 
     ret = touch_i2c_read_block(chip_info->client, SEC_READ_IMG_VERSION, 8, &data[0]);
     if (ret < 0)
-        TPD_INFO("%s: failed to read FW version(%d)\n", __func__, ret);
+        TPD_DEBUG("%s: failed to read FW version(%d)\n", __func__, ret);
     else
-        TPD_INFO("%s: TOUCH FW VERSION: %02X.%02X.%02X.%02X\n", __func__,data[0], data[1], data[2], data[3]);
+        TPD_DEBUG("%s: TOUCH FW VERSION: %02X.%02X.%02X.%02X\n", __func__,data[0], data[1], data[2], data[3]);
     sec_reset(chip_info);
 
     /* 6. create debug interface*/
     sec_raw_device_init(ts);
     sec_create_proc(ts, &sec_proc_ops);
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_register_driver:
@@ -2847,7 +2847,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -2855,7 +2855,7 @@ static int sec_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -2865,7 +2865,7 @@ static int sec_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -2875,7 +2875,7 @@ static int sec_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2917,13 +2917,13 @@ static struct i2c_driver tp_i2c_driver =
 /***********************Start of module init and exit****************************/
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
        return -1;
 
     if (i2c_add_driver(&tp_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

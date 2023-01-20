@@ -66,7 +66,7 @@ static int recovery_device_reset(struct recovery_hcd *recovery_hcd)
             &command,
             sizeof(command));
     if (retval < 0) {
-        TPD_INFO("Failed to write F$35 command\n");
+        TPD_DEBUG("Failed to write F$35 command\n");
         return retval;
     }
 
@@ -78,7 +78,7 @@ static int recovery_device_reset(struct recovery_hcd *recovery_hcd)
 static int recovery_add_data_entry(struct recovery_hcd *recovery_hcd, unsigned char data)
 {
     if (recovery_hcd->data_entries >= DATA_BUF_SIZE) {
-        TPD_INFO("Reached data buffer size limit\n");
+        TPD_DEBUG("Reached data buffer size limit\n");
         return -EINVAL;
     }
 
@@ -98,13 +98,13 @@ static int recovery_add_padding(struct recovery_hcd *recovery_hcd, unsigned int 
     while (padding) {
         retval = recovery_add_data_entry(recovery_hcd, 0xff);
         if (retval < 0) {
-            TPD_INFO("Failed to add data entry\n");
+            TPD_DEBUG("Failed to add data entry\n");
             return retval;
         }
 
         retval = recovery_add_data_entry(recovery_hcd, 0xff);
         if (retval < 0) {
-            TPD_INFO("Failed to add data entry\n");
+            TPD_DEBUG("Failed to add data entry\n");
             return retval;
         }
 
@@ -148,7 +148,7 @@ static int recovery_parse_ihex(struct recovery_hcd *recovery_hcd)
                 &data0,
                 &data1);
         if (retval != 7) {
-            TPD_INFO("Failed to read ihex record\n");
+            TPD_DEBUG("Failed to read ihex record\n");
             return -EINVAL;
         }
 
@@ -160,26 +160,26 @@ static int recovery_parse_ihex(struct recovery_hcd *recovery_hcd)
 
                 retval = recovery_add_data_entry(recovery_hcd, addr);
                 if (retval < 0) {
-                    TPD_INFO("Failed to add data entry\n");
+                    TPD_DEBUG("Failed to add data entry\n");
                     return retval;
                 }
 
                 retval = recovery_add_data_entry(recovery_hcd, addr >> 8);
                 if (retval < 0) {
-                    TPD_INFO("Failed to add data entry\n");
+                    TPD_DEBUG("Failed to add data entry\n");
                     return retval;
                 }
             }
 
             retval = recovery_add_data_entry(recovery_hcd, data0);
             if (retval < 0) {
-                TPD_INFO("Failed to add data entry\n");
+                TPD_DEBUG("Failed to add data entry\n");
                 return retval;
             }
 
             retval = recovery_add_data_entry(recovery_hcd, data1);
             if (retval < 0) {
-                TPD_INFO("Failed to add data entry\n");
+                TPD_DEBUG("Failed to add data entry\n");
                 return retval;
             }
 
@@ -187,7 +187,7 @@ static int recovery_parse_ihex(struct recovery_hcd *recovery_hcd)
         } else if (type == 0x02) {
             retval = recovery_add_padding(recovery_hcd, &words);
             if (retval < 0) {
-                TPD_INFO("Failed to add padding\n");
+                TPD_DEBUG("Failed to add padding\n");
                 return retval;
             }
 
@@ -198,7 +198,7 @@ static int recovery_parse_ihex(struct recovery_hcd *recovery_hcd)
 
     retval = recovery_add_padding(recovery_hcd, &words);
     if (retval < 0) {
-        TPD_INFO("Failed to add padding\n");
+        TPD_DEBUG("Failed to add padding\n");
         return retval;
     }
 
@@ -215,14 +215,14 @@ static int recovery_check_status(struct recovery_hcd *recovery_hcd)
             &status,
             sizeof(status));
     if (retval < 0) {
-        TPD_INFO("Failed to read status\n");
+        TPD_DEBUG("Failed to read status\n");
         return retval;
     }
 
     status = status & 0x1f;
 
     if (status != 0x00) {
-        TPD_INFO("Recovery mode status = 0x%02x\n", status);
+        TPD_DEBUG("Recovery mode status = 0x%02x\n", status);
         return -EINVAL;
     }
 
@@ -257,7 +257,7 @@ static int recovery_write_flash(struct recovery_hcd *recovery_hcd)
                 recovery_hcd->data_entries - entries_written,
                 entries_to_write);
         if (retval < 0) {
-            TPD_INFO("Failed to copy chunk data\n");
+            TPD_DEBUG("Failed to copy chunk data\n");
             return retval;
         }
 
@@ -266,7 +266,7 @@ static int recovery_write_flash(struct recovery_hcd *recovery_hcd)
                 recovery_hcd->chunk_buf,
                 chunk_buf_size);
         if (retval < 0) {
-            TPD_INFO("Failed to write chunk data\n");
+            TPD_DEBUG("Failed to write chunk data\n");
             return retval;
         }
 
@@ -276,7 +276,7 @@ static int recovery_write_flash(struct recovery_hcd *recovery_hcd)
 
     retval = recovery_check_status(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to get no error recovery mode status\n");
+        TPD_DEBUG("Failed to get no error recovery mode status\n");
         return retval;
     }
 
@@ -303,7 +303,7 @@ static int recovery_poll_erase_completion(struct recovery_hcd *recovery_hcd)
                 &command,
                 sizeof(command));
         if (retval < 0) {
-            TPD_INFO("Failed to write F$35 command\n");
+            TPD_DEBUG("Failed to write F$35 command\n");
             return retval;
         }
 
@@ -313,7 +313,7 @@ static int recovery_poll_erase_completion(struct recovery_hcd *recovery_hcd)
                     &command,
                     sizeof(command));
             if (retval < 0) {
-                TPD_INFO("Failed to read command status\n");
+                TPD_DEBUG("Failed to read command status\n");
                 return retval;
             }
 
@@ -337,7 +337,7 @@ static int recovery_poll_erase_completion(struct recovery_hcd *recovery_hcd)
                 &status,
                 sizeof(status));
         if (retval < 0) {
-            TPD_INFO("Failed to read flash status\n");
+            TPD_DEBUG("Failed to read flash status\n");
             return retval;
         }
 
@@ -357,7 +357,7 @@ static int recovery_poll_erase_completion(struct recovery_hcd *recovery_hcd)
 
 exit:
     if (retval < 0) {
-        TPD_INFO("Failed to get erase completion\n");
+        TPD_DEBUG("Failed to get erase completion\n");
     }
 
     return retval;
@@ -375,14 +375,14 @@ static int recovery_erase_flash(struct recovery_hcd *recovery_hcd)
             &command,
             sizeof(command));
     if (retval < 0) {
-        TPD_INFO("Failed to write F$35 command\n");
+        TPD_DEBUG("Failed to write F$35 command\n");
         return retval;
     }
 
     if (recovery_hcd->f35_addr.command_base) {
         retval = recovery_poll_erase_completion(recovery_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to wait for erase completion\n");
+            TPD_DEBUG("Failed to wait for erase completion\n");
             return retval;
         }
     } else {
@@ -391,7 +391,7 @@ static int recovery_erase_flash(struct recovery_hcd *recovery_hcd)
 
     retval = recovery_check_status(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to get no error recovery mode status\n");
+        TPD_DEBUG("Failed to get no error recovery mode status\n");
         return retval;
     }
 
@@ -407,12 +407,12 @@ static int recovery_in_ubl_mode(struct recovery_hcd *recovery_hcd)
             (unsigned char *)&p_entry,
             sizeof(p_entry));
     if (retval < 0) {
-        TPD_INFO("Failed to read PDT entry\n");
+        TPD_DEBUG("Failed to read PDT entry\n");
         return false;
     }
 
     if (p_entry.fn_number != UBL_FN_NUMBER) {
-        TPD_INFO("Failed to find F$35\n");
+        TPD_DEBUG("Failed to find F$35\n");
         return false;
     }
     return true;
@@ -423,11 +423,11 @@ static int recovery_get_fw_ihex(struct recovery_hcd *recovery_hcd, char *iHex)
 
     retval = request_firmware(&recovery_hcd->fw_entry, iHex, &recovery_hcd->tcm_hcd->client->dev);
     if (retval < 0) {
-        TPD_INFO("Failed to request %s\n", iHex);
+        TPD_DEBUG("Failed to request %s\n", iHex);
         return retval;
     }
 
-    TPD_INFO("ihex file size = %d\n", (unsigned int)recovery_hcd->fw_entry->size);
+    TPD_DEBUG("ihex file size = %d\n", (unsigned int)recovery_hcd->fw_entry->size);
     secure_memcpy(recovery_hcd->ihex_buf,
                 recovery_hcd->fw_entry->size,
                 recovery_hcd->fw_entry->data,
@@ -445,13 +445,13 @@ static int recovery_do_recovery(struct recovery_hcd *recovery_hcd, char *iHex)
 
     retval = recovery_get_fw_ihex(recovery_hcd, iHex);
     if (retval < 0) {
-        TPD_INFO("Failed to get ihex data\n");
+        TPD_DEBUG("Failed to get ihex data\n");
         return retval;
     }
 
     retval = recovery_parse_ihex(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to parse ihex data\n");
+        TPD_DEBUG("Failed to parse ihex data\n");
         return retval;
     }
 
@@ -460,12 +460,12 @@ static int recovery_do_recovery(struct recovery_hcd *recovery_hcd, char *iHex)
             (unsigned char *)&p_entry,
             sizeof(p_entry));
     if (retval < 0) {
-        TPD_INFO("Failed to read PDT entry\n");
+        TPD_DEBUG("Failed to read PDT entry\n");
         return retval;
     }
 
     if (p_entry.fn_number != UBL_FN_NUMBER) {
-        TPD_INFO("Failed to find F$35\n");
+        TPD_DEBUG("Failed to find F$35\n");
         return -ENODEV;
     }
 
@@ -474,31 +474,31 @@ static int recovery_do_recovery(struct recovery_hcd *recovery_hcd, char *iHex)
     recovery_hcd->f35_addr.control_base = p_entry.control_base_addr;
     recovery_hcd->f35_addr.data_base = p_entry.data_base_addr;
 
-    TPD_INFO("Start of recovery\n");
+    TPD_DEBUG("Start of recovery\n");
 
     retval = recovery_erase_flash(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to erase flash\n");
+        TPD_DEBUG("Failed to erase flash\n");
         return retval;
     }
 
-    TPD_INFO("Flash erased\n");
+    TPD_DEBUG("Flash erased\n");
 
     retval = recovery_write_flash(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to write to flash\n");
+        TPD_DEBUG("Failed to write to flash\n");
         return retval;
     }
 
-    TPD_INFO("Flash written\n");
+    TPD_DEBUG("Flash written\n");
 
     retval = recovery_device_reset(recovery_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to do reset\n");
+        TPD_DEBUG("Failed to do reset\n");
         return retval;
     }
 
-    TPD_INFO("End of recovery\n");
+    TPD_DEBUG("End of recovery\n");
 
     return 0;
 }
@@ -510,20 +510,20 @@ int td4330_try_to_recovery_ic(struct syna_tcm_hcd *tcm_hcd, char *iHex)
 
     recovery_hcd = kzalloc(sizeof(*recovery_hcd), GFP_KERNEL);
     if (!recovery_hcd) {
-        TPD_INFO("Failed to allocate memory for recovery_hcd\n");
+        TPD_DEBUG("Failed to allocate memory for recovery_hcd\n");
         return -ENOMEM;
     }
 
     recovery_hcd->ihex_buf = kzalloc(IHEX_BUF_SIZE, GFP_KERNEL);
     if (!recovery_hcd->ihex_buf) {
-        TPD_INFO("Failed to allocate memory for recovery_hcd->ihex_buf\n");
+        TPD_DEBUG("Failed to allocate memory for recovery_hcd->ihex_buf\n");
         retval = -ENOMEM;
         goto err_allocate_ihex_buf;
     }
 
     recovery_hcd->data_buf = kzalloc(DATA_BUF_SIZE, GFP_KERNEL);
     if (!recovery_hcd->data_buf) {
-        TPD_INFO("Failed to allocate memory for recovery_hcd->data_buf\n");
+        TPD_DEBUG("Failed to allocate memory for recovery_hcd->data_buf\n");
         retval = -ENOMEM;
         goto err_allocate_data_buf;
     }
@@ -534,7 +534,7 @@ int td4330_try_to_recovery_ic(struct syna_tcm_hcd *tcm_hcd, char *iHex)
     recovery_hcd->tcm_hcd = tcm_hcd;
 
     if (!recovery_in_ubl_mode(recovery_hcd)) {
-        TPD_INFO("not in ubl mode, goto normal fw update process\n");
+        TPD_DEBUG("not in ubl mode, goto normal fw update process\n");
         retval = 0;
         goto exit;
     }

@@ -56,11 +56,11 @@
 
 
 #define FTS_TEST_FUNC_ENTER() do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Enter\n", __func__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Enter\n", __func__); \
 } while (0)
 
 #define FTS_TEST_FUNC_EXIT()  do { \
-    TPD_INFO("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
+    TPD_DEBUG("[FTS_TS][TEST]%s: Exit(%d)\n", __func__, __LINE__); \
 } while (0)
 
 
@@ -68,14 +68,14 @@
     if (g_ft3681_data->s) { \
         seq_printf(g_ft3681_data->s, fmt, ##args); \
     } \
-    TPD_INFO(fmt, ##args); \
+    TPD_DEBUG(fmt, ##args); \
 } while (0)
 
 #define FTS_TEST_SAVE_ERR(fmt, args...)  do { \
     if (g_ft3681_data->s) { \
         seq_printf(g_ft3681_data->s, fmt, ##args); \
     } \
-    TPD_INFO(fmt, ##args); \
+    TPD_DEBUG(fmt, ##args); \
 } while (0)
 
 #define SHORT_MIN_CA                    600
@@ -134,7 +134,7 @@ void ft3681_print_buffer(int *buffer, int length, int line_num)
 	int cnt = 0;
 
 	if ((NULL == buffer) || (length <= 0)) {
-		TPD_INFO("buffer/length(%d) fail", length);
+		TPD_DEBUG("buffer/length(%d) fail", length);
 		return;
 	}
 
@@ -143,7 +143,7 @@ void ft3681_print_buffer(int *buffer, int length, int line_num)
 	tmpbuf = kzalloc(tmplen, GFP_KERNEL);
 
 	if (!tmpbuf) {
-		TPD_INFO("%s, alloc failed \n", __func__);
+		TPD_DEBUG("%s, alloc failed \n", __func__);
 		return;
 	}
 
@@ -335,7 +335,7 @@ static int wait_state_update(u8 retval)
 		if ((ret >= 0) && (retval == state)) {
 			break;
 		} else {
-			TPD_INFO("reg%x=%x,retry:%d", addr, state, times);
+			TPD_DEBUG("reg%x=%x,retry:%d", addr, state, times);
 		}
 	}
 
@@ -370,7 +370,7 @@ static int read_mass_data(u8 addr, int byte_num, int *buf)
 	}
 
 	/* read rawdata buffer */
-	TPD_INFO("mass data len:%d", byte_num);
+	TPD_DEBUG("mass data len:%d", byte_num);
 	ret = ft3681_test_read(addr, data, byte_num);
 
 	if (ret < 0) {
@@ -436,7 +436,7 @@ static int enter_work_mode(void)
 	int i = 0;
 	int j = 0;
 
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	ret = ft3681_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 
 	if ((ret >= 0) && (0x00 == mode)) {
@@ -453,7 +453,7 @@ static int enter_work_mode(void)
 				ret = ft3681_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 
 				if ((ret >= 0) && (0x00 == mode)) {
-					TPD_INFO("enter work mode success");
+					TPD_DEBUG("enter work mode success");
 					return 0;
 
 				} else {
@@ -470,7 +470,7 @@ static int enter_work_mode(void)
 		return -EIO;
 	}
 
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 	return 0;
 }
 
@@ -518,7 +518,7 @@ static int enter_factory_mode(struct chip_data_ft3681 *ts_data)
 				ret = ft3681_test_read_reg(DEVIDE_MODE_ADDR, &mode);
 
 				if ((ret >= 0) && (FT3681_FACTORY_MODE == mode)) {
-					TPD_INFO("enter factory mode success");
+					TPD_DEBUG("enter factory mode success");
 					sys_delay(200);
 					ft3681_special_operation_for_samsung(ts_data);
 					return 0;
@@ -624,7 +624,7 @@ static int start_scan(void)
 			break;
 
 		} else {
-			TPD_INFO("reg%x=%x,retry:%d", addr, val, times);
+			TPD_DEBUG("reg%x=%x,retry:%d", addr, val, times);
 		}
 	}
 
@@ -667,7 +667,7 @@ int ft3681_start_scan(int frame_num)
 		if ((ret >= 0) && (val == finish_val)) {
 			break;
 		} else {
-			TPD_INFO("reg%x=%x,retry:%d", addr, val, times);
+			TPD_DEBUG("reg%x=%x,retry:%d", addr, val, times);
 		}
 	}
 
@@ -813,7 +813,7 @@ static bool compare_mc_sc(struct chip_data_ft3681 *ts_data, bool tx_check,
 			}
 
 			if ((data[i] < min[i]) || (data[i] > max[i])) {
-				TPD_INFO("rx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i],
+				TPD_DEBUG("rx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i],
 					 min[i]);
 				FTS_TEST_SAVE_ERR("test fail,rx%d=%5d,range=(%5d,%5d)\n",
 						  i + 1, data[i], min[i], max[i]);
@@ -829,7 +829,7 @@ static bool compare_mc_sc(struct chip_data_ft3681 *ts_data, bool tx_check,
 			}
 
 			if ((data[i] < min[i]) || (data[i] > max[i])) {
-				TPD_INFO("tx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i],
+				TPD_DEBUG("tx check ERR [%d]: [%d] > [%d] > [%d] \n", i, max[i], data[i],
 					 min[i]);
 				FTS_TEST_SAVE_INFO("test fail,tx%d=%5d,range=(%5d,%5d)\n",
 						   i - rx_num + 1, data[i], min[i], max[i]);
@@ -899,7 +899,7 @@ static int short_test_ch_to_all(struct chip_data_ft3681 *ts_data,
 	int byte_num = 0;
 	u8 ab_ch_num = 0;
 
-	TPD_INFO("short test:channel to all other\n");
+	TPD_DEBUG("short test:channel to all other\n");
 
 	ret = ft3681_test_write_reg(FACTROY_REG_SHORT2_RES_LEVEL, 1);
 	if (ret < 0) {
@@ -927,11 +927,11 @@ static int short_test_ch_to_all(struct chip_data_ft3681 *ts_data,
 	if (ab_ch_num) {
 		ft3681_print_buffer(res, ch_num, ch_num);
 		ab_ch[0] = ab_ch_num;
-		TPD_INFO("[FTS_TS]ab_ch:");
+		TPD_DEBUG("[FTS_TS]ab_ch:");
 		for (i = 0; i < ab_ch_num + 1; i++) {
-			TPD_INFO("%2d ", ab_ch[i]);
+			TPD_DEBUG("%2d ", ab_ch[i]);
 		}
-		TPD_INFO("\n");
+		TPD_DEBUG("\n");
 	}
 
 	return 0;
@@ -944,12 +944,12 @@ static void ft3681_show_null_noise(int *null_noise, int rx_num)
 	char tmpbuf[512] = { 0 };
 
 	/*show noise*/
-	TPD_INFO("null noise:%d", null_noise[0]);
+	TPD_DEBUG("null noise:%d", null_noise[0]);
 	for (i = 0; i < (rx_num * 3); i = i + 1) {
 		cnt += snprintf(tmpbuf + cnt, 512 - cnt, "%5d,", null_noise[i + 1]);
 		if (((i + 1) % rx_num) == 0) {
 			cnt = 0;
-			TPD_INFO("%s", tmpbuf);
+			TPD_DEBUG("%s", tmpbuf);
 		}
 	}
 }
@@ -962,10 +962,10 @@ static void ft3681_get_null_noise(struct chip_data_ft3681 *ts_data)
 	int null_byte_num = 0;
 
 	null_byte_num = ts_data->hw_res->RX_NUM * 3 + 1;//ts_data->fre_num + 1;
-	TPD_INFO("null noise num:%d", null_byte_num);
+	TPD_DEBUG("null noise num:%d", null_byte_num);
 	null_noise = kzalloc(null_byte_num * sizeof(int), GFP_KERNEL);
 	if (!null_noise) {
-		TPD_INFO("null_noise malloc fail");
+		TPD_DEBUG("null_noise malloc fail");
 		return;
 	}
 
@@ -973,7 +973,7 @@ static void ft3681_get_null_noise(struct chip_data_ft3681 *ts_data)
 	ret = read_rawdata(FACTORY_REG_LINE_ADDR, 0xB0, 0xCE, null_byte_num,
 			   null_noise);
 	if (ret < 0) {
-		TPD_INFO("read null noise fail\n");
+		TPD_DEBUG("read null noise fail\n");
 	} else {
 		ts_data->null_noise_value = null_noise[0];
 		snprintf(data_buf, 64, "%d,", null_noise[0]);
@@ -1093,7 +1093,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 	FTS_TEST_SAVE_INFO("\n============ Test Item: Noise Test\n");
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_noise_data_P || !ts_data->ft3681_autotest_offset->ft3681_noise_data_N) {
-		TPD_INFO("ft3681_noise_data_P || ft3681_noise_data_N is NULL");
+		TPD_DEBUG("ft3681_noise_data_P || ft3681_noise_data_N is NULL");
 		return 0;
 	}
 
@@ -1117,7 +1117,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		goto test_err;
 	}
 
-	TPD_INFO("reg0d_val = [%d]\n", reg0d_val);
+	TPD_DEBUG("reg0d_val = [%d]\n", reg0d_val);
 
 	/* save origin value */
 	ret = ft3681_test_read_reg(FACTORY_REG_DATA_SELECT, &reg06_val);
@@ -1127,7 +1127,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		goto test_err;
 	}
 
-	TPD_INFO("reg06_val = [%d]\n", reg06_val);
+	TPD_DEBUG("reg06_val = [%d]\n", reg06_val);
 
 	ret = ft3681_test_read_reg(FACTORY_REG_FRE_LIST, &fre);
 
@@ -1136,7 +1136,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		goto test_err;
 	}
 
-	TPD_INFO("fre = [%d]\n", fre);
+	TPD_DEBUG("fre = [%d]\n", fre);
 
 	ret = ft3681_test_read_reg(0x1A, &reg1a_val);
 
@@ -1145,7 +1145,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		goto test_err;
 	}
 
-	TPD_INFO("reg1a_val = [%d]\n", reg1a_val);
+	TPD_DEBUG("reg1a_val = [%d]\n", reg1a_val);
 
 	ret = ft3681_test_read_reg(0x1B, &reg1b_val);
 
@@ -1154,7 +1154,7 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		goto test_err;
 	}
 
-	TPD_INFO("reg1B_val = [%d]\n", reg1b_val);
+	TPD_DEBUG("reg1B_val = [%d]\n", reg1b_val);
 
 	ret = ft3681_test_write_reg(FACTORY_REG_DATA_SELECT, 0x01);
 
@@ -1226,14 +1226,14 @@ static int ft3681_noise_autotest(struct chip_data_ft3681 *ts_data, bool *test_re
 		for (i = 0; i < node_num; i++) {
 			//if ((rawdata[i] > ts_data->ft3681_autotest_offset->ft3681_noise_data_P[i]) || (rawdata[i] < ts_data->ft3681_autotest_offset->ft3681_noise_data_N[i])) {
 			if (ts_data->noise_rawdata[i] > ts_data->ft3681_autotest_offset->ft3681_noise_data_P[i]) {
-				TPD_INFO("noise data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_noise_data_P[i], ts_data->noise_rawdata[i], ts_data->ft3681_autotest_offset->ft3681_noise_data_N[i]);
+				TPD_DEBUG("noise data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_noise_data_P[i], ts_data->noise_rawdata[i], ts_data->ft3681_autotest_offset->ft3681_noise_data_N[i]);
 				FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
 						  i / rx_num + 1, i % rx_num + 1, ts_data->noise_rawdata[i], ts_data->ft3681_autotest_offset->ft3681_noise_data_N[i], ts_data->ft3681_autotest_offset->ft3681_noise_data_P[i]);
 				result = false;
 			}
 		}
 	} else {
-		TPD_INFO("ft3681_raw_data_P || ft3681_raw_data_N is null \n");
+		TPD_DEBUG("ft3681_raw_data_P || ft3681_raw_data_N is null \n");
 		result = false;
 	}
 
@@ -1309,7 +1309,7 @@ static int ft3681_rawdata_autotest(struct chip_data_ft3681 *ts_data, bool *test_
 	FTS_TEST_SAVE_INFO("\n============ Test Item: Rawdata Test\n");
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_raw_data_P || !ts_data->ft3681_autotest_offset->ft3681_raw_data_N) {
-		TPD_INFO("ft3681_raw_data_P || ft3681_raw_data_N is NULL");
+		TPD_DEBUG("ft3681_raw_data_P || ft3681_raw_data_N is NULL");
 		return 0;
 	}
 
@@ -1415,7 +1415,7 @@ static int ft3681_rawdata_autotest(struct chip_data_ft3681 *ts_data, bool *test_
 		}
 
 		if ((ts_data->rawdata[i] < ts_data->ft3681_autotest_offset->ft3681_raw_data_N[i]) || (ts_data->rawdata[i] > ts_data->ft3681_autotest_offset->ft3681_raw_data_P[i])) {
-			TPD_INFO("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_raw_data_P[i], ts_data->rawdata[i], ts_data->ft3681_autotest_offset->ft3681_raw_data_N[i]);
+			TPD_DEBUG("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_raw_data_P[i], ts_data->rawdata[i], ts_data->ft3681_autotest_offset->ft3681_raw_data_N[i]);
 			FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
 					  i / rx_num + 1, i % rx_num + 1, ts_data->rawdata[i],
 					  ts_data->ft3681_autotest_offset->ft3681_raw_data_N[i], ts_data->ft3681_autotest_offset->ft3681_raw_data_P[i]);
@@ -1487,7 +1487,7 @@ static int ft3681_uniformity_autotest(struct chip_data_ft3681 *ts_data, bool *te
 	FTS_TEST_SAVE_INFO("\n============ Test Item: Rawdata Unfiormity Test\n");
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P || !ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N) {
-		TPD_INFO("ft3681_uniformity_data_P || ft3681_uniformity_data_N is NULL");
+		TPD_DEBUG("ft3681_uniformity_data_P || ft3681_uniformity_data_N is NULL");
 		return 0;
 	}
 
@@ -1524,7 +1524,7 @@ static int ft3681_uniformity_autotest(struct chip_data_ft3681 *ts_data, bool *te
 		}
 
 		if ((rl_tmp[i] < ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]) || (rl_tmp[i] > ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i])) {
-			TPD_INFO("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i], rl_tmp[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]);
+			TPD_DEBUG("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i], rl_tmp[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]);
 			FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
 					  i / rx_num + 1, i % rx_num + 1, rl_tmp[i],
 					  ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i]);
@@ -1554,7 +1554,7 @@ static int ft3681_uniformity_autotest(struct chip_data_ft3681 *ts_data, bool *te
 		}
 
 		if ((rl_tmp[i] < ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]) || (rl_tmp[i] > ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i])) {
-			TPD_INFO("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i], rl_tmp[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]);
+			TPD_DEBUG("uniformity data ERR [%d]: [%d] > [%d] > [%d] \n", i, ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i], rl_tmp[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i]);
 			FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
 					  i / rx_num + 1, i % rx_num + 1, rl_tmp[i],
 					  ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N[i], ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P[i]);
@@ -1599,7 +1599,7 @@ static int ft3681_scap_cb_autotest(struct chip_data_ft3681 *ts_data, bool *test_
 	FTS_TEST_SAVE_INFO("\n============ Test Item: Scap CB Test\n");
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_P || !ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_N || !ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_N || !ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_P) {
-		TPD_INFO("ft3681_scap_cb_data_P || ft3681_scap_cb_data_N || ft3681_scap_cb_data_waterproof_N || ft3681_scap_cb_data_waterproof_P is NULL");
+		TPD_DEBUG("ft3681_scap_cb_data_P || ft3681_scap_cb_data_N || ft3681_scap_cb_data_waterproof_N || ft3681_scap_cb_data_waterproof_P is NULL");
 		return 0;
 	}
 
@@ -1664,7 +1664,7 @@ static int ft3681_scap_cb_autotest(struct chip_data_ft3681 *ts_data, bool *test_
 			FTS_TEST_SAVE_ERR("read GCB_TX fail,ret=%d\n", ret);
 			goto restore_reg;
 		}
-		TPD_INFO("GCB:RX=%d,TX=%d", ts_data->scap_gcb_rx, ts_data->scap_gcb_tx);
+		TPD_DEBUG("GCB:RX=%d,TX=%d", ts_data->scap_gcb_rx, ts_data->scap_gcb_tx);
 
 		/* compare */
 		tx_check = get_fw_wp(wc_sel, WATER_PROOF_ON_TX);
@@ -1728,7 +1728,7 @@ static int ft3681_scap_cb_autotest(struct chip_data_ft3681 *ts_data, bool *test_
 			FTS_TEST_SAVE_ERR("read GCB_TX fail,ret=%d\n", ret);
 			goto restore_reg;
 		}
-		TPD_INFO("GCB:RX=%d,TX=%d", ts_data->scap_gcb_rx, ts_data->scap_gcb_tx);
+		TPD_DEBUG("GCB:RX=%d,TX=%d", ts_data->scap_gcb_rx, ts_data->scap_gcb_tx);
 
 		/* compare */
 		tx_check = get_fw_wp(wc_sel, WATER_PROOF_OFF_TX);
@@ -1810,7 +1810,7 @@ static int ft3681_scap_rawdata_autotest(struct chip_data_ft3681 *ts_data, bool *
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_P || !ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_N ||
 	    !ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_N || !ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_P) {
-		TPD_INFO("ft3681_scap_raw_data_P || ft3681_scap_raw_data_N || ft3681_scap_raw_waterproof_data_N || ft3681_scap_raw_waterproof_data_P is NULL");
+		TPD_DEBUG("ft3681_scap_raw_data_P || ft3681_scap_raw_data_N || ft3681_scap_raw_waterproof_data_N || ft3681_scap_raw_waterproof_data_P is NULL");
 		return 0;
 	}
 
@@ -1991,7 +1991,7 @@ static int ft3681_panel_differ_test(struct chip_data_ft3681 *ts_data, bool *test
 
 	if (!ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P
 	    || !ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N) {
-		TPD_INFO("ft3681_panel_differ_data_P || ft3681_panel_differ_data_N is NULL");
+		TPD_DEBUG("ft3681_panel_differ_data_P || ft3681_panel_differ_data_N is NULL");
 		return 0;
 	}
 
@@ -2108,7 +2108,7 @@ static int ft3681_panel_differ_test(struct chip_data_ft3681 *ts_data, bool *test
 
 		if ((ts_data->panel_differ[i] < ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N[i])
 		    || (ts_data->panel_differ[i] > ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P[i])) {
-			TPD_INFO("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i,
+			TPD_DEBUG("raw data ERR [%d]: [%d] > [%d] > [%d] \n", i,
 			         ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P[i], ts_data->panel_differ[i],
 			         ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N[i]);
 			FTS_TEST_SAVE_ERR("test fail,node(%4d,%4d)=%5d,range=(%5d,%5d)\n",
@@ -2183,7 +2183,7 @@ static void ft3681_auto_write_result(struct chip_data_ft3681 *ts_data, int faile
 	struct timespec now_time;
 	struct rtc_time rtc_now_time;
 
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 
 	//step2: create a file to store test data in /sdcard/Tp_Test
 	getnstimeofday(&now_time);
@@ -2215,7 +2215,7 @@ static void ft3681_auto_write_result(struct chip_data_ft3681 *ts_data, int faile
 	ts_data->csv_fd = sys_open(file_data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
 	if (ts_data->csv_fd < 0) {
-		TPD_INFO("Open log file '%s' failed, %d.\n", file_data_buf, ts_data->csv_fd);
+		TPD_DEBUG("Open log file '%s' failed, %d.\n", file_data_buf, ts_data->csv_fd);
 		set_fs(old_fs);
 		return;
 	}
@@ -2389,14 +2389,14 @@ static void ft3681_auto_write_result(struct chip_data_ft3681 *ts_data, int faile
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
 		set_fs(old_fs);
 	}
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 	return;
 }
 
 
 static int ft3681_auto_endoperation(struct chip_data_ft3681 *ts_data)
 {
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	if (ts_data->rawdata_linearity) {
 		kfree(ts_data->rawdata_linearity);
 		ts_data->rawdata_linearity = NULL;
@@ -2424,7 +2424,7 @@ static int ft3681_auto_endoperation(struct chip_data_ft3681 *ts_data)
 		kfree(ts_data->noise_rawdata);
 		ts_data->noise_rawdata = NULL;
 	}
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 
 	return 0;
 }
@@ -2442,14 +2442,14 @@ static int ft3681_rst_test(struct chip_data_ft3681 *ts_data)
 	ft3681_test_write_reg(FT3681_REG_REPORT_RATE, val2);
 	ft3681_rstpin_reset((void *)ts_data);
 	ft3681_test_read_reg(FT3681_REG_REPORT_RATE, &val3);
-	TPD_INFO("one: reset test: val = %d, val3 = %d", val, val3);
+	TPD_DEBUG("one: reset test: val = %d, val3 = %d", val, val3);
 
 	ft3681_test_read_reg(FT3681_REG_REPORT_RATE, &val);
 	val2 = val - 1;
 	ft3681_test_write_reg(FT3681_REG_REPORT_RATE, val2);
 	ft3681_rstpin_reset((void *)ts_data);
 	ft3681_test_read_reg(FT3681_REG_REPORT_RATE, &val3);
-	TPD_INFO("two: reset test: val = %d, val3 = %d", val, val3);
+	TPD_DEBUG("two: reset test: val = %d, val3 = %d", val, val3);
 
 	if (val3 != val) {
 		FTS_TEST_SAVE_ERR("check reg to test rst failed.\n");
@@ -2467,7 +2467,7 @@ static int ft3681_start_test(struct chip_data_ft3681 *ts_data)
 	int failed_count = 0;
 
 	FTS_TEST_FUNC_ENTER();
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	ft3681_auto_preoperation(ts_data);
 
 	/*noise test*/
@@ -2541,9 +2541,9 @@ static int ft3681_start_test(struct chip_data_ft3681 *ts_data)
 	ft3681_auto_write_result(ts_data, failed_count);
 	ft3681_auto_endoperation(ts_data);
 
-	TPD_INFO("%s: test_result = [0x%x] \n ", __func__, test_result);
+	TPD_DEBUG("%s: test_result = [0x%x] \n ", __func__, test_result);
 	FTS_TEST_FUNC_EXIT();
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 
 	return failed_count;
 }
@@ -2553,7 +2553,7 @@ static void ft3681_threshold_free(struct chip_data_ft3681 *ts_data)
 {
 	struct mc_sc_threshold *thr = &ts_data->mpt.thr;
 
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	kfree(thr->node_valid);
 	kfree(thr->node_valid_sc);
 	kfree(thr->rawdata_h_max);
@@ -2572,13 +2572,13 @@ static void ft3681_threshold_free(struct chip_data_ft3681 *ts_data)
 	kfree(thr->scap_rawdata_on_min);
 	kfree(thr->panel_differ_max);
 	kfree(thr->panel_differ_min);
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 	return;
 }
 
 static void ft3681_autotest_endoperation(struct chip_data_ft3681 *ts_data, const struct firmware *limit_fw)
 {
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	if (ts_data->ft3681_autotest_offset) {
 		kfree(ts_data->ft3681_autotest_offset);
 		ts_data->ft3681_autotest_offset = NULL;
@@ -2588,7 +2588,7 @@ static void ft3681_autotest_endoperation(struct chip_data_ft3681 *ts_data, const
 		release_firmware(limit_fw);
 		limit_fw = NULL;
 	}
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 }
 
 static int ft3681_threshold_malloc(struct chip_data_ft3681 *ts_data)
@@ -2747,10 +2747,10 @@ static int ft3681_get_threshold(struct chip_data_ft3681 *ts_data, char *data)
 			thr->panel_differ_max[i] = 1400;
 			thr->panel_differ_min[i] = 200;
 		}
-		TPD_INFO("raw_max = [%d] raw_min = [%d] \n", 12000, 2690);
-		TPD_INFO("tx_linearity_max = [%d] tx_linearity_min = [%d] \n", 40, 0);
-		TPD_INFO("rx_linearity_max = [%d] rx_linearity_min = [%d] \n", 40, 0);
-		TPD_INFO("panel_differ_max = [%d] panel_differ_min = [%d] \n", 1400, 200);
+		TPD_DEBUG("raw_max = [%d] raw_min = [%d] \n", 12000, 2690);
+		TPD_DEBUG("tx_linearity_max = [%d] tx_linearity_min = [%d] \n", 40, 0);
+		TPD_DEBUG("rx_linearity_max = [%d] rx_linearity_min = [%d] \n", 40, 0);
+		TPD_DEBUG("panel_differ_max = [%d] panel_differ_min = [%d] \n", 1400, 200);
 
 #if 0
 		thr->rawdata_h_max[0] = 7090;
@@ -2774,11 +2774,11 @@ static int ft3681_get_threshold(struct chip_data_ft3681 *ts_data, char *data)
 			thr->scap_rawdata_on_max[i] = 15000;
 			thr->scap_rawdata_on_min[i] = 3000;
 		}
-		TPD_INFO("node_valid_sc = [%d] \n", 1);
-		TPD_INFO("scap_cb_off_max = [%d] scap_cb_off_min = [%d] \n", 490, 0);
-		TPD_INFO("scap_cb_on_max = [%d] scap_cb_on_min = [%d] \n", 490, 0);
-		TPD_INFO("scap_rawdata_off_max = [%d] scap_rawdata_off_min = [%d] \n", 15000, 3000);
-		TPD_INFO("scap_rawdata_on_max = [%d] scap_rawdata_on_min = [%d] \n", 15000, 3000);
+		TPD_DEBUG("node_valid_sc = [%d] \n", 1);
+		TPD_DEBUG("scap_cb_off_max = [%d] scap_cb_off_min = [%d] \n", 490, 0);
+		TPD_DEBUG("scap_cb_on_max = [%d] scap_cb_on_min = [%d] \n", 490, 0);
+		TPD_DEBUG("scap_rawdata_off_max = [%d] scap_rawdata_off_min = [%d] \n", 15000, 3000);
+		TPD_DEBUG("scap_rawdata_on_max = [%d] scap_rawdata_on_min = [%d] \n", 15000, 3000);
 	}
 
 	return 0;
@@ -2803,28 +2803,28 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 	} else {
 		ts_data->use_panelfactory_limit = true;
 	}
-	TPD_INFO("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
+	TPD_DEBUG("%s, use_panelfactory_limit = %d \n", __func__, ts_data->use_panelfactory_limit);
 
 	ts_data->ft3681_autotest_offset = kzalloc(sizeof(struct ft3681_autotest_offset), GFP_KERNEL);
 
 	ret = request_real_test_limit(ts,&limit_fw, ts->panel_data.test_limit_name, &ts_data->ft_spi->dev);
-	TPD_INFO("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
+	TPD_DEBUG("limit_img path is [%s] \n", ts->panel_data.test_limit_name);
 	if (ret < 0) {
-		TPD_INFO("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+		TPD_DEBUG("Request limit_img failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
 		goto RELEASE_DATA;
 	}
 
 	ph = (struct auto_test_header *)(limit_fw->data);
 #if 0
-	TPD_INFO("start to dump img \n");
+	TPD_DEBUG("start to dump img \n");
 	p_print = (uint8_t *)ph;
 	for (i = 0; i < 16 * 8; i++) {
 		if (i % 16 == 0) {
-			TPD_INFO("current line [%d]: \n", i / 16);
+			TPD_DEBUG("current line [%d]: \n", i / 16);
 		}
-		TPD_INFO("0x%x \n", *(p_print + i * sizeof(uint8_t)));
+		TPD_DEBUG("0x%x \n", *(p_print + i * sizeof(uint8_t)));
 	}
-	TPD_INFO("end of dump img \n");
+	TPD_DEBUG("end of dump img \n");
 #endif
 	p_item_offset = (uint32_t *)(limit_fw->data + 16);
 	for (i = 0; i < 8 * sizeof(ph->test_item); i++) {
@@ -2832,27 +2832,27 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 			item_cnt++;
 		}
 	}
-	TPD_INFO("%s: total test item = %d \n", __func__, item_cnt);
+	TPD_DEBUG("%s: total test item = %d \n", __func__, item_cnt);
 
-	TPD_INFO("%s: populating ft3681_test_offset \n", __func__);
+	TPD_DEBUG("%s: populating ft3681_test_offset \n", __func__);
 
 	for (i = 0; i < item_cnt; i++) {
-		TPD_INFO("%s: i[%d] \n", __func__, i);
+		TPD_DEBUG("%s: i[%d] \n", __func__, i);
 		item_head = (struct auto_test_item_header *)(limit_fw->data + p_item_offset[i]);
 
 		if (item_head->item_limit_type == LIMIT_TYPE_NO_DATA) {
-			TPD_INFO("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
+			TPD_DEBUG("[%d] incorrect item type: LIMIT_TYPE_NO_DATA\n", item_head->item_bit);
 
 		} else if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_DATA) {
 			if (false == ts_data->use_panelfactory_limit) {
-				TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+				TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
 
 				if (item_head->item_bit == TYPE_NOISE_DATA) {
 					ts_data->ft3681_autotest_offset->ft3681_noise_data_P = (int32_t *)(
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_noise_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("item_head->top_limit_offset = %d, ft3681_noise_data_N = %d \n",
+					TPD_DEBUG("item_head->top_limit_offset = %d, ft3681_noise_data_N = %d \n",
 						 item_head->top_limit_offset,
 						 ts_data->ft3681_autotest_offset->ft3681_noise_data_N);
 
@@ -2861,7 +2861,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_raw_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_raw_data_P = %p, ft3681_raw_data_N = %p \n",
+					TPD_DEBUG("ft3681_raw_data_P = %p, ft3681_raw_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_raw_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_raw_data_N);
 
@@ -2870,7 +2870,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_uniformity_data_P = %p, ft3681_uniformity_data_N = %p \n",
+					TPD_DEBUG("ft3681_uniformity_data_P = %p, ft3681_uniformity_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N);
 
@@ -2879,20 +2879,20 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_panel_differ_data_P = %p, ft3681_panel_differ_data_N = %p \n",
+					TPD_DEBUG("ft3681_panel_differ_data_P = %p, ft3681_panel_differ_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N);
 				}
 
 			} else if (true == ts_data->use_panelfactory_limit) {
-				TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+				TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
 
 				if (item_head->item_bit == TYPE_FACTORY_NOISE_DATA) {
 					ts_data->ft3681_autotest_offset->ft3681_noise_data_P = (int32_t *)(
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_noise_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_noise_data_P = %p, ft3681_noise_data_N = %p \n",
+					TPD_DEBUG("ft3681_noise_data_P = %p, ft3681_noise_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_noise_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_noise_data_P);
 
@@ -2901,7 +2901,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_raw_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_raw_data_P = %p, ft3681_raw_data_N = %p \n",
+					TPD_DEBUG("ft3681_raw_data_P = %p, ft3681_raw_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_raw_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_raw_data_N);
 
@@ -2910,7 +2910,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_uniformity_data_P = %p, ft3681_uniformity_data_N = %p \n",
+					TPD_DEBUG("ft3681_uniformity_data_P = %p, ft3681_uniformity_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N);
 
@@ -2919,7 +2919,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_panel_differ_data_P = %p, ft3681_panel_differ_data_N = %p \n",
+					TPD_DEBUG("ft3681_panel_differ_data_P = %p, ft3681_panel_differ_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N);
 				}
@@ -2927,14 +2927,14 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 
 		} else if (item_head->item_limit_type == LIMIT_TYPE_TOP_FLOOR_RX_TX_DATA) {
 			if (false == ts_data->use_panelfactory_limit) {
-				TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+				TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
 
 				if (item_head->item_bit == TYPE_SCAP_CB_DATA) {
 					ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_P = (int32_t *)(
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_scap_cb_data_P = %p, ft3681_scap_cb_data_P = %p \n",
+					TPD_DEBUG("ft3681_scap_cb_data_P = %p, ft3681_scap_cb_data_P = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_N);
 
@@ -2943,7 +2943,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_scap_raw_data_P = %p, ft3681_scap_raw_data_N = %p \n",
+					TPD_DEBUG("ft3681_scap_raw_data_P = %p, ft3681_scap_raw_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_N);
 
@@ -2952,7 +2952,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_scap_cb_data_waterproof_P = %p, ft3681_scap_cb_data_waterproof_N = %p \n",
+					TPD_DEBUG("ft3681_scap_cb_data_waterproof_P = %p, ft3681_scap_cb_data_waterproof_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_P,
 						 ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_N);
 
@@ -2961,13 +2961,13 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 								limit_fw->data + item_head->top_limit_offset);
 					ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_N = (int32_t *)(
 								limit_fw->data + item_head->floor_limit_offset);
-					TPD_INFO("ft3681_scap_raw_waterproof_data_P = %p, ft3681_scap_raw_waterproof_data_N = %p \n",
+					TPD_DEBUG("ft3681_scap_raw_waterproof_data_P = %p, ft3681_scap_raw_waterproof_data_N = %p \n",
 						 ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_P,
 						 ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_N);
 				}
 
 			} else if (true == ts_data->use_panelfactory_limit) {
-				TPD_INFO("test item bit [%d] \n", item_head->item_bit);
+				TPD_DEBUG("test item bit [%d] \n", item_head->item_bit);
 
 				if (item_head->item_bit == TYPE_FACTORY_SCAP_CB_DATA) {
 					ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_P = (int32_t *)(
@@ -2996,7 +2996,7 @@ static int ft3681_get_threshold_from_img(struct chip_data_ft3681 *ts_data, char 
 			}
 
 		} else {
-			TPD_INFO("[%d] unknown item type \n", item_head->item_bit);
+			TPD_DEBUG("[%d] unknown item type \n", item_head->item_bit);
 		}
 	}
 
@@ -3016,35 +3016,35 @@ static void ft3681_print_threshold(struct chip_data_ft3681 *ts_data)
 	int node_num = tx_num * rx_num;
 	int channel_num = tx_num + rx_num;
 
-	TPD_INFO("noise threshold max/min:");
+	TPD_DEBUG("noise threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_noise_data_P, node_num, rx_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_noise_data_N, node_num, rx_num);
 
-	TPD_INFO("rawdata threshold max/min:");
+	TPD_DEBUG("rawdata threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_raw_data_P, node_num, rx_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_raw_data_N, node_num, rx_num);
 
-	TPD_INFO("uniformity threshold max/min:");
+	TPD_DEBUG("uniformity threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_uniformity_data_P, node_num, rx_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_uniformity_data_N, node_num, rx_num);
 
-	TPD_INFO("scap cb normal threshold max/min:");
+	TPD_DEBUG("scap cb normal threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_P, channel_num, channel_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_N, channel_num, channel_num);
 
-	TPD_INFO("scap cb waterproof threshold max/min:");
+	TPD_DEBUG("scap cb waterproof threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_P, channel_num, channel_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_cb_data_waterproof_N, channel_num, channel_num);
 
-	TPD_INFO("scap rawdata threshold max/min:");
+	TPD_DEBUG("scap rawdata threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_P, channel_num, channel_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_raw_data_N, channel_num, channel_num);
 
-	TPD_INFO("panel differ threshold max/min:");
+	TPD_DEBUG("panel differ threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_P, node_num, rx_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_panel_differ_data_N, node_num, rx_num);
 
-	TPD_INFO("scap rawdata waterproof threshold max/min:");
+	TPD_DEBUG("scap rawdata waterproof threshold max/min:");
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_P, channel_num, channel_num);
 	ft3681_print_buffer(ts_data->ft3681_autotest_offset->ft3681_scap_raw_waterproof_data_N, channel_num, channel_num);
 }
@@ -3054,7 +3054,7 @@ int ft3681_test_entry(struct chip_data_ft3681 *ts_data)
 	int ret = 0;
 	const struct firmware *limit_fw = NULL;
 
-	TPD_INFO("%s +\n", __func__);
+	TPD_DEBUG("%s +\n", __func__);
 	FTS_TEST_SAVE_ERR("FW_VER:0x%02x, TX_NUM:%d, RX_NUM:%d\n", ts_data->fwver, ts_data->hw_res->TX_NUM, ts_data->hw_res->RX_NUM);
 	ret = ft3681_get_threshold(ts_data, NULL);
 	if (ret < 0) {
@@ -3082,7 +3082,7 @@ int ft3681_test_entry(struct chip_data_ft3681 *ts_data)
 		FTS_TEST_SAVE_ERR("read fre_num fails");
 		goto test_err;
 	}
-	TPD_INFO("fre_num:%d", ts_data->fre_num);
+	TPD_DEBUG("fre_num:%d", ts_data->fre_num);
 
 	ret = get_channel_num(ts_data);
 	if (ret < 0) {
@@ -3101,6 +3101,6 @@ test_err:
 	enter_work_mode();
 	ft3681_threshold_free(ts_data);
 	ft3681_autotest_endoperation(ts_data, limit_fw);
-	TPD_INFO("%s -\n", __func__);
+	TPD_DEBUG("%s -\n", __func__);
 	return ret;
 }

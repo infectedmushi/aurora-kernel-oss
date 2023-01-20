@@ -76,7 +76,7 @@ static int synaptics_get_touch_points(void *chip_data, struct point_info *points
 
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.F12_2D_DATA_BASE, 8*fingers_to_process, buf);
     if (ret < 0) {
-        TPD_INFO("touch i2c read block failed\n");
+        TPD_DEBUG("touch i2c read block failed\n");
         return -1;
     }
     for (i = 0; i < fingers_to_process; i++) {
@@ -93,11 +93,11 @@ static int synaptics_get_touch_points(void *chip_data, struct point_info *points
 static int synaptics_ftm_process(void *chip_data)
 {
     int ret = -1;
-    TPD_INFO("%s go to sleep in ftm\n",__func__);
+    TPD_DEBUG("%s go to sleep in ftm\n",__func__);
     synaptics_get_chip_info(chip_data);
     synaptics_mode_switch(chip_data, MODE_SLEEP, true);
     if (ret < 0) {
-        TPD_INFO("%s, Touchpanel operate mode switch failed\n", __func__);
+        TPD_DEBUG("%s, Touchpanel operate mode switch failed\n", __func__);
     }
     return 0;
 }
@@ -108,7 +108,7 @@ static int synaptics_get_vendor(void *chip_data, struct panel_info *panel_data)
 
     chip_info->tp_type = panel_data->tp_type;
     chip_info->p_tp_fw = &panel_data->TP_FW;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->test_limit_name, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->test_limit_name = %s, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->test_limit_name, panel_data->fw_name);
     return 0;
 }
 
@@ -119,7 +119,7 @@ static int synaptics_read_F54_base_reg(struct chip_data_s3320 *chip_info)
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x01);    // page 1
     if (ret < 0) {
-        TPD_INFO("%s: failed for page select\n", __func__);
+        TPD_DEBUG("%s: failed for page select\n", __func__);
         return -1;
     }
     ret = touch_i2c_read_block(chip_info->client, 0xE9, 4, &(buf[0x0]));
@@ -127,7 +127,7 @@ static int synaptics_read_F54_base_reg(struct chip_data_s3320 *chip_info)
     chip_info->reg_info.F54_ANALOG_COMMAND_BASE = buf[1];
     chip_info->reg_info.F54_ANALOG_CONTROL_BASE = buf[2];
     chip_info->reg_info.F54_ANALOG_DATA_BASE = buf[3];
-    TPD_INFO("F54_QUERY_BASE = %x \n\
+    TPD_DEBUG("F54_QUERY_BASE = %x \n\
             F54_CMD_BASE    = %x \n\
             F54_CTRL_BASE   = %x \n\
             F54_DATA_BASE   = %x \n",
@@ -147,12 +147,12 @@ static int synaptics_get_chip_info(void *chip_data)
     memset(buf, 0, sizeof(buf));
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);   // page 0
     if (ret < 0) {
-        TPD_INFO("%s: failed for page select\n", __func__);
+        TPD_DEBUG("%s: failed for page select\n", __func__);
         return -1;
     }
     ret = touch_i2c_read_block(chip_info->client, 0xDD, 4, &(buf[0x0]));
     if (ret < 0) {
-        TPD_INFO("failed for page select!\n");
+        TPD_DEBUG("failed for page select!\n");
         return -1;
     }
 
@@ -161,7 +161,7 @@ static int synaptics_get_chip_info(void *chip_data)
     reg_info->F12_2D_CTRL_BASE = buf[2];
     reg_info->F12_2D_DATA_BASE = buf[3];
 
-    TPD_INFO("F12_2D_QUERY_BASE = 0x%x \n\
+    TPD_DEBUG("F12_2D_QUERY_BASE = 0x%x \n\
             F12_2D_CMD_BASE    = 0x%x \n\
             F12_2D_CTRL_BASE   = 0x%x \n\
             F12_2D_DATA_BASE   = 0x%x \n",
@@ -173,7 +173,7 @@ static int synaptics_get_chip_info(void *chip_data)
     reg_info->F01_RMI_CMD_BASE = buf[1];
     reg_info->F01_RMI_CTRL_BASE = buf[2];
     reg_info->F01_RMI_DATA_BASE = buf[3];
-    TPD_INFO("F01_RMI_QUERY_BASE = 0x%x \n\
+    TPD_DEBUG("F01_RMI_QUERY_BASE = 0x%x \n\
             F01_RMI_CMD_BASE    = 0x%x \n\
             F01_RMI_CTRL_BASE   = 0x%x \n\
             F01_RMI_DATA_BASE   = 0x%x \n",
@@ -185,7 +185,7 @@ static int synaptics_get_chip_info(void *chip_data)
     reg_info->F34_FLASH_CMD_BASE = buf[1];
     reg_info->F34_FLASH_CTRL_BASE = buf[2];
     reg_info->F34_FLASH_DATA_BASE = buf[3];
-    TPD_INFO("F34_FLASH_QUERY_BASE   = 0x%x \n\
+    TPD_DEBUG("F34_FLASH_QUERY_BASE   = 0x%x \n\
             F34_FLASH_CMD_BASE      = 0x%x \n\
             F34_FLASH_CTRL_BASE     = 0x%x \n\
             F34_FLASH_DATA_BASE     = 0x%x \n",
@@ -210,7 +210,7 @@ static int synaptics_get_chip_info(void *chip_data)
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x4);
     if (ret < 0) {
-        TPD_INFO("%s: failed for page select\n", __func__);
+        TPD_DEBUG("%s: failed for page select\n", __func__);
         return -1;
     }
     ret = touch_i2c_read_block(chip_info->client, 0xE9, 4, &(buf[0x0]));
@@ -218,7 +218,7 @@ static int synaptics_get_chip_info(void *chip_data)
     reg_info->F51_CUSTOM_CMD_BASE   = buf[1];
     reg_info->F51_CUSTOM_CTRL_BASE  = buf[2];
     reg_info->F51_CUSTOM_DATA_BASE  = buf[3];
-    TPD_INFO("F51_CUSTOM_QUERY_BASE  = 0x%x \n\
+    TPD_DEBUG("F51_CUSTOM_QUERY_BASE  = 0x%x \n\
             F51_CUSTOM_CMD_BASE     = 0x%x \n\
             F51_CUSTOM_CTRL_BASE    = 0x%x \n\
             F51_CUSTOM_DATA_BASE    = 0x%x \n",
@@ -252,7 +252,7 @@ static uint32_t synaptics_get_fw_id(struct chip_data_s3320 *chip_info)
     touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     touch_i2c_read_block(chip_info->client, chip_info->reg_info.F34_FLASH_CTRL_BASE, 4, buf);
     current_firmware = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
-    TPD_INFO("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
+    TPD_DEBUG("CURRENT_FIRMWARE_ID = 0x%x\n", current_firmware);
 
     return current_firmware;
 }
@@ -270,7 +270,7 @@ static fw_check_state synaptics_fw_check(void *chip_data, struct resolution_info
     touch_i2c_read_block(chip_info->client, chip_info->reg_info.F12_2D_CTRL08, 4, buf);
     max_x_ic = ((buf[1] << 8) & 0xffff) | (buf[0] & 0xffff);
     max_y_ic = ((buf[3] << 8) & 0xffff) | (buf[2] & 0xffff);
-    TPD_INFO("max_x = %d, max_y = %d, max_x_ic = %d, max_y_ic = %d\n", resolution_info->max_x, resolution_info->max_y, max_x_ic, max_y_ic);
+    TPD_DEBUG("max_x = %d, max_y = %d, max_x_ic = %d, max_y_ic = %d\n", resolution_info->max_x, resolution_info->max_y, max_x_ic, max_y_ic);
     if ((resolution_info->max_x == 0) ||(resolution_info->max_y == 0)) {
         resolution_info->max_x = max_x_ic;
         resolution_info->max_y = max_y_ic;
@@ -279,10 +279,10 @@ static fw_check_state synaptics_fw_check(void *chip_data, struct resolution_info
     bootloader_mode = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F01_RMI_DATA_BASE);
     bootloader_mode = bootloader_mode & 0xff;
     bootloader_mode = bootloader_mode & 0x40;
-    TPD_INFO("%s, bootloader_mode = 0x%x\n", __func__, bootloader_mode);
+    TPD_DEBUG("%s, bootloader_mode = 0x%x\n", __func__, bootloader_mode);
 
     if ((max_x_ic == 0) || (max_y_ic == 0) || (bootloader_mode == 0x40)) {
-        TPD_INFO("Something terrible wrong, Trying Update the Firmware again\n");
+        TPD_DEBUG("Something terrible wrong, Trying Update the Firmware again\n");
         return FW_ABNORMAL;
     }
 
@@ -305,10 +305,10 @@ static int synaptics_enable_interrupt(struct chip_data_s3320 *chip_info, bool en
     int ret;
     uint8_t abs_status_int;
 
-    TPD_INFO("%s enter, enable = %d.\n", __func__, enable);
+    TPD_DEBUG("%s enter, enable = %d.\n", __func__, enable);
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     if (ret < 0) {
-        TPD_INFO("%s: select page failed ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s: select page failed ret = %d\n", __func__, ret);
         return -1;
     }
     if (enable) {
@@ -316,7 +316,7 @@ static int synaptics_enable_interrupt(struct chip_data_s3320 *chip_info, bool en
         /*clear interrupt bits for previous touch*/
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F01_RMI_DATA_BASE + 1);
         if (ret < 0) {
-            TPD_INFO("%s :clear interrupt bits failed\n", __func__);
+            TPD_DEBUG("%s :clear interrupt bits failed\n", __func__);
             return -1;
         }
     } else {
@@ -325,7 +325,7 @@ static int synaptics_enable_interrupt(struct chip_data_s3320 *chip_info, bool en
 
     ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F01_RMI_CTRL00 + 1, abs_status_int);
     if (ret < 0) {
-        TPD_INFO("%s: enable or disable abs interrupt failed, abs_int = %d\n", __func__, abs_status_int);
+        TPD_DEBUG("%s: enable or disable abs interrupt failed, abs_int = %d\n", __func__, abs_status_int);
         return -1;
     }
 
@@ -347,14 +347,14 @@ static u8 synaptics_trigger_reason(void *chip_data, int gesture_enable, int is_s
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);   // page 0
     ret = touch_i2c_read_word(chip_info->client, chip_info->reg_info.F01_RMI_DATA_BASE);
     if (ret < 0) {
-        TPD_INFO("%s, i2c read error, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s, i2c read error, ret = %d\n", __func__, ret);
         return IRQ_EXCEPTION;
     }
     device_status = ret & 0xff;
     interrupt_status = (ret & 0x7f00) >> 8;
 
     if (device_status) {
-        TPD_INFO("%s, IRQ_EXCEPTION ,interrupt_status = 0x%x, device_status = 0x%x\n", __func__, interrupt_status, device_status);
+        TPD_DEBUG("%s, IRQ_EXCEPTION ,interrupt_status = 0x%x, device_status = 0x%x\n", __func__, interrupt_status, device_status);
         return IRQ_EXCEPTION;
     }
     if (interrupt_status & 0x04) {
@@ -373,7 +373,7 @@ static u8 synaptics_trigger_reason(void *chip_data, int gesture_enable, int is_s
 static int synaptics_resetgpio_set(struct hw_resource *hw_res, bool on)
 {
     if (gpio_is_valid(hw_res->reset_gpio)) {
-        TPD_INFO("Set the reset_gpio \n");
+        TPD_DEBUG("Set the reset_gpio \n");
         gpio_direction_output(hw_res->reset_gpio, on);
     }
 
@@ -386,18 +386,18 @@ static int synaptics_reset_for_prepare(void *chip_data)
     int i2c_error_number = 0;
     struct chip_data_s3320 *chip_info = (struct chip_data_s3320 *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     synaptics_resetgpio_set(chip_info->hw_res, true); // reset gpio
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
     while ((ret < 0) && (i2c_error_number < I2C_ERROR_MAX_TIME)) {
         ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
         if (ret < 0) {
-            TPD_INFO("%s error, ret = %d i2c_error_number=%d\n", __func__, ret,i2c_error_number);
+            TPD_DEBUG("%s error, ret = %d i2c_error_number=%d\n", __func__, ret,i2c_error_number);
         }
         i2c_error_number++;
     }
     if (i2c_error_number == I2C_ERROR_MAX_TIME) {
-        TPD_INFO("i2c_error_number=%d , pull down tp 3V ,then pull up\n",i2c_error_number);
+        TPD_DEBUG("i2c_error_number=%d , pull down tp 3V ,then pull up\n",i2c_error_number);
         ret = tp_powercontrol_2v8(chip_info->hw_res, false);
         msleep(30);
         ret = tp_powercontrol_2v8(chip_info->hw_res, true);
@@ -405,13 +405,13 @@ static int synaptics_reset_for_prepare(void *chip_data)
 
         ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
         if (ret < 0) {
-            TPD_INFO("%s error, ret = %d\n", __func__, ret);
+            TPD_DEBUG("%s error, ret = %d\n", __func__, ret);
         }
     }
 
     ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F01_RMI_CMD_BASE, 0x01);   // reset register
     if (ret < 0) {
-        TPD_INFO("%s error, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s error, ret = %d\n", __func__, ret);
     }
 
     return ret;
@@ -425,13 +425,13 @@ static int synaptics_reset(void *chip_data)
     int ret = -1;
     struct chip_data_s3320 *chip_info = (struct chip_data_s3320 *)chip_data;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     clear_view_touchdown_flag(); //clear touch download flag
     synaptics_resetgpio_set(chip_info->hw_res, true); // reset gpio
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
     ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F01_RMI_CMD_BASE, 0x01);   // reset register
     if (ret < 0) {
-        TPD_INFO("%s error, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s error, ret = %d\n", __func__, ret);
     }
     msleep(RESET_TO_NORMAL_TIME);
 
@@ -442,16 +442,16 @@ static int synaptics_configuration_init(struct chip_data_s3320 *chip_info, bool 
 {
     int ret = 0;
 
-    TPD_INFO("%s, configuration init = %d\n", __func__, config);
+    TPD_DEBUG("%s, configuration init = %d\n", __func__, config);
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0); // page 0
     if (ret < 0) {
-        TPD_INFO("init_panel failed for page select\n");
+        TPD_DEBUG("init_panel failed for page select\n");
         return -1;
     }
 
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F01_RMI_CTRL00);
     if (ret < 0) {
-        TPD_INFO("init_panel failed for page select\n");
+        TPD_DEBUG("init_panel failed for page select\n");
         return -1;
     }
 
@@ -459,13 +459,13 @@ static int synaptics_configuration_init(struct chip_data_s3320 *chip_info, bool 
     if (config) {//configed  && out of sleep mode
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F01_RMI_CTRL00, (ret & 0xf8) | 0x80);
         if (ret < 0) {
-            TPD_INFO("%s failed for mode select\n", __func__);
+            TPD_DEBUG("%s failed for mode select\n", __func__);
             return -1;
         }
     } else {//sleep mode
         ret = touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F01_RMI_CTRL00, (ret & 0xf8) | 0x81);
         if (ret < 0) {
-            TPD_INFO("%s failed for mode select\n", __func__);
+            TPD_DEBUG("%s failed for mode select\n", __func__);
             return -1;
         }
     }
@@ -477,7 +477,7 @@ static int synaptics_glove_mode_enable(struct chip_data_s3320 *chip_info, bool e
 {
     int ret = 0;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
     if (ret < 0) {
         TPD_DEBUG("touch_i2c_write_byte failed for mode select\n");
@@ -500,10 +500,10 @@ static int synaptics_enable_black_gesture(struct chip_data_s3320 *chip_info, boo
     unsigned char report_gesture_ctrl_buf[3];
     unsigned char wakeup_gesture_enable_buf;
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    TPD_DEBUG("%s, enable = %d\n", __func__, enable);
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     if (ret < 0) {
-        TPD_INFO("%s: select page failed ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s: select page failed ret = %d\n", __func__, ret);
         return -1;
     }
     touch_i2c_read_block(chip_info->client, chip_info->reg_info.F12_2D_CTRL20, 3, &(report_gesture_ctrl_buf[0x0]));
@@ -528,7 +528,7 @@ static int synaptics_enable_edge_limit(struct chip_data_s3320 *chip_info, bool e
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x04);
     if (ret < 0) {
-        TPD_INFO("%s: select page failed ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s: select page failed ret = %d\n", __func__, ret);
         return -1;
     }
 
@@ -541,11 +541,11 @@ static int synaptics_enable_edge_limit(struct chip_data_s3320 *chip_info, bool e
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F51_CUSTOM_CTRL50, ret);
 
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F51_CUSTOM_CTRL50);
-    TPD_INFO("%s %s, write back value = 0x%x\n", enable ? "enable" : "disable", __func__, ret);
+    TPD_DEBUG("%s %s, write back value = 0x%x\n", enable ? "enable" : "disable", __func__, ret);
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
     if (ret < 0) {
-        TPD_INFO("%s: failed for page select\n", __func__);
+        TPD_DEBUG("%s: failed for page select\n", __func__);
         return -1;
     }
     return ret;
@@ -560,12 +560,12 @@ static int synaptics_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_NORMAL:
             ret = synaptics_configuration_init(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics configuration init failed.\n", __func__);
                 return ret;
             }
             ret = synaptics_enable_interrupt(chip_info, true);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics enable interrupt failed.\n", __func__);
                 return ret;
             }
 
@@ -574,14 +574,14 @@ static int synaptics_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_SLEEP:
             ret = synaptics_enable_interrupt(chip_info, false);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics enable interrupt failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics enable interrupt failed.\n", __func__);
                 return ret;
             }
 
             /*device control: sleep mode*/
             ret = synaptics_configuration_init(chip_info, false) ;
             if (ret < 0) {
-                TPD_INFO("%s: synaptics configuration init failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics configuration init failed.\n", __func__);
                 return ret;
             }
 
@@ -590,7 +590,7 @@ static int synaptics_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_GESTURE:
             ret = synaptics_enable_black_gesture(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics enable gesture failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics enable gesture failed.\n", __func__);
                 return ret;
             }
 
@@ -599,7 +599,7 @@ static int synaptics_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_GLOVE:
             ret = synaptics_glove_mode_enable(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics enable glove mode failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics enable glove mode failed.\n", __func__);
                 return ret;
             }
 
@@ -608,14 +608,14 @@ static int synaptics_mode_switch(void *chip_data, work_mode mode, bool flag)
         case MODE_EDGE:
             ret = synaptics_enable_edge_limit(chip_info, flag);
             if (ret < 0) {
-                TPD_INFO("%s: synaptics enable edg limit failed.\n", __func__);
+                TPD_DEBUG("%s: synaptics enable edg limit failed.\n", __func__);
                 return ret;
             }
 
             break;
 
         default:
-            TPD_INFO("%s: Wrong mode.\n", __func__);
+            TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -631,7 +631,7 @@ static int synaptics_get_gesture_info(void *chip_data, struct gesture_info * ges
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x00);
     if (ret < 0) {
-        TPD_INFO("failed to transfer the data, ret = %d\n", ret);
+        TPD_DEBUG("failed to transfer the data, ret = %d\n", ret);
         return -1;
     }
 
@@ -748,7 +748,7 @@ static int checkCMD(struct chip_data_s3320 *chip_info)
         flag_err++;
     }while((ret > 0x00) && (flag_err < 30));
     if (ret > 0x00)
-        TPD_INFO("checkCMD error ret is %x flag_err is %d\n", ret, flag_err);
+        TPD_DEBUG("checkCMD error ret is %x flag_err is %d\n", ret, flag_err);
     return ret;
 }
 
@@ -768,7 +768,7 @@ static bool checkCMD_for_short_test(struct chip_data_s3320 *chip_info)
     if ((ret & 0x02) || (ret & 0x04)) {
         return true;
     } else {
-        TPD_INFO("checkCMD_for_short_test ret is %x flag_err is %d\n", ret, flag_err);
+        TPD_DEBUG("checkCMD_for_short_test ret is %x flag_err is %d\n", ret, flag_err);
         return false;
     }
 }
@@ -779,7 +779,7 @@ static int checkCMD_for_finger(struct chip_data_s3320 *chip_info)
     int flag_err = 0;
 
     if (chip_info->p_spuri_fp_touch == NULL) {
-        TPD_INFO("checkCMD_for_finger() chip_info->p_spuri_fp_touch == NULL\n");
+        TPD_DEBUG("checkCMD_for_finger() chip_info->p_spuri_fp_touch == NULL\n");
         return -1;
     }
 
@@ -788,16 +788,16 @@ static int checkCMD_for_finger(struct chip_data_s3320 *chip_info)
         ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F54_ANALOG_COMMAND_BASE);
         flag_err++;
         if (chip_info->p_spuri_fp_touch->lcd_trigger_fp_check && !chip_info->p_spuri_fp_touch->lcd_resume_ok) {
-            TPD_INFO("checkCMD_for_finger() lcd_resume_ok=%d ret=%d flag_err=%d line=%d\n",chip_info->p_spuri_fp_touch->lcd_resume_ok,ret,flag_err,__LINE__);
+            TPD_DEBUG("checkCMD_for_finger() lcd_resume_ok=%d ret=%d flag_err=%d line=%d\n",chip_info->p_spuri_fp_touch->lcd_resume_ok,ret,flag_err,__LINE__);
             return -1;
         }
     }while((ret > 0x00) && (flag_err < SPURIOUS_FP_BASE_DATA_RETRY));
-    TPD_INFO("checkCMD error ret is %x flag_err is %d\n", ret, flag_err);
+    TPD_DEBUG("checkCMD error ret is %x flag_err is %d\n", ret, flag_err);
 
     if (10 == flag_err) {
-        TPD_INFO("checkCMD_for_finger error,reset  then msleep(80)\n");
+        TPD_DEBUG("checkCMD_for_finger error,reset  then msleep(80)\n");
         if (chip_info->p_spuri_fp_touch->lcd_trigger_fp_check && !chip_info->p_spuri_fp_touch->lcd_resume_ok) {
-            TPD_INFO("checkCMD_for_finger() lcd_resume_ok=%d ret=%d flag_err=%d line=%d\n",chip_info->p_spuri_fp_touch->lcd_resume_ok,ret,flag_err,__LINE__);
+            TPD_DEBUG("checkCMD_for_finger() lcd_resume_ok=%d ret=%d flag_err=%d line=%d\n",chip_info->p_spuri_fp_touch->lcd_resume_ok,ret,flag_err,__LINE__);
             return -1;
         }
         synaptics_reset(chip_info);
@@ -805,7 +805,7 @@ static int checkCMD_for_finger(struct chip_data_s3320 *chip_info)
         synaptics_mode_switch(chip_info, MODE_NORMAL, true);
         return -1;
     } else {
-        TPD_INFO("checkCMD_for_finger ok\n");
+        TPD_DEBUG("checkCMD_for_finger ok\n");
         return 0;
     }
 }
@@ -839,14 +839,14 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
     if (!raw_data) {
         error_count++;
         snprintf(data_buf, sizeof(data_buf), "raw_data kzalloc error\n");
-        TPD_INFO("%s", data_buf);
+        TPD_DEBUG("%s", data_buf);
         goto END;
     }
 
     //open file to save test data
     ph = (struct test_header *)(syna_testdata->fw->data);
 
-    TPD_INFO("%s, step 0: begin to check INT-GND short item\n", __func__);
+    TPD_DEBUG("%s, step 0: begin to check INT-GND short item\n", __func__);
     ret = synaptics_enable_interrupt(chip_info, false);
 
     eint_count = 0;
@@ -858,29 +858,29 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
             eint_count--;
         else
             eint_count++;
-        TPD_INFO("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
+        TPD_DEBUG("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
     }
-    TPD_INFO("TP EINT PIN direct short! eint_count = %d\n", eint_count);
+    TPD_DEBUG("TP EINT PIN direct short! eint_count = %d\n", eint_count);
     if (eint_count == 10) {
-        TPD_INFO("error :  TP EINT PIN direct short!\n");
+        TPD_DEBUG("error :  TP EINT PIN direct short!\n");
         error_count++;
         snprintf(data_buf, sizeof(data_buf), "step 0: begin to check INT-GND short item,"
                             "eint_status is low, TP EINT direct stort\n");
         sys_write(syna_testdata->fd, data_buf, strlen(data_buf));
-        TPD_INFO("%s", data_buf);
+        TPD_DEBUG("%s", data_buf);
         goto END;
     }
 
     synaptics_read_F54_base_reg(chip_info);
 
     //step 1: Close CBC and test RT20
-    TPD_INFO("\n step 1:Close CBC and test RT20\n");
+    TPD_DEBUG("\n step 1:Close CBC and test RT20\n");
     ret = touch_i2c_write_byte(client, reg_info->F54_ANALOG_DATA_BASE, 0x14);//select report type 0x14
     if (ret < 0) {
         error_count++;
         snprintf(data_buf, sizeof(data_buf), "step 1: Close CBC and test RT20 error,"
                             "[line:%d]touch_i2c_write_byte failed \n", __LINE__);
-        TPD_INFO("%s", data_buf);
+        TPD_DEBUG("%s", data_buf);
         goto END;
     }
 
@@ -930,7 +930,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
                                         x, y, baseline_data,
                                         *(baseline_data_test + count*2),
                                         *(baseline_data_test + count*2 + 1));
-                    TPD_INFO("%s", data_buf);
+                    TPD_DEBUG("%s", data_buf);
                     error_count++;
                     if (tp_debug != 2) {
                         goto END;
@@ -947,7 +947,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
                                         x, y, baseline_data,
                                         *(baseline_data_test + count*2),
                                         *(baseline_data_test + count*2 + 1));
-                    TPD_INFO("%s", data_buf);
+                    TPD_DEBUG("%s", data_buf);
                     error_count++;
                     if (tp_debug != 2) {
                         goto END;
@@ -966,13 +966,13 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
     }
 
     //step 2: Open CBC and test RT3
-    TPD_INFO("\n step 2:Open CBC and test RT3\n");
+    TPD_DEBUG("\n step 2:Open CBC and test RT3\n");
     do{
         ret = touch_i2c_write_byte(client, reg_info->F54_ANALOG_DATA_BASE, 0x03);//select report type 0x03
         if (ret < 0) {
             snprintf(data_buf, sizeof(data_buf), "step 2:Open CBC and test RT3 error, "
                                 "[line:%d]touch_i2c_write_byte failed \n", __LINE__);
-            TPD_INFO("%s", data_buf);
+            TPD_DEBUG("%s", data_buf);
             error_count++;
             goto END;
         }
@@ -1005,7 +1005,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
         ret = touch_i2c_write_byte(client, reg_info->F54_ANALOG_COMMAND_BASE, 0x01);//get report
         checkCMD(chip_info);
 
-        TPD_INFO("RX_NUM is %d, TX_NUM is %d\n", syna_testdata->RX_NUM, syna_testdata->TX_NUM);
+        TPD_DEBUG("RX_NUM is %d, TX_NUM is %d\n", syna_testdata->RX_NUM, syna_testdata->TX_NUM);
         ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.F54_ANALOG_DATA_BASE+3, syna_testdata->TX_NUM*syna_testdata->RX_NUM*2, raw_data);     //read data
         count = 0;
         for (x = 0; x < syna_testdata->TX_NUM; x++) {
@@ -1030,7 +1030,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
                                             x, y, baseline_data,
                                             *(baseline_data_test + count*2),
                                             *(baseline_data_test + count*2 + 1));
-                        TPD_INFO("%s", data_buf);
+                        TPD_DEBUG("%s", data_buf);
                         error_count++;
                         if (tp_debug != 2) {
                             goto END;
@@ -1045,7 +1045,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
                                             x, y, baseline_data,
                                             *(baseline_data_test + count*2),
                                             *(baseline_data_test + count*2 + 1));
-                        TPD_INFO("%s", data_buf);
+                        TPD_DEBUG("%s", data_buf);
                         error_count++;
                         if (tp_debug != 2) {
                             goto END;
@@ -1066,7 +1066,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
     }while(enable_cbc < 2);
 
     //step 3 :check tx-to-tx and tx-to-vdd
-    TPD_INFO("step 3:check TRx-TRx & TRx-Vdd short\n");
+    TPD_DEBUG("step 3:check TRx-TRx & TRx-Vdd short\n");
     ret = touch_i2c_write_byte(client, reg_info->F01_RMI_CMD_BASE, 0x01);//software reset TP
     msleep(100);
     ret = touch_i2c_write_byte(client, reg_info->F54_ANALOG_DATA_BASE, 0x1A);//select report type 26
@@ -1096,7 +1096,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
             error_count++;
             snprintf(data_buf, sizeof(data_buf), "step 3: check tx-to-tx and tx-to-vdd error,"
                                 "x = %d, data = %d\n", x, buffer[x]);
-            TPD_INFO("%s", data_buf);
+            TPD_DEBUG("%s", data_buf);
             if (syna_testdata->fd >= 0) {
                 sys_write(syna_testdata->fd, data_buf, strlen(data_buf));
             }
@@ -1108,7 +1108,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
     msleep(50);
 
     //Step 4 : Check the broken line with RT133
-    TPD_INFO("Step 4 : Check the broken line\n" );
+    TPD_DEBUG("Step 4 : Check the broken line\n" );
     ret = touch_i2c_write_byte(client, 0xff, 0x01);    // page 1
     ret = touch_i2c_write_byte(client, reg_info->F54_ANALOG_DATA_BASE, 0x85);//select report type 0x85
     ret = touch_i2c_write_word(client, reg_info->F54_ANALOG_DATA_BASE + 1, 0x00);//set fifo 00
@@ -1126,16 +1126,16 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
             error_count++;
             snprintf(data_buf, sizeof(data_buf), "step 4 :Check the broken line with RT133 error,"
                                 "error_line is y =%d, data[%d] = %d\n", y, y, baseline_data);
-            TPD_INFO("%s", data_buf);
+            TPD_DEBUG("%s", data_buf);
             goto END;
         }
     }
 
     msleep(20);
-    TPD_INFO("Step 4 after read ret is %d\n", ret);
+    TPD_DEBUG("Step 4 after read ret is %d\n", ret);
 
     //step5: check doze mode
-    TPD_INFO("step5: check doze mode\n" );
+    TPD_DEBUG("step5: check doze mode\n" );
     synaptics_reset(chip_info);
     ret = touch_i2c_write_byte(client, 0xff, 0x1);
     ret |= touch_i2c_write_byte(client, 0x67, 0x01); //enter doze mode
@@ -1167,7 +1167,7 @@ static void synaptics_auto_test(struct seq_file *s, void *chip_data, struct syna
             error_count++;
             snprintf(data_buf, sizeof(data_buf), "step5: check abs doze error,"
                                 "%d: %d not in( %d %d)\n", x, doze_data, LIMIT_DOZE, LIMIT_DOZE_LOW);
-            TPD_INFO("%s", data_buf);
+            TPD_DEBUG("%s", data_buf);
             goto END;
         }
     }
@@ -1180,8 +1180,8 @@ END:
         seq_printf(s, data_buf);
     }
     seq_printf(s, "%d error(s). %s\n", error_count, error_count?"":"All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
-    TPD_INFO("\n\nstep5 reset and open irq complete\n");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
+    TPD_DEBUG("\n\nstep5 reset and open irq complete\n");
 }
 
 static void synaptics_baseline_read(struct seq_file *s, void *chip_data)
@@ -1198,7 +1198,7 @@ static void synaptics_baseline_read(struct seq_file *s, void *chip_data)
         return ;
     raw_data = kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-        TPD_INFO("raw_data kzalloc error\n");
+        TPD_DEBUG("raw_data kzalloc error\n");
         return;
     }
     synaptics_read_F54_base_reg(chip_info);
@@ -1210,7 +1210,7 @@ static void synaptics_baseline_read(struct seq_file *s, void *chip_data)
         }
 
         if (ret < 0) {
-            TPD_INFO("read_baseline: touch_i2c_write_byte failed \n");
+            TPD_DEBUG("read_baseline: touch_i2c_write_byte failed \n");
             seq_printf(s, "what the hell4, ");
             goto END;
         }
@@ -1276,7 +1276,7 @@ static void synaptics_delta_read(struct seq_file *s, void *chip_data)
 
     raw_data = kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-            TPD_INFO("raw_data kzalloc error\n");
+            TPD_DEBUG("raw_data kzalloc error\n");
             return;
     }
 
@@ -1296,7 +1296,7 @@ static void synaptics_delta_read(struct seq_file *s, void *chip_data)
     if (ret > 0) {
         touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F54_ANALOG_COMMAND_BASE, 0);
         seq_printf(s, "checkCMD error, can not read delta data\n");
-        TPD_INFO("checkCMD error, can not read delta data\n");
+        TPD_DEBUG("checkCMD error, can not read delta data\n");
         goto OUT;
     }
 
@@ -1337,7 +1337,7 @@ static void synaptics_main_register_read(struct seq_file *s, void *chip_data)
 
     ret = touch_i2c_read_word(chip_info->client, chip_info->reg_info.F01_RMI_DATA_BASE);
     if (ret < 0) {
-        TPD_INFO("%s, i2c read error, ret = %d\n", __func__, ret);
+        TPD_DEBUG("%s, i2c read error, ret = %d\n", __func__, ret);
     }
     seq_printf(s, "F01_RMI_DATA00 Device Status: 0x%x\n", ret & 0xff);
     seq_printf(s, "F01_RMI_DATA01.00 Interrupt Status: 0x%x\n", (ret & 0x7f00) >> 8);
@@ -1363,7 +1363,7 @@ static void synaptics_main_register_read(struct seq_file *s, void *chip_data)
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     if (ret < 0) {
-        TPD_INFO("%s: failed for page select\n", __func__);
+        TPD_DEBUG("%s: failed for page select\n", __func__);
         seq_printf(s, "%s: failed for page select\n", __func__);
         return;
     }
@@ -1381,11 +1381,11 @@ static void synaptics_reserve_read(struct seq_file *s, void *chip_data)
         return ;
 
     //1.get firmware doze mode info
-    TPD_INFO("1.get firmware doze mode info\n");
+    TPD_DEBUG("1.get firmware doze mode info\n");
     seq_printf(s, "1.get firmware doze mode info\n");
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x04);    // page 4
     ret = touch_i2c_read_byte(chip_info->client, chip_info->reg_info.F51_CUSTOM_DATA_BASE + 0x19);
-    TPD_INFO("TP doze mode status is %d\n", ret);
+    TPD_DEBUG("TP doze mode status is %d\n", ret);
     seq_printf(s, "TP doze mode status is %d\n", ret);
 
     msleep(10);
@@ -1408,7 +1408,7 @@ static void synaptics_abs_doze_read(struct seq_file *s, void *chip_data)
 
     raw_data = kzalloc((chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM) * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-            TPD_INFO("raw_data kzalloc error\n");
+            TPD_DEBUG("raw_data kzalloc error\n");
             return;
     }
 
@@ -1427,14 +1427,14 @@ static void synaptics_abs_doze_read(struct seq_file *s, void *chip_data)
     checkCMD_for_short_test(chip_info);
 
     touch_i2c_read_block(chip_info->client, chip_info->reg_info.F54_ANALOG_DATA_BASE + 3, (chip_info->hw_res->TX_NUM + chip_info->hw_res->RX_NUM) * 2, raw_data);
-    TPD_INFO("abs doze(limite-%d): ",LIMIT_DOZE);
+    TPD_DEBUG("abs doze(limite-%d): ",LIMIT_DOZE);
     seq_printf(s, "abs doze(limite-%d): ",LIMIT_DOZE);
     for (x = 0; x < chip_info->hw_res->RX_NUM; x++) {
         doze_data = (raw_data[x * 2 + 1] << 8) | raw_data[x * 2];
         printk("%4d, ", doze_data);
         seq_printf(s, "%4d, ", doze_data);
     }
-    TPD_INFO("\n");
+    TPD_DEBUG("\n");
     seq_printf(s, "\n");
 
     touch_i2c_write_byte(chip_info->client, 0xff, 0x00);    // page 0
@@ -1503,11 +1503,11 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
     struct chip_data_s3320 *chip_info = (struct chip_data_s3320 *)chip_data;
 
     if (!chip_info) {
-        TPD_INFO("Chip info is NULL\n");
+        TPD_DEBUG("Chip info is NULL\n");
         return 0;
     }
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     //step 1:fill Fw related header, get all data.
     synaptics_parse_header(&header, fw->data);
@@ -1523,7 +1523,7 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.F34_FLASH_CTRL_BASE, 4, buf);
     CURRENT_FIRMWARE_ID = (buf[0] << 24)|(buf[1] << 16)|(buf[2] << 8)|buf[3];
     FIRMWARE_ID = (Config_Data[0] << 24)|(Config_Data[1] << 16)|(Config_Data[2] << 8)|Config_Data[3];
-    TPD_INFO("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
+    TPD_DEBUG("CURRENT TP FIRMWARE ID is 0x%x, FIRMWARE IMAGE ID is 0x%x\n", CURRENT_FIRMWARE_ID, FIRMWARE_ID);
 
     if (!force) {
         if (CURRENT_FIRMWARE_ID == FIRMWARE_ID) {
@@ -1551,7 +1551,7 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
     TPD_DEBUG("attn step 4\n");
     ret = checkFlashState(chip_info);
     if (ret > 0) {
-        TPD_INFO("Get in prog:The status(Image) of flashstate is %x\n", ret);
+        TPD_DEBUG("Get in prog:The status(Image) of flashstate is %x\n", ret);
         return FW_UPDATE_ERROR;
     }
     ret = touch_i2c_read_byte(chip_info->client, 0x04);
@@ -1572,7 +1572,7 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
     TPD_DEBUG("going to flash firmware area synaF34_FlashControl %d\n", ret);
 
     //step 4:flash firmware zone
-    TPD_INFO("update-----------------firmware ------------------update!\n");
+    TPD_DEBUG("update-----------------firmware ------------------update!\n");
     TPD_DEBUG("cnt %d\n", firmware);
     for (j = 0; j < firmware; j++) {
         buf[0] = j & 0x00ff;
@@ -1582,16 +1582,16 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
         touch_i2c_write_byte(chip_info->client, chip_info->reg_info.SynaF34_FlashControl, 0x02);
         ret = checkFlashState(chip_info);
         if (ret > 0) {
-            TPD_INFO("Firmware:The status(Image) of flash data3 is %x, time = %d\n", ret, j);
+            TPD_DEBUG("Firmware:The status(Image) of flash data3 is %x, time = %d\n", ret, j);
             return FW_UPDATE_ERROR;
         }
     }
 
     //step 5:flash configure data
-    //TPD_INFO("going to flash configuration area\n");
-    //TPD_INFO("header.firmware_size is 0x%x\n", header.firmware_size);
-    //TPD_INFO("bootloader_size is 0x%x\n", bootloader_size);
-    TPD_INFO("update-----------------configuration ------------------update!\n");
+    //TPD_DEBUG("going to flash configuration area\n");
+    //TPD_DEBUG("header.firmware_size is 0x%x\n", header.firmware_size);
+    //TPD_DEBUG("bootloader_size is 0x%x\n", bootloader_size);
+    TPD_DEBUG("update-----------------configuration ------------------update!\n");
     for (j = 0; j < configuration; j++) {
         //a)write SynaF34Reflash_BlockNum to access
         buf[0] = j & 0x00ff;
@@ -1604,12 +1604,12 @@ static fw_update_state synaptics_fw_update(void *chip_data, const struct firmwar
         //d) wait attn
         ret = checkFlashState(chip_info);
         if (ret > 0) {
-            TPD_INFO("Configuration:The status(Image) of flash data3 is %x, time = %d\n", ret, j);
+            TPD_DEBUG("Configuration:The status(Image) of flash data3 is %x, time = %d\n", ret, j);
             return FW_UPDATE_ERROR;
         }
     }
 
-    TPD_INFO("Firmware && configuration flash over\n");
+    TPD_DEBUG("Firmware && configuration flash over\n");
 
     return FW_UPDATE_SUCCESS;
 }
@@ -1623,15 +1623,15 @@ static fp_touch_state synaptics_spurious_fp_check(void *chip_data)
     fp_touch_state fp_touch_state = FINGER_PROTECT_TOUCH_UP;
 
     struct chip_data_s3320 *chip_info = (struct chip_data_s3320 *)chip_data;
-    TPD_INFO(" synaptics_spurious_fp_check  start\n");
+    TPD_DEBUG(" synaptics_spurious_fp_check  start\n");
 
     if(TX_NUM*RX_NUM*(sizeof(int16_t)) > 1800){
-        TPD_INFO("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
+        TPD_DEBUG("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
         return FINGER_PROTECT_NOTREADY ;
     }
 
     if (!chip_info->spuri_fp_data) {
-        TPD_INFO("chip_info->spuri_fp_data kzalloc error\n");
+        TPD_DEBUG("chip_info->spuri_fp_data kzalloc error\n");
         return fp_touch_state;
     }
     TX_NUM = chip_info->hw_res->TX_NUM;
@@ -1639,7 +1639,7 @@ static fp_touch_state synaptics_spurious_fp_check(void *chip_data)
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     if (ret < 0) {
-        TPD_INFO("%s,I2C transfer error\n", __func__);
+        TPD_DEBUG("%s,I2C transfer error\n", __func__);
         return fp_touch_state;
     }
 
@@ -1669,7 +1669,7 @@ static fp_touch_state synaptics_spurious_fp_check(void *chip_data)
             TPD_DEBUG_NTAG("%4d, ", delta_data);
             if ((delta_data + SPURIOUS_FP_LIMIT) < 0) {
                 if (!tp_debug)
-                    TPD_INFO("delta_data too large, delta_data = %d TX[%d] RX[%d]\n", delta_data, x, y);
+                    TPD_DEBUG("delta_data too large, delta_data = %d TX[%d] RX[%d]\n", delta_data, x, y);
                 err_count++;
             }
         }
@@ -1678,21 +1678,21 @@ static fp_touch_state synaptics_spurious_fp_check(void *chip_data)
             fp_touch_state = FINGER_PROTECT_TOUCH_DOWN;
             err_count = 0;
             if (!tp_debug) {
-                TPD_INFO("finger protect trigger!report_finger_protect = %d\n", fp_touch_state);
+                TPD_DEBUG("finger protect trigger!report_finger_protect = %d\n", fp_touch_state);
                 break;
             }
         }
     }
 
-    TPD_INFO("%s:%d chip_info->reg_info.F54_ANALOG_COMMAND_BASE=0x%x set 0, \n",__func__,__LINE__,chip_info->reg_info.F54_ANALOG_COMMAND_BASE); //add for Prevent TP failure
+    TPD_DEBUG("%s:%d chip_info->reg_info.F54_ANALOG_COMMAND_BASE=0x%x set 0, \n",__func__,__LINE__,chip_info->reg_info.F54_ANALOG_COMMAND_BASE); //add for Prevent TP failure
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F54_ANALOG_COMMAND_BASE,0);
 
     touch_i2c_write_byte(chip_info->client, 0xff, 0x0);
     if (ret < 0) {
-        TPD_INFO("%s,I2C transfer error,line=%d\n", __func__,__LINE__);
+        TPD_DEBUG("%s,I2C transfer error,line=%d\n", __func__,__LINE__);
     }
 
-    TPD_INFO("finger protect trigger fp_touch_state= %d\n", fp_touch_state);
+    TPD_DEBUG("finger protect trigger fp_touch_state= %d\n", fp_touch_state);
 
     return fp_touch_state;
 }
@@ -1705,7 +1705,7 @@ static u8 synaptics_get_keycode(void *chip_data)
 
     touch_i2c_write_byte(chip_info->client, 0xff, 0x02);
     ret = touch_i2c_read_byte(chip_info->client, 0x00);
-    TPD_INFO("touch key int_key code = %d\n",ret);
+    TPD_DEBUG("touch key int_key code = %d\n",ret);
 
     if (ret & 0x01)
         SET_BIT(bitmap_result, BIT_MENU);
@@ -1738,27 +1738,27 @@ static void synaptics_finger_proctect_data_get(void * chip_data)
     int RX_NUM = chip_info->hw_res->RX_NUM;
 
     if(TX_NUM*RX_NUM*(sizeof(int16_t)) > 1800){
-        TPD_INFO("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
+        TPD_DEBUG("%s,TX_NUM*RX_NUM*(sizeof(int16_t)>1800,There is not enough space\n", __func__);
         return;
     }
 
     raw_data = kzalloc(TX_NUM * SPURIOUS_FP_RX_NUM * 2 * (sizeof(uint8_t)), GFP_KERNEL);
     if (!raw_data) {
-            TPD_INFO("raw_data kzalloc error\n");
+            TPD_DEBUG("raw_data kzalloc error\n");
             return;
     }
 
     chip_info->spuri_fp_data = kzalloc(TX_NUM*RX_NUM*(sizeof(int16_t)), GFP_KERNEL);
     if (!chip_info->spuri_fp_data) {
-        TPD_INFO("chip_info->spuri_fp_data kzalloc error\n");
+        TPD_DEBUG("chip_info->spuri_fp_data kzalloc error\n");
         ret = -ENOMEM;
     }
 
 RE_TRY:
-    TPD_INFO("%s retry_time=%d line=%d\n",__func__,retry_time,__LINE__);
+    TPD_DEBUG("%s retry_time=%d line=%d\n",__func__,retry_time,__LINE__);
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x1);
     if (ret < 0) {
-        TPD_INFO("%s,I2C transfer error\n", __func__);
+        TPD_DEBUG("%s,I2C transfer error\n", __func__);
         kfree(raw_data);
         raw_data = NULL;
         return;
@@ -1767,7 +1767,7 @@ RE_TRY:
     ret = checkCMD_for_finger(chip_info);
     if (ret < 0) {
         if (retry_time) {
-            TPD_INFO("checkCMD_for_finger error line=%d\n",__LINE__);
+            TPD_DEBUG("checkCMD_for_finger error line=%d\n",__LINE__);
             retry_time--;
             goto RE_TRY;
         }
@@ -1781,7 +1781,7 @@ RE_TRY:
     ret = checkCMD_for_finger(chip_info);
     if (ret < 0) {
         if (retry_time) {
-            TPD_INFO("checkCMD_for_finger error line=%d\n",__LINE__);
+            TPD_DEBUG("checkCMD_for_finger error line=%d\n",__LINE__);
             retry_time--;
             goto RE_TRY;
         }
@@ -1790,7 +1790,7 @@ RE_TRY:
     ret = touch_i2c_read_block(chip_info->client, chip_info->reg_info.F54_ANALOG_DATA_BASE+3, RX_NUM*SPURIOUS_FP_TX_NUM*2, raw_data);     //read data
     if (ret < 0) {
         if (retry_time) {
-            TPD_INFO("%s touch_i2c_read_block error\n",__func__);
+            TPD_DEBUG("%s touch_i2c_read_block error\n",__func__);
             retry_time--;
             goto RE_TRY;
         }
@@ -1806,12 +1806,12 @@ RE_TRY:
         printk("\n");
     }
 
-    TPD_INFO("%s F54_ANALOG_COMMAND_BASE=0x%x set 0, \n",__func__,chip_info->reg_info.F54_ANALOG_COMMAND_BASE); //add for Prevent TP failure
+    TPD_DEBUG("%s F54_ANALOG_COMMAND_BASE=0x%x set 0, \n",__func__,chip_info->reg_info.F54_ANALOG_COMMAND_BASE); //add for Prevent TP failure
     touch_i2c_write_byte(chip_info->client, chip_info->reg_info.F54_ANALOG_COMMAND_BASE,0);
 
     ret = touch_i2c_write_byte(chip_info->client, 0xff, 0x0);   // page 0
     if (ret < 0) {
-        TPD_INFO("%s,I2C transfer error\n", __func__);
+        TPD_DEBUG("%s,I2C transfer error\n", __func__);
     }
 
     kfree(raw_data);
@@ -1858,11 +1858,11 @@ static int synaptics_tp_probe(struct i2c_client *client, const struct i2c_device
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
     //step1:Alloc chip_info
     chip_info = kzalloc(sizeof(struct chip_data_s3320), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -1872,7 +1872,7 @@ static int synaptics_tp_probe(struct i2c_client *client, const struct i2c_device
     //step2:Alloc common ts
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -1923,7 +1923,7 @@ static int synaptics_tp_probe(struct i2c_client *client, const struct i2c_device
     }
 #endif
 
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
 
     return 0;
 
@@ -1936,7 +1936,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
 
     return ret;
 }
@@ -1945,7 +1945,7 @@ static int synaptics_tp_remove(struct i2c_client *client)
 {
     struct touchpanel_data *ts = i2c_get_clientdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 #ifdef CONFIG_SYNAPTIC_RED
     unregister_remote_device();
 #endif
@@ -1958,7 +1958,7 @@ static int synaptics_i2c_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -1968,7 +1968,7 @@ static int synaptics_i2c_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -2005,13 +2005,13 @@ static struct i2c_driver tp_i2c_driver = {
 
 static int __init tp_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&tp_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
     return 0;

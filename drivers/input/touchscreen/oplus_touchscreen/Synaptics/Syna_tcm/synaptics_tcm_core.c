@@ -201,7 +201,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get timestamp\n");
+                TPD_DEBUG("Failed to get timestamp\n");
                 return retval;
             }
             touch_data->timestamp = data;
@@ -211,7 +211,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &obj);
             if (retval < 0) {
-                TPD_INFO("Failed to get object index\n");
+                TPD_DEBUG("Failed to get object index\n");
                 return retval;
             }
             offset += bits;
@@ -220,7 +220,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object classification\n");
+                TPD_DEBUG("Failed to get object classification\n");
                 return retval;
             }
             object_data[obj].status = data;
@@ -230,7 +230,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object x position\n");
+                TPD_DEBUG("Failed to get object x position\n");
                 return retval;
             }
             object_data[obj].x_pos = data;
@@ -240,7 +240,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object y position\n");
+                TPD_DEBUG("Failed to get object y position\n");
                 return retval;
             }
             object_data[obj].y_pos = data;
@@ -250,7 +250,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object z\n");
+                TPD_DEBUG("Failed to get object z\n");
                 return retval;
             }
             object_data[obj].z = data;
@@ -260,7 +260,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object x width\n");
+                TPD_DEBUG("Failed to get object x width\n");
                 return retval;
             }
             object_data[obj].x_width = data;
@@ -270,7 +270,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object y width\n");
+                TPD_DEBUG("Failed to get object y width\n");
                 return retval;
             }
             object_data[obj].y_width = data;
@@ -280,7 +280,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object tx position\n");
+                TPD_DEBUG("Failed to get object tx position\n");
                 return retval;
             }
             object_data[obj].tx_pos = data;
@@ -290,7 +290,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get object rx position\n");
+                TPD_DEBUG("Failed to get object rx position\n");
                 return retval;
             }
             object_data[obj].rx_pos = data;
@@ -300,7 +300,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get 0D buttons state\n");
+                TPD_DEBUG("Failed to get 0D buttons state\n");
                 return retval;
             }
             touch_data->buttons_state = data;
@@ -315,7 +315,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get gesture double tap\n");
+                TPD_DEBUG("Failed to get gesture double tap\n");
                 return retval;
             }
             touch_data->lpwg_gesture = tcm_hcd->report.buffer.buf[0];
@@ -325,7 +325,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get gesture double tap\n");
+                TPD_DEBUG("Failed to get gesture double tap\n");
                 return retval;
             }
             touch_data->extra_gesture_info = data;
@@ -335,7 +335,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, (unsigned int *)(&touch_data->data_point[0]));
             if (retval < 0) {
-                TPD_INFO("Failed to get gesture double tap\n");
+                TPD_DEBUG("Failed to get gesture double tap\n");
                 return retval;
             }
             offset += bits;
@@ -344,7 +344,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get frame rate\n");
+                TPD_DEBUG("Failed to get frame rate\n");
                 return retval;
             }
             touch_data->frame_rate = data;
@@ -354,7 +354,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get power IM\n");
+                TPD_DEBUG("Failed to get power IM\n");
                 return retval;
             }
             touch_data->power_im = data;
@@ -364,7 +364,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get CID IM\n");
+                TPD_DEBUG("Failed to get CID IM\n");
                 return retval;
             }
             touch_data->cid_im = data;
@@ -374,7 +374,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get rail IM\n");
+                TPD_DEBUG("Failed to get rail IM\n");
                 return retval;
             }
             touch_data->rail_im = data;
@@ -384,7 +384,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get CID variance IM\n");
+                TPD_DEBUG("Failed to get CID variance IM\n");
                 return retval;
             }
             touch_data->cid_variance_im = data;
@@ -394,7 +394,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get NSM frequency\n");
+                TPD_DEBUG("Failed to get NSM frequency\n");
                 return retval;
             }
             touch_data->nsm_frequency = data;
@@ -404,7 +404,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get NSM state\n");
+                TPD_DEBUG("Failed to get NSM state\n");
                 return retval;
             }
             touch_data->nsm_state = data;
@@ -414,7 +414,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get number of active objects\n");
+                TPD_DEBUG("Failed to get number of active objects\n");
                 return retval;
             }
             active_objects = data;
@@ -428,7 +428,7 @@ static int syna_parse_report(struct syna_tcm_hcd *tcm_hcd)
             bits = config_data[idx++];
             retval = syna_get_report_data(tcm_hcd, offset, bits, &data);
             if (retval < 0) {
-                TPD_INFO("Failed to get number of CPU cycles used since last frame\n");
+                TPD_DEBUG("Failed to get number of CPU cycles used since last frame\n");
                 return retval;
             }
             touch_data->num_of_cpu_cycles = data;
@@ -468,7 +468,7 @@ static int syna_get_input_params(struct syna_tcm_hcd *tcm_hcd)
             &tcm_hcd->config.data_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_GET_TOUCH_REPORT_CONFIG));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_GET_TOUCH_REPORT_CONFIG));
         UNLOCK_BUFFER(tcm_hcd->config);
         return retval;
     }
@@ -492,7 +492,7 @@ static int syna_set_default_report_config(struct syna_tcm_hcd *tcm_hcd)
                     &tcm_hcd->config,
                     length);
         if (retval < 0) {
-            TPD_INFO("Failed to alloc mem\n");
+            TPD_DEBUG("Failed to alloc mem\n");
             goto exit;
         }
 
@@ -525,7 +525,7 @@ static int syna_get_default_report_config(struct syna_tcm_hcd *tcm_hcd)
             &tcm_hcd->default_config.data_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_GET_TOUCH_REPORT_CONFIG));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_GET_TOUCH_REPORT_CONFIG));
         goto exit;
     }
 
@@ -545,7 +545,7 @@ static int syna_set_normal_report_config(struct syna_tcm_hcd *tcm_hcd)
     length = le2_to_uint(tcm_hcd->app_info.max_touch_report_config_size);
 
     if (length < TOUCH_REPORT_CONFIG_SIZE) {
-        TPD_INFO("Invalid maximum touch report config size\n");
+        TPD_DEBUG("Invalid maximum touch report config size\n");
         return -EINVAL;
     }
 
@@ -555,7 +555,7 @@ static int syna_set_normal_report_config(struct syna_tcm_hcd *tcm_hcd)
             &touch_hcd->out,
             length);
     if (retval < 0) {
-        TPD_INFO("Failed to allocate memory for touch_hcd->out.buf\n");
+        TPD_DEBUG("Failed to allocate memory for touch_hcd->out.buf\n");
         UNLOCK_BUFFER(touch_hcd->out);
         return retval;
     }
@@ -585,7 +585,7 @@ static int syna_set_normal_report_config(struct syna_tcm_hcd *tcm_hcd)
             &touch_hcd->resp.data_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_SET_TOUCH_REPORT_CONFIG));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_SET_TOUCH_REPORT_CONFIG));
         UNLOCK_BUFFER(touch_hcd->resp);
         UNLOCK_BUFFER(touch_hcd->out);
         return retval;
@@ -608,7 +608,7 @@ static int syna_set_gesture_report_config(struct syna_tcm_hcd *tcm_hcd)
     length = le2_to_uint(tcm_hcd->app_info.max_touch_report_config_size);
 
     if (length < TOUCH_REPORT_CONFIG_SIZE) {
-        TPD_INFO("Invalid maximum touch report config size\n");
+        TPD_DEBUG("Invalid maximum touch report config size\n");
         return -EINVAL;
     }
 
@@ -618,7 +618,7 @@ static int syna_set_gesture_report_config(struct syna_tcm_hcd *tcm_hcd)
             &touch_hcd->out,
             length);
     if (retval < 0) {
-        TPD_INFO("Failed to allocate memory for touch_hcd->out.buf\n");
+        TPD_DEBUG("Failed to allocate memory for touch_hcd->out.buf\n");
         UNLOCK_BUFFER(touch_hcd->out);
         return retval;
     }
@@ -663,7 +663,7 @@ static int syna_set_gesture_report_config(struct syna_tcm_hcd *tcm_hcd)
             &touch_hcd->resp.data_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_SET_TOUCH_REPORT_CONFIG));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_SET_TOUCH_REPORT_CONFIG));
         UNLOCK_BUFFER(touch_hcd->resp);
         UNLOCK_BUFFER(touch_hcd->out);
         return retval;
@@ -682,7 +682,7 @@ static int syna_set_input_reporting(struct syna_tcm_hcd *tcm_hcd, bool suspend)
 
     TPD_DEBUG("%s: mode 0x%x, state %d\n", __func__, tcm_hcd->id_info.mode, suspend);
     if (tcm_hcd->id_info.mode != MODE_APPLICATION || tcm_hcd->app_status != APP_STATUS_OK) {
-        TPD_INFO("Application firmware not running\n");
+        TPD_DEBUG("Application firmware not running\n");
         return 0;
     }
 
@@ -693,20 +693,20 @@ static int syna_set_input_reporting(struct syna_tcm_hcd *tcm_hcd, bool suspend)
     if (!suspend) {
         retval = syna_set_normal_report_config(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to set report config\n");
+            TPD_DEBUG("Failed to set report config\n");
             goto default_config;
         }
     } else {
         retval = syna_set_gesture_report_config(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to set report config\n");
+            TPD_DEBUG("Failed to set report config\n");
             goto default_config;
         }
     }
 
     retval = syna_get_input_params(tcm_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to get input parameters\n");
+        TPD_DEBUG("Failed to get input parameters\n");
     }
 
     goto exit;
@@ -715,7 +715,7 @@ default_config:
     /*if failed to set report config, use default report config */
     retval = syna_set_default_report_config(tcm_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to set default report config");
+        TPD_DEBUG("Failed to set default report config");
     }
 
 exit:
@@ -771,7 +771,7 @@ static void syna_tcm_dispatch_report(struct syna_tcm_hcd *tcm_hcd)
     if (tcm_hcd->report.id == REPORT_TOUCH) {
         ret = syna_parse_report(tcm_hcd);
         if (ret < 0) {
-            TPD_INFO("Failed to parse report\n");
+            TPD_DEBUG("Failed to parse report\n");
             goto exit;
         }
 
@@ -820,7 +820,7 @@ static void syna_tcm_dispatch_response(struct syna_tcm_hcd *tcm_hcd)
             &tcm_hcd->resp,
             tcm_hcd->payload_length);
     if (retval < 0) {
-        TPD_INFO("Failed to allocate memory for tcm_hcd->resp.buf\n");
+        TPD_DEBUG("Failed to allocate memory for tcm_hcd->resp.buf\n");
         UNLOCK_BUFFER(tcm_hcd->resp);
         atomic_set(&tcm_hcd->command_status, CMD_ERROR);
         goto exit;
@@ -834,7 +834,7 @@ static void syna_tcm_dispatch_response(struct syna_tcm_hcd *tcm_hcd)
             tcm_hcd->in.buf_size - MESSAGE_HEADER_SIZE,
             tcm_hcd->payload_length);
     if (retval < 0) {
-        TPD_INFO("Failed to copy payload\n");
+        TPD_DEBUG("Failed to copy payload\n");
         UNLOCK_BUFFER(tcm_hcd->in);
         UNLOCK_BUFFER(tcm_hcd->resp);
         atomic_set(&tcm_hcd->command_status, CMD_ERROR);
@@ -879,7 +879,7 @@ static void syna_tcm_dispatch_message(struct syna_tcm_hcd *tcm_hcd)
                 tcm_hcd->in.buf_size - MESSAGE_HEADER_SIZE,
                 MIN(sizeof(tcm_hcd->id_info), payload_length));
         if (retval < 0) {
-            TPD_INFO("Failed to copy identification info\n");
+            TPD_DEBUG("Failed to copy identification info\n");
             UNLOCK_BUFFER(tcm_hcd->in);
             return;
         }
@@ -888,7 +888,7 @@ static void syna_tcm_dispatch_message(struct syna_tcm_hcd *tcm_hcd)
 
         syna_tcm_resize_chunk_size(tcm_hcd);
 
-        TPD_INFO("Received identify report (firmware mode = 0x%02x)\n",
+        TPD_DEBUG("Received identify report (firmware mode = 0x%02x)\n",
                 tcm_hcd->id_info.mode);
 
         if (atomic_read(&tcm_hcd->command_status) == CMD_BUSY) {
@@ -900,7 +900,7 @@ static void syna_tcm_dispatch_message(struct syna_tcm_hcd *tcm_hcd)
                 complete(&response_complete);
                 break;
             default:
-                TPD_INFO("Device has been reset\n");
+                TPD_DEBUG("Device has been reset\n");
                 atomic_set(&tcm_hcd->command_status, CMD_ERROR);
                 complete(&response_complete);
                 break;
@@ -953,7 +953,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
             &tcm_hcd->in,
             total_length);
     if (retval < 0) {
-        TPD_INFO("Failed to reallocate memory for tcm_hcd->in.buf\n");
+        TPD_DEBUG("Failed to reallocate memory for tcm_hcd->in.buf\n");
         UNLOCK_BUFFER(tcm_hcd->in);
         return retval;
     }
@@ -990,7 +990,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
                 &tcm_hcd->temp,
                 xfer_length + 2);
         if (retval < 0) {
-            TPD_INFO("Failed to allocate memory for tcm_hcd->temp.buf\n");
+            TPD_DEBUG("Failed to allocate memory for tcm_hcd->temp.buf\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             UNLOCK_BUFFER(tcm_hcd->in);
             return retval;
@@ -1000,7 +1000,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
                 tcm_hcd->temp.buf,
                 xfer_length + 2);
         if (retval < 0) {
-            TPD_INFO("Failed to read from device\n");
+            TPD_DEBUG("Failed to read from device\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             UNLOCK_BUFFER(tcm_hcd->in);
             return retval;
@@ -1010,7 +1010,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
         code = tcm_hcd->temp.buf[1];
 
         if (marker != MESSAGE_MARKER) {
-            TPD_INFO("Incorrect header marker (0x%02x)\n",
+            TPD_DEBUG("Incorrect header marker (0x%02x)\n",
                     marker);
             UNLOCK_BUFFER(tcm_hcd->temp);
             UNLOCK_BUFFER(tcm_hcd->in);
@@ -1018,7 +1018,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
         }
 
         if (code != STATUS_CONTINUED_READ) {
-            TPD_INFO("Incorrect header code (0x%02x)\n",
+            TPD_DEBUG("Incorrect header code (0x%02x)\n",
                     code);
             UNLOCK_BUFFER(tcm_hcd->temp);
             UNLOCK_BUFFER(tcm_hcd->in);
@@ -1031,7 +1031,7 @@ static int syna_tcm_continued_read(struct syna_tcm_hcd *tcm_hcd)
                 xfer_length,
                 xfer_length);
         if (retval < 0) {
-            TPD_INFO("Failed to copy payload\n");
+            TPD_DEBUG("Failed to copy payload\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             UNLOCK_BUFFER(tcm_hcd->in);
             return retval;
@@ -1071,7 +1071,7 @@ static int syna_tcm_raw_read(struct syna_tcm_hcd *tcm_hcd,
     unsigned int remaining_length;
 
     if (length < 2) {
-        TPD_INFO("Invalid length information\n");
+        TPD_DEBUG("Invalid length information\n");
         return -EINVAL;
     }
 
@@ -1110,7 +1110,7 @@ static int syna_tcm_raw_read(struct syna_tcm_hcd *tcm_hcd,
                 &tcm_hcd->temp,
                 xfer_length + 2);
         if (retval < 0) {
-            TPD_INFO("Failed to allocate memory for tcm_hcd->temp.buf\n");
+            TPD_DEBUG("Failed to allocate memory for tcm_hcd->temp.buf\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             return retval;
         }
@@ -1119,7 +1119,7 @@ static int syna_tcm_raw_read(struct syna_tcm_hcd *tcm_hcd,
                 tcm_hcd->temp.buf,
                 xfer_length + 2);
         if (retval < 0) {
-            TPD_INFO("Failed to read from device\n");
+            TPD_DEBUG("Failed to read from device\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             return retval;
         }
@@ -1134,7 +1134,7 @@ static int syna_tcm_raw_read(struct syna_tcm_hcd *tcm_hcd,
                     xfer_length + 2);
         } else {
             if (code != STATUS_CONTINUED_READ) {
-                TPD_INFO("Incorrect header code (0x%02x)\n",
+                TPD_DEBUG("Incorrect header code (0x%02x)\n",
                         code);
                 UNLOCK_BUFFER(tcm_hcd->temp);
                 return -EIO;
@@ -1147,7 +1147,7 @@ static int syna_tcm_raw_read(struct syna_tcm_hcd *tcm_hcd,
                     xfer_length);
         }
         if (retval < 0) {
-            TPD_INFO("Failed to copy data\n");
+            TPD_DEBUG("Failed to copy data\n");
             UNLOCK_BUFFER(tcm_hcd->temp);
             return retval;
         }
@@ -1211,7 +1211,7 @@ static int syna_tcm_raw_write(struct syna_tcm_hcd *tcm_hcd,
                 &tcm_hcd->out,
                 xfer_length + 1);
         if (retval < 0) {
-            TPD_INFO("Failed to allocate memory for tcm_hcd->out.buf\n");
+            TPD_DEBUG("Failed to allocate memory for tcm_hcd->out.buf\n");
             UNLOCK_BUFFER(tcm_hcd->out);
             return retval;
         }
@@ -1228,7 +1228,7 @@ static int syna_tcm_raw_write(struct syna_tcm_hcd *tcm_hcd,
                     remaining_length,
                     xfer_length);
             if (retval < 0) {
-                TPD_INFO("Failed to copy data\n");
+                TPD_DEBUG("Failed to copy data\n");
                 UNLOCK_BUFFER(tcm_hcd->out);
                 return retval;
             }
@@ -1238,7 +1238,7 @@ static int syna_tcm_raw_write(struct syna_tcm_hcd *tcm_hcd,
                 tcm_hcd->out.buf,
                 xfer_length + 1);
         if (retval < 0) {
-            TPD_INFO("Failed to write to device\n");
+            TPD_DEBUG("Failed to write to device\n");
             UNLOCK_BUFFER(tcm_hcd->out);
             return retval;
         }
@@ -1255,7 +1255,7 @@ static int syna_tcm_raw_write(struct syna_tcm_hcd *tcm_hcd,
 static void syna_tcm_debug_message(char *buf, int len)
 {
     int i = 0;
-    TPD_INFO("message hex:");
+    TPD_DEBUG("message hex:");
     for (i = 0; i < len; i++) {
         if (i > 32)
             break;
@@ -1298,7 +1298,7 @@ static int syna_tcm_read_message(struct syna_tcm_hcd *tcm_hcd,
             tcm_hcd->in.buf,
             tcm_hcd->read_length);
     if (retval < 0) {
-        TPD_INFO("Failed to read from device\n");
+        TPD_DEBUG("Failed to read from device\n");
         UNLOCK_BUFFER(tcm_hcd->in);
         goto exit;
     }
@@ -1322,7 +1322,7 @@ static int syna_tcm_read_message(struct syna_tcm_hcd *tcm_hcd,
         case STATUS_OK:
             break;
         case STATUS_CONTINUED_READ:
-            TPD_INFO("Out-of-sync continued read\n");
+            TPD_DEBUG("Out-of-sync continued read\n");
         case STATUS_IDLE:
         case STATUS_BUSY:
             tcm_hcd->payload_length = 0;
@@ -1330,7 +1330,7 @@ static int syna_tcm_read_message(struct syna_tcm_hcd *tcm_hcd,
             retval = 0;
             goto exit;
         default:
-            TPD_INFO("Incorrect header code (0x%02x)\n",
+            TPD_DEBUG("Incorrect header code (0x%02x)\n",
                     tcm_hcd->status_report_code);
             if (tcm_hcd->status_report_code != STATUS_ERROR) {
                 UNLOCK_BUFFER(tcm_hcd->in);
@@ -1360,7 +1360,7 @@ static int syna_tcm_read_message(struct syna_tcm_hcd *tcm_hcd,
 
     retval = syna_tcm_continued_read(tcm_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to do continued read\n");
+        TPD_DEBUG("Failed to do continued read\n");
         goto exit;
     };
 
@@ -1373,7 +1373,7 @@ static int syna_tcm_read_message(struct syna_tcm_hcd *tcm_hcd,
 
 check_padding:
     if (tcm_hcd->in.buf[total_length - 1] != MESSAGE_PADDING) {
-        TPD_INFO("Incorrect message padding byte (0x%02x)\n",
+        TPD_DEBUG("Incorrect message padding byte (0x%02x)\n",
                 tcm_hcd->in.buf[total_length - 1]);
         UNLOCK_BUFFER(tcm_hcd->in);
         retval = -EIO;
@@ -1491,7 +1491,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
                 &tcm_hcd->out,
                 xfer_length + 1);
         if (retval < 0) {
-            TPD_INFO("Failed to allocate memory for tcm_hcd->out.buf\n");
+            TPD_DEBUG("Failed to allocate memory for tcm_hcd->out.buf\n");
             UNLOCK_BUFFER(tcm_hcd->out);
             mutex_unlock(&tcm_hcd->rw_ctrl_mutex);
             goto exit;
@@ -1509,7 +1509,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
                         remaining_length - 2,
                         xfer_length - 2);
                 if (retval < 0) {
-                    TPD_INFO("Failed to copy payload\n");
+                    TPD_DEBUG("Failed to copy payload\n");
                     UNLOCK_BUFFER(tcm_hcd->out);
                     mutex_unlock(&tcm_hcd->rw_ctrl_mutex);
                     goto exit;
@@ -1524,7 +1524,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
                     remaining_length,
                     xfer_length);
             if (retval < 0) {
-                TPD_INFO("Failed to copy payload\n");
+                TPD_DEBUG("Failed to copy payload\n");
                 UNLOCK_BUFFER(tcm_hcd->out);
                 mutex_unlock(&tcm_hcd->rw_ctrl_mutex);
                 goto exit;
@@ -1535,7 +1535,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
                 tcm_hcd->out.buf,
                 xfer_length + 1);
         if (retval < 0) {
-            TPD_INFO("Failed to write to device\n");
+            TPD_DEBUG("Failed to write to device\n");
             UNLOCK_BUFFER(tcm_hcd->out);
             mutex_unlock(&tcm_hcd->rw_ctrl_mutex);
             goto exit;
@@ -1557,7 +1557,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
     retval = wait_for_completion_timeout(&response_complete,
             msecs_to_jiffies(timeout_ms));
     if (retval == 0) {
-        TPD_INFO("Timed out waiting for response (command 0x%02x)\n",
+        TPD_DEBUG("Timed out waiting for response (command 0x%02x)\n",
                 tcm_hcd->command);
         retval = -EIO;
     } else {
@@ -1565,7 +1565,7 @@ static int syna_tcm_write_message(struct syna_tcm_hcd *tcm_hcd,
 
         if (command_status != CMD_IDLE ||
                 tcm_hcd->status_report_code == STATUS_ERROR) {
-            TPD_INFO("Failed to get valid response\n");
+            TPD_DEBUG("Failed to get valid response\n");
             retval = -EIO;
             goto exit;
         }
@@ -1579,7 +1579,7 @@ exit:
 
         if (tcm_hcd->status_report_code == STATUS_ERROR) {
             if (tcm_hcd->resp.data_length) {
-                TPD_INFO("Error code = 0x%02x\n",
+                TPD_DEBUG("Error code = 0x%02x\n",
                         tcm_hcd->resp.buf[0]);
             }
         }
@@ -1623,7 +1623,7 @@ get_app_info:
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",
+        TPD_DEBUG("Failed to write command %s\n",
                 STR(CMD_GET_APPLICATION_INFO));
         goto exit;
     }
@@ -1634,7 +1634,7 @@ get_app_info:
             resp_buf_size,
             MIN(sizeof(tcm_hcd->app_info), resp_length));
     if (retval < 0) {
-        TPD_INFO("Failed to copy application info\n");
+        TPD_DEBUG("Failed to copy application info\n");
         goto exit;
     }
 
@@ -1676,7 +1676,7 @@ static int syna_tcm_get_boot_info(struct syna_tcm_hcd *tcm_hcd)
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",
+        TPD_DEBUG("Failed to write command %s\n",
                 STR(CMD_GET_BOOT_INFO));
         goto exit;
     }
@@ -1687,7 +1687,7 @@ static int syna_tcm_get_boot_info(struct syna_tcm_hcd *tcm_hcd)
             resp_buf_size,
             MIN(sizeof(tcm_hcd->boot_info), resp_length));
     if (retval < 0) {
-        TPD_INFO("Failed to copy boot info\n");
+        TPD_DEBUG("Failed to copy boot info\n");
         goto exit;
     }
 
@@ -1723,7 +1723,7 @@ static int syna_tcm_identify(struct syna_tcm_hcd *tcm_hcd, bool id)
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",
+        TPD_DEBUG("Failed to write command %s\n",
                 STR(CMD_IDENTIFY));
         goto exit;
     }
@@ -1734,7 +1734,7 @@ static int syna_tcm_identify(struct syna_tcm_hcd *tcm_hcd, bool id)
             resp_buf_size,
             MIN(sizeof(tcm_hcd->id_info), resp_length));
     if (retval < 0) {
-        TPD_INFO("Failed to copy identification info\n");
+        TPD_DEBUG("Failed to copy identification info\n");
         goto exit;
     }
 
@@ -1744,13 +1744,13 @@ get_info:
     if (tcm_hcd->id_info.mode == MODE_APPLICATION) {
         retval = syna_tcm_get_app_info(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to get application info\n");
+            TPD_DEBUG("Failed to get application info\n");
             goto exit;
         }
     } else {
         retval = syna_tcm_get_boot_info(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to get boot info\n");
+            TPD_DEBUG("Failed to get boot info\n");
             goto exit;
         }
     }
@@ -1788,19 +1788,19 @@ retry:
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",
+        TPD_DEBUG("Failed to write command %s\n",
                 STR(CMD_RUN_APPLICATION_FIRMWARE));
         goto exit;
     }
 
     retval = syna_tcm_identify(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to do identification\n");
+        TPD_DEBUG("Failed to do identification\n");
         goto exit;
     }
 
     if (tcm_hcd->id_info.mode != MODE_APPLICATION) {
-        TPD_INFO("Failed to run application firmware (boot status = 0x%02x)\n",
+        TPD_DEBUG("Failed to run application firmware (boot status = 0x%02x)\n",
                 tcm_hcd->boot_info.status);
         if (retry) {
             retry = false;
@@ -1809,7 +1809,7 @@ retry:
         retval = -EINVAL;
         goto exit;
     } else if (tcm_hcd->app_status != APP_STATUS_OK) {
-        TPD_INFO("Application status = 0x%02x\n", tcm_hcd->app_status);
+        TPD_DEBUG("Application status = 0x%02x\n", tcm_hcd->app_status);
     }
 
     retval = 0;
@@ -1840,18 +1840,18 @@ static int syna_tcm_run_bootloader_firmware(struct syna_tcm_hcd *tcm_hcd)
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_RUN_BOOTLOADER_FIRMWARE));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_RUN_BOOTLOADER_FIRMWARE));
         goto exit;
     }
 
     retval = syna_tcm_identify(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to do identification\n");
+        TPD_DEBUG("Failed to do identification\n");
         goto exit;
     }
 
     if (tcm_hcd->id_info.mode == MODE_APPLICATION) {
-        TPD_INFO("Failed to enter bootloader mode\n");
+        TPD_DEBUG("Failed to enter bootloader mode\n");
         retval = -EINVAL;
         goto exit;
     }
@@ -1876,19 +1876,19 @@ static int syna_tcm_switch_mode(struct syna_tcm_hcd *tcm_hcd,
     case FW_MODE_BOOTLOADER:
         retval = syna_tcm_run_bootloader_firmware(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to switch to bootloader mode\n");
+            TPD_DEBUG("Failed to switch to bootloader mode\n");
             goto exit;
         }
         break;
     case FW_MODE_APPLICATION:
         retval = syna_tcm_run_application_firmware(tcm_hcd);
         if (retval < 0) {
-            TPD_INFO("Failed to switch to application mode\n");
+            TPD_DEBUG("Failed to switch to application mode\n");
             goto exit;
         }
         break;
     default:
-        TPD_INFO("Invalid firmware mode\n");
+        TPD_DEBUG("Invalid firmware mode\n");
         retval = -EINVAL;
         goto exit;
     }
@@ -1925,7 +1925,7 @@ static int syna_tcm_get_dynamic_config(struct syna_tcm_hcd *tcm_hcd,
             RESPONSE_TIMEOUT_MS_SHORT);
     if (retval < 0 || resp_length < 2) {
         retval = -EINVAL;
-        TPD_INFO("Failed to read dynamic config\n");
+        TPD_DEBUG("Failed to read dynamic config\n");
         goto exit;
     }
 
@@ -1961,7 +1961,7 @@ static int syna_tcm_set_dynamic_config(struct syna_tcm_hcd *tcm_hcd,
             &resp_length,
             RESPONSE_TIMEOUT_MS_SHORT);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",
+        TPD_DEBUG("Failed to write command %s\n",
                 STR(CMD_SET_DYNAMIC_CONFIG));
         goto exit;
     }
@@ -1979,10 +1979,10 @@ static void syna_tcm_write_ps_status(void *chip_data, int ps_status)
     int retval = 0;
     struct syna_tcm_hcd *tcm_hcd = (struct syna_tcm_hcd *)chip_data;
 
-    TPD_INFO("%s: value %d\n", __func__, ps_status);
+    TPD_DEBUG("%s: value %d\n", __func__, ps_status);
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_PS_STATUS, ps_status);
     if (retval < 0) {
-        TPD_INFO("Failed to write ps status\n");
+        TPD_DEBUG("Failed to write ps status\n");
     }
 
     return;
@@ -2010,7 +2010,7 @@ static int syna_tcm_sleep(struct syna_tcm_hcd *tcm_hcd, bool en)
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n",en ?STR(CMD_ENTER_DEEP_SLEEP):STR(CMD_EXIT_DEEP_SLEEP));
+        TPD_DEBUG("Failed to write command %s\n",en ?STR(CMD_ENTER_DEEP_SLEEP):STR(CMD_EXIT_DEEP_SLEEP));
         goto exit;
     }
 
@@ -2044,14 +2044,14 @@ static int syna_tcm_reset(void *chip_data)
                 &resp_length,
                 0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_RESET));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_RESET));
         goto exit;
     }
 
     msleep(200);
     retval = syna_tcm_identify(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to do identification\n");
+        TPD_DEBUG("Failed to do identification\n");
         goto exit;
     }
 
@@ -2067,17 +2067,17 @@ static int syna_tcm_reset(void *chip_data)
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_RUN_APPLICATION_FIRMWARE));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_RUN_APPLICATION_FIRMWARE));
     }
 
     retval = syna_tcm_identify(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to do identification\n");
+        TPD_DEBUG("Failed to do identification\n");
         goto exit;
     }
 
 dispatch_reset:
-    TPD_INFO("Firmware mode = 0x%02x, boot status 0x%02x, app status 0x%02x\n",
+    TPD_DEBUG("Firmware mode = 0x%02x, boot status 0x%02x, app status 0x%02x\n",
         tcm_hcd->id_info.mode,
         tcm_hcd->boot_info.status,
         tcm_hcd->app_status);
@@ -2094,16 +2094,16 @@ static int syna_get_chip_info(void *chip_data){
     int ret = 0;
     struct syna_tcm_hcd *tcm_hcd = (struct syna_tcm_hcd *)chip_data;
 
-    TPD_INFO("%s: Enter\n", __func__);
+    TPD_DEBUG("%s: Enter\n", __func__);
 
     ret = syna_tcm_reset(tcm_hcd);  // reset to get bootloader info or boot info
     if (ret < 0) {
-        TPD_INFO("failed to reset device\n");
+        TPD_DEBUG("failed to reset device\n");
     }
 
     ret = syna_get_default_report_config(tcm_hcd);
     if (ret < 0) {
-        TPD_INFO("failed to get default report config\n");
+        TPD_DEBUG("failed to get default report config\n");
     }
     return 0;
 }
@@ -2164,7 +2164,7 @@ static int syna_tcm_set_gesture_mode(struct syna_tcm_hcd *tcm_hcd, bool enable)
     /*this command may take too much time, if needed can add flag to skip this */
     retval = syna_tcm_get_dynamic_config(tcm_hcd, DC_IN_WAKEUP_GESTURE_MODE, &config);
     if (retval < 0) {
-        TPD_INFO("Failed to get dynamic config\n");
+        TPD_DEBUG("Failed to get dynamic config\n");
         return retval;
     }
 
@@ -2174,13 +2174,13 @@ static int syna_tcm_set_gesture_mode(struct syna_tcm_hcd *tcm_hcd, bool enable)
         if (!config) {
             retval = syna_set_input_reporting(tcm_hcd, true);
             if (retval < 0) {
-                TPD_INFO("Failed to set input reporting\n");
+                TPD_DEBUG("Failed to set input reporting\n");
                 return retval;
             }
 
             retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_IN_WAKEUP_GESTURE_MODE, true);
             if (retval < 0) {
-                TPD_INFO("Failed to set dynamic gesture config\n");
+                TPD_DEBUG("Failed to set dynamic gesture config\n");
                 return retval;
             }
         }
@@ -2189,7 +2189,7 @@ static int syna_tcm_set_gesture_mode(struct syna_tcm_hcd *tcm_hcd, bool enable)
     /*set to sleep*/
     retval = syna_tcm_sleep(tcm_hcd, !enable);
     if (retval < 0) {
-        TPD_INFO("Failed to set sleep mode");
+        TPD_DEBUG("Failed to set sleep mode");
     }
 
     return retval;
@@ -2201,13 +2201,13 @@ static int syna_tcm_normal_mode(struct syna_tcm_hcd *tcm_hcd)
 
     retval = syna_set_input_reporting(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to set input reporting\n");
+        TPD_DEBUG("Failed to set input reporting\n");
         return retval;
     }
 
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_IN_WAKEUP_GESTURE_MODE, false);
     if (retval < 0) {
-        TPD_INFO("Failed to set dynamic gesture config\n");
+        TPD_DEBUG("Failed to set dynamic gesture config\n");
         return retval;
     }
 
@@ -2222,31 +2222,31 @@ static int syna_mode_switch(void *chip_data, work_mode mode, bool flag){
         case MODE_NORMAL:
             ret = syna_tcm_normal_mode(tcm_hcd);
             if (ret < 0) {
-                TPD_INFO("normal mode switch failed\n");
+                TPD_DEBUG("normal mode switch failed\n");
             }
             break;
         case MODE_GESTURE:
             ret = syna_tcm_set_gesture_mode(tcm_hcd, flag);
             if (ret < 0) {
-                TPD_INFO("%s:Failed to set gesture mode\n", __func__);
+                TPD_DEBUG("%s:Failed to set gesture mode\n", __func__);
             }
             break;
         case MODE_SLEEP:
             ret = syna_tcm_sleep(tcm_hcd, true);
             if (ret < 0) {
-                TPD_INFO("%s: failed to switch to sleep", __func__);
+                TPD_DEBUG("%s: failed to switch to sleep", __func__);
             }
             break;
         case MODE_CHARGE:
             ret = syna_tcm_set_dynamic_config(tcm_hcd, DC_CHARGER_CONNECTED, flag?1:0);
             if (ret < 0) {
-                TPD_INFO("%s:failed to set charger mode\n", __func__);
+                TPD_DEBUG("%s:failed to set charger mode\n", __func__);
             }
             break;
         case MODE_EDGE:
             ret = syna_tcm_set_dynamic_config(tcm_hcd, DC_GRIP_SUPPRESSION_ENABLED, flag?1:0);
             if (ret < 0) {
-                TPD_INFO("%s:failed to set grip suppression\n", __func__);
+                TPD_DEBUG("%s:failed to set grip suppression\n", __func__);
             }
             break;
         default:
@@ -2257,7 +2257,7 @@ static int syna_mode_switch(void *chip_data, work_mode mode, bool flag){
 
 static int syna_ftm_process(void *chip_data)
 {
-    TPD_INFO("%s: go into sleep\n", __func__);
+    TPD_DEBUG("%s: go into sleep\n", __func__);
     syna_get_chip_info(chip_data);
     syna_mode_switch(chip_data, MODE_SLEEP, true);
     return 0;
@@ -2274,7 +2274,7 @@ static int  syna_tcm_reinit_device (void *chip_data)
 static int syna_hw_reset(struct syna_tcm_hcd *tcm_hcd, struct hw_resource *hw_res)
 {
     if (gpio_is_valid(hw_res->reset_gpio)) {
-        TPD_INFO("hardware reset: %d\n", hw_res->reset_gpio);
+        TPD_DEBUG("hardware reset: %d\n", hw_res->reset_gpio);
         gpio_set_value(hw_res->reset_gpio, false);
         msleep(20);
         gpio_set_value(hw_res->reset_gpio, true);
@@ -2310,7 +2310,7 @@ static fw_check_state syna_fw_check(void *chip_data, struct resolution_info *res
 {
     struct syna_tcm_hcd *tcm_hcd = (struct syna_tcm_hcd *)chip_data;
 
-    TPD_INFO("fw id %d, custom config id 0x%s\n", panel_data->TP_FW, tcm_hcd->app_info.customer_config_id);
+    TPD_DEBUG("fw id %d, custom config id 0x%s\n", panel_data->TP_FW, tcm_hcd->app_info.customer_config_id);
 
     if (strlen(tcm_hcd->app_info.customer_config_id) == 0) {
         return FW_ABNORMAL;
@@ -2332,7 +2332,7 @@ static int syna_tcm_helper(struct syna_tcm_hcd *tcm_hcd)
 {
     if (tcm_hcd->id_info.mode != MODE_APPLICATION &&
         !mutex_is_locked(&tcm_hcd->reset_mutex)) {
-        TPD_INFO("%s: use helper\n", __func__);
+        TPD_DEBUG("%s: use helper\n", __func__);
         queue_work(tcm_hcd->helper_workqueue, &tcm_hcd->helper_work);
     }
 
@@ -2348,7 +2348,7 @@ static void syna_tcm_helper_work(struct work_struct *work)
     mutex_lock(&tcm_hcd->reset_mutex);
     retval = syna_tcm_run_application_firmware(tcm_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to switch to app mode\n");
+        TPD_DEBUG("Failed to switch to app mode\n");
     }
 
     mutex_unlock(&tcm_hcd->reset_mutex);
@@ -2365,7 +2365,7 @@ static int syna_tcm_async_work(void *chip_data)
 
     retval = syna_tcm_identify(tcm_hcd, false);
     if (retval < 0) {
-        TPD_INFO("Failed to do identification\n");
+        TPD_DEBUG("Failed to do identification\n");
         return retval;
     }
 
@@ -2381,7 +2381,7 @@ static int syna_tcm_erase_flash(struct syna_tcm_hcd *tcm_hcd, unsigned int page_
     unsigned int resp_buf_size;
     unsigned int resp_length;
 
-    TPD_INFO("start page %d, page count %d\n", page_start, page_count);
+    TPD_DEBUG("start page %d, page count %d\n", page_start, page_count);
     resp_buf = NULL;
     resp_buf_size = 0;
 
@@ -2397,7 +2397,7 @@ static int syna_tcm_erase_flash(struct syna_tcm_hcd *tcm_hcd, unsigned int page_
             &resp_length,
             ERASE_FLASH_DELAY_MS);
     if (ret < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_ERASE_FLASH));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_ERASE_FLASH));
     }
 
     kfree(resp_buf);
@@ -2439,7 +2439,7 @@ static int syna_tcm_write_flash(struct syna_tcm_hcd *tcm_hcd, struct reflash_hcd
                 &out,
                 xfer_len + 2);
         if (retval < 0) {
-            TPD_INFO("Failed to alloc memory\n");
+            TPD_DEBUG("Failed to alloc memory\n");
             break;
         }
 
@@ -2454,7 +2454,7 @@ static int syna_tcm_write_flash(struct syna_tcm_hcd *tcm_hcd, struct reflash_hcd
                 datalen - offset,
                 xfer_len);
         if (retval < 0) {
-            TPD_INFO("Failed to copy write data\n");
+            TPD_DEBUG("Failed to copy write data\n");
             break;
         }
 
@@ -2467,7 +2467,7 @@ static int syna_tcm_write_flash(struct syna_tcm_hcd *tcm_hcd, struct reflash_hcd
                 &resp_length,
                 WRITE_FLASH_DELAY_MS);
         if (retval < 0) {
-            TPD_INFO("Failed to write message %s, Addr 0x%08x, Len 0x%d\n",
+            TPD_DEBUG("Failed to write message %s, Addr 0x%08x, Len 0x%d\n",
                 STR(CMD_WRITE_FLASH), flash_addr, xfer_len);
             break;
         }
@@ -2508,7 +2508,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
         if (ret > 0) {
             ret = syna_tcm_switch_mode(tcm_hcd, FW_MODE_APPLICATION); /* switch to app mode to get app info */
             if (ret < 0) {
-                TPD_INFO("Failed to switch to normal mode\n");
+                TPD_DEBUG("Failed to switch to normal mode\n");
                 return FW_UPDATE_ERROR;
             }
         }
@@ -2517,7 +2517,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     memset(&image_info, 0, sizeof(struct image_info));
     ret = synaptics_parse_header_v2(&image_info, fw->data);
     if (ret < 0) {
-        TPD_INFO("Failed to parse fw image\n");
+        TPD_DEBUG("Failed to parse fw image\n");
         return FW_UPDATE_FATAL;
     }
 
@@ -2525,15 +2525,15 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
 
     image_fw_id = le4_to_uint(header->build_id);
     device_fw_id = le4_to_uint(tcm_hcd->id_info.build_id);
-    TPD_INFO("image build id %d, device build id %d\n", image_fw_id, device_fw_id);
+    TPD_DEBUG("image build id %d, device build id %d\n", image_fw_id, device_fw_id);
 
     image_config_id = header->customer_config_id;
     device_config_id = tcm_hcd->app_info.customer_config_id;
-    TPD_INFO("image config id 0x%s, device config id 0x%s\n", image_config_id, device_config_id);
+    TPD_DEBUG("image config id 0x%s, device config id 0x%s\n", image_config_id, device_config_id);
 
     if (!force) {
         if ((image_fw_id == device_fw_id) && (strncmp(image_config_id, device_config_id, 16) == 0)) {
-            TPD_INFO("same firmware/config id, no need to update\n");
+            TPD_DEBUG("same firmware/config id, no need to update\n");
             return FW_NO_NEED_UPDATE;
         }
     }
@@ -2546,7 +2546,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     if (tcm_hcd->id_info.mode == MODE_APPLICATION) {
         ret = syna_tcm_switch_mode(tcm_hcd, FW_MODE_BOOTLOADER);
         if (ret < 0) {
-            TPD_INFO("Failed to switch to bootloader mode\n");
+            TPD_DEBUG("Failed to switch to bootloader mode\n");
             return FW_UPDATE_ERROR;
         }
     }
@@ -2560,18 +2560,18 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     temp = le2_to_uint(tcm_hcd->boot_info.max_write_payload_size);
     reflash_hcd.max_write_payload_size = temp;
 
-    TPD_INFO("Write block size %d, page size %d, payload_size %d\n",
+    TPD_DEBUG("Write block size %d, page size %d, payload_size %d\n",
         reflash_hcd.write_block_size,
         reflash_hcd.page_size,
         reflash_hcd.max_write_payload_size);
 
     if (reflash_hcd.write_block_size > (tcm_hcd->wr_chunk_size - 5)) {
-        TPD_INFO("write block size is exceed\n");
+        TPD_DEBUG("write block size is exceed\n");
         return FW_UPDATE_ERROR;
     }
 
     if (image_info.app_firmware.size == 0) {
-        TPD_INFO("no application firmware in image\n\n");
+        TPD_DEBUG("no application firmware in image\n\n");
         return FW_UPDATE_ERROR;
     }
 
@@ -2580,7 +2580,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     page_count = ceil_div(image_info.app_firmware.size, reflash_hcd.page_size);
     ret = syna_tcm_erase_flash(tcm_hcd, page_start, page_count);
     if (ret < 0) {
-        TPD_INFO("Failed to erase firmware\n");
+        TPD_DEBUG("Failed to erase firmware\n");
         return FW_UPDATE_ERROR;
     }
 
@@ -2591,7 +2591,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
 
     ret = syna_tcm_write_flash(tcm_hcd, &reflash_hcd, flash_addr, data, size);
     if (ret < 0) {
-        TPD_INFO("Failed to write flash \n");
+        TPD_DEBUG("Failed to write flash \n");
         return FW_UPDATE_ERROR;
     }
 
@@ -2606,10 +2606,10 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     temp = le2_to_uint(tcm_hcd->boot_info.display_config_length_blocks);
     device_size = temp * reflash_hcd.write_block_size;
 
-    TPD_INFO("Dispaly Device addr/size 0x%x/%d, flash addr/size 0x%x/%d\n",
+    TPD_DEBUG("Dispaly Device addr/size 0x%x/%d, flash addr/size 0x%x/%d\n",
                 device_addr, device_size, flash_addr, size);
     if ((flash_addr != device_addr) || (size != device_size)) {
-        TPD_INFO("Failed to display config \n");
+        TPD_DEBUG("Failed to display config \n");
         return FW_UPDATE_ERROR;
     }
     page_start = image_info.disp_config.flash_addr / reflash_hcd.page_size;
@@ -2617,13 +2617,13 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
 
     ret = syna_tcm_erase_flash(tcm_hcd, page_start, page_count);
     if (ret < 0) {
-        TPD_INFO("Failed to erase config\n");
+        TPD_DEBUG("Failed to erase config\n");
         return FW_UPDATE_ERROR;
     }
 
     ret = syna_tcm_write_flash(tcm_hcd, &reflash_hcd, flash_addr, data, size);
     if (ret < 0) {
-        TPD_INFO("Failed to write config \n");
+        TPD_DEBUG("Failed to write config \n");
         return FW_UPDATE_ERROR;
     }
     /* update display config end*/
@@ -2638,7 +2638,7 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
     device_addr = temp * reflash_hcd.write_block_size;
     device_size = le2_to_uint(tcm_hcd->app_info.app_config_size);
 
-    TPD_INFO("Config Device addr/size 0x%x/%d, flash addr/size 0x%x/%d\n",
+    TPD_DEBUG("Config Device addr/size 0x%x/%d, flash addr/size 0x%x/%d\n",
                 device_addr, device_size, flash_addr, size);
 
     page_start = image_info.app_config.flash_addr / reflash_hcd.page_size;
@@ -2646,17 +2646,17 @@ static fw_update_state syna_tcm_fw_update(void *chip_data, const struct firmware
 
     ret = syna_tcm_erase_flash(tcm_hcd, page_start, page_count);
     if (ret < 0) {
-        TPD_INFO("Failed to erase config\n");
+        TPD_DEBUG("Failed to erase config\n");
         return FW_UPDATE_ERROR;
     }
 
     ret = syna_tcm_write_flash(tcm_hcd, &reflash_hcd, flash_addr, data, size);
     if (ret < 0) {
-        TPD_INFO("Failed to write config \n");
+        TPD_DEBUG("Failed to write config \n");
         return FW_UPDATE_ERROR;
     }
 
-    TPD_INFO("end of config update\n");
+    TPD_DEBUG("end of config update\n");
     /* update app config end */
 
     return FW_UPDATE_SUCCESS;
@@ -2851,7 +2851,7 @@ static int syna_testing_limit_compare(char *s,
 
     limit_block = (struct limit_block *)(syna_testdata->fw->data + offset);
 
-    TPD_INFO("compare mode %d, test name %s, size %d\n", limit_block->mode, limit_block->name, limit_block->size);
+    TPD_DEBUG("compare mode %d, test name %s, size %d\n", limit_block->mode, limit_block->name, limit_block->size);
     if ((limit_block->mode && limit_block->size < rows*cols*2) ||
         (!limit_block->mode && limit_block->size != 4)) {
         store_to_buf(s, "limit data is not valid");
@@ -2883,8 +2883,8 @@ static int syna_testing_limit_compare(char *s,
             }
             if (data > hi_data || data < lo_data) {
                 if (!error_count) {
-                    TPD_INFO("error:[row,col][%2d %2d]=%4d\n", row, col, data);
-                    TPD_INFO("range lo hi [%5d %5d]\n", lo_data, hi_data);
+                    TPD_DEBUG("error:[row,col][%2d %2d]=%4d\n", row, col, data);
+                    TPD_DEBUG("range lo hi [%5d %5d]\n", lo_data, hi_data);
                     store_to_buf(s, "error:[row,col][%2d %2d]=%4d", row, col, data);
                 }
                 error_count++;
@@ -3199,10 +3199,10 @@ static int syna_int_pin_test(char *s, void *chip_data, struct syna_testdata *syn
             eint_count--;
         else
             eint_count++;
-        TPD_INFO("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
+        TPD_DEBUG("%s eint_count = %d  eint_status = %d\n", __func__, eint_count, eint_status);
     }
     if (eint_count == 10) {
-        TPD_INFO("error :  TP EINT PIN direct short!\n");
+        TPD_DEBUG("error :  TP EINT PIN direct short!\n");
         store_to_buf(s, "TP EINT direct stort");
         eint_count = 0;
         return 1;
@@ -3246,7 +3246,7 @@ static void syna_tcm_black_screen_test(void *chip_data, char *message)
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         store_to_buf(buffer, "Open failed failed");
         error_count++;
         set_fs(old_fs);
@@ -3255,7 +3255,7 @@ static void syna_tcm_black_screen_test(void *chip_data, char *message)
 
     retval = request_firmware(&fw, tcm_hcd->limit_name, &tcm_hcd->client->dev);
     if (retval < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", tcm_hcd->limit_name, retval);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", tcm_hcd->limit_name, retval);
         store_to_buf(buffer, "No Limit data");
         error_count++;
         goto firware_err;
@@ -3281,7 +3281,7 @@ firware_err:
 
 sys_err:
     sprintf(message, "%d errors. %s", error_count, buffer);
-    TPD_INFO("%d errors. %s\n", error_count, buffer);
+    TPD_DEBUG("%d errors. %s\n", error_count, buffer);
 
     kfree(buffer);
     return;
@@ -3322,7 +3322,7 @@ static void syna_auto_test(struct seq_file *s, void *chip_data, struct syna_test
     seq_printf(s, buffer);
     seq_printf(s, "imageid = %lld customID 0x%s\n", syna_testdata->TP_FW, tcm_hcd->app_info.customer_config_id);
     seq_printf(s, "%d error(s). %s\n", error_count, error_count?"":"All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", error_count, error_count?"":"All test passed.");
 
     kfree(buffer);
 }
@@ -3355,7 +3355,7 @@ static int syna_tcm_collect_reports(struct syna_tcm_hcd *tcm_hcd, enum report_ty
             &resp_length,
             0);
     if (retval < 0) {
-        TPD_INFO("Failed to write message %s\n", STR(CMD_ENABLE_REPORT));
+        TPD_DEBUG("Failed to write message %s\n", STR(CMD_ENABLE_REPORT));
         completed = false;
         goto exit;
     }
@@ -3365,7 +3365,7 @@ static int syna_tcm_collect_reports(struct syna_tcm_hcd *tcm_hcd, enum report_ty
     retval = wait_for_completion_timeout(&report_complete,
             msecs_to_jiffies(timeout));
     if (retval == 0) {
-        TPD_INFO("Timed out waiting for report collection\n");
+        TPD_DEBUG("Timed out waiting for report collection\n");
     } else {
         completed = true;
     }
@@ -3381,7 +3381,7 @@ static int syna_tcm_collect_reports(struct syna_tcm_hcd *tcm_hcd, enum report_ty
         &resp_length,
         0);
     if (retval < 0) {
-        TPD_INFO("Failed to write message %s\n", STR(CMD_DISABLE_REPORT));
+        TPD_DEBUG("Failed to write message %s\n", STR(CMD_DISABLE_REPORT));
     }
 
     if (!completed) {
@@ -3399,7 +3399,7 @@ static void syna_tcm_test_report(struct syna_tcm_hcd *tcm_hcd)
     struct syna_tcm_test *test_hcd = tcm_hcd->test_hcd;
 
     if (tcm_hcd->report.id != test_hcd->report_type) {
-        TPD_INFO("Not request report type\n");
+        TPD_DEBUG("Not request report type\n");
         return;
     }
 
@@ -3411,7 +3411,7 @@ static void syna_tcm_test_report(struct syna_tcm_hcd *tcm_hcd)
             &test_hcd->report,
             report_size*test_hcd->num_of_reports);
         if (retval < 0) {
-            TPD_INFO("Failed to allocate memory\n");
+            TPD_DEBUG("Failed to allocate memory\n");
 
             UNLOCK_BUFFER(test_hcd->report);
             return;
@@ -3426,7 +3426,7 @@ static void syna_tcm_test_report(struct syna_tcm_hcd *tcm_hcd)
                 tcm_hcd->report.buffer.buf_size,
                 tcm_hcd->report.buffer.data_length);
         if (retval < 0) {
-            TPD_INFO("Failed to copy report data\n");
+            TPD_DEBUG("Failed to copy report data\n");
 
             UNLOCK_BUFFER(test_hcd->report);
             return;
@@ -3494,7 +3494,7 @@ static void syna_main_register(struct seq_file *s, void *chip_data)
         &resp_length,
         0);
     if (retval < 0) {
-        TPD_INFO("Failed to write command %s\n", STR(CMD_GET_NSM_INFO));
+        TPD_DEBUG("Failed to write command %s\n", STR(CMD_GET_NSM_INFO));
         if (s) {
             seq_printf(s, "Failed to write command %s\n", STR(CMD_GET_NSM_INFO));
         }
@@ -3502,19 +3502,19 @@ static void syna_main_register(struct seq_file *s, void *chip_data)
     }
 
     if (resp_length < 10) {
-        TPD_INFO("Error response data\n");
+        TPD_DEBUG("Error response data\n");
         if (s) {
            seq_printf(s, "Error response data\n");
         }
         goto exit;
     }
 
-    TPD_INFO("Reset reason:0x%02x%02x\n", resp_buf[1], resp_buf[0]);
-    TPD_INFO("power im: 0x%02x%02x\n", resp_buf[3], resp_buf[2]);
-    TPD_INFO("nsm Frequency: 0x%02x%02x\n", resp_buf[5], resp_buf[4]);
-    TPD_INFO("nsm State: 0x%02x%02x\n", resp_buf[7], resp_buf[6]);
-    TPD_INFO("esd State: 0x%02x%02x\n", resp_buf[8], resp_buf[9]);
-    TPD_INFO("Buid ID:%d, Custom ID:0x%s\n",
+    TPD_DEBUG("Reset reason:0x%02x%02x\n", resp_buf[1], resp_buf[0]);
+    TPD_DEBUG("power im: 0x%02x%02x\n", resp_buf[3], resp_buf[2]);
+    TPD_DEBUG("nsm Frequency: 0x%02x%02x\n", resp_buf[5], resp_buf[4]);
+    TPD_DEBUG("nsm State: 0x%02x%02x\n", resp_buf[7], resp_buf[6]);
+    TPD_DEBUG("esd State: 0x%02x%02x\n", resp_buf[8], resp_buf[9]);
+    TPD_DEBUG("Buid ID:%d, Custom ID:0x%s\n",
                 le4_to_uint(tcm_hcd->id_info.build_id),
                 tcm_hcd->app_info.customer_config_id);
 
@@ -3543,7 +3543,7 @@ static void syna_delta_read(struct seq_file *s, void *chip_data)
 
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 1);
     if (retval < 0){
-        TPD_INFO("Failed to exit doze\n");
+        TPD_DEBUG("Failed to exit doze\n");
     }
 
     msleep(20); // delay 20ms
@@ -3559,7 +3559,7 @@ static void syna_delta_read(struct seq_file *s, void *chip_data)
     /*set normal doze*/
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 0);
     if (retval < 0){
-        TPD_INFO("Failed to switch to normal\n");
+        TPD_DEBUG("Failed to switch to normal\n");
     }
 
     return;
@@ -3572,7 +3572,7 @@ static void syna_baseline_read(struct seq_file *s, void *chip_data)
 
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 1);
     if (retval < 0){
-        TPD_INFO("Failed to exit doze\n");
+        TPD_DEBUG("Failed to exit doze\n");
     }
 
     msleep(20); // delay 20ms
@@ -3588,7 +3588,7 @@ static void syna_baseline_read(struct seq_file *s, void *chip_data)
     /*set normal doze*/
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 0);
     if (retval < 0){
-        TPD_INFO("Failed to switch to normal\n");
+        TPD_DEBUG("Failed to switch to normal\n");
     }
 
     return;
@@ -3651,7 +3651,7 @@ static void syna_reserve_read(struct seq_file *s, void *chip_data)
 
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 1);
     if (retval < 0){
-        TPD_INFO("Failed to exit doze\n");
+        TPD_DEBUG("Failed to exit doze\n");
     }
 
     msleep(20); // delay 20ms
@@ -3667,7 +3667,7 @@ static void syna_reserve_read(struct seq_file *s, void *chip_data)
     /*set normal doze*/
     retval = syna_tcm_set_dynamic_config(tcm_hcd, DC_NO_DOZE, 0);
     if (retval < 0){
-        TPD_INFO("Failed to switch to normal\n");
+        TPD_DEBUG("Failed to switch to normal\n");
     }
 
     return;
@@ -3686,7 +3686,7 @@ static int syna_device_report_touch(struct syna_tcm_hcd *tcm_hcd)
 {
     int ret = syna_parse_report(tcm_hcd);
     if (ret < 0) {
-        TPD_INFO("Failed to parse report\n");
+        TPD_DEBUG("Failed to parse report\n");
         return -EINVAL;
     }
 
@@ -3741,9 +3741,9 @@ static int syna_tcm_init_device(struct syna_tcm_hcd *tcm_hcd)
     retval = syna_tcm_alloc_mem(tcm_hcd,
             &tcm_hcd->in,
             tcm_hcd->read_length + 2);
-    TPD_INFO("%s read_length:%d\n", __func__, tcm_hcd->read_length);
+    TPD_DEBUG("%s read_length:%d\n", __func__, tcm_hcd->read_length);
     if (retval < 0) {
-        TPD_INFO("Failed to allocate memory for tcm_hcd->in.buf\n");
+        TPD_DEBUG("Failed to allocate memory for tcm_hcd->in.buf\n");
         return retval;
     }
 
@@ -3794,17 +3794,17 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
     struct touchpanel_data *ts = NULL;
     struct device_hcd *device_hcd;
 
-    TPD_INFO("%s: enter\n", __func__);
+    TPD_DEBUG("%s: enter\n", __func__);
 
     tcm_hcd = kzalloc(sizeof(*tcm_hcd), GFP_KERNEL);
     if (!tcm_hcd) {
-        TPD_INFO("no more memory\n");
+        TPD_DEBUG("no more memory\n");
         return -ENOMEM;
     }
 
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("failed to alloc common data\n");
+        TPD_DEBUG("failed to alloc common data\n");
         goto ts_alloc_failed;
     }
 
@@ -3829,7 +3829,7 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 
     retval = syna_tcm_init_device(tcm_hcd);
     if (retval < 0) {
-        TPD_INFO("Failed to init device information\n");
+        TPD_DEBUG("Failed to init device information\n");
         goto err_alloc_mem;
     }
 
@@ -3837,7 +3837,7 @@ static int syna_tcm_probe(struct i2c_client *client, const struct i2c_device_id 
 
     retval = register_common_touch_device(ts);
     if (retval < 0 && (retval != -EFTM)) {
-        TPD_INFO("Failed to init device information\n");
+        TPD_DEBUG("Failed to init device information\n");
         goto err_register_driver;
     }
 
@@ -3903,7 +3903,7 @@ static struct of_device_id syna_match_table[] = {
 
 static int syna_i2c_suspend(struct device *dev){
     struct touchpanel_data *ts = dev_get_drvdata(dev);
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
     return 0;
 }
@@ -3911,7 +3911,7 @@ static int syna_i2c_suspend(struct device *dev){
 static int syna_i2c_resume(struct device *dev){
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
     return 0;
 }
@@ -3943,13 +3943,13 @@ static struct i2c_driver syna_i2c_driver = {
 static int __init syna_tcm_module_init(void)
 {
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if (!tp_judge_ic_match(TPD_DEVICE))
         return -1;
 
     if (i2c_add_driver(&syna_i2c_driver)!= 0) {
-        TPD_INFO("unable to add i2c driver.\n");
+        TPD_DEBUG("unable to add i2c driver.\n");
         return -1;
     }
 

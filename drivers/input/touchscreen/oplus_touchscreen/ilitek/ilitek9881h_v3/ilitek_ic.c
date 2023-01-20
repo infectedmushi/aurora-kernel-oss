@@ -64,11 +64,11 @@ static int ilitek_tddi_ic_check_support(u32 pid, u16 id)
     }
 
     if (i >= CHIP_SUP_NUM) {
-        TPD_INFO("ERROR, ILITEK CHIP (%x, %x) Not found !!\n", pid, id);
+        TPD_DEBUG("ERROR, ILITEK CHIP (%x, %x) Not found !!\n", pid, id);
         return -1;
     }
 
-    TPD_INFO("ILITEK CHIP (%x, %x) found.\n", pid, id);
+    TPD_DEBUG("ILITEK CHIP (%x, %x) found.\n", pid, id);
     idev->chip->id = id;//for oplus ftm mode
 
     if (id == ILI9881_CHIP) {
@@ -175,11 +175,11 @@ int ilitek_ice_mode_ctrl(bool enable, bool mcu)
     u8 cmd_close[4] = {0x1B, 0x62, 0x10, 0x18};
     u32 pid;
 
-    TPD_INFO("%s ICE mode, mcu on = %d\n", (enable ? "Enable" : "Disable"), mcu);
+    TPD_DEBUG("%s ICE mode, mcu on = %d\n", (enable ? "Enable" : "Disable"), mcu);
 
     if (enable) {
         if (atomic_read(&idev->ice_stat)) {
-            TPD_INFO("ice mode already enabled\n");
+            TPD_DEBUG("ice mode already enabled\n");
             return 0;
         }
 
@@ -215,7 +215,7 @@ int ilitek_ice_mode_ctrl(bool enable, bool mcu)
         ilitek_ice_mode_write(0x47002, 0x00, 1);
     } else {
         if (!atomic_read(&idev->ice_stat)) {
-            TPD_INFO("ice mode already disabled\n");
+            TPD_DEBUG("ice mode already disabled\n");
             return 0;
         }
 
@@ -245,11 +245,11 @@ int ilitek_tddi_ic_watch_dog_ctrl(bool write, bool enable)
 
     if (!write) {
         ret = ilitek_ice_mode_read(idev->chip->wdt_addr, &reg_data, sizeof(u8));
-        TPD_INFO("Read WDT: %s\n", (reg_data ? "ON" : "OFF"));
+        TPD_DEBUG("Read WDT: %s\n", (reg_data ? "ON" : "OFF"));
         return reg_data;
     }
 
-    TPD_INFO("%s WDT, key = %x\n", (enable ? "Enable" : "Disable"), idev->chip->wtd_key);
+    TPD_DEBUG("%s WDT, key = %x\n", (enable ? "Enable" : "Disable"), idev->chip->wtd_key);
 
     if (enable) {
         ilitek_ice_mode_write(idev->chip->wdt_addr, 1, 1);
@@ -285,9 +285,9 @@ int ilitek_tddi_ic_watch_dog_ctrl(bool write, bool enable)
     }
 
     if (enable) {
-        TPD_INFO("WDT turn on succeed\n");
+        TPD_DEBUG("WDT turn on succeed\n");
     } else {
-        TPD_INFO("WDT turn off succeed\n");
+        TPD_DEBUG("WDT turn off succeed\n");
         ilitek_ice_mode_write(idev->chip->wdt_addr, 0, 1);
     }
     return 0;
@@ -320,14 +320,14 @@ int ilitek_tddi_ic_func_ctrl(const char *name, int ctrl)
     if (idev->protocol->ver >= PROTOCOL_VER_560) {
         if (strncmp(func_ctrl[i].name, "gesture", strlen("gesture")) == 0 ||
             strncmp(func_ctrl[i].name, "phone_cover_window", strlen("phone_cover_window")) == 0) {
-            TPD_INFO("Non support %s function ctrl\n", func_ctrl[i].name);
+            TPD_DEBUG("Non support %s function ctrl\n", func_ctrl[i].name);
             return -1;
         }
     }
 
     func_ctrl[i].cmd[2] = ctrl;
 
-    TPD_INFO("func = %s, len = %d, cmd = 0x%x, 0%x, 0x%x\n", func_ctrl[i].name, func_ctrl[i].len,
+    TPD_DEBUG("func = %s, len = %d, cmd = 0x%x, 0%x, 0x%x\n", func_ctrl[i].name, func_ctrl[i].len,
              func_ctrl[i].cmd[0], func_ctrl[i].cmd[1], func_ctrl[i].cmd[2]);
     ret = idev->write(func_ctrl[i].cmd, func_ctrl[i].len);
     return ret;
@@ -352,7 +352,7 @@ int ilitek_tddi_ic_code_reset(void)
 
 int ilitek_tddi_ic_whole_reset(void)
 {
-    TPD_INFO("ic whole reset key = 0x%x, edge_delay = %d\n",
+    TPD_DEBUG("ic whole reset key = 0x%x, edge_delay = %d\n",
              idev->chip->reset_key, RST_EDGE_DELAY);
 
     if (ilitek_ice_mode_write(idev->chip->reset_key,
@@ -374,14 +374,14 @@ static void ilitek_tddi_ic_wr_pack(int packet)
         int ret = 0;
         ret = ilitek_ice_mode_read(0x73010, &reg_data, sizeof(u8));
         if (ret >= 0 && (reg_data & 0x02) == 0) {
-            TPD_INFO("check ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
+            TPD_DEBUG("check ok 0x73010 read 0x%X retry = %d\n", reg_data, retry);
             break;
         }
         mdelay(10);
     }
 
     if (retry <= 0)
-        TPD_INFO("check 0x73010 error read 0x%X\n", reg_data);
+        TPD_DEBUG("check 0x73010 error read 0x%X\n", reg_data);
 
     ilitek_ice_mode_write(0x73000, packet, 4);
 }
@@ -397,13 +397,13 @@ static int ilitek_tddi_ic_rd_pack(int packet, u32 *rd_data)
     while (retry--) {
         ret = ilitek_ice_mode_read(0x4800A, &reg_data, sizeof(u8));
         if (ret >= 0 && (reg_data & 0x02) == 0x02) {
-            TPD_INFO("check  ok 0x4800A read 0x%X retry = %d\n", reg_data, retry);
+            TPD_DEBUG("check  ok 0x4800A read 0x%X retry = %d\n", reg_data, retry);
             break;
         }
         mdelay(10);
     }
     if (retry <= 0)
-        TPD_INFO("check 0x4800A error read 0x%X\n", reg_data);
+        TPD_DEBUG("check 0x4800A error read 0x%X\n", reg_data);
 
     ilitek_ice_mode_write(0x4800A, 0x02, 1);
     ret = ilitek_ice_mode_read(0x73016, rd_data, sizeof(u32));
@@ -417,7 +417,7 @@ void ilitek_tddi_ic_set_ddi_reg_onepage(u8 page, u8 reg, u8 data)
     u32 setreg = 0x1F000100 | (reg << 16) | data;
     bool ice = atomic_read(&idev->ice_stat);
 
-    TPD_INFO("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
+    TPD_DEBUG("setpage =  0x%X setreg = 0x%X\n", setpage, setreg);
 
     if (!ice)
         ilitek_ice_mode_ctrl(ENABLE, OFF);
@@ -450,7 +450,7 @@ void ilitek_tddi_ic_get_ddi_reg_onepage(u8 page, u8 reg)
     u32 setreg = 0x2F000100 | (reg << 16);
     bool ice = atomic_read(&idev->ice_stat);
 
-    TPD_INFO("setpage = 0x%X setreg = 0x%X\n", setpage, setreg);
+    TPD_DEBUG("setpage = 0x%X setreg = 0x%X\n", setpage, setreg);
 
     if (!ice)
         ilitek_ice_mode_ctrl(ENABLE, OFF);
@@ -470,7 +470,7 @@ void ilitek_tddi_ic_get_ddi_reg_onepage(u8 page, u8 reg)
     ilitek_ice_mode_write(0x4800A, 0x02, 1);
 
     ilitek_tddi_ic_rd_pack(setreg, &reg_data);
-    TPD_INFO("check page = 0x%X, reg = 0x%X, read 0x%X\n", page, reg, reg_data);
+    TPD_DEBUG("check page = 0x%X, reg = 0x%X, read 0x%X\n", page, reg, reg_data);
 
     /*TDI_RD_KEY OFF*/
     ilitek_tddi_ic_wr_pack(0x1FFF9400);
@@ -512,7 +512,7 @@ void ilitek_tddi_ic_check_otp_prog_mode(void)
 
         ilitek_ice_mode_read(0x43030, &prog_done, sizeof(u8));
         ilitek_ice_mode_read(0x43008, &prog_mode, sizeof(u8));
-        TPD_INFO("otp prog_mode = 0x%x, prog_done = 0x%x\n", prog_mode, prog_done);
+        TPD_DEBUG("otp prog_mode = 0x%x, prog_done = 0x%x\n", prog_mode, prog_done);
 
         if (prog_done == 0x0 && prog_mode == 0x80)
             break;
@@ -532,7 +532,7 @@ u32 ilitek_tddi_ic_get_pc_counter(void)
 
     ilitek_ice_mode_read(idev->chip->pc_counter_addr, &pc, sizeof(u32));
 
-    TPD_INFO("pc counter = 0x%x\n", pc);
+    TPD_DEBUG("pc counter = 0x%x\n", pc);
 
     if (!ice)
         ilitek_ice_mode_ctrl(DISABLE, OFF);
@@ -557,7 +557,7 @@ int ilitek_tddi_ic_check_busy(int count, int delay)
         return -EINVAL;
     }
 
-    TPD_INFO("read byte = %x, delay = %d\n", rby, delay);
+    TPD_DEBUG("read byte = %x, delay = %d\n", rby, delay);
 
     do {
         msleep(delay);
@@ -568,7 +568,7 @@ int ilitek_tddi_ic_check_busy(int count, int delay)
         TPD_DEBUG("busy = 0x%x\n", busy);
 
         if (busy == rby) {
-            TPD_INFO("Check busy free\n");
+            TPD_DEBUG("Check busy free\n");
             return 0;
         }
     } while (--count > 0);
@@ -606,7 +606,7 @@ int ilitek_tddi_ic_get_core_ver(void)
         return -EINVAL;
     }
 
-    TPD_INFO("Core version = %d.%d.%d.%d\n", buf[1], buf[2], buf[3], buf[4]);
+    TPD_DEBUG("Core version = %d.%d.%d.%d\n", buf[1], buf[2], buf[3], buf[4]);
     idev->chip->core_ver = buf[1] << 24 | buf[2] << 16 | buf[3] << 8 | buf[4];
     return 0;
 }
@@ -639,7 +639,7 @@ int ilitek_tddi_ic_get_fw_ver(void)
         return -EINVAL;
     }
 
-    TPD_INFO("Firmware version = %d.%d.%d.%d\n", buf[1], buf[2], buf[3], buf[4]);
+    TPD_DEBUG("Firmware version = %d.%d.%d.%d\n", buf[1], buf[2], buf[3], buf[4]);
     idev->chip->fw_ver = buf[1] << 24 | buf[2] << 16 | buf[3] << 8 | buf[4];
 
     snprintf(dev_version, MAX_DEVICE_VERSION_LENGTH, "%02X", buf[3]);
@@ -660,7 +660,7 @@ int ilitek_tddi_ic_get_fw_ver(void)
 
         }
     }
-    TPD_INFO("manufacture_info.version: %s\n", idev->ts->panel_data.manufacture_info.version);
+    TPD_DEBUG("manufacture_info.version: %s\n", idev->ts->panel_data.manufacture_info.version);
     return 0;
 }
 
@@ -690,7 +690,7 @@ out:
         idev->panel_hei = buf[3] << 8 | buf[4];
     }
 
-    TPD_INFO("Panel info: width = %d, height = %d\n", idev->panel_wid, idev->panel_hei);
+    TPD_DEBUG("Panel info: width = %d, height = %d\n", idev->panel_wid, idev->panel_hei);
     return ret;
 }
 
@@ -737,8 +737,8 @@ out:
         idev->stx = buf[11];
         idev->srx = buf[12];
     }
-    TPD_INFO("TP Info: min_x = %d, min_y = %d, max_x = %d, max_y = %d\n", idev->min_x, idev->min_y, idev->max_x, idev->max_y);
-    TPD_INFO("TP Info: xch = %d, ych = %d, stx = %d, srx = %d\n", idev->xch_num, idev->ych_num, idev->stx, idev->srx);
+    TPD_DEBUG("TP Info: min_x = %d, min_y = %d, max_x = %d, max_y = %d\n", idev->min_x, idev->min_y, idev->max_x, idev->max_y);
+    TPD_DEBUG("TP Info: xch = %d, ych = %d, stx = %d, srx = %d\n", idev->xch_num, idev->ych_num, idev->stx, idev->srx);
     return ret;
 }
 
@@ -747,19 +747,19 @@ static void ilitek_tddi_ic_check_protocol_ver(u32 pver)
     int i = 0;
 
     if (idev->protocol->ver == pver) {
-        TPD_INFO("same procotol version, do nothing\n");
+        TPD_DEBUG("same procotol version, do nothing\n");
         return;
     }
 
     for (i = 0; i < PROTOCL_VER_NUM - 1; i++) {
         if (protocol_info[i].ver == pver) {
             idev->protocol = &protocol_info[i];
-            TPD_INFO("update protocol version = %x\n", idev->protocol->ver);
+            TPD_DEBUG("update protocol version = %x\n", idev->protocol->ver);
             return;
         }
     }
 
-    TPD_INFO("Not found a correct protocol version in list, use newest version\n");
+    TPD_DEBUG("Not found a correct protocol version in list, use newest version\n");
     idev->protocol = &protocol_info[PROTOCL_VER_NUM - 1];
 }
 
@@ -767,7 +767,7 @@ int ilitek_tddi_edge_palm_ctrl(u8 type)
 {
     u8 cmd[4] = { 0 };
 
-    TPD_INFO("edge palm ctrl, type = %d\n", type);
+    TPD_DEBUG("edge palm ctrl, type = %d\n", type);
 
     cmd[0] = P5_X_READ_DATA_CTRL;
     cmd[1] = P5_X_EDGE_PLAM_CTRL_1;
@@ -819,7 +819,7 @@ int ilitek_tddi_ic_get_protocl_ver(void)
 
     ilitek_tddi_ic_check_protocol_ver(ver);
 
-    TPD_INFO("Protocol version = %d.%d.%d\n", idev->protocol->ver >> 16,
+    TPD_DEBUG("Protocol version = %d.%d.%d\n", idev->protocol->ver >> 16,
              (idev->protocol->ver >> 8) & 0xFF, idev->protocol->ver & 0xFF);
     return 0;
 }
@@ -843,7 +843,7 @@ int ilitek_tddi_ic_get_info(void)
     idev->chip->otp_id &= 0xFF;
     idev->chip->ana_id &= 0xFF;
 
-    TPD_INFO("CHIP INFO: PID = %x, ID = %x, TYPE = %x, OTP = %x, ANA = %x\n",
+    TPD_DEBUG("CHIP INFO: PID = %x, ID = %x, TYPE = %x, OTP = %x, ANA = %x\n",
              idev->chip->pid,
              idev->chip->id,
              ((idev->chip->type_hi << 8) | idev->chip->type_low),

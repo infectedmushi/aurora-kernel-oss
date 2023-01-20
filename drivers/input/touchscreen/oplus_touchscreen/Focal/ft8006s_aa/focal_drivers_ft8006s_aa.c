@@ -203,7 +203,7 @@ static int fts_spi_transfer(struct spi_device *spi, u8 *tx_buf, u8 *rx_buf, u32 
 
     ret = spi_sync(spi, &msg);
     if (ret) {
-        TPD_INFO("spi_sync fail,ret:%d", ret);
+        TPD_DEBUG("spi_sync fail,ret:%d", ret);
         return ret;
     }
 
@@ -254,7 +254,7 @@ int fts_write(struct spi_device *spi, u8 *writebuf, u32 writelen)
     u32 datalen = writelen - 1;
 
     if (!writebuf || !writelen) {
-        TPD_INFO("writebuf/len is invalid");
+        TPD_DEBUG("writebuf/len is invalid");
         return -EINVAL;
     }
 
@@ -262,14 +262,14 @@ int fts_write(struct spi_device *spi, u8 *writebuf, u32 writelen)
     if (txlen_need > SPI_BUF_LENGTH) {
         txbuf = kzalloc(txlen_need, GFP_KERNEL | GFP_DMA);
         if (NULL == txbuf) {
-            TPD_INFO("txbuf malloc fail");
+            TPD_DEBUG("txbuf malloc fail");
             ret = -ENOMEM;
             goto err_write;
         }
 
         rxbuf = kzalloc(txlen_need, GFP_KERNEL | GFP_DMA);
         if (NULL == rxbuf) {
-            TPD_INFO("rxbuf malloc fail");
+            TPD_DEBUG("rxbuf malloc fail");
             ret = -ENOMEM;
             goto err_write;
         }
@@ -295,14 +295,14 @@ int fts_write(struct spi_device *spi, u8 *writebuf, u32 writelen)
         if ((0 == ret) && ((rxbuf[3] & 0xA0) == 0)) {
             break;
         } else {
-            TPD_INFO("data write(addr:%x),status:%x,retry:%d,ret:%d",
+            TPD_DEBUG("data write(addr:%x),status:%x,retry:%d,ret:%d",
                       writebuf[0], rxbuf[3], i, ret);
             ret = -EIO;
             udelay(CS_HIGH_DELAY);
         }
     }
     if (ret < 0) {
-        TPD_INFO("data write(addr:%x) fail,status:%x,ret:%d",
+        TPD_DEBUG("data write(addr:%x) fail,status:%x,ret:%d",
                   writebuf[0], rxbuf[3], ret);
     }
 
@@ -345,7 +345,7 @@ int fts_read(struct spi_device *spi, u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
     u32 dp = 0;
 
     if (!cmd || !cmdlen || !data || !datalen) {
-        TPD_INFO("cmd/cmdlen/data/datalen is invalid");
+        TPD_DEBUG("cmd/cmdlen/data/datalen is invalid");
         return -EINVAL;
     }
 
@@ -353,14 +353,14 @@ int fts_read(struct spi_device *spi, u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
     if (txlen_need > SPI_BUF_LENGTH) {
         txbuf = kzalloc(txlen_need, GFP_KERNEL | GFP_DMA);
         if (NULL == txbuf) {
-            TPD_INFO("txbuf malloc fail");
+            TPD_DEBUG("txbuf malloc fail");
             ret = -ENOMEM;
             goto err_read;
         }
 
         rxbuf = kzalloc(txlen_need, GFP_KERNEL | GFP_DMA);
         if (NULL == rxbuf) {
-            TPD_INFO("rxbuf malloc fail");
+            TPD_DEBUG("rxbuf malloc fail");
             ret = -ENOMEM;
             goto err_read;
         }
@@ -397,7 +397,7 @@ int fts_read(struct spi_device *spi, u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
             }
             break;
         } else {
-            TPD_INFO("data read(addr:%x) status:%x,retry:%d,ret:%d",
+            TPD_DEBUG("data read(addr:%x) status:%x,retry:%d,ret:%d",
                       cmd[0], rxbuf[3], i, ret);
             ret = -EIO;
             udelay(CS_HIGH_DELAY);
@@ -405,7 +405,7 @@ int fts_read(struct spi_device *spi, u8 *cmd, u32 cmdlen, u8 *data, u32 datalen)
     }
 
     if (ret < 0) {
-        TPD_INFO("data read(addr:%x) %s,status:%x,ret:%d", cmd[0],
+        TPD_DEBUG("data read(addr:%x) %s,status:%x,ret:%d", cmd[0],
                   (i >= SPI_RETRY_NUMBER) ? "crc abnormal" : "fail",
                   rxbuf[3], ret);
     }
@@ -438,13 +438,13 @@ static int fts_bus_init(void)
     
     bus_tx_buf = kzalloc(SPI_BUF_LENGTH, GFP_KERNEL | GFP_DMA);
     if (NULL == bus_tx_buf) {
-        TPD_INFO("failed to allocate memory for bus_tx_buf");
+        TPD_DEBUG("failed to allocate memory for bus_tx_buf");
         return -ENOMEM;
     }
 
     bus_rx_buf = kzalloc(SPI_BUF_LENGTH, GFP_KERNEL | GFP_DMA);
     if (NULL == bus_rx_buf) {
-        TPD_INFO("failed to allocate memory for bus_rx_buf");
+        TPD_DEBUG("failed to allocate memory for bus_rx_buf");
         kfree(bus_tx_buf);
         bus_tx_buf = NULL;
         return -ENOMEM;
@@ -479,11 +479,11 @@ static int fts_bus_exit(void)
 static int fts_rstgpio_set(struct hw_resource *hw_res, bool on)
 {
     if (gpio_is_valid(hw_res->reset_gpio)) {
-        TPD_INFO("Set the reset_gpio \n");
+        TPD_DEBUG("Set the reset_gpio \n");
         gpio_direction_output(hw_res->reset_gpio, on);
     }
     else{
-         TPD_INFO("reset is invalid!!\n");
+         TPD_DEBUG("reset is invalid!!\n");
     }
     return 0;
 }
@@ -493,7 +493,7 @@ static int fts_rstgpio_set(struct hw_resource *hw_res, bool on)
  */
 static int fts_hw_reset(struct fts_ts_data *ts_data, u32 delayms)
 {
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     fts_rstgpio_set(ts_data->hw_res, false); /* reset gpio*/
     msleep(5);
     fts_rstgpio_set(ts_data->hw_res, true); /* reset gpio*/
@@ -522,20 +522,20 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     struct ftxxxx_proc *proc;
 
     if (!ts_data) {
-        TPD_INFO("ts_data is null");
+        TPD_DEBUG("ts_data is null");
         return 0;
     }
     proc = &ts_data->proc;
 
     if (buflen <= 1) {
-        TPD_INFO("apk proc wirte count(%d) fail", buflen);
+        TPD_DEBUG("apk proc wirte count(%d) fail", buflen);
         return -EINVAL;
     }
 
     if (buflen > PROC_BUF_SIZE) {
         writebuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
         if (NULL == writebuf) {
-            TPD_INFO("apk proc wirte buf zalloc fail");
+            TPD_DEBUG("apk proc wirte buf zalloc fail");
             return -ENOMEM;
         }
     } else {
@@ -543,7 +543,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     }
 
     if (copy_from_user(writebuf, buff, buflen)) {
-        TPD_INFO("[APK]: copy from user error!!");
+        TPD_DEBUG("[APK]: copy from user error!!");
         ret = -EFAULT;
         goto proc_write_err;
     }
@@ -566,7 +566,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     case PROC_WRITE_REGISTER:
         ret = fts_write_reg(ts_data->spi, writebuf[1], writebuf[2]);
         if (ret < 0) {
-            TPD_INFO("PROC_WRITE_REGISTER write error");
+            TPD_DEBUG("PROC_WRITE_REGISTER write error");
             goto proc_write_err;
         }
         break;
@@ -574,7 +574,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
     case PROC_READ_DATA:
         writelen = buflen - 1;
         if (writelen >= FTX_MAX_COMMMAND_LENGTH) {
-            TPD_INFO("cmd(PROC_READ_DATA) length(%d) fail", writelen);
+            TPD_DEBUG("cmd(PROC_READ_DATA) length(%d) fail", writelen);
             goto proc_write_err;
         }
         memcpy(proc->cmd, writebuf + 1, writelen);
@@ -585,7 +585,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
         writelen = buflen - 1;
         ret = fts_write(ts_data->spi, writebuf + 1, writelen);
         if (ret < 0) {
-            TPD_INFO("PROC_WRITE_DATA write error");
+            TPD_DEBUG("PROC_WRITE_DATA write error");
             goto proc_write_err;
         }
         break;
@@ -595,7 +595,7 @@ static ssize_t fts_debug_write(struct file *filp, const char __user *buff, size_
             snprintf(tmp, PROC_BUF_SIZE, "%s", writebuf + 1);
             tmp[buflen - 1] = '\0';
             if (strncmp(tmp, "focal_driver", 12) == 0) {
-                TPD_INFO("APK execute HW Reset");
+                TPD_DEBUG("APK execute HW Reset");
                 fts_hw_reset(ts_data, 0);
             }
         }
@@ -626,20 +626,20 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
     struct ftxxxx_proc *proc;
 
     if (!ts_data) {
-        TPD_INFO("ts_data is null");
+        TPD_DEBUG("ts_data is null");
         return 0;
     }
     proc = &ts_data->proc;
 
     if (buflen <= 0) {
-        TPD_INFO("apk proc read count(%d) fail", buflen);
+        TPD_DEBUG("apk proc read count(%d) fail", buflen);
         return -EINVAL;
     }
 
     if (buflen > PROC_BUF_SIZE) {
         readbuf = (u8 *)kzalloc(buflen * sizeof(u8), GFP_KERNEL);
         if (NULL == readbuf) {
-            TPD_INFO("apk proc wirte buf zalloc fail");
+            TPD_DEBUG("apk proc wirte buf zalloc fail");
             return -ENOMEM;
         }
     } else {
@@ -651,7 +651,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
         num_read_chars = 1;
         ret = fts_read_reg(ts_data->spi, proc->cmd[0], &readbuf[0]);
         if (ret < 0) {
-            TPD_INFO("PROC_READ_REGISTER read error");
+            TPD_DEBUG("PROC_READ_REGISTER read error");
             goto proc_read_err;
         }
         break;
@@ -662,7 +662,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
         num_read_chars = buflen;
         ret = fts_read(ts_data->spi, proc->cmd, proc->cmd_len, readbuf, num_read_chars);
         if (ret < 0) {
-            TPD_INFO("PROC_READ_DATA read error");
+            TPD_DEBUG("PROC_READ_DATA read error");
             goto proc_read_err;
         }
         break;
@@ -677,7 +677,7 @@ static ssize_t fts_debug_read(struct file *filp, char __user *buff, size_t count
     ret = num_read_chars;
 proc_read_err:
     if (copy_to_user(buff, readbuf, num_read_chars)) {
-        TPD_INFO("copy to user error");
+        TPD_DEBUG("copy to user error");
         ret = -EFAULT;
     }
 
@@ -701,10 +701,10 @@ static int fts_create_apk_debug_channel(struct fts_ts_data *ts_data)
 
     proc->proc_entry = proc_create_data(PROC_NAME, 0777, NULL, &fts_proc_fops, ts_data);
     if (NULL == proc->proc_entry) {
-        TPD_INFO("create proc entry fail");
+        TPD_DEBUG("create proc entry fail");
         return -ENOMEM;
     }
-    TPD_INFO("Create proc entry success!");
+    TPD_DEBUG("Create proc entry success!");
     return 0;
 }
 
@@ -805,7 +805,7 @@ static int fts_esd_handle(void *chip_data)
     for (i = 0; i < 3; i++) {
         ret = fts_read_reg(ts_data->spi, FTS_REG_CHIP_ID, &val);
         if ((val != 0x86) && (val != 0x80)) {
-            TPD_INFO("%s: read chip_id(%x) failed!(ret:%d)\n", __func__, val, ret);
+            TPD_DEBUG("%s: read chip_id(%x) failed!(ret:%d)\n", __func__, val, ret);
             msleep(10);
             i2c_err++;
         } else {
@@ -815,7 +815,7 @@ static int fts_esd_handle(void *chip_data)
     }
     ret = fts_read_reg(ts_data->spi, FTS_REG_FLOW_WORK_CNT, &val);
     if (ret < 0) {
-        TPD_INFO("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
+        TPD_DEBUG("%s: read FTS_REG_FLOW_WORK_CNT failed!\n", __func__);
         i2c_err++;
     }
 
@@ -827,7 +827,7 @@ static int fts_esd_handle(void *chip_data)
     flow_work_cnt_last = val;
 
     if ((err_cnt >= 5) || (i2c_err >= 3)) {
-        TPD_INFO("esd check failed, start reset!\n");
+        TPD_DEBUG("esd check failed, start reset!\n");
         disable_irq_nosync(ts_data->ts->irq);
         tp_touch_btnkey_release();
         fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
@@ -850,7 +850,7 @@ static int fts_enter_into_boot(struct fts_ts_data *ts_data)
     u8 cmd = 0;
     u8 id[2] = { 0 };
 
-    TPD_INFO("enter into boot environment");
+    TPD_DEBUG("enter into boot environment");
     for (i = 0; i < FTS_UPGRADE_LOOP; i++) {
         /* hardware tp reset to boot */
         fts_hw_reset(ts_data, 0);
@@ -862,7 +862,7 @@ static int fts_enter_into_boot(struct fts_ts_data *ts_data)
         mdelay(FTS_CMD_START_DELAY);
         cmd = FTS_CMD_READ_ID;
         ret = fts_read(ts_data->spi, &cmd, 1, id, 2);
-        TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+        TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
         if (id[0] == FTS_VAL_BOOT_ID) {
             return 0;
         }
@@ -884,10 +884,10 @@ static int fts_dpram_write(struct fts_ts_data *ts_data, u32 saddr, const u8 *buf
     u32 packet_len = 0;
     u32 packet_size = FTS_FLASH_PACKET_LENGTH_SPI;
 
-    TPD_INFO("dpram write");
+    TPD_DEBUG("dpram write");
     cmd = vmalloc(packet_size + 4);
     if (NULL == cmd) {
-        TPD_INFO("malloc memory for pram write buffer fail");
+        TPD_DEBUG("malloc memory for pram write buffer fail");
         return -ENOMEM;
     }
     memset(cmd, 0, packet_size + 4);
@@ -897,7 +897,7 @@ static int fts_dpram_write(struct fts_ts_data *ts_data, u32 saddr, const u8 *buf
     if (remainder > 0)
         packet_number++;
     packet_len = packet_size;
-    TPD_INFO("write data, num:%d remainder:%d", packet_number, remainder);
+    TPD_DEBUG("write data, num:%d remainder:%d", packet_number, remainder);
 
     for (i = 0; i < packet_number; i++) {
         offset = i * packet_size;
@@ -913,7 +913,7 @@ static int fts_dpram_write(struct fts_ts_data *ts_data, u32 saddr, const u8 *buf
         cmd[3] = (addr);
         ret = fts_write(ts_data->spi, &cmd[0], 4);
         if (ret < 0) {
-            TPD_INFO("set pram(%d) addr(%d) fail", i, addr);
+            TPD_DEBUG("set pram(%d) addr(%d) fail", i, addr);
             goto write_pram_err;
         }
 
@@ -924,7 +924,7 @@ static int fts_dpram_write(struct fts_ts_data *ts_data, u32 saddr, const u8 *buf
         }
         ret = fts_write(ts_data->spi, &cmd[0], 1 + packet_len);
         if (ret < 0) {
-            TPD_INFO("write fw to pram(%d) fail", i);
+            TPD_DEBUG("write fw to pram(%d) fail", i);
             goto write_pram_err;
         }
     }
@@ -945,7 +945,7 @@ static int fts_ecc_cal_tp(struct fts_ts_data *ts_data, u32 ecc_saddr, u32 ecc_le
     u8 cmd[FTS_CMD_ECC_LEN] = { 0 };
     u8 value[2] = { 0 };
 
-    TPD_INFO("ecc calc in tp");
+    TPD_DEBUG("ecc calc in tp");
     cmd[0] = FTS_CMD_ECC;
     cmd[1] = (ecc_saddr >> 16);
     cmd[2] = (ecc_saddr >> 8);
@@ -957,7 +957,7 @@ static int fts_ecc_cal_tp(struct fts_ts_data *ts_data, u32 ecc_saddr, u32 ecc_le
     /* make boot to calculate ecc in pram */
     ret = fts_write(ts_data->spi, cmd, FTS_CMD_ECC_LEN);
     if (ret < 0) {
-        TPD_INFO("ecc calc cmd fail");
+        TPD_DEBUG("ecc calc cmd fail");
         return ret;
     }
     mdelay(2);
@@ -967,7 +967,7 @@ static int fts_ecc_cal_tp(struct fts_ts_data *ts_data, u32 ecc_saddr, u32 ecc_le
     for (i = 0; i < FTS_ECC_FINISH_TIMEOUT; i++) {
         ret = fts_read(ts_data->spi, cmd, 1, value, 1);
         if (ret < 0) {
-            TPD_INFO("ecc finish cmd fail");
+            TPD_DEBUG("ecc finish cmd fail");
             return ret;
         }
         if (FTS_CMD_ECC_FINISH_OK_A5 == value[0])
@@ -975,7 +975,7 @@ static int fts_ecc_cal_tp(struct fts_ts_data *ts_data, u32 ecc_saddr, u32 ecc_le
         mdelay(1);
     }
     if (i >= FTS_ECC_FINISH_TIMEOUT) {
-        TPD_INFO("wait ecc finish timeout,ecc_finish=%x", value[0]);
+        TPD_DEBUG("wait ecc finish timeout,ecc_finish=%x", value[0]);
         return -EIO;
     }
 
@@ -983,7 +983,7 @@ static int fts_ecc_cal_tp(struct fts_ts_data *ts_data, u32 ecc_saddr, u32 ecc_le
     cmd[0] = FTS_CMD_ECC_READ;
     ret = fts_read(ts_data->spi, cmd, 1, value, 2);
     if (ret < 0) {
-        TPD_INFO("ecc read cmd fail");
+        TPD_DEBUG("ecc read cmd fail");
         return ret;
     }
 
@@ -1022,48 +1022,48 @@ static int fts_pram_write_ecc(struct fts_ts_data *ts_data, u8 *buf, u32 len)
     u16 ecc_in_host = 0;
     u16 ecc_in_tp = 0;
 
-    TPD_INFO("begin to write pram app(bin len:%d)", len);
+    TPD_DEBUG("begin to write pram app(bin len:%d)", len);
     /* get pram app length */
     code_len = ((u16)buf[FTS_APP_INFO_OFFSET + 0] << 8)
                + buf[FTS_APP_INFO_OFFSET + 1];
     code_len_n = ((u16)buf[FTS_APP_INFO_OFFSET + 2] << 8)
                  + buf[FTS_APP_INFO_OFFSET + 3];
     if ((code_len + code_len_n) != 0xFFFF) {
-        TPD_INFO("pram code len(%x %x) fail", code_len, code_len_n);
+        TPD_DEBUG("pram code len(%x %x) fail", code_len, code_len_n);
         return -EINVAL;
     }
     pram_app_size = (u32)code_len;
-    TPD_INFO("pram app length in fact:%d", pram_app_size);
+    TPD_DEBUG("pram app length in fact:%d", pram_app_size);
     
     /* write pram */
     ret = fts_dpram_write(ts_data, pram_start_addr, buf, pram_app_size);
     if (ret < 0) {
-        TPD_INFO("write pram fail");
+        TPD_DEBUG("write pram fail");
         return ret;
     }
 
     /* check ecc */
-    TPD_INFO("ecc check");
+    TPD_DEBUG("ecc check");
     ret = fts_ecc_cal_host(buf, pram_app_size, &ecc_in_host);
     if (ret < 0) {
-        TPD_INFO("ecc in host calc fail");
+        TPD_DEBUG("ecc in host calc fail");
         return ret;
     }
 
     ret = fts_ecc_cal_tp(ts_data, pram_start_addr, pram_app_size, &ecc_in_tp);
     if (ret < 0) {
-        TPD_INFO("ecc in tp calc fail");
+        TPD_DEBUG("ecc in tp calc fail");
         return ret;
     }
 
-    TPD_INFO("ecc in tp:%04x,host:%04x", ecc_in_tp, ecc_in_host);
+    TPD_DEBUG("ecc in tp:%04x,host:%04x", ecc_in_tp, ecc_in_host);
     if (ecc_in_tp != ecc_in_host) {
-        TPD_INFO("ecc_in_tp(%x) != ecc_in_host(%x), ecc check fail",
+        TPD_DEBUG("ecc_in_tp(%x) != ecc_in_host(%x), ecc check fail",
                   ecc_in_tp, ecc_in_host);
         return -EIO;
     }
 
-    TPD_INFO("pram app write successfully");
+    TPD_DEBUG("pram app write successfully");
     return 0;
 }
 
@@ -1072,10 +1072,10 @@ static int fts_pram_start(struct fts_ts_data *ts_data)
     int ret = 0;
     u8 cmd = FTS_CMD_START_APP;
 
-    TPD_INFO("remap to start pram");
+    TPD_DEBUG("remap to start pram");
     ret = fts_write(ts_data->spi, &cmd, 1);
     if (ret < 0) {
-        TPD_INFO("write start pram cmd fail");
+        TPD_DEBUG("write start pram cmd fail");
         return ret;
     }
 
@@ -1086,13 +1086,13 @@ static int fts_fw_write_start(struct fts_ts_data *ts_data, u8 *buf, u32 len, boo
 {
     int ret = 0;
 
-    TPD_INFO("begin to write and start fw(bin len:%d)", len);
+    TPD_DEBUG("begin to write and start fw(bin len:%d)", len);
 
     if (need_reset) {
         /* enter into boot environment */
         ret = fts_enter_into_boot(ts_data);
         if (ret < 0) {
-            TPD_INFO("enter into boot environment fail");
+            TPD_DEBUG("enter into boot environment fail");
             return ret;
         }
     }
@@ -1100,18 +1100,18 @@ static int fts_fw_write_start(struct fts_ts_data *ts_data, u8 *buf, u32 len, boo
     /* write pram */
     ret = fts_pram_write_ecc(ts_data, buf, len);
     if (ret < 0) {
-        TPD_INFO("write pram fail");
+        TPD_DEBUG("write pram fail");
         return ret;
     }
 
     /* remap pram and run fw */
     ret = fts_pram_start(ts_data);
     if (ret < 0) {
-        TPD_INFO("pram start fail");
+        TPD_DEBUG("pram start fail");
         return ret;
     }
 
-    TPD_INFO("fw download successfully");
+    TPD_DEBUG("fw download successfully");
     return 0;
 }
 
@@ -1120,15 +1120,15 @@ static int fts_fw_download(struct fts_ts_data *ts_data, u8 *buf, u32 len, bool n
     int ret = 0;
     int i = 0;
 
-    TPD_INFO("fw upgrade download function");
+    TPD_DEBUG("fw upgrade download function");
     for (i = 0; i < 3; i++) {
-        TPD_INFO("fw download times:%d", i + 1);
+        TPD_DEBUG("fw download times:%d", i + 1);
         ret = fts_fw_write_start(ts_data, buf, len, need_reset);
         if (0 == ret)
             break;
     }
     if (i >= 3) {
-        TPD_INFO("fw download fail");
+        TPD_DEBUG("fw download fail");
         return -EIO;
     }
 
@@ -1161,10 +1161,10 @@ static int fts_enter_factory_work_mode(struct fts_ts_data *ts_data, u8 mode_val)
     int retry = 20;
     u8 regval = 0;
 
-    TPD_INFO("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
+    TPD_DEBUG("%s:enter %s mode", __func__, (mode_val == 0x40) ? "factory" : "work");
     ret = fts_write_reg(ts_data->spi, DEVIDE_MODE_ADDR, mode_val);
     if (ret < 0) {
-        TPD_INFO("%s:write mode(val:0x%x) fail", __func__, mode_val);
+        TPD_DEBUG("%s:write mode(val:0x%x) fail", __func__, mode_val);
         return ret;
     }
 
@@ -1176,7 +1176,7 @@ static int fts_enter_factory_work_mode(struct fts_ts_data *ts_data, u8 mode_val)
     }
 
     if (!retry) {
-        TPD_INFO("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
+        TPD_DEBUG("%s:enter mode(val:0x%x) timeout", __func__, mode_val);
         return -EIO;
     }
 
@@ -1191,10 +1191,10 @@ static int fts_start_scan(struct fts_ts_data *ts_data)
     u8 regval = 0;
     u8 scanval = FTS_FACTORY_MODE_VALUE | (1 << 7);
 
-    TPD_INFO("%s: start to scan a frame", __func__);
+    TPD_DEBUG("%s: start to scan a frame", __func__);
     ret = fts_write_reg(ts_data->spi, DEVIDE_MODE_ADDR, scanval);
     if (ret < 0) {
-        TPD_INFO("%s:start to scan a frame fail", __func__);
+        TPD_DEBUG("%s:start to scan a frame fail", __func__);
         return ret;
     }
 
@@ -1207,7 +1207,7 @@ static int fts_start_scan(struct fts_ts_data *ts_data)
     msleep(50);
 
     if (!retry) {
-        TPD_INFO("%s:scan a frame timeout", __func__);
+        TPD_DEBUG("%s:scan a frame timeout", __func__);
         return -EIO;
     }
 
@@ -1223,18 +1223,18 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff)
     u8 regval = 0;
     u8 *buf = NULL;
 
-    TPD_INFO("%s:call", __func__);
+    TPD_DEBUG("%s:call", __func__);
 
     /*kzalloc buffer*/
     buf = kzalloc(byte_num, GFP_KERNEL);
     if (!buf) {
-        TPD_INFO("%s:kzalloc for raw byte buf fail", __func__);
+        TPD_DEBUG("%s:kzalloc for raw byte buf fail", __func__);
         return -ENOMEM;
     }
 
     ret = fts_enter_factory_work_mode(ts_data, FTS_FACTORY_MODE_VALUE);
     if (ret < 0) {
-        TPD_INFO("%s:enter factory mode fail", __func__);
+        TPD_DEBUG("%s:enter factory mode fail", __func__);
         goto raw_err;
     }
 
@@ -1242,20 +1242,20 @@ static int fts_get_rawdata(struct fts_ts_data *ts_data, int *raw, bool is_diff)
         ret = fts_read_reg(ts_data->spi, FACTORY_REG_DATA_SELECT, &regval);
         ret = fts_write_reg(ts_data->spi, FACTORY_REG_DATA_SELECT, 0x01);
         if (ret < 0) {
-            TPD_INFO("%s:write 0x01 to reg0x06 fail", __func__);
+            TPD_DEBUG("%s:write 0x01 to reg0x06 fail", __func__);
             goto reg_restore;
         }
     }
 
     ret = fts_start_scan(ts_data);
     if (ret < 0) {
-        TPD_INFO("%s:scan a frame fail", __func__);
+        TPD_DEBUG("%s:scan a frame fail", __func__);
         goto reg_restore;
     }
 
     ret = fts_write_reg(ts_data->spi, FACTORY_REG_LINE_ADDR, 0xAD);
     if (ret < 0) {
-        TPD_INFO("%s:write [data_type] to reg0x01 fail", __func__);
+        TPD_DEBUG("%s:write [data_type] to reg0x01 fail", __func__);
         goto reg_restore;
     }
 
@@ -1272,7 +1272,7 @@ reg_restore:
     if (is_diff) {
         ret = fts_write_reg(ts_data->spi, FACTORY_REG_DATA_SELECT, regval);
         if (ret < 0) {
-            TPD_INFO("%s:restore reg0x06 fail", __func__);
+            TPD_DEBUG("%s:restore reg0x06 fail", __func__);
         }
     }
 
@@ -1280,7 +1280,7 @@ raw_err:
     kfree(buf);
     ret = fts_enter_factory_work_mode(ts_data, FTS_WORK_MODE_VALUE);
     if (ret < 0) {
-        TPD_INFO("%s:enter work mode fail", __func__);
+        TPD_DEBUG("%s:enter work mode fail", __func__);
     }
 
     return ret;
@@ -1296,7 +1296,7 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
     int tx_num = ts_data->hw_res->TX_NUM;
     int rx_num = ts_data->hw_res->RX_NUM;
 
-    TPD_INFO("%s:start to read diff data", __func__);
+    TPD_DEBUG("%s:start to read diff data", __func__);
     focal_esd_check_enable(ts_data, false);   //no allowed esd check
 
     raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1307,7 +1307,7 @@ static void fts_delta_read(struct seq_file *s, void *chip_data)
 
     ret = fts_write_reg(ts_data->spi, FTS_REG_AUTOCLB_ADDR, 0x01);
     if (ret < 0){
-        TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+        TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
     }
 
     ret = fts_get_rawdata(ts_data, raw, true);
@@ -1339,7 +1339,7 @@ static void fts_baseline_read(struct seq_file *s, void *chip_data)
     int tx_num = ts_data->hw_res->TX_NUM;
     int rx_num = ts_data->hw_res->RX_NUM;
 
-    TPD_INFO("%s:start to read raw data", __func__);
+    TPD_DEBUG("%s:start to read raw data", __func__);
     focal_esd_check_enable(ts_data, false);
 
     raw = kzalloc(tx_num * rx_num * sizeof(int), GFP_KERNEL);
@@ -1350,7 +1350,7 @@ static void fts_baseline_read(struct seq_file *s, void *chip_data)
     
     ret = fts_write_reg(ts_data->spi, FTS_REG_AUTOCLB_ADDR, 0x01);
     if (ret < 0){
-        TPD_INFO("%s, write 0x01 to reg 0xee failed \n", __func__);
+        TPD_DEBUG("%s, write 0x01 to reg 0xee failed \n", __func__);
     }
     
     ret = fts_get_rawdata(ts_data, raw, false);
@@ -1440,7 +1440,7 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
 
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "Request failed, Check the path\n");
         return;
     }
@@ -1448,7 +1448,7 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
     ph = (struct auto_test_header *)(fw->data);
     p_item_offset = (uint32_t *)(fw->data + LEN_TEST_ITEM_FIELD);
     if ((ph->magic1 != LIMIT_HEADER_MAGIC_1) || (ph->magic2 != LIMIT_HEADER_MAGIC_2)) {
-        TPD_INFO("limit image is not generated by oplus\n");
+        TPD_DEBUG("limit image is not generated by oplus\n");
         seq_printf(s, "limit image is not generated by oplus\n");
         release_firmware(fw);
         return;
@@ -1459,21 +1459,21 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
             item_cnt++;
         }
     }
-    TPD_INFO("%s: total test item = %d \n", __func__, item_cnt);
+    TPD_DEBUG("%s: total test item = %d \n", __func__, item_cnt);
     if (!item_cnt) {
-        TPD_INFO("limit image has no test item\n");
+        TPD_DEBUG("limit image has no test item\n");
         seq_printf(s, "limit image has no test item\n");
     }
 
     for (m = 0; m < item_cnt; m++) {
-        TPD_INFO("common debug d: p_item_offset[%d] = 0x%x \n", m, p_item_offset[m]);
+        TPD_DEBUG("common debug d: p_item_offset[%d] = 0x%x \n", m, p_item_offset[m]);
         item_head = (struct auto_test_item_header *)(fw->data + p_item_offset[m]);
         if (item_head->item_magic != 0x4F50504F) {
-            TPD_INFO("item: %d limit data has some problem\n", item_head->item_bit);
+            TPD_DEBUG("item: %d limit data has some problem\n", item_head->item_bit);
             seq_printf(s, "item: %d limit data has some problem\n", item_head->item_bit);
             continue;
         }
-        TPD_INFO("item %d[size %d, limit type %d, para num %d] :\n", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
+        TPD_DEBUG("item %d[size %d, limit type %d, para num %d] :\n", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
         seq_printf(s, "\n\nitem %d[size %d, limit type %d, para num %d] :", item_head->item_bit, item_head->item_size, item_head->item_limit_type, item_head->para_num);
         if (item_head->item_limit_type == LIMIT_TYPE_NO_DATA) {
             seq_printf(s, "no limit data\n");
@@ -1496,7 +1496,7 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
                 seq_printf(s, "TYPE_BLACK_NOISE_DATA: \n");
             }
             
-            TPD_INFO("top data [%d]: \n", m);
+            TPD_DEBUG("top data [%d]: \n", m);
             seq_printf(s, "top data: ");
             p_data32 = (int32_t *)(fw->data + item_head->top_limit_offset);
             if (p_data32) {
@@ -1516,7 +1516,7 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
                     TPD_DEBUG("%d, ", p_data32[i]);
                 }
             } else {
-                TPD_INFO("%s: screen on, p_data32 is NULL \n", __func__);
+                TPD_DEBUG("%s: screen on, p_data32 is NULL \n", __func__);
             }
         }
         p_data32 = (int32_t *)(fw->data + p_item_offset[m] + sizeof(struct auto_test_item_header));
@@ -1536,7 +1536,7 @@ static void fts_limit_read_std(struct seq_file *s, struct touchpanel_data *ts)
 
 static int fts_enable_black_gesture(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_GESTURE, write 0xD0=%d", enable);
+    TPD_DEBUG("MODE_GESTURE, write 0xD0=%d", enable);
     return fts_write_reg(ts_data->spi, FTS_REG_GESTURE_EN, enable);
 }
 
@@ -1553,25 +1553,25 @@ static int fts_enable_edge_limit(struct fts_ts_data *ts_data, bool enable)
         else if (LANDSCAPE_SCREEN_270 == ts_data->touch_direction)
             edge_mode = 2;
     }
-    TPD_INFO("MODE_EDGE, write 0x8C=%d", edge_mode);
+    TPD_DEBUG("MODE_EDGE, write 0x8C=%d", edge_mode);
     return fts_write_reg(ts_data->spi, FTS_REG_EDGE_LIMIT, edge_mode);
 }
 
 static int fts_enable_charge_mode(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_CHARGE, write 0x8B=%d", enable);
+    TPD_DEBUG("MODE_CHARGE, write 0x8B=%d", enable);
     return fts_write_reg(ts_data->spi, FTS_REG_CHARGER_MODE_EN, enable);
 }
 
 static int fts_enable_game_mode(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_GAME, write 0xB8=%d", enable);
+    TPD_DEBUG("MODE_GAME, write 0xB8=%d", enable);
     return fts_write_reg(ts_data->spi, FTS_REG_GAME_MODE_EN, enable);;
 }
 
 static int fts_enable_headset_mode(struct fts_ts_data *ts_data, bool enable)
 {
-    TPD_INFO("MODE_HEADSET, write 0xC3=%d \n", enable);
+    TPD_DEBUG("MODE_HEADSET, write 0xC3=%d \n", enable);
     return fts_write_reg(ts_data->spi, FTS_REG_HEADSET_MODE_EN, enable);
 }
 
@@ -1582,20 +1582,20 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
 
     switch (mode) {
     case MODE_NORMAL:
-        TPD_INFO("MODE_NORMAL");
+        TPD_DEBUG("MODE_NORMAL");
         break;
 
     case MODE_SLEEP:
-        TPD_INFO("MODE_SLEEP, write 0xA5=3");
+        TPD_DEBUG("MODE_SLEEP, write 0xA5=3");
         ret = fts_write_reg(ts_data->spi, FTS_REG_POWER_MODE, 0x03);
         if (ret < 0) {
-            TPD_INFO("%s: enter into sleep failed.\n", __func__);
+            TPD_DEBUG("%s: enter into sleep failed.\n", __func__);
             goto mode_err;
         }
         break;
 
     case MODE_GESTURE:
-        TPD_INFO("MODE_GESTURE, Melo, ts->is_suspended = %d \n", ts_data->ts->is_suspended);
+        TPD_DEBUG("MODE_GESTURE, Melo, ts->is_suspended = %d \n", ts_data->ts->is_suspended);
         if (ts_data->ts->is_suspended){                              // do not pull up reset when doing resume
             if (ts_data->last_mode == MODE_SLEEP) {
                 fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
@@ -1603,7 +1603,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
         }
         ret = fts_enable_black_gesture(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable gesture failed.\n", __func__);
+            TPD_DEBUG("%s: enable gesture failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1614,7 +1614,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_EDGE:
         ret = fts_enable_edge_limit(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable edg limit failed.\n", __func__);
+            TPD_DEBUG("%s: enable edg limit failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1625,7 +1625,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_CHARGE:
         ret = fts_enable_charge_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable charge mode failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1633,7 +1633,7 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_GAME:
         ret = fts_enable_game_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable game mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable game mode failed.\n", __func__);
             goto mode_err;
         }
         break;
@@ -1641,13 +1641,13 @@ static int fts_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_HEADSET:
         ret = fts_enable_headset_mode(ts_data, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable headset mode failed.\n", __func__);
+            TPD_DEBUG("%s: enable headset mode failed.\n", __func__);
             goto mode_err;
         }
         break;
 
     default:
-        TPD_INFO("%s: Wrong mode.\n", __func__);
+        TPD_DEBUG("%s: Wrong mode.\n", __func__);
         goto mode_err;
     }
 
@@ -1670,7 +1670,7 @@ static int fts_reset(void *chip_data)
 {
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s:call\n", __func__);
+    TPD_DEBUG("%s:call\n", __func__);
     fts_hw_reset(ts_data, RESET_TO_NORMAL_TIME);
 
     return 0;
@@ -1693,11 +1693,11 @@ static int fts_get_vendor(void *chip_data, struct panel_info *panel_data)
         //panel_data->fw_name[len-3] = 'b';
         //panel_data->fw_name[len-2] = 'i';
         //panel_data->fw_name[len-1] = 'n';
-        TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
+        TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
     }
     //strlcat(manu_temp, panel_data->manufacture_info.manufacture, MAX_DEVICE_MANU_LENGTH);
     //strncpy(panel_data->manufacture_info.manufacture, manu_temp, MAX_DEVICE_MANU_LENGTH);
-    TPD_INFO("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
+    TPD_DEBUG("tp_type = %d, panel_data->fw_name = %s\n", panel_data->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -1720,7 +1720,7 @@ static int fts_get_chip_info(void *chip_data)
         mdelay(FTS_CMD_START_DELAY);
         cmd = FTS_CMD_READ_ID;
         fts_read(ts_data->spi, &cmd, 1, id, 2);
-        TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+        TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
         if (id[0] == FTS_VAL_BOOT_ID) {
 //            tpd_load_status = 1;
             return 0;
@@ -1735,13 +1735,13 @@ static int fts_ftm_process(void *chip_data)
     int ret = -1;
 	struct fts_ts_data *chip_info = (struct fts_ts_data *)chip_data;
 
-	TPD_INFO("%s is called!\n", __func__);
+	TPD_DEBUG("%s is called!\n", __func__);
 
 	 ret = fts_get_chip_info(chip_info);
 	 if (!ret) {
 		 ret = fts_fw_update_ftm(chip_info, 1);
 		 if(ret > 0) {
-			 TPD_INFO("%s fw update failed!\n", __func__);
+			 TPD_DEBUG("%s fw update failed!\n", __func__);
 		 }  
 	}
 
@@ -1757,7 +1757,7 @@ static fw_check_state fts_fw_check(void *chip_data, struct resolution_info *reso
     char dev_version[MAX_DEVICE_VERSION_LENGTH] = {0};
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
-    TPD_INFO("%s:called", __func__);
+    TPD_DEBUG("%s:called", __func__);
 
     for(i = 0; i < 10; i++) {
         msleep(10);
@@ -1768,14 +1768,14 @@ static fw_check_state fts_fw_check(void *chip_data, struct resolution_info *reso
     }
     if (i >= 10) {
         fts_read(ts_data->spi, &cmd, 1, id, 2);
-        TPD_INFO("%s:boot id:0x%02x%02x, fw abnormal", __func__, id[0], id[1]);
+        TPD_DEBUG("%s:boot id:0x%02x%02x, fw abnormal", __func__, id[0], id[1]);
         return FW_ABNORMAL;
     }
 
     /*fw check normal need update TP_FW  && device info*/
     fts_read_reg(ts_data->spi, FTS_REG_FW_VER, &ts_data->fwver);
     panel_data->TP_FW = ts_data->fwver;
-    TPD_INFO("FW VER:%d", panel_data->TP_FW);
+    TPD_DEBUG("FW VER:%d", panel_data->TP_FW);
     if (panel_data->manufacture_info.version) {
         sprintf(dev_version, "%02x", panel_data->TP_FW);
         ver_len = strlen(panel_data->manufacture_info.version);
@@ -1796,18 +1796,18 @@ static fw_update_state fts_fw_update_ftm(void *chip_data,  bool force)
     u8 *buf;
     u32 len = 0;
 
-    TPD_INFO("%s: called", __func__);
+    TPD_DEBUG("%s: called", __func__);
 
 
     /*request_firmware fail*/
-    TPD_INFO("no fw from request_firmware()");
+    TPD_DEBUG("no fw from request_firmware()");
     buf = ts_data->h_fw_file;
     len = ts_data->h_fw_size;
 
 
 
     if ((len < 0x120) || (len > (256 * 1024))) {
-        TPD_INFO("fw_len(%d) is invalid", len);
+        TPD_DEBUG("fw_len(%d) is invalid", len);
         return FW_UPDATE_ERROR;
     }
 
@@ -1815,7 +1815,7 @@ static fw_update_state fts_fw_update_ftm(void *chip_data,  bool force)
     ret = fts_fw_download(ts_data, buf, len, true);
     focal_esd_check_enable(ts_data, true);
     if (ret < 0) {
-        TPD_INFO("fw update fail");
+        TPD_DEBUG("fw update fail");
         return FW_UPDATE_ERROR;
     }
 
@@ -1829,9 +1829,9 @@ static fw_update_state fts_fw_update(void *chip_data, const struct firmware *fw,
     u8 *buf;
     u32 len = 0;
 
-    TPD_INFO("%s: called", __func__);
+    TPD_DEBUG("%s: called", __func__);
     if (!fw && (!ts_data->h_fw_file || !ts_data->h_fw_size)) {
-        TPD_INFO("fw is null");
+        TPD_DEBUG("fw is null");
         return FW_UPDATE_ERROR;
     }
 
@@ -1840,14 +1840,14 @@ static fw_update_state fts_fw_update(void *chip_data, const struct firmware *fw,
         len = (int)fw->size;
     } else {
         /*request_firmware fail*/
-        TPD_INFO("no fw from request_firmware()");
+        TPD_DEBUG("no fw from request_firmware()");
         buf = ts_data->h_fw_file;
         len = ts_data->h_fw_size;
     }
 
 
     if ((len < 0x120) || (len > (256 * 1024))) {
-        TPD_INFO("fw_len(%d) is invalid", len);
+        TPD_DEBUG("fw_len(%d) is invalid", len);
         return FW_UPDATE_ERROR;
     }
 
@@ -1855,7 +1855,7 @@ static fw_update_state fts_fw_update(void *chip_data, const struct firmware *fw,
     ret = fts_fw_download(ts_data, buf, len, true);
     focal_esd_check_enable(ts_data, true);
     if (ret < 0) {
-        TPD_INFO("fw update fail");
+        TPD_DEBUG("fw update fail");
         return FW_UPDATE_ERROR;
     }
 
@@ -1873,40 +1873,40 @@ static int fts_fw_recovery(struct fts_ts_data *ts_data)
     const struct firmware *fw = NULL;
     struct touchpanel_data *ts = ts_data->ts;
 
-    TPD_INFO("check if boot recovery");
+    TPD_DEBUG("check if boot recovery");
 
     if (ts->loading_fw) {
-        TPD_INFO("fw is loading, not download again");
+        TPD_DEBUG("fw is loading, not download again");
         return -EINVAL;
     }
 
     ret = fts_read(ts_data->spi, &cmd, 1, id, 2);
-    TPD_INFO("read boot id:0x%02x%02x", id[0], id[1]);
+    TPD_DEBUG("read boot id:0x%02x%02x", id[0], id[1]);
     if (id[0] != FTS_VAL_BOOT_ID) {
-        TPD_INFO("check boot id fail");
+        TPD_DEBUG("check boot id fail");
         return ret;
     }
 
     ret = fts_read_reg(ts_data->spi, 0xD0, &boot_state);
     if (ret < 0) {
-        TPD_INFO("read boot state failed, ret=%d", ret);
+        TPD_DEBUG("read boot state failed, ret=%d", ret);
         return ret;
     }
 
     if (boot_state != 0x01) {
-        TPD_INFO("not in boot mode(0x%x),exit", boot_state);
+        TPD_DEBUG("not in boot mode(0x%x),exit", boot_state);
         return -EIO;
     }
 
-    TPD_INFO("abnormal situation,need download fw");
+    TPD_DEBUG("abnormal situation,need download fw");
     /*ret = request_firmware(&fw, ts->panel_data.fw_name, ts->dev);
     if (ret) {
-        TPD_INFO("request_firmware(%s) fail", ts->panel_data.fw_name);
+        TPD_DEBUG("request_firmware(%s) fail", ts->panel_data.fw_name);
     }*/
    ts_data->h_fw_file = (u8 *)ts->panel_data.firmware_headfile.firmware_data;
    ts_data->h_fw_size = ts->panel_data.firmware_headfile.firmware_size;
 
-   TPD_INFO("ts_data->h_fw_size == %d\n", ts_data->h_fw_size);
+   TPD_DEBUG("ts_data->h_fw_size == %d\n", ts_data->h_fw_size);
 
     ts->loading_fw = true;
     if (ts->ts_ops && ts->ts_ops->fw_update)
@@ -1919,9 +1919,9 @@ static int fts_fw_recovery(struct fts_ts_data *ts_data)
 
     msleep(10);
     ret = fts_read_reg(ts_data->spi, FTS_REG_CHIP_ID, &chip_id);
-    TPD_INFO("read chip id:0x%02x", chip_id);
+    TPD_DEBUG("read chip id:0x%02x", chip_id);
 
-    TPD_INFO("boot recovery pass");
+    TPD_DEBUG("boot recovery pass");
     return ret;
 }
 
@@ -1940,7 +1940,7 @@ static u8 fts_trigger_reason(void *chip_data, int gesture_enable, int is_suspend
 
     ret = fts_read(ts_data->spi, &cmd, 1, &buf[0], FTS_REPORT_BUFFER_SIZE);
     if (ret < 0) {
-        TPD_INFO("read touch point one fail");
+        TPD_DEBUG("read touch point one fail");
         return IRQ_IGNORE;
     }
 
@@ -1959,7 +1959,7 @@ static u8 fts_trigger_reason(void *chip_data, int gesture_enable, int is_suspend
     
 
     if ((buf[1] == 0xFF) && (buf[2] == 0xFF) && (buf[3] == 0xFF)) {
-        TPD_INFO("Need recovery TP state");
+        TPD_DEBUG("Need recovery TP state");
         return IRQ_FW_AUTO_RESET;
     }
 
@@ -1989,7 +1989,7 @@ static u32 fts_u32_trigger_reason(void *chip_data, int gesture_enable, int is_su
 
     ret = fts_read(ts_data->spi, &cmd, 1, &buf[0], FTS_REPORT_BUFFER_SIZE);
     if (ret < 0) {
-        TPD_INFO("read touch point one fail");
+        TPD_DEBUG("read touch point one fail");
         return IRQ_IGNORE;
     }
 
@@ -2008,7 +2008,7 @@ static u32 fts_u32_trigger_reason(void *chip_data, int gesture_enable, int is_su
     
 
     if ((buf[1] == 0xFF) && (buf[2] == 0xFF) && (buf[3] == 0xFF)) {
-        TPD_INFO("Need recovery TP state");
+        TPD_DEBUG("Need recovery TP state");
         return IRQ_FW_AUTO_RESET;
     }
 
@@ -2065,7 +2065,7 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
 
     point_num = buf[1] & 0xFF;
     if (point_num > max_num) {
-        TPD_INFO("invalid point_num(%d),max_num(%d)", point_num, max_num);
+        TPD_DEBUG("invalid point_num(%d),max_num(%d)", point_num, max_num);
         return -EIO;
     }
 
@@ -2075,7 +2075,7 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
         if (pointid >= FTS_MAX_ID)
             break;
         else if (pointid >= max_num) {
-            TPD_INFO("ID(%d) beyond max_num(%d)", pointid, max_num);
+            TPD_DEBUG("ID(%d) beyond max_num(%d)", pointid, max_num);
             return -EINVAL;
         }
 
@@ -2092,14 +2092,14 @@ static int fts_get_touch_points(void *chip_data, struct point_info *points, int 
             points[pointid].status = 1;
             obj_attention |= (1 << pointid);
             if (point_num == 0) {
-                TPD_INFO("abnormal touch data from fw");
+                TPD_DEBUG("abnormal touch data from fw");
                 return -EIO;
             }
         }
     }
 
     if (touch_point == 0) {
-        TPD_INFO("no touch point information");
+        TPD_DEBUG("no touch point information");
         return -EIO;
     }
 
@@ -2114,11 +2114,11 @@ static void fts_health_report(void *chip_data, struct monitor_data *mon_data)
     struct fts_ts_data *ts_data = (struct fts_ts_data *)chip_data;
 
     ret = fts_read_reg(ts_data->spi, 0x01, &val);
-    TPD_INFO("Health register(0x01):0x%x", ret);
+    TPD_DEBUG("Health register(0x01):0x%x", ret);
     ret = fts_read_reg(ts_data->spi, FTS_REG_HEALTH_1, &val);
-    TPD_INFO("Health register(0xFD):0x%x", ret);
+    TPD_DEBUG("Health register(0xFD):0x%x", ret);
     ret = fts_read_reg(ts_data->spi, FTS_REG_HEALTH_2, &val);
-    TPD_INFO("Health register(0xFE):0x%x", ret);
+    TPD_DEBUG("Health register(0xFE):0x%x", ret);
 }
 
 static int fts_get_gesture_info(void *chip_data, struct gesture_info *gesture)
@@ -2130,7 +2130,7 @@ static int fts_get_gesture_info(void *chip_data, struct gesture_info *gesture)
 
     gesture_id = gesture_buf[2];
     point_num = gesture_buf[3];
-    TPD_INFO("gesture_id=%d, point_num=%d", gesture_id, point_num);
+    TPD_DEBUG("gesture_id=%d, point_num=%d", gesture_id, point_num);
     switch (gesture_id) {
     case GESTURE_DOUBLE_TAP:
         gesture->gesture_type = DouTap;
@@ -2299,10 +2299,10 @@ static int fts_tp_probe(struct spi_device *spi)
         struct touchpanel_data *ts = NULL;
         int ret = -1;
 
-        TPD_INFO("%s  is called\n", __func__);
+        TPD_DEBUG("%s  is called\n", __func__);
 
         if (tp_register_times > 0) {
-                TPD_INFO("TP driver have success loaded %d times, exit\n", tp_register_times);
+                TPD_DEBUG("TP driver have success loaded %d times, exit\n", tp_register_times);
                 return -1;
         }
 
@@ -2314,14 +2314,14 @@ static int fts_tp_probe(struct spi_device *spi)
 /*
         ret = spi_setup(spi);
         if (ret) {
-            TPD_INFO("spi setup fail");
+            TPD_DEBUG("spi setup fail");
             return ret;
         }
 */
         /*step1:Alloc chip_info*/
         ts_data = kzalloc(sizeof(struct fts_ts_data), GFP_KERNEL);
         if (ts_data == NULL) {
-                TPD_INFO("ts_data kzalloc error\n");
+                TPD_DEBUG("ts_data kzalloc error\n");
                 ret = -ENOMEM;
                 return ret;
         }
@@ -2331,7 +2331,7 @@ static int fts_tp_probe(struct spi_device *spi)
         /*step2:Alloc common ts*/
         ts = common_touch_data_alloc();
         if (ts == NULL) {
-                TPD_INFO("ts kzalloc error\n");
+                TPD_DEBUG("ts kzalloc error\n");
                 goto ts_malloc_failed;
         }
         memset(ts, 0, sizeof(*ts));
@@ -2363,14 +2363,14 @@ static int fts_tp_probe(struct spi_device *spi)
 		/* old usage of MTK spi API */
 		ret = spi_setup(spi);
 		if (ret) {
-			 TPD_INFO("spi setup fail");
+			 TPD_DEBUG("spi setup fail");
 			 return ret;
 		}
 #endif	//CONFIG_SPI_MT65XX
 #else // else of CONFIG_TOUCHPANEL_MTK_PLATFORM
 		ret = spi_setup(spi);
 		if (ret) {
-			 TPD_INFO("spi setup fail");
+			 TPD_DEBUG("spi setup fail");
 			 return ret;
 		}
 		
@@ -2383,7 +2383,7 @@ static int fts_tp_probe(struct spi_device *spi)
         /* Init communication interface */
         ret = fts_bus_init();
         if (ret) {
-            TPD_INFO("bus initialize fail");
+            TPD_DEBUG("bus initialize fail");
             goto err_bus_init;
         }
 
@@ -2412,17 +2412,17 @@ static int fts_tp_probe(struct spi_device *spi)
         if (ts->boot_mode == MSM_BOOT_MODE__RECOVERY || is_oem_unlocked() || ts->fw_update_in_probe_with_headfile)
 #endif
         {
-            TPD_INFO("In Recovery mode,or oem unlocked,or fw_update_in_probe_with_headfile is enable,no-flash download fw by headfile\n");
+            TPD_DEBUG("In Recovery mode,or oem unlocked,or fw_update_in_probe_with_headfile is enable,no-flash download fw by headfile\n");
             disable_irq_nosync(ts_data->ts->irq);
 			ret = fts_fw_update(ts_data, NULL, 0);
             if(ret > 0) {
-                TPD_INFO("fw update failed!\n");
+                TPD_DEBUG("fw update failed!\n");
             }
             enable_irq(ts_data->ts->irq);
         }
 
         ts_data->probe_done = 1;
-        TPD_INFO("%s, probe normal end\n", __func__);
+        TPD_DEBUG("%s, probe normal end\n", __func__);
 
         return 0;
 
@@ -2438,7 +2438,7 @@ ts_malloc_failed:
         ts_data = NULL;
         ret = -1;
 
-        TPD_INFO("%s, probe error\n", __func__);
+        TPD_DEBUG("%s, probe error\n", __func__);
 
         return ret;
 }
@@ -2448,7 +2448,7 @@ static int fts_tp_remove(struct spi_device *spi)
         struct touchpanel_data *ts = spi_get_drvdata(spi);
         struct fts_ts_data *ts_data = (struct fts_ts_data *)ts->chip_data;
 
-        TPD_INFO("%s is called\n", __func__);
+        TPD_DEBUG("%s is called\n", __func__);
         fts_release_apk_debug_channel(ts_data);
         fts_bus_exit();
         kfree(ts_data);
@@ -2462,7 +2462,7 @@ static int fts_spi_suspend(struct device *dev)
 {
         struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-        TPD_INFO("%s: is called\n", __func__);
+        TPD_DEBUG("%s: is called\n", __func__);
         tp_i2c_suspend(ts);
 
         return 0;
@@ -2472,7 +2472,7 @@ static int fts_spi_resume(struct device *dev)
 {
         struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-        TPD_INFO("%s is called\n", __func__);
+        TPD_DEBUG("%s is called\n", __func__);
         tp_i2c_resume(ts);
 
         return 0;
@@ -2516,13 +2516,13 @@ static struct spi_driver tp_spi_driver = {
 
 static int __init tp_driver_init(void)
 {
-        TPD_INFO("%s is called\n", __func__);
+        TPD_DEBUG("%s is called\n", __func__);
 
         if (!tp_judge_ic_match(TPD_DEVICE))
             return -1;
 
         if (spi_register_driver(&tp_spi_driver)!= 0) {
-                TPD_INFO("unable to add spi driver.\n");
+                TPD_DEBUG("unable to add spi driver.\n");
                 return -1;
         }
         return 0;

@@ -167,7 +167,7 @@ void dump_data(void *data, int type, int len, int row_len, const char *name)
 
     if (LEVEL_DEBUG == tp_debug) {
         if (data == NULL) {
-            TPD_INFO("The data going to dump is NULL\n");
+            TPD_DEBUG("The data going to dump is NULL\n");
             return;
         }
 
@@ -199,7 +199,7 @@ static void dump_benchmark_data(int32_t* max_ptr, int32_t* min_ptr)
     int i = 0;
 
     if (LEVEL_DEBUG == tp_debug) {
-        TPD_INFO("benchmark max\n");
+        TPD_DEBUG("benchmark max\n");
 
         for(i = 0; i < core_mp->frame_len; i++) {
             printk("%d, ", max_ptr[i]);
@@ -207,7 +207,7 @@ static void dump_benchmark_data(int32_t* max_ptr, int32_t* min_ptr)
                 printk("\n");
         }
 
-        TPD_INFO("benchmark min\n");
+        TPD_DEBUG("benchmark min\n");
 
         for(i = 0; i < core_mp->frame_len; i++) {
             printk("%d, ", min_ptr[i]);
@@ -222,7 +222,7 @@ void dump_node_type_buffer(int32_t* node_ptr, uint8_t *name)
     int i = 0;
 
     if (LEVEL_DEBUG == tp_debug) {
-        TPD_INFO("Node Type buffer: %s\n", name);
+        TPD_DEBUG("Node Type buffer: %s\n", name);
         for(i=0; i<core_mp->frame_len ; i++)
         {
             printk("%d, ",node_ptr[i]);
@@ -239,7 +239,7 @@ static void mp_compare_cdc_result(int32_t *tmp, int32_t *max_ts, int32_t *min_ts
     int y = 0;
 
     if (ERR_ALLOC_MEM(tmp)) {
-        TPD_INFO("The data of test item is null (%p)\n", tmp);
+        TPD_DEBUG("The data of test item is null (%p)\n", tmp);
         *result = MP_FAIL;
         return;
     }
@@ -262,7 +262,7 @@ static void mp_compare_cdc_show_result(int32_t *tmp, char *csv, int *csv_len, in
     int mp_result = MP_PASS;
 
     if (ERR_ALLOC_MEM(tmp)) {
-        TPD_INFO("The data of test item is null (%p)\n", tmp);
+        TPD_DEBUG("The data of test item is null (%p)\n", tmp);
         mp_result = MP_FAIL;
         goto out;
     }
@@ -317,10 +317,10 @@ static void mp_compare_cdc_show_result(int32_t *tmp, char *csv, int *csv_len, in
 out:
     if (type == TYPE_JUGE) {
         if (mp_result == MP_PASS){
-            TPD_INFO("\n Result : PASS\n");
+            TPD_DEBUG("\n Result : PASS\n");
             tmp_len += sprintf(csv + tmp_len, "Result : PASS\n");
         } else {
-            TPD_INFO("\n Result : FAIL\n");
+            TPD_DEBUG("\n Result : FAIL\n");
             tmp_len += sprintf(csv + tmp_len, "Result : FAIL\n");
         }
     }
@@ -333,7 +333,7 @@ static int create_mp_test_frame_buffer(int index, int frame_count)
     TPD_DEBUG("Create MP frame buffers (index = %d), count = %d\n",index, frame_count);
     //this item aready created buffer
     if(tItems[index].test_count != 0) {
-        TPD_INFO("this item already created buffer\n");
+        TPD_DEBUG("this item already created buffer\n");
         return 0;
     }
     if (tItems[index].catalog == TX_RX_DELTA) {
@@ -351,17 +351,17 @@ static int create_mp_test_frame_buffer(int index, int frame_count)
         core_mp->rx_min_buf = vmalloc(core_mp->frame_len * sizeof(int32_t));
 
         if (ERR_ALLOC_MEM(core_mp->tx_delta_buf) || ERR_ALLOC_MEM(core_mp->rx_delta_buf)) {
-            TPD_INFO("Failed to allocate Tx/Rx Delta buffer\n");
+            TPD_DEBUG("Failed to allocate Tx/Rx Delta buffer\n");
             return -ENOMEM;
         }
 
         if (ERR_ALLOC_MEM(core_mp->tx_max_buf) || ERR_ALLOC_MEM(core_mp->tx_min_buf)) {
-            TPD_INFO("Failed to allocate Tx Max/Min buffer\n");
+            TPD_DEBUG("Failed to allocate Tx Max/Min buffer\n");
             return -ENOMEM;
         }
 
         if (ERR_ALLOC_MEM(core_mp->rx_max_buf) || ERR_ALLOC_MEM(core_mp->rx_min_buf)) {
-            TPD_INFO("Failed to allocate Rx Max/Min buffe\n");
+            TPD_DEBUG("Failed to allocate Rx Max/Min buffe\n");
             return -ENOMEM;
         }
 
@@ -375,13 +375,13 @@ static int create_mp_test_frame_buffer(int index, int frame_count)
             tItems[index].bench_mark_min = vmalloc(core_mp->frame_len * sizeof(int32_t));
 
             if (ERR_ALLOC_MEM(tItems[index].bench_mark_max) || ERR_ALLOC_MEM(tItems[index].bench_mark_min)){
-                TPD_INFO("Failed to allocate bench_mark FRAME buffer\n");
+                TPD_DEBUG("Failed to allocate bench_mark FRAME buffer\n");
                 return -ENOMEM;
             }
         }
         if (ERR_ALLOC_MEM(tItems[index].buf) || ERR_ALLOC_MEM(tItems[index].max_buf) ||
                 ERR_ALLOC_MEM(tItems[index].min_buf) || ERR_ALLOC_MEM(tItems[index].result_buf)) {
-            TPD_INFO("Failed to allocate FRAME buffer\n");
+            TPD_DEBUG("Failed to allocate FRAME buffer\n");
             return -ENOMEM;
         }
     }
@@ -411,7 +411,7 @@ static int core_mp_ctrl_lcm_status(bool on)
 
     ret = core_write(core_config->slave_i2c_addr, lcd, ARRAY_SIZE(lcd));
     if (ret < 0) {
-        TPD_INFO("Failed to write LCM command\n");
+        TPD_DEBUG("Failed to write LCM command\n");
         goto out;
     }
 
@@ -532,7 +532,7 @@ static int allnode_key_cdc_data(int index)
     TPD_DEBUG("core_mp->key_len = %d\n", core_mp->key_len);
 
     if (len <= 0) {
-        TPD_INFO("Length is invalid\n");
+        TPD_DEBUG("Length is invalid\n");
         res = -1;
         goto out;
     }
@@ -544,7 +544,7 @@ static int allnode_key_cdc_data(int index)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 3);
     if (res < 0) {
-        TPD_INFO("I2C Write Error while initialising cdc\n");
+        TPD_DEBUG("I2C Write Error while initialising cdc\n");
         goto out;
     }
 
@@ -552,7 +552,7 @@ static int allnode_key_cdc_data(int index)
 
     /* Check busy */
     if (core_config_check_cdc_busy(50) < 0) {
-        TPD_INFO("Check busy is timout !\n");
+        TPD_DEBUG("Check busy is timout !\n");
         res = -1;
         goto out;
     }
@@ -565,7 +565,7 @@ static int allnode_key_cdc_data(int index)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
@@ -573,14 +573,14 @@ static int allnode_key_cdc_data(int index)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
     /* Allocate a buffer for the original */
     ori = kcalloc(len, sizeof(uint8_t), GFP_KERNEL);
     if (ERR_ALLOC_MEM(ori)) {
-        TPD_INFO("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
+        TPD_DEBUG("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
         goto out;
     }
 
@@ -589,7 +589,7 @@ static int allnode_key_cdc_data(int index)
     /* Get original frame(cdc) data */
     res = core_read(core_config->slave_i2c_addr, ori, len);
     if (res < 0) {
-        TPD_INFO("I2C Read Error while getting original cdc data\n");
+        TPD_DEBUG("I2C Read Error while getting original cdc data\n");
         goto out;
     }
 
@@ -598,7 +598,7 @@ static int allnode_key_cdc_data(int index)
     if (key_buf == NULL) {
         key_buf = kcalloc(core_mp->key_len, sizeof(int32_t), GFP_KERNEL);
         if (ERR_ALLOC_MEM(key_buf)) {
-            TPD_INFO("Failed to allocate FrameBuffer mem (%ld)\n", PTR_ERR(key_buf));
+            TPD_DEBUG("Failed to allocate FrameBuffer mem (%ld)\n", PTR_ERR(key_buf));
             goto out;
         }
     } else {
@@ -642,7 +642,7 @@ int core_mp_calc_timing_nodp(void)
     uint8_t timing_cmd[15] = {0};
     uint8_t get_timing[64] = {0};
     if (ERR_ALLOC_MEM(core_mp)) {
-        TPD_INFO("core_mp is NULL\n");
+        TPD_DEBUG("core_mp is NULL\n");
         return -ENOMEM;
     }
 
@@ -662,13 +662,13 @@ int core_mp_calc_timing_nodp(void)
     }
     ret = core_write(core_config->slave_i2c_addr, timing_cmd, sizeof(timing_cmd));
     if (ret < 0) {
-        TPD_INFO("Failed to write timing command\n");
+        TPD_DEBUG("Failed to write timing command\n");
         goto out;
     }
 
     ret = core_read(core_config->slave_i2c_addr, get_timing, sizeof(get_timing));
     if (ret < 0) {
-        TPD_INFO("Failed to read timing parameters\n");
+        TPD_DEBUG("Failed to read timing parameters\n");
         goto out;
     }
     if (LEVEL_DEBUG == tp_debug)
@@ -702,30 +702,30 @@ int core_mp_calc_timing_nodp(void)
     core_mp->nodp.drop_nodp = get_timing[35];
     if (LEVEL_DEBUG == tp_debug)
     {
-        TPD_INFO("60HZ = %d\n",core_mp->nodp.is60HZ);
-        TPD_INFO("DDI Mode = %d\n",core_mp->nodp.isLongV);
-        TPD_INFO("TSHD = %d\n",core_mp->nodp.tshd);
-        TPD_INFO("Multi Term Num (120Hz) = %d\n",core_mp->nodp.multi_term_num_120);
-        TPD_INFO("Multi Term Num (60Hz) = %d\n",core_mp->nodp.multi_term_num_60);
-        TPD_INFO("TSVD to TSHD = %d\n",core_mp->nodp.tsvd_to_tshd);
-        TPD_INFO("QSH TDF = %d\n",core_mp->nodp.qsh_tdf);
-        TPD_INFO("AutoTrim Variation = %d\n",core_mp->nodp.auto_trim);
-        TPD_INFO("TP TSHD Wait (120Hz) = %d\n",core_mp->nodp.tp_tshd_wait_120);
-        TPD_INFO("DDI Width (120Hz) = %d\n",core_mp->nodp.ddi_width_120);
-        TPD_INFO("TP TSHD Wait (60Hz) = %d\n",core_mp->nodp.tp_tshd_wait_60);
-        TPD_INFO("DDI Width (60Hz) = %d\n",core_mp->nodp.ddi_width_60);
-        TPD_INFO("DP to TP = %d\n",core_mp->nodp.dp_to_tp);
-        TPD_INFO("TX Wait Const = %d\n",core_mp->nodp.tx_wait_const);
-        TPD_INFO("TX Wait Const Multi = %d\n",core_mp->nodp.tx_wait_const_multi);
-        TPD_INFO("TP to DP = %d\n",core_mp->nodp.tp_to_dp);
-        TPD_INFO("Phase ADC = %d\n",core_mp->nodp.phase_adc);
-        TPD_INFO("R2D PW = %d\n",core_mp->nodp.r2d_pw);
-        TPD_INFO("RST PW = %d\n",core_mp->nodp.rst_pw);
-        TPD_INFO("RST PW Back = %d\n",core_mp->nodp.rst_pw_back);
-        TPD_INFO("DAC TD = %d\n",core_mp->nodp.dac_td);
-        TPD_INFO("QSH PW = %d\n",core_mp->nodp.qsh_pw);
-        TPD_INFO("QSH TD = %d\n",core_mp->nodp.qsh_td);
-        TPD_INFO("Drop NODP Num = %d\n",core_mp->nodp.drop_nodp);
+        TPD_DEBUG("60HZ = %d\n",core_mp->nodp.is60HZ);
+        TPD_DEBUG("DDI Mode = %d\n",core_mp->nodp.isLongV);
+        TPD_DEBUG("TSHD = %d\n",core_mp->nodp.tshd);
+        TPD_DEBUG("Multi Term Num (120Hz) = %d\n",core_mp->nodp.multi_term_num_120);
+        TPD_DEBUG("Multi Term Num (60Hz) = %d\n",core_mp->nodp.multi_term_num_60);
+        TPD_DEBUG("TSVD to TSHD = %d\n",core_mp->nodp.tsvd_to_tshd);
+        TPD_DEBUG("QSH TDF = %d\n",core_mp->nodp.qsh_tdf);
+        TPD_DEBUG("AutoTrim Variation = %d\n",core_mp->nodp.auto_trim);
+        TPD_DEBUG("TP TSHD Wait (120Hz) = %d\n",core_mp->nodp.tp_tshd_wait_120);
+        TPD_DEBUG("DDI Width (120Hz) = %d\n",core_mp->nodp.ddi_width_120);
+        TPD_DEBUG("TP TSHD Wait (60Hz) = %d\n",core_mp->nodp.tp_tshd_wait_60);
+        TPD_DEBUG("DDI Width (60Hz) = %d\n",core_mp->nodp.ddi_width_60);
+        TPD_DEBUG("DP to TP = %d\n",core_mp->nodp.dp_to_tp);
+        TPD_DEBUG("TX Wait Const = %d\n",core_mp->nodp.tx_wait_const);
+        TPD_DEBUG("TX Wait Const Multi = %d\n",core_mp->nodp.tx_wait_const_multi);
+        TPD_DEBUG("TP to DP = %d\n",core_mp->nodp.tp_to_dp);
+        TPD_DEBUG("Phase ADC = %d\n",core_mp->nodp.phase_adc);
+        TPD_DEBUG("R2D PW = %d\n",core_mp->nodp.r2d_pw);
+        TPD_DEBUG("RST PW = %d\n",core_mp->nodp.rst_pw);
+        TPD_DEBUG("RST PW Back = %d\n",core_mp->nodp.rst_pw_back);
+        TPD_DEBUG("DAC TD = %d\n",core_mp->nodp.dac_td);
+        TPD_DEBUG("QSH PW = %d\n",core_mp->nodp.qsh_pw);
+        TPD_DEBUG("QSH TD = %d\n",core_mp->nodp.qsh_td);
+        TPD_DEBUG("Drop NODP Num = %d\n",core_mp->nodp.drop_nodp);
     }
     mp_calc_nodp(core_mp->nodp.isLongV);
 
@@ -756,7 +756,7 @@ static int mp_cdc_get_pv5_4_command(uint8_t *cmd, int len, int index)
 
     ret = core_parser_get_int_data("PV5_4 Command", key, str);
     if (ret < 0) {
-        TPD_INFO("Failed to parse PV54 command, ret = %d\n",ret);
+        TPD_DEBUG("Failed to parse PV54 command, ret = %d\n",ret);
         goto out;
     }
 
@@ -819,7 +819,7 @@ static int core_config_check_data_ready(void)
     }
 
     if (res < 0)
-        TPD_INFO("Check busy timeout !!\n");
+        TPD_DEBUG("Check busy timeout !!\n");
 
     return res;
 }
@@ -841,7 +841,7 @@ static int allnode_mutual_cdc_data(int index)
     TPD_DEBUG("core_mp->frame_len = %d\n", core_mp->frame_len);
 
     if (len <= 2) {
-        TPD_INFO("Length is invalid\n");
+        TPD_DEBUG("Length is invalid\n");
         res = -1;
         goto out;
     }
@@ -856,7 +856,7 @@ static int allnode_mutual_cdc_data(int index)
     ipd->Mp_test_data_ready = false;
     res = core_write(core_config->slave_i2c_addr, cmd, protocol->cdc_len);
     if (res < 0) {
-        TPD_INFO("I2C Write Error while initialising cdc\n");
+        TPD_DEBUG("I2C Write Error while initialising cdc\n");
         goto out;
     }
 
@@ -871,7 +871,7 @@ static int allnode_mutual_cdc_data(int index)
     }
 
     if (res < 0) {
-        TPD_INFO("Check busy timeout !\n");
+        TPD_DEBUG("Check busy timeout !\n");
         res = -1;
     }
 
@@ -881,7 +881,7 @@ static int allnode_mutual_cdc_data(int index)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
@@ -889,7 +889,7 @@ static int allnode_mutual_cdc_data(int index)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
@@ -898,14 +898,14 @@ static int allnode_mutual_cdc_data(int index)
     /* Allocate a buffer for the original */
     ori = kcalloc(len, sizeof(uint8_t), GFP_KERNEL);
     if (ERR_ALLOC_MEM(ori)) {
-        TPD_INFO("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
+        TPD_DEBUG("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
         goto out;
     }
 
     /* Get original frame(cdc) data */
     res = core_read(core_config->slave_i2c_addr, ori, len);
     if (res < 0) {
-        TPD_INFO("I2C Read Error while getting original cdc data\n");
+        TPD_DEBUG("I2C Read Error while getting original cdc data\n");
         goto out;
     }
 
@@ -914,7 +914,7 @@ static int allnode_mutual_cdc_data(int index)
     if (frame_buf == NULL) {
         frame_buf = kcalloc(core_mp->frame_len, sizeof(int32_t), GFP_KERNEL);
         if (ERR_ALLOC_MEM(frame_buf)) {
-            TPD_INFO("Failed to allocate FrameBuffer mem (%ld)\n", PTR_ERR(frame_buf));
+            TPD_DEBUG("Failed to allocate FrameBuffer mem (%ld)\n", PTR_ERR(frame_buf));
             goto out;
         }
     } else {
@@ -1247,7 +1247,7 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
     TPD_DEBUG("core_mp->frame_len = %d, mode= %d\n", core_mp->frame_len, mode);
 
     if (len <= 2) {
-        TPD_INFO("Length is invalid\n");
+        TPD_DEBUG("Length is invalid\n");
         res = -1;
         goto out;
     }
@@ -1255,7 +1255,7 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
     /* CDC init. Read command from ini file */
     res = core_parser_get_int_data("PV5_4 Command", key[mode], str);
     if (res < 0) {
-        TPD_INFO("Failed to parse PV54 command, res = %d\n",res);
+        TPD_DEBUG("Failed to parse PV54 command, res = %d\n",res);
         goto out;
     }
 
@@ -1267,12 +1267,12 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
     ipd->Mp_test_data_ready = false;
     res = core_write(core_config->slave_i2c_addr, cmd, protocol->cdc_len);
     if (res < 0) {
-        TPD_INFO("I2C Write Error while initialising cdc\n");
+        TPD_DEBUG("I2C Write Error while initialising cdc\n");
         goto out;
     }
 
     /* Check busy */
-    TPD_INFO("Check busy method = %d\n",core_mp->busy_cdc);
+    TPD_DEBUG("Check busy method = %d\n",core_mp->busy_cdc);
     if (core_mp->busy_cdc == POLL_CHECK) {
         res = core_config_check_cdc_busy(50);
     } else if (core_mp->busy_cdc == INT_CHECK) {
@@ -1282,7 +1282,7 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
     }
 
     if (res < 0) {
-        TPD_INFO("Check busy timeout !\n");
+        TPD_DEBUG("Check busy timeout !\n");
         res = -1;
     }
 
@@ -1292,7 +1292,7 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
 
     res = core_write(core_config->slave_i2c_addr, cmd, 2);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
@@ -1300,7 +1300,7 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
 
     res = core_write(core_config->slave_i2c_addr, &cmd[1], 1);
     if (res < 0) {
-        TPD_INFO("I2C Write Error\n");
+        TPD_DEBUG("I2C Write Error\n");
         goto out;
     }
 
@@ -1309,14 +1309,14 @@ int allnode_open_cdc_data(int mode, int *buf, int *dac)
     /* Allocate a buffer for the original */
     ori = kcalloc(len, sizeof(uint8_t), GFP_KERNEL);
     if (ERR_ALLOC_MEM(ori)) {
-        TPD_INFO("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
+        TPD_DEBUG("Failed to allocate ori mem (%ld)\n", PTR_ERR(ori));
         goto out;
     }
 
     /* Get original frame(cdc) data */
     res = core_read(core_config->slave_i2c_addr, ori, len);
     if (res < 0) {
-        TPD_INFO("I2C Read Error while getting original cdc data\n");
+        TPD_DEBUG("I2C Read Error while getting original cdc data\n");
         goto out;
     }
 
@@ -1381,7 +1381,7 @@ static int open_test_sp(int index)
      * as 1, so we just help them to set it up.
      */
     if (tItems[index].frame_count <= 0) {
-        TPD_INFO("Frame count is zero, which is at least set as 1\n");
+        TPD_DEBUG("Frame count is zero, which is at least set as 1\n");
         tItems[index].frame_count = 1;
     }
 
@@ -1395,14 +1395,14 @@ static int open_test_sp(int index)
         frame1_cbk200 = vmalloc(core_mp->frame_len * sizeof(int32_t));
 
         if (ERR_ALLOC_MEM(frame1_cbk700) || ERR_ALLOC_MEM(frame1_cbk250) || ERR_ALLOC_MEM(frame1_cbk200)){
-            TPD_INFO("Failed to allocate cbk buffer\n");
+            TPD_DEBUG("Failed to allocate cbk buffer\n");
             return -ENOMEM;
         }
     }
 
     tItems[index].node_type = kcalloc(core_mp->frame_len, sizeof(int32_t), GFP_KERNEL);
     if (ERR_ALLOC_MEM(tItems[index].node_type)){
-        TPD_INFO("Failed to allocate node_type FRAME buffer\n");
+        TPD_DEBUG("Failed to allocate node_type FRAME buffer\n");
         return -ENOMEM;
     }
 
@@ -1441,7 +1441,7 @@ static int open_test_sp(int index)
         full_open_rate = katoi(str);
 
     if (res < 0) {
-        TPD_INFO("Failed to get parameters from ini file\n");
+        TPD_DEBUG("Failed to get parameters from ini file\n");
         goto out;
     }
 
@@ -1461,7 +1461,7 @@ static int open_test_sp(int index)
             ERR_ALLOC_MEM(open[i].cbk_200 ) || ERR_ALLOC_MEM(open[i].charg_rate ) ||
             ERR_ALLOC_MEM(open[i].full_Open ) || ERR_ALLOC_MEM(open[i].dac ) ||
             ERR_ALLOC_MEM(open[i].cdc )){
-                TPD_INFO("Failed to allocate open test buffer\n");
+                TPD_DEBUG("Failed to allocate open test buffer\n");
                 goto out;
         }
     }
@@ -1469,22 +1469,22 @@ static int open_test_sp(int index)
     for (i = 0; i < tItems[index].frame_count; i++) {
         res = allnode_open_cdc_data(0, open[i].dac, open[i].dac);
         if (res < 0) {
-            TPD_INFO("Failed to get Open SP DAC data, %d\n", res);
+            TPD_DEBUG("Failed to get Open SP DAC data, %d\n", res);
             goto out;
         }
         res = allnode_open_cdc_data(1, open[i].cbk_700, open[i].dac);
         if (res < 0) {
-            TPD_INFO("Failed to get Open SP Raw1 data, %d\n", res);
+            TPD_DEBUG("Failed to get Open SP Raw1 data, %d\n", res);
             goto out;
         }
         res = allnode_open_cdc_data(2, open[i].cbk_250, open[i].dac);
         if (res < 0) {
-            TPD_INFO("Failed to get Open SP Raw2 data, %d\n", res);
+            TPD_DEBUG("Failed to get Open SP Raw2 data, %d\n", res);
             goto out;
         }
         res = allnode_open_cdc_data(3, open[i].cbk_200, open[i].dac);
         if (res < 0) {
-            TPD_INFO("Failed to get Open SP Raw3 data, %d\n", res);
+            TPD_DEBUG("Failed to get Open SP Raw3 data, %d\n", res);
             goto out;
         }
         addr = 0;
@@ -1576,7 +1576,7 @@ int codeToOhm(int32_t Code)
 
     if(Code == 0)
     {
-        TPD_INFO("code is invalid\n");
+        TPD_DEBUG("code is invalid\n");
     }
     else
     {
@@ -1621,7 +1621,7 @@ static int mutual_test(int index)
      * as 1, so we just help them to set it up.
      */
     if (tItems[index].frame_count <= 0) {
-        TPD_INFO("Frame count is zero, which is at least set as 1\n");
+        TPD_DEBUG("Frame count is zero, which is at least set as 1\n");
         tItems[index].frame_count = 1;
     }
 
@@ -1659,7 +1659,7 @@ static int mutual_test(int index)
     for (i = 0; i < get_frame_cont; i++) {
         res = allnode_mutual_cdc_data(index);
         if (res < 0) {
-            TPD_INFO("Failed to initialise CDC data, %d\n", res);
+            TPD_DEBUG("Failed to initialise CDC data, %d\n", res);
             goto out;
         }
         switch (tItems[index].catalog) {
@@ -1701,7 +1701,7 @@ static int key_test(int index)
         tItems[index].name, tItems[index].cmd, tItems[index].frame_count);
 
     if (tItems[index].frame_count == 0) {
-        TPD_INFO("Frame count is zero, which at least sets as 1\n");
+        TPD_DEBUG("Frame count is zero, which at least sets as 1\n");
         res = -EINVAL;
         goto out;
     }
@@ -1717,7 +1717,7 @@ static int key_test(int index)
     for (i = 0; i < tItems[index].frame_count; i++) {
         res = allnode_key_cdc_data(index);
         if (res < 0) {
-            TPD_INFO("Failed to initialise CDC data, %d\n", res);
+            TPD_DEBUG("Failed to initialise CDC data, %d\n", res);
             goto out;
         }
 
@@ -1733,13 +1733,13 @@ out:
 
 static int self_test(int index)
 {
-    TPD_INFO("TDDI has no self to be tested currently\n");
+    TPD_DEBUG("TDDI has no self to be tested currently\n");
     return -1;
 }
 
 static int st_test(int index)
 {
-    TPD_INFO("ST Test is not supported by the driver\n");
+    TPD_DEBUG("ST Test is not supported by the driver\n");
     return -1;
 }
 
@@ -1762,14 +1762,14 @@ int mp_test_data_sort_average(int32_t *oringin_data,int index, int32_t *avg_resu
 
 
     if (ERR_ALLOC_MEM(oringin_data)){
-        TPD_INFO("Input wrong adress\n");
+        TPD_DEBUG("Input wrong adress\n");
             return -ENOMEM;
     }
 
     u32data_buff = kcalloc(core_mp->frame_len * tItems[index].frame_count, sizeof(int32_t), GFP_KERNEL);
     u32sum_raw_data = kcalloc(core_mp->frame_len, sizeof(int32_t), GFP_KERNEL);
     if (ERR_ALLOC_MEM(u32sum_raw_data) || (ERR_ALLOC_MEM(u32data_buff))){
-        TPD_INFO("Failed to allocate u32sum_raw_data FRAME buffer\n");
+        TPD_DEBUG("Failed to allocate u32sum_raw_data FRAME buffer\n");
         return -ENOMEM;
     }
 
@@ -1855,7 +1855,7 @@ int core_mp_compare_retry_cdc_result(int i)
     max_threshold = vmalloc(core_mp->frame_len * sizeof(int32_t));
     min_threshold = vmalloc(core_mp->frame_len * sizeof(int32_t));
     if (ERR_ALLOC_MEM(max_threshold) || ERR_ALLOC_MEM(min_threshold)) {
-        TPD_INFO("Failed to allocate threshold FRAME buffer\n");
+        TPD_DEBUG("Failed to allocate threshold FRAME buffer\n");
         test_result = MP_FAIL;
         goto fail_open;
     }
@@ -1864,7 +1864,7 @@ int core_mp_compare_retry_cdc_result(int i)
     if (tItems[i].catalog == TX_RX_DELTA) {
 
         if (ERR_ALLOC_MEM(core_mp->rx_delta_buf) || ERR_ALLOC_MEM(core_mp->tx_delta_buf)) {
-            TPD_INFO("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
+            TPD_DEBUG("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
             test_result = MP_FAIL;
             goto fail_open;
         }
@@ -1885,7 +1885,7 @@ int core_mp_compare_retry_cdc_result(int i)
 
         if (ERR_ALLOC_MEM(tItems[i].buf) || ERR_ALLOC_MEM(tItems[i].max_buf) ||
                 ERR_ALLOC_MEM(tItems[i].min_buf) || ERR_ALLOC_MEM(tItems[i].result_buf)) {
-            TPD_INFO("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
+            TPD_DEBUG("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
             test_result = MP_FAIL;
             goto fail_open;
         }
@@ -1926,7 +1926,7 @@ void core_mp_retry(int index)
     core_config_ice_mode_enable();
 
     if (core_config_set_watch_dog(false) < 0) {
-        TPD_INFO("Failed to disable watch dog\n");
+        TPD_DEBUG("Failed to disable watch dog\n");
     }
 
     core_config_ic_reset();
@@ -1965,14 +1965,14 @@ void core_mp_show_result(void)
 
     csv = vmalloc(CSV_FILE_SIZE);
     if (ERR_ALLOC_MEM(csv)) {
-        TPD_INFO("Failed to allocate CSV mem\n");
+        TPD_DEBUG("Failed to allocate CSV mem\n");
         goto fail_open;
     }
 
     max_threshold = vmalloc(core_mp->frame_len * sizeof(int32_t));
     min_threshold = vmalloc(core_mp->frame_len * sizeof(int32_t));
     if (ERR_ALLOC_MEM(max_threshold) || ERR_ALLOC_MEM(min_threshold)) {
-        TPD_INFO("Failed to allocate threshold FRAME buffer\n");
+        TPD_DEBUG("Failed to allocate threshold FRAME buffer\n");
         goto fail_open;
     }
     /* header must has 19 line*/
@@ -2018,21 +2018,21 @@ void core_mp_show_result(void)
 
         if (tItems[i].item_result == MP_PASS)
         {
-            TPD_INFO("\n\n[%s],OK \n", tItems[i].desp);
+            TPD_DEBUG("\n\n[%s],OK \n", tItems[i].desp);
             csv_len += sprintf(csv + csv_len, "\n\n[%s],OK\n", tItems[i].desp);
         }else{
-            TPD_INFO("\n\n[%s],NG \n", tItems[i].desp);
+            TPD_DEBUG("\n\n[%s],NG \n", tItems[i].desp);
             csv_len += sprintf(csv + csv_len, "\n\n[%s],NG\n", tItems[i].desp);
         }
 
-        TPD_INFO("Frame count = %d\n",tItems[i].frame_count);
+        TPD_DEBUG("Frame count = %d\n",tItems[i].frame_count);
         csv_len += sprintf(csv + csv_len, "Frame count = %d\n", tItems[i].frame_count);
 
         if(tItems[i].trimmed_mean && tItems[i].catalog != PEAK_TO_PEAK_TEST) {
-            TPD_INFO("Lowest Percentage = %d\n",tItems[i].lowest_percentage);
+            TPD_DEBUG("Lowest Percentage = %d\n",tItems[i].lowest_percentage);
             csv_len += sprintf(csv + csv_len, "Lowest Percentage = %d\n", tItems[i].lowest_percentage);
 
-            TPD_INFO("Highest Percentage = %d\n",tItems[i].highest_percentage);
+            TPD_DEBUG("Highest Percentage = %d\n",tItems[i].highest_percentage);
             csv_len += sprintf(csv + csv_len, "Highest Percentage = %d\n", tItems[i].highest_percentage);
         }
 
@@ -2052,10 +2052,10 @@ void core_mp_show_result(void)
                 min_threshold[j] = tItems[i].min;
             }
 
-            TPD_INFO("Max = %d\n",tItems[i].max);
+            TPD_DEBUG("Max = %d\n",tItems[i].max);
             csv_len += sprintf(csv + csv_len, "Max = %d\n", tItems[i].max);
 
-            TPD_INFO("Min = %d\n",tItems[i].min);
+            TPD_DEBUG("Min = %d\n",tItems[i].min);
             csv_len += sprintf(csv + csv_len, "Min = %d\n", tItems[i].min);
         }
         if (strcmp(tItems[i].name, "open_integration_sp") == 0)
@@ -2070,13 +2070,13 @@ void core_mp_show_result(void)
 
         if (tItems[i].catalog == TX_RX_DELTA) {
             if (ERR_ALLOC_MEM(core_mp->rx_delta_buf) || ERR_ALLOC_MEM(core_mp->tx_delta_buf)) {
-                TPD_INFO("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
+                TPD_DEBUG("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
                 continue;
             }
         } else {
             if (ERR_ALLOC_MEM(tItems[i].buf) || ERR_ALLOC_MEM(tItems[i].max_buf) ||
                     ERR_ALLOC_MEM(tItems[i].min_buf)) {
-                TPD_INFO("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
+                TPD_DEBUG("This test item (%s) has no data inside its buffer\n", tItems[i].desp);
                 continue;
             }
         }
@@ -2206,20 +2206,20 @@ void core_mp_show_result(void)
         sprintf(csv_name, "%s/%s%s", CSV_PATH, ret_pass_name, data_buf);
     }
 
-    TPD_INFO("Open CSV : %s\n", csv_name);
+    TPD_DEBUG("Open CSV : %s\n", csv_name);
 
     if (f == NULL)
         f = filp_open(csv_name, O_WRONLY | O_CREAT | O_TRUNC, 644);
 
     if (ERR_ALLOC_MEM(f)) {
-        TPD_INFO("Failed to open CSV file");
+        TPD_DEBUG("Failed to open CSV file");
         goto fail_open;
     }
 
-    TPD_INFO("Open CSV succeed, its length = %d\n ", csv_len);
+    TPD_DEBUG("Open CSV succeed, its length = %d\n ", csv_len);
 
     if (csv_len >= CSV_FILE_SIZE) {
-        TPD_INFO("The length saved to CSV is too long !\n");
+        TPD_DEBUG("The length saved to CSV is too long !\n");
         goto fail_open;
     }
 
@@ -2230,7 +2230,7 @@ void core_mp_show_result(void)
     set_fs(fs);
     filp_close(f, NULL);
 
-    TPD_INFO("Writing Data into CSV succeed\n");
+    TPD_DEBUG("Writing Data into CSV succeed\n");
 
 fail_open:
     ipio_vfree((void **)&csv);
@@ -2257,7 +2257,7 @@ void core_mp_run_test(char *item, bool ini)
     if (item == NULL || strncmp(item, " ", strlen(item)) == 0 || core_mp->frame_len == 0 ) {
         tItems[i].result = "FAIL";
         core_mp->final_result = MP_FAIL;
-        TPD_INFO("Invaild string or length\n");
+        TPD_DEBUG("Invaild string or length\n");
         return;
     }
 
@@ -2315,7 +2315,7 @@ void core_mp_run_test(char *item, bool ini)
                         core_mp_ctrl_lcm_status(false);
                 }
 
-                TPD_INFO("Running Test Item : %s\n", tItems[i].desp);
+                TPD_DEBUG("Running Test Item : %s\n", tItems[i].desp);
                 tItems[i].do_test(i);
                 tItems[i].test_count ++;
                 test_result = core_mp_compare_retry_cdc_result(i);
@@ -2324,7 +2324,7 @@ void core_mp_run_test(char *item, bool ini)
                 if (core_mp->retry && (test_result == MP_FAIL)) {
                     for(count = 0; count < RETRY_COUNT; count++)
                     {
-                        TPD_INFO("retry = %d, item = %s\n", (count+1), tItems[i].desp);
+                        TPD_DEBUG("retry = %d, item = %s\n", (count+1), tItems[i].desp);
                         core_mp_retry(i);
                         test_result = core_mp_compare_retry_cdc_result(i);
                         if(test_result == MP_PASS)
@@ -2354,7 +2354,7 @@ int ilitek_osc_check(void)
 
     res = core_parser_get_int_data(item, "Enable", str);
     if (res <= 0) {
-        TPD_INFO("Failed to get osc_test enable data, %d\n", res);
+        TPD_DEBUG("Failed to get osc_test enable data, %d\n", res);
         core_mp->osc_test = 1;
     }
     else {
@@ -2362,7 +2362,7 @@ int ilitek_osc_check(void)
     }
     res = core_parser_get_int_data(item, "Max", str);
     if (res <= 0) {
-        TPD_INFO("Failed to get osc_threshold_max data, %d\n", res);
+        TPD_DEBUG("Failed to get osc_threshold_max data, %d\n", res);
         core_mp->osc_threshold_max = 20;
     }
     else {
@@ -2370,7 +2370,7 @@ int ilitek_osc_check(void)
     }
     res = core_parser_get_int_data(item, "Min", str);
     if (res <= 0) {
-        TPD_INFO("Failed to get osc_threshold_min data, %d\n", res);
+        TPD_DEBUG("Failed to get osc_threshold_min data, %d\n", res);
         core_mp->osc_threshold_min = -25;
     }
     else {
@@ -2386,18 +2386,18 @@ int ilitek_osc_check(void)
         test_cmd[2] = 0x00;
         res = core_write(core_config->slave_i2c_addr, test_cmd, 3);
         if (res < 0) {
-            TPD_INFO("Failed to write data, %d\n", res);
+            TPD_DEBUG("Failed to write data, %d\n", res);
             mdelay(20);
             continue;
         }
         res = core_read(core_config->slave_i2c_addr, test_cmd, 5);
         if (res < 0) {
-            TPD_INFO("Failed to read tp set ddi trim code %d\n", res);
+            TPD_DEBUG("Failed to read tp set ddi trim code %d\n", res);
             mdelay(20);
             continue;
         }
         else {
-            TPD_INFO("read osc value 0x%X 0x%X 0x%X 0x%X\n", test_cmd[0], test_cmd[1], test_cmd[2], test_cmd[3]);
+            TPD_DEBUG("read osc value 0x%X 0x%X 0x%X 0x%X\n", test_cmd[0], test_cmd[1], test_cmd[2], test_cmd[3]);
             core_mp->osc_org_data[0] = test_cmd[0];
             core_mp->osc_org_data[1] = test_cmd[1];
             core_mp->osc_org_data[2] = test_cmd[2];
@@ -2411,21 +2411,21 @@ int ilitek_osc_check(void)
             {
                 core_mp->osc_offset = ((test_cmd[2] << 8) + test_cmd[3]);
             }
-            TPD_INFO("osc offset org value is %d,  trim count is %d", core_mp->osc_offset, ((test_cmd[0] << 8) + test_cmd[1]));
+            TPD_DEBUG("osc offset org value is %d,  trim count is %d", core_mp->osc_offset, ((test_cmd[0] << 8) + test_cmd[1]));
             break;
         }
     }
     if (i >= 3) {
-        TPD_INFO("Failed to read OSC value, %d\n", res);
+        TPD_DEBUG("Failed to read OSC value, %d\n", res);
         res = -1;
     }
     else {
         if (core_mp->osc_offset > core_mp->osc_threshold_max || core_mp->osc_offset < core_mp->osc_threshold_min) {
-            TPD_INFO("OSC check failed, osc_offset = %d osc_threshold_max = %d osc_threshold_min = %d\n", core_mp->osc_offset, core_mp->osc_threshold_max, core_mp->osc_threshold_min);
+            TPD_DEBUG("OSC check failed, osc_offset = %d osc_threshold_max = %d osc_threshold_min = %d\n", core_mp->osc_offset, core_mp->osc_threshold_max, core_mp->osc_threshold_min);
             core_mp->osc_result = MP_FAIL;
         }
         else {
-            TPD_INFO("OSC check pass, osc_offset = %d osc_threshold_max = %d osc_threshold_min = %d\n", core_mp->osc_offset, core_mp->osc_threshold_max, core_mp->osc_threshold_min);
+            TPD_DEBUG("OSC check pass, osc_offset = %d osc_threshold_max = %d osc_threshold_min = %d\n", core_mp->osc_offset, core_mp->osc_threshold_max, core_mp->osc_threshold_min);
             core_mp->osc_result = MP_PASS;
         }
         res = 0;
@@ -2446,7 +2446,7 @@ int ilitek_mp_test(void *chip_data, struct seq_file *s)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
 
@@ -2456,17 +2456,17 @@ int ilitek_mp_test(void *chip_data, struct seq_file *s)
 
     ilitek_ini_file_data = (struct ini_file_data *)vmalloc(sizeof(struct ini_file_data) * PARSER_MAX_KEY_NUM);
     if (ERR_ALLOC_MEM(ilitek_ini_file_data)) {
-        TPD_INFO("Failed to malloc ilitek_ini_file_data\n");
+        TPD_DEBUG("Failed to malloc ilitek_ini_file_data\n");
         goto out;
     }
     if (core_parser_path(chip_info, chip_info->test_limit_name) < 0) {
-        TPD_INFO("Failed to parsing INI file\n");
+        TPD_DEBUG("Failed to parsing INI file\n");
         goto out;
     }
 
     /* Init MP structure */
     if(core_mp_init() < 0) {
-        TPD_INFO("Failed to init mp\n");
+        TPD_DEBUG("Failed to init mp\n");
         goto out;
     }
     /* Start to run MP test */
@@ -2488,7 +2488,7 @@ int ilitek_mp_test(void *chip_data, struct seq_file *s)
      */
     if (protocol->major >= 5 && protocol->mid >= 4) {
         if (core_mp_calc_timing_nodp() < 0) {
-            TPD_INFO("Can't get timing parameters\n");
+            TPD_DEBUG("Can't get timing parameters\n");
             //goto out;
         }
     }
@@ -2512,7 +2512,7 @@ int ilitek_mp_test(void *chip_data, struct seq_file *s)
     core_config_ice_mode_enable();
 
     if (core_config_set_watch_dog(false) < 0) {
-        TPD_INFO("Failed to disable watch dog\n");
+        TPD_DEBUG("Failed to disable watch dog\n");
     }
 
     core_config_ic_reset();
@@ -2566,7 +2566,7 @@ out:
         vfree(ilitek_ini_file_data);
         ilitek_ini_file_data = NULL;
     }
-    TPD_INFO("MP Test DONE\n");
+    TPD_DEBUG("MP Test DONE\n");
     mutex_lock(&chip_info->plat_mutex);
     chip_info->esd_check_enabled = true;
     mutex_unlock(&chip_info->plat_mutex);
@@ -2582,7 +2582,7 @@ int ilitek_mp_black_screen_test(void *chip_data, char *message)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
 
@@ -2593,17 +2593,17 @@ int ilitek_mp_black_screen_test(void *chip_data, char *message)
     mutex_unlock(&chip_info->plat_mutex);
     ilitek_ini_file_data = (struct ini_file_data *)vmalloc(sizeof(struct ini_file_data) * PARSER_MAX_KEY_NUM);
     if (ERR_ALLOC_MEM(ilitek_ini_file_data)) {
-        TPD_INFO("Failed to malloc ilitek_ini_file_data\n");
+        TPD_DEBUG("Failed to malloc ilitek_ini_file_data\n");
         goto out;
     }
     if (core_parser_path(chip_info, chip_info->test_limit_name) < 0) {
-        TPD_INFO("Failed to parsing INI file\n");
+        TPD_DEBUG("Failed to parsing INI file\n");
         goto out;
     }
 
     /* Init MP structure */
     if(core_mp_init() < 0) {
-        TPD_INFO("Failed to init mp\n");
+        TPD_DEBUG("Failed to init mp\n");
         goto out;
     }
     mutex_lock(&chip_info->plat_mutex);
@@ -2666,7 +2666,7 @@ out:
         vfree(ilitek_ini_file_data);
         ilitek_ini_file_data = NULL;
     }
-    TPD_INFO("MP Test DONE\n");
+    TPD_DEBUG("MP Test DONE\n");
     mutex_lock(&chip_info->plat_mutex);
     chip_info->esd_check_enabled = true;
     mutex_unlock(&chip_info->plat_mutex);
@@ -2678,7 +2678,7 @@ void core_mp_test_free(void)
 {
     int i = 0;
 
-    TPD_INFO("Free all allocated mem\n");
+    TPD_DEBUG("Free all allocated mem\n");
 
     core_mp->final_result = MP_FAIL;
 
@@ -2823,7 +2823,7 @@ int core_mp_init(void)
         if (core_mp == NULL) {
             core_mp = kzalloc(sizeof(*core_mp), GFP_KERNEL);
             if (ERR_ALLOC_MEM(core_mp)) {
-                TPD_INFO("Failed to init core_mp, %ld\n", PTR_ERR(core_mp));
+                TPD_DEBUG("Failed to init core_mp, %ld\n", PTR_ERR(core_mp));
                 res = -ENOMEM;
                 goto out;
             }
@@ -2849,7 +2849,7 @@ int core_mp_init(void)
             mp_test_init_item();
         }
     } else {
-        TPD_INFO("Failed to allocate core_mp mem as did not find TP info\n");
+        TPD_DEBUG("Failed to allocate core_mp mem as did not find TP info\n");
         res = -ENOMEM;
     }
 
@@ -2936,21 +2936,21 @@ static int get_ini_phy_data(char *data, int fsize)
     char M_CFG_EQS = '=';
 
     if (data == NULL) {
-        TPD_INFO("INI data is NULL\n");
+        TPD_DEBUG("INI data is NULL\n");
         res = -EINVAL;
         goto out;
     }
 
     ini_buf = kzalloc((PARSER_MAX_CFG_BUF + 1) * sizeof(char), GFP_KERNEL);
     if (ERR_ALLOC_MEM(ini_buf)) {
-        TPD_INFO("Failed to allocate ini_buf memory, %ld\n", PTR_ERR(ini_buf));
+        TPD_DEBUG("Failed to allocate ini_buf memory, %ld\n", PTR_ERR(ini_buf));
         res = -ENOMEM;
         goto out;
     }
 
     tmpSectionName = kzalloc((PARSER_MAX_CFG_BUF + 1) * sizeof(char), GFP_KERNEL);
     if (ERR_ALLOC_MEM(tmpSectionName)) {
-        TPD_INFO("Failed to allocate tmpSectionName memory, %ld\n", PTR_ERR(tmpSectionName));
+        TPD_DEBUG("Failed to allocate tmpSectionName memory, %ld\n", PTR_ERR(tmpSectionName));
         res = -ENOMEM;
         goto out;
     }
@@ -2963,13 +2963,13 @@ static int get_ini_phy_data(char *data, int fsize)
         else
             fsize = temp-data;
     }
-    TPD_INFO("fsize = %d\n", fsize);
+    TPD_DEBUG("fsize = %d\n", fsize);
     while (true) {
         banchmark_flag = 0;
         empty_section = 0;
         nodetype_flag = 0;
         if (g_ini_items >= PARSER_MAX_KEY_NUM) {
-            TPD_INFO("MAX_KEY_NUM: Out of length\n");
+            TPD_DEBUG("MAX_KEY_NUM: Out of length\n");
             goto out;
         }
 
@@ -2978,7 +2978,7 @@ static int get_ini_phy_data(char *data, int fsize)
         //n = get_ini_phy_line(data + offset, ini_buf, PARSER_MAX_CFG_BUF);
         n = get_ini_phy_line(data + offset, ini_buf, ((offset + PARSER_MAX_CFG_BUF) >= fsize) ? (fsize - offset) : PARSER_MAX_CFG_BUF);
         if (n < 0) {
-            TPD_INFO("End of Line\n");
+            TPD_DEBUG("End of Line\n");
             goto out;
         }
 
@@ -2991,14 +2991,14 @@ static int get_ini_phy_data(char *data, int fsize)
 
         /* Get section names */
         if (n > 2 && ((ini_buf[0] == M_CFG_SSL && ini_buf[n - 1] != M_CFG_SSR))) {
-            TPD_INFO("Bad Section: %s\n", ini_buf);
+            TPD_DEBUG("Bad Section: %s\n", ini_buf);
             res = -EINVAL;
             goto out;
         } else {
             if (ini_buf[0] == M_CFG_SSL) {
                 ilitek_ini_file_data[g_ini_items].iSectionNameLen = n - 2;
                 if (ilitek_ini_file_data[g_ini_items].iSectionNameLen > PARSER_MAX_KEY_NAME_LEN) {
-                    TPD_INFO("MAX_KEY_NAME_LEN: Out Of Length\n");
+                    TPD_DEBUG("MAX_KEY_NAME_LEN: Out Of Length\n");
                     res = INI_ERR_OUT_OF_LINE;
                     goto out;
                 }
@@ -3062,7 +3062,7 @@ static int get_ini_phy_data(char *data, int fsize)
             ilitek_ini_file_data[g_ini_items].iKeyNameLen = isEqualSign;
             if (ilitek_ini_file_data[g_ini_items].iKeyNameLen > PARSER_MAX_KEY_NAME_LEN) {
                 /* ret = CFG_ERR_OUT_OF_LEN; */
-                TPD_INFO("MAX_KEY_NAME_LEN: Out Of Length\n");
+                TPD_DEBUG("MAX_KEY_NAME_LEN: Out Of Length\n");
                 res = INI_ERR_OUT_OF_LINE;
                 goto out;
             }
@@ -3075,7 +3075,7 @@ static int get_ini_phy_data(char *data, int fsize)
         /* Get a value assigned to a key */
 
         if (ilitek_ini_file_data[g_ini_items].iKeyValueLen > PARSER_MAX_KEY_VALUE_LEN) {
-            TPD_INFO("MAX_KEY_VALUE_LEN: Out Of Length\n");
+            TPD_DEBUG("MAX_KEY_VALUE_LEN: Out Of Length\n");
             res = INI_ERR_OUT_OF_LINE;
             goto out;
         }
@@ -3210,7 +3210,7 @@ void core_parser_benchmark(int32_t* max_ptr, int32_t* min_ptr, int8_t type, char
                     temp = katoi(str);
                     data[(count % 4)] = temp;
                     if ((count/4) >= (core_mp->frame_len)) {
-                        TPD_INFO("count/4 = %d\n", count/4);
+                        TPD_DEBUG("count/4 = %d\n", count/4);
                         break;
                     }
                     if ((count % 4) == 3) {
@@ -3254,7 +3254,7 @@ int core_parser_get_u8_array(char *key, uint8_t *buf)
             if(res == 0)
                 buf[conut] = s_to_long;
             else
-                TPD_INFO("convert string too long, res = %d\n", res);
+                TPD_DEBUG("convert string too long, res = %d\n", res);
             conut++;
         }
     }
@@ -3271,7 +3271,7 @@ int core_parser_get_int_data(char *section, char *keyname, char *rv)
     TPD_DEBUG("section = %s, keyname = %s\n",section,keyname);
 
     if (rv == NULL || section == NULL || keyname == NULL) {
-        TPD_INFO("Parameters are invalid\n");
+        TPD_DEBUG("Parameters are invalid\n");
         return -EINVAL;
     }
 
@@ -3293,21 +3293,21 @@ int core_parser_path(void *chip_data, char *path)
 	struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
     if(!chip_info) {
-        TPD_INFO("%s:chip_data is null\n", __func__);
+        TPD_DEBUG("%s:chip_data is null\n", __func__);
         return -EINVAL;
     }
 
-    TPD_INFO("path = %s\n", path);
+    TPD_DEBUG("path = %s\n", path);
 
     res = request_firmware(&fw, path, &(chip_info->spi->dev));
     if (res != 0) {
-        TPD_INFO("%s : request mp file failed! ret = %d\n", __func__, res);
+        TPD_DEBUG("%s : request mp file failed! ret = %d\n", __func__, res);
         goto out;
     }
 
-    TPD_INFO("fw->size = %d\n", (int)fw->size);
+    TPD_DEBUG("fw->size = %d\n", (int)fw->size);
     if (fw->size <= 0) {
-        TPD_INFO("The size of file is invaild\n");
+        TPD_DEBUG("The size of file is invaild\n");
         res = -EINVAL;
         goto out;
     }
@@ -3317,11 +3317,11 @@ int core_parser_path(void *chip_data, char *path)
 
     res = get_ini_phy_data((uint8_t *)fw->data, (int)fw->size);
     if (res < 0) {
-        TPD_INFO("Failed to get physical ini data, res = %d\n", res);
+        TPD_DEBUG("Failed to get physical ini data, res = %d\n", res);
         goto out;
     }
 
-    TPD_INFO("Parsing INI file doen\n");
+    TPD_DEBUG("Parsing INI file doen\n");
 
 out:
     if(fw != NULL) {

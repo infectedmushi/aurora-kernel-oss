@@ -249,7 +249,7 @@ void synaptics_print_limit_v1(struct seq_file *s, struct touchpanel_data *ts, co
     ph = (struct test_header *)(fw->data);
     prow = (uint16_t *)(fw->data + ph->array_limit_offset);
     prowcbc = (uint16_t *)(fw->data + ph->array_limitcbc_offset);
-    TPD_INFO("synaptics_test_limit_show:array_limit_offset = %x array_limitcbc_offset = %x \n",
+    TPD_DEBUG("synaptics_test_limit_show:array_limit_offset = %x array_limitcbc_offset = %x \n",
             ph->array_limit_offset, ph->array_limitcbc_offset);
     TPD_DEBUG("test begin:\n");
     seq_printf(s, "Without cbc:");
@@ -383,7 +383,7 @@ void synaptics_limit_read(struct seq_file *s, struct touchpanel_data *ts)
 
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "Request failed, Check the path %s\n",ts->panel_data.test_limit_name);
         return;
     }
@@ -472,14 +472,14 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
     fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif /*CONFIG_ARCH_HAS_SYSCALL_WRAPPER*/
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         set_fs(old_fs);
     }
 
     //step3:request test limit data from userspace
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         if (fd >= 0) {
 #ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
             ksys_close(fd);
@@ -718,7 +718,7 @@ static ssize_t proc_touchfilter_control_write(struct file *file, const char __us
 
     sscanf(buf, "%d", &temp);
     mutex_lock(&ts->mutex);
-    TPD_INFO("%s: value = %d\n", __func__, temp);
+    TPD_DEBUG("%s: value = %d\n", __func__, temp);
     syn_ops->set_touchfilter_state(ts->chip_data, temp);
     mutex_unlock(&ts->mutex);
 
@@ -743,34 +743,34 @@ int synaptics_create_proc(struct touchpanel_data *ts, struct synaptics_proc_oper
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &tp_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     // show RT251 interface
     prEntry_tmp = proc_create_data("RT251", 0666, ts->prEntry_debug_tp, &tp_RT251_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     // show RT76 interface
     prEntry_tmp = proc_create_data("RT76", 0666, ts->prEntry_debug_tp, &tp_RT76_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     prEntry_tmp = proc_create_data("DRT", 0666, ts->prEntry_debug_tp, &tp_DRT_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     if (ts->face_detect_support) {
         prEntry_tmp = proc_create_data("touch_filter", 0666, ts->prEntry_tp, &touch_filter_proc_fops, ts);
         if (prEntry_tmp == NULL) {
             ret = -ENOMEM;
-            TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+            TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
         }
     }
     return ret;

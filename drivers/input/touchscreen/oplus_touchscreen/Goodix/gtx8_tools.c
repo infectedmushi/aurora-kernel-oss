@@ -80,26 +80,26 @@ static int async_read(void __user *arg)
     length = i2c_msg_head[4] + (i2c_msg_head[5] << 8)
              + (i2c_msg_head[6] << 16) + (i2c_msg_head[7] << 24);
     if (length > GOODIX_TOOLS_MAX_DATA_LEN) {
-        TPD_INFO("%s: Invalied data length:%d\n", __func__, length);
+        TPD_DEBUG("%s: Invalied data length:%d\n", __func__, length);
         return -EFAULT;
     }
 
     databuf = kzalloc(length, GFP_KERNEL);
     if (!databuf) {
-        TPD_INFO("Alloc memory failed\n");
+        TPD_DEBUG("Alloc memory failed\n");
         return -ENOMEM;
     }
 
     if (touch_i2c_read_block(gtx8_tool_info.client, (u16)reg_addr, length, databuf) >= 0) {
         if (copy_to_user((u8 *)arg + I2C_MSG_HEAD_LEN, databuf, length)) {
             ret = -EFAULT;
-            TPD_INFO("Copy_to_user failed\n");
+            TPD_DEBUG("Copy_to_user failed\n");
         } else {
             ret = length;
         }
     } else {
         ret = -EBUSY;
-        TPD_INFO("Read i2c failed\n");
+        TPD_DEBUG("Read i2c failed\n");
     }
 
     if(databuf) {
@@ -122,7 +122,7 @@ static int async_write(void __user *arg)
 
     ret = copy_from_user(&i2c_msg_head, arg, I2C_MSG_HEAD_LEN);
     if (ret) {
-        TPD_INFO("Copy data from user failed\n");
+        TPD_DEBUG("Copy data from user failed\n");
         return -EFAULT;
     }
 
@@ -132,25 +132,25 @@ static int async_write(void __user *arg)
              + (i2c_msg_head[6] << 16) + (i2c_msg_head[7] << 24);
 
     if (length > GOODIX_TOOLS_MAX_DATA_LEN) {
-        TPD_INFO("%s: Invalied data length:%d\n", __func__, length);
+        TPD_DEBUG("%s: Invalied data length:%d\n", __func__, length);
         return -EFAULT;
     }
     databuf = kzalloc(length, GFP_KERNEL);
     if (!databuf) {
-        TPD_INFO("Alloc memory failed\n");
+        TPD_DEBUG("Alloc memory failed\n");
         return -ENOMEM;
     }
 
     ret = copy_from_user(databuf, (u8 *)arg + I2C_MSG_HEAD_LEN, length);
     if (ret) {
         ret = -EFAULT;
-        TPD_INFO("Copy data from user failed\n");
+        TPD_DEBUG("Copy data from user failed\n");
         goto err_out;
     }
 
     if (touch_i2c_write_block(gtx8_tool_info.client, (u16)reg_addr, length, databuf) < 0) {
         ret = -EBUSY;
-        TPD_INFO("Write data to device failed\n");
+        TPD_DEBUG("Write data to device failed\n");
     } else {
         ret = length;
     }
@@ -165,10 +165,10 @@ err_out:
 
 static int goodix_tools_open(struct inode *inode, struct file *filp)
 {
-    TPD_INFO("tools open\n");
+    TPD_DEBUG("tools open\n");
     if (gtx8_tool_info.devicecount > 0) {
         return -ERESTARTSYS;
-        TPD_INFO("tools open failed!");
+        TPD_DEBUG("tools open failed!");
     }
     gtx8_tool_info.devicecount++;
 
@@ -177,7 +177,7 @@ static int goodix_tools_open(struct inode *inode, struct file *filp)
 
 static int goodix_tools_release(struct inode *inode, struct file *filp)
 {
-    TPD_INFO("tools release\n");
+    TPD_DEBUG("tools release\n");
     gtx8_tool_info.devicecount--;
 
     return 0;
@@ -199,12 +199,12 @@ static long goodix_tools_ioctl(struct file *filp, unsigned int cmd,
     struct i2c_client *client = gtx8_tool_info.client;
 
     if (_IOC_TYPE(cmd) != GOODIX_TS_IOC_MAGIC) {
-        TPD_INFO("Bad magic num:%c\n", _IOC_TYPE(cmd));
+        TPD_DEBUG("Bad magic num:%c\n", _IOC_TYPE(cmd));
         return -ENOTTY;
     }
 
     if (_IOC_NR(cmd) > GOODIX_TS_IOC_MAXNR) {
-        TPD_INFO("Bad cmd num:%d > %d",
+        TPD_DEBUG("Bad cmd num:%d > %d",
                  _IOC_NR(cmd), GOODIX_TS_IOC_MAXNR);
         return -ENOTTY;
     }
@@ -216,13 +216,13 @@ static long goodix_tools_ioctl(struct file *filp, unsigned int cmd,
         } else {
             disable_irq_nosync(client->irq);
         }
-        TPD_INFO("set irq mode: %s\n", arg ? "enable" : "disable");
+        TPD_DEBUG("set irq mode: %s\n", arg ? "enable" : "disable");
         ret = 0;
         break;
     case GTP_ESD_ENABLE:
         ret = 0;
         if(!gtx8_tool_info.esd_handle_support) {
-            TPD_INFO("Unsupport esd operation\n");
+            TPD_DEBUG("Unsupport esd operation\n");
         } else {
             esd_handle_switch(gtx8_tool_info.esd_info, !!arg);
             TPD_DEBUG("set esd mode: %s\n", arg ? "enable" : "disable");
@@ -235,7 +235,7 @@ static long goodix_tools_ioctl(struct file *filp, unsigned int cmd,
     case GTP_ASYNC_READ:
         ret = async_read((void __user *)arg);
         if (ret < 0)
-            TPD_INFO("Async data read failed\n");
+            TPD_DEBUG("Async data read failed\n");
         break;
     case GTP_SYNC_READ:
         gt8x_rawdiff_mode = 1;
@@ -243,7 +243,7 @@ static long goodix_tools_ioctl(struct file *filp, unsigned int cmd,
     case GTP_ASYNC_WRITE:
         ret = async_write((void __user *)arg);
         if (ret < 0)
-            TPD_INFO("Async data write failed\n");
+            TPD_DEBUG("Async data write failed\n");
         break;
     case GTP_CLEAR_RAWDATA_FLAG:
         gt8x_rawdiff_mode = 0;
@@ -251,7 +251,7 @@ static long goodix_tools_ioctl(struct file *filp, unsigned int cmd,
         break;
 
     default:
-        TPD_INFO("Invalid cmd\n");
+        TPD_DEBUG("Invalid cmd\n");
         ret = -ENOTTY;
         break;
     }
@@ -293,7 +293,7 @@ int gtx8_init_tool_node(struct touchpanel_data *ts)
 
     ret = misc_register(&goodix_tools_miscdev);
     if (ret) {
-        TPD_INFO("Debug tools miscdev register failed\n");
+        TPD_DEBUG("Debug tools miscdev register failed\n");
     }
     gtx8_tool_info.devicecount = 0;
     gtx8_tool_info.is_suspended = &ts->is_suspended;
@@ -310,5 +310,5 @@ int gtx8_init_tool_node(struct touchpanel_data *ts)
 void gtx8_deinit_tool_node(void)
 {
     misc_deregister(&goodix_tools_miscdev);
-    TPD_INFO("Goodix tools miscdev exit\n");
+    TPD_DEBUG("Goodix tools miscdev exit\n");
 }

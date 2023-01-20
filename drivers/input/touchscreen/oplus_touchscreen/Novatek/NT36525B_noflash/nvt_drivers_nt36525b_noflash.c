@@ -169,7 +169,7 @@ static int32_t nvt_write_addr(struct spi_device *client, uint32_t addr, uint8_t 
     buf[2] = (addr >> 7) & 0xFF;
     ret = CTP_SPI_WRITE(client, buf, 3);
     if (ret) {
-        TPD_INFO("set page 0x%06X failed, ret = %d\n", addr, ret);
+        TPD_DEBUG("set page 0x%06X failed, ret = %d\n", addr, ret);
         return ret;
     }
 
@@ -178,7 +178,7 @@ static int32_t nvt_write_addr(struct spi_device *client, uint32_t addr, uint8_t 
     buf[1] = data;
     ret = CTP_SPI_WRITE(client, buf, 2);
     if (ret) {
-        TPD_INFO("write data to 0x%06X failed, ret = %d\n", addr, ret);
+        TPD_DEBUG("write data to 0x%06X failed, ret = %d\n", addr, ret);
         return ret;
     }
 
@@ -195,7 +195,7 @@ return:
 static void nvt_bootloader_reset_noflash(struct chip_data_nt36525b *chip_info)
 {
     //---reset cmds to SWRST_N8_ADDR---
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     nvt_write_addr(chip_info->s_client, SWRST_N8_ADDR, 0x69);
 
     mdelay(5);  //wait tBRST2FR after Bootload RST
@@ -241,7 +241,7 @@ static uint8_t nvt_wdt_fw_recovery(struct chip_data_nt36525b *chip_info, uint8_t
     }
 
     if (chip_info->recovery_cnt) {
-        TPD_INFO("recovery_cnt is %d (0x%02X)\n", chip_info->recovery_cnt, point_data[1]);
+        TPD_DEBUG("recovery_cnt is %d (0x%02X)\n", chip_info->recovery_cnt, point_data[1]);
     }
 
     return recovery_enable;
@@ -296,7 +296,7 @@ static int nvt_esd_handle(void *chip_data)
     unsigned int timer = jiffies_to_msecs(jiffies - chip_info->irq_timer);
 
     if ((timer > NVT_TOUCH_ESD_CHECK_PERIOD) && chip_info->esd_check_enabled) {
-        TPD_INFO("do ESD recovery, timer = %d, retry = %d\n", timer, chip_info->esd_retry);
+        TPD_DEBUG("do ESD recovery, timer = %d, retry = %d\n", timer, chip_info->esd_retry);
         /* do esd recovery, bootloader reset */
         nvt_reset(chip_info);
         tp_touch_btnkey_release();
@@ -342,7 +342,7 @@ static int8_t nvt_ts_check_chip_ver_trim(struct chip_data_nt36525b *chip_info)
         buf[5] = 0x00;
         buf[6] = 0x00;
         CTP_SPI_READ(chip_info->s_client, buf, 7);
-        TPD_INFO("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
+        TPD_DEBUG("buf[1]=0x%02X, buf[2]=0x%02X, buf[3]=0x%02X, buf[4]=0x%02X, buf[5]=0x%02X, buf[6]=0x%02X\n",
                  buf[1], buf[2], buf[3], buf[4], buf[5], buf[6]);
 
         // compare read chip id on supported list
@@ -362,7 +362,7 @@ static int8_t nvt_ts_check_chip_ver_trim(struct chip_data_nt36525b *chip_info)
             }
 
             if (found_nvt_chip) {
-                TPD_INFO("This is NVT touch IC\n");
+                TPD_DEBUG("This is NVT touch IC\n");
                 chip_info->trim_id_table.mmap = trim_id_table[list].mmap;
                 chip_info->trim_id_table.carrier_system = trim_id_table[list].carrier_system;
                 chip_info->trim_id_table.support_hw_crc = trim_id_table[list].support_hw_crc;
@@ -384,7 +384,7 @@ static int8_t nvt_ts_check_chip_ver_trim(struct chip_data_nt36525b *chip_info)
     }
 
 out:
-    TPD_INFO("list = %d, support_hw_crc is %d\n", list, chip_info->trim_id_table.support_hw_crc);
+    TPD_DEBUG("list = %d, support_hw_crc is %d\n", list, chip_info->trim_id_table.support_hw_crc);
     return ret;
 }
 
@@ -417,7 +417,7 @@ static int32_t nvt_check_fw_reset_state_noflash(struct chip_data_nt36525b *chip_
 
         retry++;
         if(unlikely(retry > retry_max)) {
-            TPD_INFO("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n", retry, buf[1], buf[2], buf[3], buf[4], buf[5]);
+            TPD_DEBUG("error, retry=%d, buf[1]=0x%02X, 0x%02X, 0x%02X, 0x%02X, 0x%02X\n", retry, buf[1], buf[2], buf[3], buf[4], buf[5]);
             ret = -1;
             break;
         }
@@ -433,11 +433,11 @@ static int nvt_enter_sleep(struct chip_data_nt36525b *chip_info, bool config)
     if (config) {
         ret = nvt_cmd_store(chip_info, CMD_ENTER_SLEEP);
         if (ret < 0) {
-            TPD_INFO("%s: enter sleep mode failed!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode failed!\n", __func__);
             return -1;
         } else {
             chip_info->is_sleep_writed = true;
-            TPD_INFO("%s: enter sleep mode sucess!\n", __func__);
+            TPD_DEBUG("%s: enter sleep mode sucess!\n", __func__);
         }
     }
 
@@ -489,19 +489,19 @@ info_retry:
     CTP_SPI_READ(chip_info->s_client, buf, 17);
     chip_info->fw_ver = buf[1];
     chip_info->fw_sub_ver = buf[14];
-    TPD_INFO("fw_ver = 0x%x, fw_sub_ver = 0x%x\n", chip_info->fw_ver, chip_info->fw_sub_ver);
+    TPD_DEBUG("fw_ver = 0x%x, fw_sub_ver = 0x%x\n", chip_info->fw_ver, chip_info->fw_sub_ver);
 
     //---clear x_num, y_num if fw info is broken---
     if ((buf[1] + buf[2]) != 0xFF) {
-        TPD_INFO("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n", buf[1], buf[2]);
+        TPD_DEBUG("FW info is broken! fw_ver=0x%02X, ~fw_ver=0x%02X\n", buf[1], buf[2]);
         chip_info->fw_ver = 0;
 
         if(retry_count < 3) {
             retry_count++;
-            TPD_INFO("retry_count=%d\n", retry_count);
+            TPD_DEBUG("retry_count=%d\n", retry_count);
             goto info_retry;
         } else {
-            TPD_INFO("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
+            TPD_DEBUG("Set default fw_ver=0, x_num=18, y_num=32, abs_x_max=1080, abs_y_max=1920, max_button_num=0!\n");
             ret = -1;
         }
     } else {
@@ -563,13 +563,13 @@ static int32_t nvt_bin_header_parser(struct chip_data_nt36525b *chip_info, const
      * ilm_dlm_num (ILM & DLM) + ovly_sec_num + info_sec_num
      */
     chip_info->partition = chip_info->ilm_dlm_num + ovly_sec_num + info_sec_num;
-    TPD_INFO("ovly_info = %d, ilm_dlm_num = %d, ovly_sec_num = %d, info_sec_num = %d, partition = %d\n",
+    TPD_DEBUG("ovly_info = %d, ilm_dlm_num = %d, ovly_sec_num = %d, info_sec_num = %d, partition = %d\n",
              ovly_info, chip_info->ilm_dlm_num, ovly_sec_num, info_sec_num, chip_info->partition);
 
     /* allocated memory for header info */
     chip_info->bin_map = (struct nvt_ts_bin_map *)kzalloc((chip_info->partition + 1) * sizeof(struct nvt_ts_bin_map), GFP_KERNEL);
     if(chip_info->bin_map == NULL) {
-        TPD_INFO("kzalloc for bin_map failed!\n");
+        TPD_DEBUG("kzalloc for bin_map failed!\n");
         return -ENOMEM;
     }
 
@@ -633,7 +633,7 @@ static int32_t nvt_bin_header_parser(struct chip_data_nt36525b *chip_info, const
 
         /* BIN size error detect */
         if ((chip_info->bin_map[list].BIN_addr + chip_info->bin_map[list].size) > fwsize) {
-            TPD_INFO("access range (0x%08X to 0x%08X) is larger than bin size!\n",
+            TPD_DEBUG("access range (0x%08X to 0x%08X) is larger than bin size!\n",
                      chip_info->bin_map[list].BIN_addr, chip_info->bin_map[list].BIN_addr + chip_info->bin_map[list].size);
             return -EINVAL;
         }
@@ -659,7 +659,7 @@ static int32_t Download_Init(struct chip_data_nt36525b *chip_info)
     if (chip_info->fwbuf == NULL) {
         chip_info->fwbuf = (uint8_t *)kzalloc((SPI_TANSFER_LEN + 1), GFP_KERNEL);
         if(chip_info->fwbuf == NULL) {
-            TPD_INFO("kzalloc for fwbuf failed!\n");
+            TPD_DEBUG("kzalloc for fwbuf failed!\n");
             return -ENOMEM;
         }
     }
@@ -684,11 +684,11 @@ static void nvt_read_ram_test(struct chip_data_nt36525b *chip_info, uint32_t add
     mm_segment_t org_fs;
 
     snprintf(file, 256, "/sdcard/dump_%s.bin", name);
-    TPD_INFO("Dump [%s] from 0x%08X to 0x%08X\n", file, addr, addr + len);
+    TPD_DEBUG("Dump [%s] from 0x%08X to 0x%08X\n", file, addr, addr + len);
 
     fbufp = (uint8_t *)kzalloc(len + 1, GFP_KERNEL);
     if(fbufp == NULL) {
-        TPD_INFO("kzalloc for fbufp failed!\n");
+        TPD_DEBUG("kzalloc for fbufp failed!\n");
         return;
     }
 
@@ -696,7 +696,7 @@ static void nvt_read_ram_test(struct chip_data_nt36525b *chip_info, uint32_t add
     set_fs(KERNEL_DS);
     fp = filp_open(file, O_WRONLY | O_CREAT | O_TRUNC, 0);
     if (fp == NULL || IS_ERR(fp)) {
-        TPD_INFO("open file failed\n");
+        TPD_DEBUG("open file failed\n");
         goto open_file_fail;
     }
 
@@ -710,7 +710,7 @@ static void nvt_read_ram_test(struct chip_data_nt36525b *chip_info, uint32_t add
     /* Write to file */
     ret = vfs_write(fp, (char __user *)fbufp + 1, len, &offset);
     if (ret <= 0) {
-        TPD_INFO("write file failed\n");
+        TPD_DEBUG("write file failed\n");
         goto open_file_fail;
     }
 
@@ -761,14 +761,14 @@ return:
         SRAM_addr = chip_info->bin_map[list].SRAM_addr;
         size = chip_info->bin_map[list].size;
         BIN_addr = chip_info->bin_map[list].BIN_addr;
-        //TPD_INFO("SRAM_addr %x, size %d, BIN_addr %x\n", SRAM_addr, size, BIN_addr);
+        //TPD_DEBUG("SRAM_addr %x, size %d, BIN_addr %x\n", SRAM_addr, size, BIN_addr);
         if (size == 0) {
             array_len = array_len - 2;
             continue;
         }
         // Check data size
         if ((BIN_addr + size) > fwsize) {
-            TPD_INFO("access range (0x%08X to 0x%08X) is larger than bin size!\n",
+            TPD_DEBUG("access range (0x%08X to 0x%08X) is larger than bin size!\n",
                      BIN_addr, BIN_addr + size);
             ret = -1;
             goto out;
@@ -818,12 +818,12 @@ static int32_t Write_Partition(struct chip_data_nt36525b *chip_info, const u8 *f
         BIN_addr = chip_info->bin_map[list].BIN_addr;
         name = chip_info->bin_map[list].name;
 
-        //              TPD_INFO("[%d][%s] SRAM (0x%08X), SIZE (0x%08X), BIN (0x%08X)\n",
+        //              TPD_DEBUG("[%d][%s] SRAM (0x%08X), SIZE (0x%08X), BIN (0x%08X)\n",
         //                              list, name, SRAM_addr, size, BIN_addr);
 
         // Check data size
         if ((BIN_addr + size) > fwsize) {
-            TPD_INFO("access range (0x%08X to 0x%08X) is larger than bin size!\n",
+            TPD_DEBUG("access range (0x%08X to 0x%08X) is larger than bin size!\n",
                      BIN_addr, BIN_addr + size);
             ret = -1;
             goto out;
@@ -943,7 +943,7 @@ return:
 static void nvt_eng_reset(struct chip_data_nt36525b *chip_info)
 {
     //---eng reset cmds to ENG_RST_ADDR---
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
     nvt_write_addr(chip_info->s_client, chip_info->ENG_RST_ADDR, 0x5A);
 
     mdelay(1);      //wait tMCU_Idle2TP_REX_Hi after TP_RST
@@ -1037,7 +1037,7 @@ static int32_t Download_Firmware_HW_CRC(struct chip_data_nt36525b *chip_info, co
         /* Start Write Firmware Process */
         ret = Write_Partition(chip_info, fw->data, fw->size);
         if (ret) {
-            TPD_INFO("Write_Firmware failed. (%d)\n", ret);
+            TPD_DEBUG("Write_Firmware failed. (%d)\n", ret);
             goto fail;
         }
 
@@ -1055,7 +1055,7 @@ static int32_t Download_Firmware_HW_CRC(struct chip_data_nt36525b *chip_info, co
 
         ret = nvt_check_fw_reset_state_noflash(chip_info, RESET_STATE_INIT);
         if (ret) {
-            TPD_INFO("nvt_check_fw_reset_state_noflash failed. (%d)\n", ret);
+            TPD_DEBUG("nvt_check_fw_reset_state_noflash failed. (%d)\n", ret);
             goto fail;
         } else {
             break;
@@ -1064,7 +1064,7 @@ static int32_t Download_Firmware_HW_CRC(struct chip_data_nt36525b *chip_info, co
 fail:
         retry++;
         if(unlikely(retry > 2) || chip_info->using_headfile) {
-            TPD_INFO("error, retry=%d\n", retry);
+            TPD_DEBUG("error, retry=%d\n", retry);
             break;
         }
     }
@@ -1091,7 +1091,7 @@ static int32_t nvt_nf_detect_chip(struct chip_data_nt36525b *chip_info)
     buf[6] = 0x00;
     ret = CTP_SPI_READ(chip_info->s_client, buf, 2);
     for(i = 1; i < 7; i++) {
-        TPD_INFO("buf[%d] is 0x%02X\n", i, buf[i]);
+        TPD_DEBUG("buf[%d] is 0x%02X\n", i, buf[i]);
         if(buf[i] != 0) {
             return 0;
         }
@@ -1109,13 +1109,13 @@ static int nvt_ftm_process(void *chip_data)
     struct chip_data_nt36525b *chip_info = (struct chip_data_nt36525b *)chip_data;
     const struct firmware *fw = NULL;
 
-    TPD_INFO("%s is called!\n", __func__);
+    TPD_DEBUG("%s is called!\n", __func__);
 
     ret = nvt_get_chip_info(chip_info);
     if (!ret) {
         ret = nvt_fw_update_sub(chip_info, fw, 0);
         if(ret > 0) {
-            TPD_INFO("%s fw update failed!\n", __func__);
+            TPD_DEBUG("%s fw update failed!\n", __func__);
         } else {
             ret = nvt_enter_sleep(chip_info, true);
         }
@@ -1142,7 +1142,7 @@ static int nvt_get_chip_info(void *chip_data)
     //---check chip version trim---
     ret = nvt_ts_check_chip_ver_trim(chip_info);
     if (ret) {
-        TPD_INFO("chip is not identified\n");
+        TPD_DEBUG("chip is not identified\n");
         ret = -EINVAL;
     }
 
@@ -1175,7 +1175,7 @@ static int nvt_get_vendor(void *chip_data, struct panel_info *panel_data)
         panel_data->fw_name[len - 1] = 'n';
     }
     chip_info->tp_type = panel_data->tp_type;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s\n", chip_info->tp_type, panel_data->fw_name);
 
     return 0;
 }
@@ -1184,7 +1184,7 @@ static int nvt_reset_gpio_control(void *chip_data, bool enable)
 {
     struct chip_data_nt36525b *chip_info = (struct chip_data_nt36525b *)chip_data;
     if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
-        TPD_INFO("%s: set reset state %d\n", __func__, enable);
+        TPD_DEBUG("%s: set reset state %d\n", __func__, enable);
         gpio_set_value(chip_info->hw_res->reset_gpio, enable);
     }
 
@@ -1202,9 +1202,9 @@ int nvt_lcd_reset_gpio_init(void *chip_data)
     if (gpio_is_valid(chip_info->lcd_reset_gpio)) {
         rc = gpio_request(chip_info->lcd_reset_gpio, "lcd-reset-gpio");
         if (rc)
-            TPD_INFO("unable to request gpio [%d]\n", chip_info->lcd_reset_gpio);
+            TPD_DEBUG("unable to request gpio [%d]\n", chip_info->lcd_reset_gpio);
     } else {
-        TPD_INFO("chip_info->lcd-reset-gpio not specified\n");
+        TPD_DEBUG("chip_info->lcd-reset-gpio not specified\n");
     }
     return 0;
 }
@@ -1213,7 +1213,7 @@ int nvt_lcd_reset_gpio_control(void *chip_data, bool enable)
 {
     struct chip_data_nt36525b *chip_info = (struct chip_data_nt36525b *)chip_data;
     if (gpio_is_valid(chip_info->lcd_reset_gpio)) {
-        TPD_INFO("%s: set reset state %d\n", __func__, enable);
+        TPD_DEBUG("%s: set reset state %d\n", __func__, enable);
         gpio_set_value(chip_info->lcd_reset_gpio, enable);
     }
 
@@ -1338,16 +1338,16 @@ static int32_t nvt_ts_point_data_checksum(uint8_t *buf, uint8_t length)
 
     // Compare ckecksum and dump fail data
     if (checksum != buf[length]) {
-        TPD_INFO("i2c/spi packet checksum not match. (point_data[%d]=0x%02X, checksum=0x%02X)\n",
+        TPD_DEBUG("i2c/spi packet checksum not match. (point_data[%d]=0x%02X, checksum=0x%02X)\n",
                  length, buf[length], checksum);
 
         for (i = 0; i < 10; i++) {
-            TPD_INFO("%02X %02X %02X %02X %02X %02X\n",
+            TPD_DEBUG("%02X %02X %02X %02X %02X %02X\n",
                      buf[1 + i * 6], buf[2 + i * 6], buf[3 + i * 6], buf[4 + i * 6], buf[5 + i * 6], buf[6 + i * 6]);
         }
 
         for (i = 0; i < (length - 60); i++) {
-            TPD_INFO("%02X ", buf[1 + 60 + i]);
+            TPD_DEBUG("%02X ", buf[1 + 60 + i]);
         }
 
         return -1;
@@ -1373,14 +1373,14 @@ static int nvt_get_touch_points(void *chip_data, struct point_info *points, int 
 
     ret = CTP_SPI_READ(chip_info->s_client, point_data, POINT_DATA_LEN + 1);
     if (ret < 0) {
-        TPD_INFO("CTP_SPI_READ failed.(%d)\n", ret);
+        TPD_DEBUG("CTP_SPI_READ failed.(%d)\n", ret);
         return -1;
     }
 
     //some kind of protect mechanism, after WDT firware redownload and try to save tp
     ret = nvt_wdt_fw_recovery(chip_info, point_data);
     if (ret) {
-        TPD_INFO("Recover for fw reset %02X\n", point_data[1]);
+        TPD_DEBUG("Recover for fw reset %02X\n", point_data[1]);
         nvt_reset(chip_info);
         return -1;
     }
@@ -1469,10 +1469,10 @@ static int8_t nvt_extend_cmd_store(struct chip_data_nt36525b *chip_info, uint8_t
     }
 
     if (unlikely(i == retry)) {
-        TPD_INFO("send Cmd 0x%02X 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, u8SubCmd, buf[1]);
+        TPD_DEBUG("send Cmd 0x%02X 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, u8SubCmd, buf[1]);
         return -1;
     } else {
-        TPD_INFO("send Cmd 0x%02X 0x%02X success, tried %d times\n", u8Cmd, u8SubCmd, i);
+        TPD_DEBUG("send Cmd 0x%02X 0x%02X success, tried %d times\n", u8Cmd, u8SubCmd, i);
     }
 
     return 0;
@@ -1503,10 +1503,10 @@ static int8_t nvt_cmd_store(struct chip_data_nt36525b *chip_info, uint8_t u8Cmd)
     }
 
     if (unlikely(i == retry)) {
-        TPD_INFO("send Cmd 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, buf[1]);
+        TPD_DEBUG("send Cmd 0x%02X failed, buf[1]=0x%02X\n", u8Cmd, buf[1]);
         return -1;
     } else {
-        TPD_INFO("send Cmd 0x%02X success, tried %d times\n", u8Cmd, i);
+        TPD_DEBUG("send Cmd 0x%02X success, tried %d times\n", u8Cmd, i);
     }
 
     return 0;
@@ -1532,7 +1532,7 @@ static void nvt_ts_wakeup_gesture_coordinate(uint8_t *data, uint8_t max_num)
             input_x = (uint32_t)(data[position + 1] << 4) + (uint32_t) (data[position + 3] >> 4);
             input_y = (uint32_t)(data[position + 2] << 4) + (uint32_t) (data[position + 3] & 0x0F);
         }
-        TPD_INFO("(%d: %d, %d)\n", i, input_x, input_y);
+        TPD_DEBUG("(%d: %d, %d)\n", i, input_x, input_y);
     }
 }
 
@@ -1557,14 +1557,14 @@ static void nvt_read_debug_gesture_coordinate_buffer(struct chip_data_nt36525b *
     residual_len = (head_addr + dummy_len + xdata_len) % XDATA_SECTOR_SIZE;
 
     /*if (xdata_len/sizeof(int32_t) < data_len) {
-    	TPD_INFO("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
+    	TPD_DEBUG("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
     	return;
     }*/
 
     //malloc buffer space
     xdata_tmp = kzalloc(2048, GFP_KERNEL);
     if (xdata_tmp == NULL) {
-        TPD_INFO("%s malloc memory failed\n", __func__);
+        TPD_DEBUG("%s malloc memory failed\n", __func__);
         return;
     }
 
@@ -1637,7 +1637,7 @@ static void nvt_dbg_gesture_record_coor_read(struct chip_data_nt36525b *chip_inf
     buf_len = 512;
     xdata = kzalloc(buf_len, GFP_KERNEL);
     if (!xdata) {
-        TPD_INFO("%s, malloc memory failed\n", __func__);
+        TPD_DEBUG("%s, malloc memory failed\n", __func__);
         return;
     }
 
@@ -1674,14 +1674,14 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info *gesture)
     memset(point_data, 0, sizeof(point_data));
     ret = CTP_SPI_READ(chip_info->s_client, point_data, POINT_DATA_LEN + 1);
     if (ret < 0) {
-        TPD_INFO("%s: read gesture data failed\n", __func__);
+        TPD_DEBUG("%s: read gesture data failed\n", __func__);
         return -1;
     }
 
     //some kind of protect mechanism, after WDT firware redownload and try to save tp
     ret = nvt_wdt_fw_recovery(chip_info, point_data);
     if (ret) {
-        TPD_INFO("receive all %02X, no gesture interrupts. recover for fw reset\n",
+        TPD_DEBUG("receive all %02X, no gesture interrupts. recover for fw reset\n",
                  point_data[1]);
         nvt_reset(chip_info);
         /* auto go back to wakeup gesture mode */
@@ -1694,12 +1694,12 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info *gesture)
     if ((gesture_id == 30) && (func_type == 1)) {
         gesture_id = (uint8_t)point_data[3];
     } else if (gesture_id > 30) {
-        TPD_INFO("invalid gesture id= %d, no gesture event\n", gesture_id);
+        TPD_DEBUG("invalid gesture id= %d, no gesture event\n", gesture_id);
         return 0;
     }
 
 #ifdef CONFIG_OPLUS_TP_APK
-    TPD_INFO("gesture id is %d,data[1] %d,data[2] %d,data[3] %d\n",
+    TPD_DEBUG("gesture id is %d,data[1] %d,data[2] %d,data[3] %d\n",
              gesture_id, point_data[1], point_data[2], point_data[3]);
     if (chip_info->debug_gesture_sta) {
         if (chip_info->ts->gesture_buf) {
@@ -1855,7 +1855,7 @@ static int nvt_get_gesture_info(void *chip_data, struct gesture_info *gesture)
         break;
     }
 
-    TPD_INFO("%s, gesture_id: 0x%x, func_type: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
+    TPD_DEBUG("%s, gesture_id: 0x%x, func_type: 0x%x, gesture_type: %d, clockwise: %d, points: (%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
              __func__, gesture_id, func_type, gesture->gesture_type, gesture->clockwise, \
              gesture->Point_start.x, gesture->Point_start.y, \
              gesture->Point_end.x, gesture->Point_end.y, \
@@ -1874,14 +1874,14 @@ static int nvt_reset(void *chip_data)
     struct touchpanel_data *ts = spi_get_drvdata(chip_info->s_client);
     //const struct firmware *fw = NULL;
 
-    TPD_INFO("%s.\n", __func__);
+    TPD_DEBUG("%s.\n", __func__);
     mutex_lock(&chip_info->mutex_testing);
 
     if(!ts->fw_update_app_support || chip_info->probe_done) {
 
         ret = nvt_fw_update(chip_info, NULL, 0);
         if(ret > 0) {
-            TPD_INFO("g_fw_buf update failed!\n");
+            TPD_DEBUG("g_fw_buf update failed!\n");
         }
     }
     /*
@@ -1907,7 +1907,7 @@ static __maybe_unused int nvt_enable_debug_gesture_coordinate_record_mode(struct
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
     if (enable) {
@@ -1923,7 +1923,7 @@ static __maybe_unused int nvt_enable_debug_gesture_coordinate_mode(struct chip_d
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
     if (enable) {
@@ -1941,7 +1941,7 @@ static int nvt_enable_black_gesture(struct chip_data_nt36525b *chip_info, bool e
 {
     int ret = -1;
 
-    TPD_INFO("%s, enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s, enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (chip_info->is_sleep_writed) {
         //disable_irq_nosync(chip_info->irq_num);
@@ -1949,7 +1949,7 @@ static int nvt_enable_black_gesture(struct chip_data_nt36525b *chip_info, bool e
         nvt_lcd_reset_gpio_control(chip_info, true);
         mdelay(5);
         if (get_lcd_status() != 1) {
-            TPD_INFO("LCD not init, control the reset low!");
+            TPD_DEBUG("LCD not init, control the reset low!");
             nvt_lcd_reset_gpio_control(chip_info, false);
             mdelay(5);
             nvt_lcd_reset_gpio_control(chip_info, true);
@@ -1962,7 +1962,7 @@ static int nvt_enable_black_gesture(struct chip_data_nt36525b *chip_info, bool e
 
     if (enable) {
         if (get_lcd_status() > 0) {
-            TPD_INFO("Will power on soon!");
+            TPD_DEBUG("Will power on soon!");
             return ret;
         }
 #ifdef CONFIG_OPLUS_TP_APK
@@ -1972,7 +1972,7 @@ static int nvt_enable_black_gesture(struct chip_data_nt36525b *chip_info, bool e
 #endif // end of CONFIG_OPLUS_TP_APK
 
         ret = nvt_cmd_store(chip_info, CMD_OPEN_BLACK_GESTURE);
-        TPD_INFO("%s: enable gesture %s !\n", __func__, (ret < 0) ? "failed" : "success");
+        TPD_DEBUG("%s: enable gesture %s !\n", __func__, (ret < 0) ? "failed" : "success");
     } else {
         ret = 0;
     }
@@ -1985,7 +1985,7 @@ static int nvt_enable_edge_limit(struct chip_data_nt36525b *chip_info, int state
 {
     int8_t ret = -1;
     struct touchpanel_data *ts = spi_get_drvdata(chip_info->s_client);
-    TPD_INFO("%s:state = %d, limit_corner = %d, level = %d, chip_info->is_sleep_writed = %d\n", __func__, state, ts->limit_corner, edge_limit_level, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:state = %d, limit_corner = %d, level = %d, chip_info->is_sleep_writed = %d\n", __func__, state, ts->limit_corner, edge_limit_level, chip_info->is_sleep_writed);
 
     if (state == 1 || VERTICAL_SCREEN == chip_info->touch_direction) {
         ret = nvt_extend_cmd_store(chip_info,
@@ -2007,7 +2007,7 @@ static int nvt_enable_charge_mode(struct chip_data_nt36525b *chip_info, bool ena
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (enable) {
         ret = nvt_cmd_store(chip_info, EVENTBUFFER_PWR_PLUG_IN);
@@ -2022,7 +2022,7 @@ static int nvt_enable_game_mode(struct chip_data_nt36525b *chip_info, bool enabl
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__, enable, chip_info->is_sleep_writed);
 
     if (enable) {
         ret = nvt_cmd_store(chip_info, EVENTBUFFER_GAME_ON);
@@ -2042,7 +2042,7 @@ static int nvt_enable_headset_mode(struct chip_data_nt36525b *chip_info, bool en
 
     if (enable) {
         ret = nvt_cmd_store(chip_info, EVENTBUFFER_HS_PLUG_IN);
-        TPD_INFO("%s: EVENTBUFFER_HS_PLUG_IN\n", __func__);
+        TPD_DEBUG("%s: EVENTBUFFER_HS_PLUG_IN\n", __func__);
     } else {
         ret = nvt_cmd_store(chip_info, EVENTBUFFER_HS_PLUG_OUT);
     }
@@ -2055,7 +2055,7 @@ static __maybe_unused int nvt_enable_hopping_polling_mode(struct chip_data_nt365
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
     nvt_esd_check_update_timer(chip_info);
@@ -2072,7 +2072,7 @@ static __maybe_unused int nvt_enable_hopping_fix_freq_mode(struct chip_data_nt36
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
     nvt_esd_check_update_timer(chip_info);
@@ -2089,7 +2089,7 @@ static __maybe_unused int nvt_enable_debug_msg_diff_mode(struct chip_data_nt3652
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
     nvt_esd_check_update_timer(chip_info);
@@ -2107,7 +2107,7 @@ static __maybe_unused int nvt_enable_water_polling_mode(struct chip_data_nt36525
 {
     int8_t ret = -1;
 
-    TPD_INFO("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
+    TPD_DEBUG("%s:enable = %d, chip_info->is_sleep_writed = %d\n", __func__,
              enable, chip_info->is_sleep_writed);
 
 
@@ -2139,7 +2139,7 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_SLEEP:
         ret = nvt_enter_sleep(chip_info, true);
         if (ret < 0) {
-            TPD_INFO("%s: nvt enter sleep failed\n", __func__);
+            TPD_DEBUG("%s: nvt enter sleep failed\n", __func__);
         }
         nvt_esd_check_enable(chip_info, false);
         break;
@@ -2147,7 +2147,7 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_GESTURE:
         ret = nvt_enable_black_gesture(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: nvt enable gesture failed.\n", __func__);
+            TPD_DEBUG("%s: nvt enable gesture failed.\n", __func__);
             return ret;
         }
 
@@ -2159,7 +2159,7 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_EDGE:
         ret = nvt_enable_edge_limit(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: nvt enable edg limit failed.\n", __func__);
+            TPD_DEBUG("%s: nvt enable edg limit failed.\n", __func__);
             return ret;
         }
         break;
@@ -2167,21 +2167,21 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
     case MODE_CHARGE:
         ret = nvt_enable_charge_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
         }
         break;
 
     case MODE_GAME:
         ret = nvt_enable_game_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable charge mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable charge mode : %d failed\n", __func__, flag);
         }
         break;
 
     case MODE_HEADSET:
         ret = nvt_enable_headset_mode(chip_info, flag);
         if (ret < 0) {
-            TPD_INFO("%s: enable headset mode : %d failed\n", __func__, flag);
+            TPD_DEBUG("%s: enable headset mode : %d failed\n", __func__, flag);
         }
         break;
 
@@ -2189,40 +2189,40 @@ static int nvt_mode_switch(void *chip_data, work_mode mode, bool flag)
     /*case MODE_HOPPING_POLLING:	//TODO: add define in oplus h file, MODE_HOPPING_POLLING
     	ret = nvt_enable_hopping_polling_mode(chip_info, flag);
     	if (ret < 0) {
-    		TPD_INFO("%s: enable hopping polling mode : %d failed\n", __func__, flag);
+    		TPD_DEBUG("%s: enable hopping polling mode : %d failed\n", __func__, flag);
     	}
     	break;
 
     case MODE_HOPPING_FIX_FREQ:	//TODO: add define in oplus h file, MODE_HOPPING_FIX_FREQ
     	ret = nvt_enable_hopping_fix_freq_mode(chip_info, flag);
     	if (ret < 0) {
-    		TPD_INFO("%s: enable hopping fix freq mode : %d failed\n", __func__, flag);
+    		TPD_DEBUG("%s: enable hopping fix freq mode : %d failed\n", __func__, flag);
     	}
     	break;*/
 
     /*case DEBUG_MODE_MESSAGE_DIFF:	//TODO: add define in oplus h file, DEBUG_MODE_MESSAGE_DIFF
     	ret = nvt_enable_debug_msg_diff_mode(chip_info, flag);
     	if (ret < 0) {
-    		TPD_INFO("%s: enable debug message diff %d failed\n", __func__, flag);
+    		TPD_DEBUG("%s: enable debug message diff %d failed\n", __func__, flag);
     	}
     	break;
 
     case DEBUG_MODE_GESTURE_COORDINATE:	//TODO: add define in oplus h file, DEBUG_MODE_GESTURE_COORDINATE
     	ret = nvt_enable_debug_gesture_coordinate_mode(chip_info, flag);
     	if (ret < 0) {
-    		TPD_INFO("%s: enable debug gesture coordinate %d failed\n", __func__, flag);
+    		TPD_DEBUG("%s: enable debug gesture coordinate %d failed\n", __func__, flag);
     	}
     	break;
 
     case DEBUG_MODE_GESTURE_COORDINATE_RECORD:	//TODO: add define in oplus h file, DEBUG_MODE_GESTURE_COORDINATE_RECORD
     	ret = nvt_enable_debug_gesture_coordinate_record_mode(chip_info, flag);
     	if (ret < 0) {
-    		TPD_INFO("%s: enable debug gesture coordinate record %d failed\n", __func__, flag);
+    		TPD_DEBUG("%s: enable debug gesture coordinate record %d failed\n", __func__, flag);
     	}
     	break;*/
 
     default:
-        TPD_INFO("%s: Wrong mode.\n", __func__);
+        TPD_DEBUG("%s: Wrong mode.\n", __func__);
     }
 
     return ret;
@@ -2239,7 +2239,7 @@ static fw_check_state nvt_fw_check(void *chip_data, struct resolution_info *reso
 
     ret |= nvt_get_fw_info_noflash(chip_info);
     if (ret < 0) {
-        TPD_INFO("%s: get fw info failed\n", __func__);
+        TPD_DEBUG("%s: get fw info failed\n", __func__);
         return FW_ABNORMAL;
     } else {
         panel_data->TP_FW = chip_info->fw_ver;
@@ -2299,7 +2299,7 @@ static int32_t nvt_clear_fw_status(struct chip_data_nt36525b *chip_info)
     }
 
     if (i >= retry) {
-        TPD_INFO("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
+        TPD_DEBUG("failed, i=%d, buf[1]=0x%02X\n", i, buf[1]);
         return -1;
     } else {
         return 0;
@@ -2322,7 +2322,7 @@ static void nvt_enable_noise_collect(struct chip_data_nt36525b *chip_info, int32
     buf[4] = 0x00;
     ret |= CTP_SPI_WRITE(chip_info->s_client, buf, 5);
     if (ret < 0) {
-        TPD_INFO("%s failed\n", __func__);
+        TPD_DEBUG("%s failed\n", __func__);
     }
 }
 
@@ -2352,7 +2352,7 @@ static int8_t nvt_switch_FreqHopEnDis(struct chip_data_nt36525b *chip_info, uint
     }
 
     if (unlikely(retry == 20)) {
-        TPD_INFO("switch FreqHopEnDis 0x%02X failed, buf[1]=0x%02X\n", FreqHopEnDis, buf[1]);
+        TPD_DEBUG("switch FreqHopEnDis 0x%02X failed, buf[1]=0x%02X\n", FreqHopEnDis, buf[1]);
         ret = -1;
     }
 
@@ -2392,7 +2392,7 @@ static uint8_t nvt_get_fw_pipe_noflash(struct chip_data_nt36525b *chip_info)
     buf[1] = 0x00;
     ret |= CTP_SPI_READ(chip_info->s_client, buf, 2);
     if (ret < 0) {
-        TPD_INFO("%s: read or write failed\n", __func__);
+        TPD_DEBUG("%s: read or write failed\n", __func__);
     }
 
     return (buf[1] & 0x01);
@@ -2417,14 +2417,14 @@ static void nvt_read_mdata(struct chip_data_nt36525b *chip_info, uint32_t xdata_
     residual_len = (head_addr + dummy_len + data_len) % XDATA_SECTOR_SIZE;
 
     if (xdata_len / sizeof(int32_t) < data_len / 2) {
-        TPD_INFO("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
+        TPD_DEBUG("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
         return;
     }
 
     //malloc buffer space
     xdata_tmp = kzalloc(2048, GFP_KERNEL);
     if (xdata_tmp == NULL) {
-        TPD_INFO("%s malloc memory failed\n", __func__);
+        TPD_DEBUG("%s malloc memory failed\n", __func__);
         return;
     }
 
@@ -2500,14 +2500,14 @@ static void nvt_read_debug_mdata(struct chip_data_nt36525b *chip_info,
     residual_len = (head_addr + dummy_len + data_len) % XDATA_SECTOR_SIZE;
 
     if (xdata_len / sizeof(int32_t) < data_len) {
-        TPD_INFO("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
+        TPD_DEBUG("xdata read buffer(%d) less than max data size(%d), return\n", xdata_len, data_len);
         return;
     }
 
     //malloc buffer space
     xdata_tmp = kzalloc(2048, GFP_KERNEL);
     if (xdata_tmp == NULL) {
-        TPD_INFO("%s malloc memory failed\n", __func__);
+        TPD_DEBUG("%s malloc memory failed\n", __func__);
         return;
     }
 
@@ -2585,7 +2585,7 @@ static int32_t nvt_polling_hand_shake_status(struct chip_data_nt36525b *chip_inf
     }
 
     if (i >= retry) {
-        TPD_INFO("polling hand shake status failed, buf[1]=0x%02X\n", buf[1]);
+        TPD_DEBUG("polling hand shake status failed, buf[1]=0x%02X\n", buf[1]);
         return -1;
     } else {
         return 0;
@@ -2614,7 +2614,7 @@ static int32_t nvt_check_fw_status(struct chip_data_nt36525b *chip_info)
     }
 
     if (i >= retry) {
-        TPD_INFO("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
+        TPD_DEBUG("%s failed, i=%d, buf[1]=0x%02X\n", __func__, i, buf[1]);
         return -1;
     } else {
         return 0;
@@ -2634,7 +2634,7 @@ static uint8_t nvt_get_fw_pipe(struct chip_data_nt36525b *chip_info)
     buf[1] = 0x00;
     ret |= CTP_SPI_READ(chip_info->s_client, buf, 2);
     if (ret < 0) {
-        TPD_INFO("%s: read or write failed\n", __func__);
+        TPD_DEBUG("%s: read or write failed\n", __func__);
     }
 
     return (buf[1] & 0x01);
@@ -2648,7 +2648,7 @@ static int32_t nvt_read_fw_noise(struct chip_data_nt36525b *chip_info, int32_t c
     int32_t frame_num = 0;
 
     if (xdata_len / sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw nosie buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw nosie buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -2660,7 +2660,7 @@ static int32_t nvt_read_fw_noise(struct chip_data_nt36525b *chip_info, int32_t c
     frame_num = config_Diff_Test_Frame / 10;
     if (frame_num <= 0)
         frame_num = 1;
-    TPD_INFO("%s: frame_num=%d\n", __func__, frame_num);
+    TPD_DEBUG("%s: frame_num=%d\n", __func__, frame_num);
     nvt_enable_noise_collect(chip_info, frame_num);
     // need wait PS_Config_Diff_Test_Frame * 8.3ms
     msleep(frame_num * 83);
@@ -2728,8 +2728,8 @@ static int32_t nvt_check_bin_checksum(const u8 *fwdata, size_t fwsize)
     /* get the checksum from file directly */
     checksum_bin = byte_to_word(fwdata + (fwsize - FW_BIN_CHECKSUM_LEN));
     if (checksum_calculated != checksum_bin) {
-        TPD_INFO("%s checksum_calculated = 0x%08X\n", __func__, checksum_calculated);
-        TPD_INFO("%s checksum_bin = 0x%08X\n", __func__, checksum_bin);
+        TPD_DEBUG("%s checksum_calculated = 0x%08X\n", __func__, checksum_calculated);
+        TPD_DEBUG("%s checksum_bin = 0x%08X\n", __func__, checksum_bin);
         ret = -EINVAL;
     }
     return ret;
@@ -2745,7 +2745,7 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
 
     //check bin file size(116kb)
     if(fw != NULL && fw->size != FW_BIN_SIZE) {
-        TPD_INFO("bin file size not match (%zu), change to use headfile fw.\n", fw->size);
+        TPD_DEBUG("bin file size not match (%zu), change to use headfile fw.\n", fw->size);
         goto out_fail;
         //release_firmware(fw);
         //fw = NULL;
@@ -2755,18 +2755,18 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
     if(fw == NULL) {
         request_fw_headfile = kzalloc(sizeof(struct firmware), GFP_KERNEL);
         if(request_fw_headfile == NULL) {
-            TPD_INFO("%s kzalloc failed!\n", __func__);
+            TPD_DEBUG("%s kzalloc failed!\n", __func__);
             goto out_fail;
         }
 
         if (chip_info->g_fw_sta) {
-            TPD_INFO("request firmware failed, get from g_fw_buf\n");
+            TPD_DEBUG("request firmware failed, get from g_fw_buf\n");
             request_fw_headfile->size = chip_info->g_fw_len;
             request_fw_headfile->data = chip_info->g_fw_buf;
             fw = request_fw_headfile;
 
         } else {
-            TPD_INFO("request firmware failed, get from headfile\n");
+            TPD_DEBUG("request firmware failed, get from headfile\n");
 
             if(chip_info->p_firmware_headfile->firmware_data) {
                 request_fw_headfile->size = chip_info->p_firmware_headfile->firmware_size;
@@ -2774,7 +2774,7 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
                 fw = request_fw_headfile;
 
             } else {
-                TPD_INFO("firmware_data is NULL! exit firmware update!\n");
+                TPD_DEBUG("firmware_data is NULL! exit firmware update!\n");
                 goto out_fail;
             }
         }
@@ -2782,14 +2782,14 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
 
     //check bin file size(116kb)
     if(fw->size != FW_BIN_SIZE) {
-        TPD_INFO("fw file size not match. (%zu)\n", fw->size);
+        TPD_DEBUG("fw file size not match. (%zu)\n", fw->size);
         goto out_fail;
     }
 
     // check if FW version add FW version bar equals 0xFF
     if (*(fw->data + FW_BIN_VER_OFFSET) + * (fw->data + FW_BIN_VER_BAR_OFFSET) != 0xFF) {
-        TPD_INFO("bin file FW_VER + FW_VER_BAR should be 0xFF!\n");
-        TPD_INFO("FW_VER=0x%02X, FW_VER_BAR=0x%02X\n", *(fw->data + FW_BIN_VER_OFFSET), *(fw->data + FW_BIN_VER_BAR_OFFSET));
+        TPD_DEBUG("bin file FW_VER + FW_VER_BAR should be 0xFF!\n");
+        TPD_DEBUG("FW_VER=0x%02X, FW_VER_BAR=0x%02X\n", *(fw->data + FW_BIN_VER_OFFSET), *(fw->data + FW_BIN_VER_BAR_OFFSET));
         goto out_fail;
     }
 
@@ -2797,30 +2797,30 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
     ret = nvt_check_bin_checksum(fw->data, fw->size);
     if (ret) {
         if (fw != request_fw_headfile) {
-            TPD_INFO("Image fw check checksum failed, reload fw from array\n");
+            TPD_DEBUG("Image fw check checksum failed, reload fw from array\n");
 
             goto out_fail;
 
         } else {
-            TPD_INFO("array fw check checksum failed, but use still\n");
+            TPD_DEBUG("array fw check checksum failed, but use still\n");
         }
     } else {
-        TPD_INFO("fw check checksum ok\n");
+        TPD_DEBUG("fw check checksum ok\n");
     }
     /* show fw type info (0:MP, 1:Normal)*/
-    TPD_INFO("%s FW type is 0x%02X\n", __func__, *(fw->data + FW_BIN_TYPE_OFFSET));
+    TPD_DEBUG("%s FW type is 0x%02X\n", __func__, *(fw->data + FW_BIN_TYPE_OFFSET));
 
     /* BIN Header Parser */
     ret = nvt_bin_header_parser(chip_info, fw->data, fw->size);
     if (ret) {
-        TPD_INFO("bin header parser failed\n");
+        TPD_DEBUG("bin header parser failed\n");
         goto out_fail;
     }
 
     /* initial buffer and variable */
     ret = Download_Init(chip_info);
     if (ret) {
-        TPD_INFO("Download Init failed. (%d)\n", ret);
+        TPD_DEBUG("Download Init failed. (%d)\n", ret);
         goto out_fail;
     }
 
@@ -2829,11 +2829,11 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
         ret = Download_Firmware_HW_CRC(chip_info, fw);
     }
     if (ret) {
-        TPD_INFO("Download Firmware failed. (%d)\n", ret);
+        TPD_DEBUG("Download Firmware failed. (%d)\n", ret);
         goto out_fail;
     }
 
-    TPD_INFO("Update firmware success! <%ld us>\n",
+    TPD_DEBUG("Update firmware success! <%ld us>\n",
              (end.tv_sec - start.tv_sec) * 1000000L + (end.tv_usec - start.tv_usec));
 
     /* Get FW Info */
@@ -2843,7 +2843,7 @@ static fw_update_state nvt_fw_update_sub(void *chip_data, const struct firmware 
     }
     ret = nvt_get_fw_info_noflash(chip_info);
     if (ret) {
-        TPD_INFO("nvt_get_fw_info_noflash failed. (%d)\n", ret);
+        TPD_DEBUG("nvt_get_fw_info_noflash failed. (%d)\n", ret);
         goto out_fail;
     }
     ret = CTP_SPI_READ(chip_info->s_client, point_data, POINT_DATA_LEN + 1);
@@ -2929,7 +2929,7 @@ static void nvt_store_testdata_to_file(int fd, char *item, uint8_t result, int32
     int32_t iArrayIndex = 0;
 
     if (fd < 0) {
-        TPD_INFO("Open log file failed.\n");
+        TPD_DEBUG("Open log file failed.\n");
         goto exit;
     }
 
@@ -2970,7 +2970,7 @@ static void nvt_enable_doze_noise_collect(struct chip_data_nt36525b *chip_info, 
     buf[4] = 0x00;
     ret |= CTP_SPI_WRITE(chip_info->s_client, buf, 5);
     if (ret < 0) {
-        TPD_INFO("%s failed\n", __func__);
+        TPD_DEBUG("%s failed\n", __func__);
     }
 }
 
@@ -2984,7 +2984,7 @@ static int32_t nvt_read_doze_fw_noise(struct chip_data_nt36525b *chip_info, int3
     int32_t frame_num = 0;
 
     if (xdata_len / sizeof(int32_t) < rx_num * doze_X_Channel) {
-        TPD_INFO("read doze nosie buffer(%d) less than data size(%d)\n", xdata_len, rx_num * doze_X_Channel);
+        TPD_DEBUG("read doze nosie buffer(%d) less than data size(%d)\n", xdata_len, rx_num * doze_X_Channel);
         return -1;
     }
 
@@ -2996,7 +2996,7 @@ static int32_t nvt_read_doze_fw_noise(struct chip_data_nt36525b *chip_info, int3
     frame_num = config_Doze_Noise_Test_Frame / 10;
     if (frame_num <= 0)
         frame_num = 1;
-    TPD_INFO("%s: frame_num=%d\n", __func__, frame_num);
+    TPD_DEBUG("%s: frame_num=%d\n", __func__, frame_num);
     nvt_enable_doze_noise_collect(chip_info, frame_num);
     // need wait PS_Config_Doze_Noise_Test_Frame * 8.3ms
     msleep(frame_num * 83);
@@ -3047,7 +3047,7 @@ static int32_t nvt_read_doze_baseline(struct chip_data_nt36525b *chip_info, int3
     //    return -EAGAIN;
     //}
     if (xdata_len / sizeof(int32_t) < rm_num * doze_X_Channel) {
-        TPD_INFO("read doze baseline buffer(%d) less than data size(%d)\n", xdata_len, rm_num * doze_X_Channel);
+        TPD_DEBUG("read doze baseline buffer(%d) less than data size(%d)\n", xdata_len, rm_num * doze_X_Channel);
         return -1;
     }
 
@@ -3126,7 +3126,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     //update test firmware
     fw_name_test = kzalloc(MAX_FW_NAME_LENGTH, GFP_KERNEL);
     if(fw_name_test == NULL) {
-        TPD_INFO("fw_name_test kzalloc error!\n");
+        TPD_DEBUG("fw_name_test kzalloc error!\n");
         return;
     }
 
@@ -3134,12 +3134,12 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     copy_len = p_node - chip_info->fw_name;
     memcpy(fw_name_test, chip_info->fw_name, copy_len);
     strlcat(fw_name_test, postfix, MAX_FW_NAME_LENGTH);
-    TPD_INFO("%s : fw_name_test is %s\n", __func__, fw_name_test);
+    TPD_DEBUG("%s : fw_name_test is %s\n", __func__, fw_name_test);
 
     //update test firmware
     ret = request_firmware(&fw, fw_name_test, chip_info->dev);
     if (ret != 0) {
-        TPD_INFO("request test firmware failed! ret = %d\n", ret);
+        TPD_DEBUG("request test firmware failed! ret = %d\n", ret);
         kfree(fw_name_test);
         fw_name_test = NULL;
         return;
@@ -3159,34 +3159,34 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     ret = nvt_fw_update_sub(chip_info, fw, 0);
 
     if(ret > 0) {
-        TPD_INFO("fw update failed!\n");
+        TPD_DEBUG("fw update failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
-    TPD_INFO("%s : update test firmware successed\n", __func__);
+    TPD_DEBUG("%s : update test firmware successed\n", __func__);
 
     //---set xdata index to EVENT BUF ADDR---
     nvt_set_page(chip_info, chip_info->trim_id_table.mmap->EVENT_BUF_ADDR);
     ret = nvt_cmd_store(chip_info, CMD_OPEN_BLACK_GESTURE);
-    TPD_INFO("%s: enable gesture %s !\n", __func__, (ret < 0) ? "failed" : "success");
+    TPD_DEBUG("%s: enable gesture %s !\n", __func__, (ret < 0) ? "failed" : "success");
     msleep(500);	/* for FDM (500ms) */
 
     if (nvt_check_fw_reset_state_noflash(chip_info, RESET_STATE_NORMAL_RUN)) {
-        TPD_INFO("check fw reset state failed!\n");
+        TPD_DEBUG("check fw reset state failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, check fw reset state failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     if (nvt_switch_FreqHopEnDis(chip_info, FREQ_HOP_DISABLE)) {
-        TPD_INFO("switch frequency hopping disable failed!\n");
+        TPD_DEBUG("switch frequency hopping disable failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, switch frequency hopping disable failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     if (nvt_check_fw_reset_state_noflash(chip_info, RESET_STATE_NORMAL_RUN)) {
-        TPD_INFO("check fw reset state failed!\n");
+        TPD_DEBUG("check fw reset state failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, check fw reset state failed!\n");
         goto RELEASE_FIRMWARE;
@@ -3196,7 +3196,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
 
     //---Enter Test Mode---
     if (nvt_clear_fw_status(chip_info)) {
-        TPD_INFO("clear fw status failed!\n");
+        TPD_DEBUG("clear fw status failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, clear fw status failed!\n");
         goto RELEASE_FIRMWARE;
@@ -3205,20 +3205,20 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     nvt_change_mode(chip_info, TEST_MODE_2);
 
     if (nvt_check_fw_status(chip_info)) {
-        TPD_INFO("check fw status failed!\n");
+        TPD_DEBUG("check fw status failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, clear fw status failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     if (nvt_get_fw_info_noflash(chip_info)) {
-        TPD_INFO("get fw info failed!\n");
+        TPD_DEBUG("get fw info failed!\n");
         snprintf(message, MESSAGE_SIZE,
                  "1 error, get fw info failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
-    TPD_INFO("malloc raw_data space\n");
+    TPD_DEBUG("malloc raw_data space\n");
     buf_len = tx_num * rx_num * sizeof(int32_t);
     raw_data = kzalloc(buf_len, GFP_KERNEL);
     noise_p_data = kzalloc(buf_len, GFP_KERNEL);
@@ -3228,12 +3228,12 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     fdm_raw_data = kzalloc(buf_len, GFP_KERNEL);
     if (!(raw_data && noise_p_data && noise_n_data
           && fdm_raw_data && fdm_noise_p_data && fdm_noise_n_data)) {
-        TPD_INFO("kzalloc space failed\n");
+        TPD_DEBUG("kzalloc space failed\n");
         snprintf(message, MESSAGE_SIZE, "1 error, kzalloc space failed\n");
         goto RELEASE_DATA;
     }
 
-    TPD_INFO("malloc raw_record space\n");
+    TPD_DEBUG("malloc raw_record space\n");
     record_len = tx_num * rx_num * sizeof(uint8_t);
     raw_record = kzalloc(record_len, GFP_KERNEL);
     noise_p_record = kzalloc(record_len, GFP_KERNEL);
@@ -3243,15 +3243,15 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     fdm_raw_record = kzalloc(record_len, GFP_KERNEL);
     if (!(raw_record && noise_p_record && noise_n_record
           && fdm_raw_record && fdm_noise_p_record && fdm_noise_n_record)) {
-        TPD_INFO("kzalloc space failed\n");
+        TPD_DEBUG("kzalloc space failed\n");
         snprintf(message, MESSAGE_SIZE, "1 error, kzalloc space failed\n");
         goto RELEASE_DATA;
     }
 
     ret = request_firmware(&fw, chip_info->test_limit_name, &chip_info->s_client->dev);
-    TPD_INFO("Roland--->fw path is %s\n", chip_info->test_limit_name);
+    TPD_DEBUG("Roland--->fw path is %s\n", chip_info->test_limit_name);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", chip_info->test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", chip_info->test_limit_name, ret);
         snprintf(message, MESSAGE_SIZE,
                  "1 error, Request firmware failed: %s\n",
                  chip_info->test_limit_name);
@@ -3269,7 +3269,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     fdm_diff_rawdata_P = (int32_t *)(fw->data + ph->array_FDM_Diff_P_offset);
     fdm_diff_rawdata_N = (int32_t *)(fw->data + ph->array_FDM_Diff_N_offset);
     //---FW Rawdata Test---
-    TPD_INFO("LPWG mode FW Rawdata Test \n");
+    TPD_DEBUG("LPWG mode FW Rawdata Test \n");
     memset(raw_data, 0, buf_len);
     memset(raw_record, 0, record_len);
     rawdata_result = NVT_MP_PASS;
@@ -3286,7 +3286,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (raw_data[iArrayIndex] < ph->config_Lmt_LPWG_Rawdata_N)) {
                     rawdata_result = NVT_MP_FAIL;
                     raw_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d[%d %d]\n",
+                    TPD_DEBUG("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d[%d %d]\n",
                              i, j, raw_data[iArrayIndex], ph->config_Lmt_LPWG_Rawdata_N, ph->config_Lmt_LPWG_Rawdata_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
@@ -3309,7 +3309,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (raw_data[iArrayIndex] < lpwg_rawdata_N[iArrayIndex])) {
                     rawdata_result = NVT_MP_FAIL;
                     raw_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG_Rawdata Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "LPWG Rawdata[%d][%d] = %d[%d %d]\n",
@@ -3328,7 +3328,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     nvt_change_mode(chip_info, NORMAL_MODE);
 
     //---Noise Test---
-    TPD_INFO("LPWG mode FW Noise Test \n");
+    TPD_DEBUG("LPWG mode FW Noise Test \n");
     memset(noise_p_data, 0, buf_len); //store max
     memset(noise_n_data, 0, buf_len); //store min
     memset(noise_p_record, 0, record_len);
@@ -3336,14 +3336,14 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     noise_p_result = NVT_MP_PASS;
     noise_n_result = NVT_MP_PASS;
     if (nvt_read_fw_noise(chip_info, ph->config_Diff_Test_Frame, noise_p_data, noise_n_data, buf_len) != 0) {
-        TPD_INFO("LPWG mode read Noise data failed!\n");    // 1: ERROR
+        TPD_DEBUG("LPWG mode read Noise data failed!\n");    // 1: ERROR
         noise_p_result = NVT_MP_FAIL_READ_DATA;
         noise_n_result = NVT_MP_FAIL_READ_DATA;
         snprintf(buf, 128, "LPWG mode read Noise data failed!\n");
         err_cnt++;
         goto TEST_END;
     }
-    TPD_INFO("LPWG Noise RawData_Diff_Max:\n");
+    TPD_DEBUG("LPWG Noise RawData_Diff_Max:\n");
     if ((ph->config_Lmt_LPWG_Diff_P != 0) && (ph->config_Lmt_LPWG_Diff_N != 0)) {
         for (j = 0; j < rx_num; j++) {
             for (i = 0; i < tx_num; i++) {
@@ -3353,7 +3353,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (noise_p_data[iArrayIndex] < ph->config_Lmt_LPWG_Diff_N)) {
                     noise_p_result = NVT_MP_FAIL;
                     noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d[%d %d]\n",
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d[%d %d]\n",
                              i, j, noise_p_data[iArrayIndex], ph->config_Lmt_LPWG_Diff_N, ph->config_Lmt_LPWG_Diff_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
@@ -3365,7 +3365,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
             }
             TPD_DEBUG_NTAG("\n");
         }
-        TPD_INFO("LPWG Noise RawData_Diff_Min:\n");
+        TPD_DEBUG("LPWG Noise RawData_Diff_Min:\n");
         for (j = 0; j < rx_num; j++) {
             for (i = 0; i < tx_num; i++) {
                 iArrayIndex = j * tx_num + i;
@@ -3374,7 +3374,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (noise_n_data[iArrayIndex] < ph->config_Lmt_LPWG_Diff_N)) {
                     noise_n_result = NVT_MP_FAIL;
                     noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d[%d %d]\n",
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d[%d %d]\n",
                              i, j, noise_n_data[iArrayIndex], ph->config_Lmt_LPWG_Diff_N,  ph->config_Lmt_LPWG_Diff_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
@@ -3395,7 +3395,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (noise_p_data[iArrayIndex] < lpwg_diff_rawdata_N[iArrayIndex])) {
                     noise_p_result = NVT_MP_FAIL;
                     noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Max Test failed at rawdata[%d][%d] = %d\n", i, j, raw_data[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "LPWG Noise RawData_Diff_Max[%d][%d] = %d[%d %d]\n",
@@ -3406,7 +3406,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
             }
             TPD_DEBUG_NTAG("\n");
         }
-        TPD_INFO("LPWG Noise RawData_Diff_Min:\n");
+        TPD_DEBUG("LPWG Noise RawData_Diff_Min:\n");
         for (j = 0; j < rx_num; j++) {
             for (i = 0; i < tx_num; i++) {
                 iArrayIndex = j * tx_num + i;
@@ -3415,7 +3415,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (noise_n_data[iArrayIndex] < lpwg_diff_rawdata_N[iArrayIndex])) {
                     noise_n_result = NVT_MP_FAIL;
                     noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, noise_n_data[iArrayIndex]);
+                    TPD_DEBUG("LPWG Noise RawData_Diff_Min Test failed at rawdata[%d][%d] = %d\n", i, j, noise_n_data[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "LPWG Noise RawData_Diff_Min[%d][%d] = %d[%d %d]\n",
@@ -3429,7 +3429,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     }
 
     //---FDM Noise Test---
-    TPD_INFO("FDM FW Noise Test \n");
+    TPD_DEBUG("FDM FW Noise Test \n");
     memset(fdm_noise_p_data, 0, buf_len); //store max
     memset(fdm_noise_n_data, 0, buf_len); //store min
     memset(fdm_noise_p_record, 0, record_len);
@@ -3437,7 +3437,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     fdm_noise_p_result = NVT_MP_PASS;
     fdm_noise_n_result = NVT_MP_PASS;
     if (nvt_read_doze_fw_noise(chip_info, ph->config_FDM_Noise_Test_Frame, ph->fdm_X_Channel, fdm_noise_p_data, fdm_noise_n_data, buf_len) != 0) {
-        TPD_INFO("read FDM Noise data failed!\n");
+        TPD_DEBUG("read FDM Noise data failed!\n");
         fdm_noise_p_result = NVT_MP_FAIL_READ_DATA;
         fdm_noise_n_result = NVT_MP_FAIL_READ_DATA;
         snprintf(buf, 128, "read FDM Noise data failed!\n");
@@ -3453,7 +3453,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_noise_p_data[iArrayIndex] < ph->config_Lmt_FDM_Diff_N)) {
                     fdm_noise_p_result = NVT_MP_FAIL;
                     fdm_noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_p_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
+                    TPD_DEBUG("FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_p_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_p_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
@@ -3470,7 +3470,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_noise_n_data[iArrayIndex] < ph->config_Lmt_FDM_Diff_N)) {
                     fdm_noise_n_result = NVT_MP_FAIL;
                     fdm_noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
+                    TPD_DEBUG("FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], ph->config_Lmt_FDM_Diff_N, ph->config_Lmt_FDM_Diff_P);
@@ -3487,7 +3487,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_noise_n_data[iArrayIndex] < fdm_diff_rawdata_N[iArrayIndex])) {
                     fdm_noise_p_result = NVT_MP_FAIL;
                     fdm_noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
@@ -3503,7 +3503,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_noise_n_data[iArrayIndex] < fdm_diff_rawdata_N[iArrayIndex])) {
                     fdm_noise_n_result = NVT_MP_FAIL;
                     fdm_noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_noise_n_data[iArrayIndex], fdm_diff_rawdata_N[iArrayIndex], fdm_diff_rawdata_P[iArrayIndex]);
@@ -3515,12 +3515,12 @@ static void nvt_black_screen_test(void *chip_data, char *message)
     }
 
     //---FDM FW Rawdata Test---
-    TPD_INFO("FDM FW Rawdata Test \n");
+    TPD_DEBUG("FDM FW Rawdata Test \n");
     memset(fdm_raw_data, 0, buf_len);
     memset(fdm_raw_record, 0, record_len);
     fdm_rawdata_result = NVT_MP_PASS;
     if(nvt_read_doze_baseline(chip_info, ph->fdm_X_Channel, fdm_raw_data, buf_len) != 0) {
-        TPD_INFO("read FDM FW Rawdata failed!\n");
+        TPD_DEBUG("read FDM FW Rawdata failed!\n");
         fdm_rawdata_result = NVT_MP_FAIL_READ_DATA;
         snprintf(buf, 128,
                  "read FDM FW Rawdata failed!\n");
@@ -3536,7 +3536,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_raw_data[iArrayIndex] < ph->config_Lmt_FDM_Rawdata_N)) {
                     fdm_rawdata_result = NVT_MP_FAIL;
                     fdm_raw_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], ph->config_Lmt_FDM_Rawdata_N, ph->config_Lmt_FDM_Rawdata_P);
+                    TPD_DEBUG("FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], ph->config_Lmt_FDM_Rawdata_N, ph->config_Lmt_FDM_Rawdata_P);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], ph->config_Lmt_FDM_Rawdata_N, ph->config_Lmt_FDM_Rawdata_P);
@@ -3553,7 +3553,7 @@ static void nvt_black_screen_test(void *chip_data, char *message)
                    || (fdm_raw_data[iArrayIndex] < fdm_rawdata_N[iArrayIndex])) {
                     fdm_rawdata_result = NVT_MP_FAIL;
                     fdm_raw_record[iArrayIndex] = 1;
-                    TPD_INFO("FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], fdm_rawdata_N[iArrayIndex], fdm_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], fdm_rawdata_N[iArrayIndex], fdm_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         snprintf(buf, 128,
                                  "FDM FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, fdm_raw_data[iArrayIndex], fdm_rawdata_N[iArrayIndex], fdm_rawdata_P[iArrayIndex]);
@@ -3596,7 +3596,7 @@ TEST_END:
 	fd = sys_open(data_buf, O_WRONLY | O_CREAT | O_TRUNC, 0);
 #endif
     if (fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         goto OUT;
     }
 
@@ -3667,7 +3667,7 @@ OUT:
     set_fs(old_fs);
 
     snprintf(message, MESSAGE_SIZE, "%d errors. %s", err_cnt, buf);
-    TPD_INFO("%d errors. %s", err_cnt, buf);
+    TPD_DEBUG("%d errors. %s", err_cnt, buf);
 
 RELEASE_DATA:
     if (raw_record)
@@ -3722,7 +3722,7 @@ static bool nvt_irq_throw_away(void *chip_data)
     struct chip_data_nt36525b *chip_info;
     chip_info = (struct chip_data_nt36525b *)chip_data;
     if (chip_info->need_judge_irq_throw) {
-        TPD_INFO("wake up the throw away irq!\n");
+        TPD_DEBUG("wake up the throw away irq!\n");
         return true;
 
     }
@@ -3760,37 +3760,37 @@ static void nvt_data_read(struct seq_file *s, struct chip_data_nt36525b *chip_in
     int32_t *xdata = NULL;
     int32_t buf_len = 0;
 
-    TPD_INFO("nvt clear fw status start\n");
+    TPD_DEBUG("nvt clear fw status start\n");
     ret = nvt_clear_fw_status(chip_info);
     if (ret < 0) {
-        TPD_INFO("clear_fw_status error, return\n");
+        TPD_DEBUG("clear_fw_status error, return\n");
         return;
     }
 
     nvt_change_mode(chip_info, TEST_MODE_2);
-    TPD_INFO("nvt check fw status start\n");
+    TPD_DEBUG("nvt check fw status start\n");
     ret = nvt_check_fw_status(chip_info);
     if (ret < 0) {
-        TPD_INFO("check_fw_status error, return\n");
+        TPD_DEBUG("check_fw_status error, return\n");
         return;
     }
 
-    TPD_INFO("nvt get fw info start");
+    TPD_DEBUG("nvt get fw info start");
     ret = nvt_get_fw_info_noflash(chip_info);
     if (ret < 0) {
-        TPD_INFO("get_fw_info error, return\n");
+        TPD_DEBUG("get_fw_info error, return\n");
         return;
     }
 
     buf_len = chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * sizeof(int32_t);
     xdata = kzalloc(buf_len, GFP_KERNEL);
     if (!xdata) {
-        TPD_INFO("%s, malloc memory failed\n", __func__);
+        TPD_DEBUG("%s, malloc memory failed\n", __func__);
         return;
     }
 
     pipe = nvt_get_fw_pipe_noflash(chip_info);
-    TPD_INFO("nvt_get_fw_pipe:%d\n", pipe);
+    TPD_DEBUG("nvt_get_fw_pipe:%d\n", pipe);
     switch (read_type) {
     case NVT_RAWDATA:
         seq_printf(s, "raw_data:\n");
@@ -3816,7 +3816,7 @@ static void nvt_data_read(struct seq_file *s, struct chip_data_nt36525b *chip_in
     }
 
     nvt_change_mode(chip_info, NORMAL_MODE);
-    TPD_INFO("change normal mode end\n");
+    TPD_DEBUG("change normal mode end\n");
 
     //print all data
     for (i = 0; i < chip_info->hw_res->RX_NUM; i++) {
@@ -3839,17 +3839,17 @@ static void nvt_debug_data_read(struct seq_file *s, struct chip_data_nt36525b *c
     int32_t *xdata = NULL;
     int32_t buf_len = 0;
 
-    TPD_INFO("nvt get fw info start");
+    TPD_DEBUG("nvt get fw info start");
     ret = nvt_get_fw_info_noflash(chip_info);
     if (ret < 0) {
-        TPD_INFO("get_fw_info error, return\n");
+        TPD_DEBUG("get_fw_info error, return\n");
         return;
     }
 
     buf_len = chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * sizeof(int32_t);
     xdata = kzalloc(buf_len, GFP_KERNEL);
     if (!xdata) {
-        TPD_INFO("%s, malloc memory failed\n", __func__);
+        TPD_DEBUG("%s, malloc memory failed\n", __func__);
         return;
     }
 
@@ -3990,7 +3990,7 @@ static int32_t nvt_read_fw_short(struct chip_data_nt36525b *chip_info, int32_t *
     int32_t iArrayIndex = 0;
 
     if (xdata_len / sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw short buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw short buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -4007,7 +4007,7 @@ static int32_t nvt_read_fw_short(struct chip_data_nt36525b *chip_info, int32_t *
 
     rawdata_buf = (uint8_t *)kzalloc(chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM * 2, GFP_KERNEL);
     if (!rawdata_buf) {
-        TPD_INFO("kzalloc for rawdata_buf failed!\n");
+        TPD_DEBUG("kzalloc for rawdata_buf failed!\n");
         return -ENOMEM;
     }
 
@@ -4068,7 +4068,7 @@ static int32_t nvt_read_fw_open(struct chip_data_nt36525b *chip_info, int32_t *x
     uint8_t buf[128] = {0};
 
     if (xdata_len / sizeof(int32_t) < chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM) {
-        TPD_INFO("read fw open buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
+        TPD_DEBUG("read fw open buffer(%d) less than data size(%d)\n", xdata_len, chip_info->hw_res->TX_NUM * chip_info->hw_res->RX_NUM);
         return -1;
     }
 
@@ -4085,7 +4085,7 @@ static int32_t nvt_read_fw_open(struct chip_data_nt36525b *chip_info, int32_t *x
 
     rawdata_buf = (uint8_t *)kzalloc(tx_num * rx_num * 2, GFP_KERNEL);
     if (!rawdata_buf) {
-        TPD_INFO("kzalloc for rawdata_buf failed!\n");
+        TPD_DEBUG("kzalloc for rawdata_buf failed!\n");
         return -ENOMEM;
     }
 
@@ -4180,7 +4180,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
 
     fw_name_test = kzalloc(MAX_FW_NAME_LENGTH, GFP_KERNEL);
     if(fw_name_test == NULL) {
-        TPD_INFO("fw_name_test kzalloc error!\n");
+        TPD_DEBUG("fw_name_test kzalloc error!\n");
         return;
     }
 
@@ -4188,12 +4188,12 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     copy_len = p_node - chip_info->fw_name;
     memcpy(fw_name_test, chip_info->fw_name, copy_len);
     strlcat(fw_name_test, postfix, MAX_FW_NAME_LENGTH);
-    TPD_INFO("fw_name_test is %s\n", fw_name_test);
+    TPD_DEBUG("fw_name_test is %s\n", fw_name_test);
 
     //update test firmware
     ret = request_firmware(&fw, fw_name_test, chip_info->dev);
     if (ret != 0) {
-        TPD_INFO("request test firmware failed! ret = %d\n", ret);
+        TPD_DEBUG("request test firmware failed! ret = %d\n", ret);
         kfree(fw_name_test);
         fw_name_test = NULL;
         return;
@@ -4205,19 +4205,19 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
 
     //ret = nvt_fw_update(chip_info, fw, 0);
     if(ret > 0) {
-        TPD_INFO("fw update failed!\n");
+        TPD_DEBUG("fw update failed!\n");
         goto RELEASE_FIRMWARE;
     }
-    TPD_INFO("update test firmware successed!\n");
+    TPD_DEBUG("update test firmware successed!\n");
 
     if (nvt_switch_FreqHopEnDis(chip_info, FREQ_HOP_DISABLE)) {
-        TPD_INFO("switch frequency hopping disable failed!\n");
+        TPD_DEBUG("switch frequency hopping disable failed!\n");
         seq_printf(s, "switch frequency hopping disable failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     if (nvt_check_fw_reset_state_noflash(chip_info, RESET_STATE_NORMAL_RUN)) {
-        TPD_INFO("check fw reset state failed!\n");
+        TPD_DEBUG("check fw reset state failed!\n");
         seq_printf(s, "check fw reset state failed!\n");
         goto RELEASE_FIRMWARE;
     }
@@ -4225,27 +4225,27 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     msleep(100);
 
     //---Enter Test Mode---
-    TPD_INFO("enter test mode\n");
+    TPD_DEBUG("enter test mode\n");
     if (nvt_clear_fw_status(chip_info)) {
-        TPD_INFO("clear fw status failed!\n");
+        TPD_DEBUG("clear fw status failed!\n");
         seq_printf(s, "clear fw status failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     nvt_change_mode(chip_info, MP_MODE_CC);
     if (nvt_check_fw_status(chip_info)) {
-        TPD_INFO("check fw status failed!\n");
+        TPD_DEBUG("check fw status failed!\n");
         seq_printf(s, "check fw status failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
     if (nvt_get_fw_info_noflash(chip_info)) {
-        TPD_INFO("get fw info failed!\n");
+        TPD_DEBUG("get fw info failed!\n");
         seq_printf(s, "get fw info failed!\n");
         goto RELEASE_FIRMWARE;
     }
 
-    TPD_INFO("malloc raw_data space\n");
+    TPD_DEBUG("malloc raw_data space\n");
     buf_len = tx_num * rx_num * sizeof(int32_t);
     raw_data = kzalloc(buf_len, GFP_KERNEL);
     cc_data = kzalloc(buf_len, GFP_KERNEL);
@@ -4282,7 +4282,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
         goto RELEASE_FIRMWARE;
     }
 
-    TPD_INFO("malloc raw_record space\n");
+    TPD_DEBUG("malloc raw_record space\n");
     record_len = tx_num * rx_num * sizeof(uint8_t);
     raw_record = kzalloc(record_len, GFP_KERNEL);
     cc_record = kzalloc(record_len, GFP_KERNEL);
@@ -4337,7 +4337,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     doze_diff_rawdata_N = (int32_t *)(nvt_testdata->fw->data + ph->array_Doze_Diff_N_offset);
 
     //---FW Rawdata Test---
-    TPD_INFO("FW Rawdata Test \n");
+    TPD_DEBUG("FW Rawdata Test \n");
     memset(raw_data, 0, buf_len);
     memset(raw_record, 0, record_len);
     rawdata_result = NVT_MP_PASS;
@@ -4349,7 +4349,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                || (raw_data[iArrayIndex] < fw_rawdata_N[iArrayIndex])) {
                 rawdata_result = NVT_MP_FAIL;
                 raw_record[iArrayIndex] = 1;
-                TPD_INFO("rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
+                TPD_DEBUG("rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
                 if (!err_cnt) {
                     seq_printf(s, "rawdata Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, raw_data[iArrayIndex], fw_rawdata_N[iArrayIndex], fw_rawdata_P[iArrayIndex]);
                 }
@@ -4358,7 +4358,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
         }
     }
 
-    TPD_INFO("FW cc data test \n");
+    TPD_DEBUG("FW cc data test \n");
     memset(cc_data, 0, buf_len);
     memset(cc_record, 0, record_len);
     cc_result = NVT_MP_PASS;
@@ -4374,7 +4374,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (cc_data[iArrayIndex] < ph->config_Lmt_FW_CC_N)) {
                     cc_result = NVT_MP_FAIL;
                     cc_record[iArrayIndex] = 1;
-                    TPD_INFO("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
+                    TPD_DEBUG("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
                     if (!err_cnt) {
                         seq_printf(s, "cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], ph->config_Lmt_FW_CC_N, ph->config_Lmt_FW_CC_P);
                     }
@@ -4390,7 +4390,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (cc_data[iArrayIndex] < cc_data_N[iArrayIndex])) {
                     cc_result = NVT_MP_FAIL;
                     cc_record[iArrayIndex] = 1;
-                    TPD_INFO("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
+                    TPD_DEBUG("cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "cc data Test failed at rawdata[%d][%d] = %d [%d,%d]\n", i, j, cc_data[iArrayIndex], cc_data_N[iArrayIndex], cc_data_P[iArrayIndex]);
                     }
@@ -4404,7 +4404,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     nvt_change_mode(chip_info, NORMAL_MODE);
 
     //---Noise Test---
-    TPD_INFO("FW Noise Test \n");
+    TPD_DEBUG("FW Noise Test \n");
     memset(noise_p_data, 0, buf_len); //store max
     memset(noise_n_data, 0, buf_len); //store min
     memset(noise_p_record, 0, record_len);
@@ -4412,7 +4412,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     noise_p_result = NVT_MP_PASS;
     noise_n_result = NVT_MP_PASS;
     if (nvt_read_fw_noise(chip_info, ph->config_Diff_Test_Frame, noise_p_data, noise_n_data, buf_len) != 0) {
-        TPD_INFO("read Noise data failed!\n");
+        TPD_DEBUG("read Noise data failed!\n");
         noise_p_result = NVT_MP_FAIL_READ_DATA;
         noise_n_result = NVT_MP_FAIL_READ_DATA;
         seq_printf(s, "read Noise data failed!\n");
@@ -4428,7 +4428,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (noise_p_data[iArrayIndex] < ph->config_Lmt_FW_Diff_N)) {
                     noise_p_result = NVT_MP_FAIL;
                     noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
+                    TPD_DEBUG("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     }
@@ -4444,7 +4444,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (noise_n_data[iArrayIndex] < ph->config_Lmt_FW_Diff_N)) {
                     noise_n_result = NVT_MP_FAIL;
                     noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
+                    TPD_DEBUG("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], ph->config_Lmt_FW_Diff_N, ph->config_Lmt_FW_Diff_P);
                     }
@@ -4460,7 +4460,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (noise_p_data[iArrayIndex] < diff_rawdata_N[iArrayIndex])) {
                     noise_p_result = NVT_MP_FAIL;
                     noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_p_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     }
@@ -4475,7 +4475,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (noise_n_data[iArrayIndex] < diff_rawdata_N[iArrayIndex])) {
                     noise_n_result = NVT_MP_FAIL;
                     noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, noise_n_data[iArrayIndex], diff_rawdata_N[iArrayIndex], diff_rawdata_P[iArrayIndex]);
                     }
@@ -4486,7 +4486,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Doze Noise Test---
-    TPD_INFO("Doze FW Noise Test \n");
+    TPD_DEBUG("Doze FW Noise Test \n");
     memset(doze_noise_p_data, 0, buf_len); //store max
     memset(doze_noise_n_data, 0, buf_len); //store min
     memset(doze_noise_p_record, 0, record_len);
@@ -4494,7 +4494,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     doze_noise_p_result = NVT_MP_PASS;
     doze_noise_n_result = NVT_MP_PASS;
     if (nvt_read_doze_fw_noise(chip_info, ph->config_Doze_Noise_Test_Frame, ph->doze_X_Channel, doze_noise_p_data, doze_noise_n_data, buf_len) != 0) {
-        TPD_INFO("read Doze Noise data failed!\n");
+        TPD_DEBUG("read Doze Noise data failed!\n");
         doze_noise_p_result = NVT_MP_FAIL_READ_DATA;
         doze_noise_n_result = NVT_MP_FAIL_READ_DATA;
         seq_printf(s, "read Doze Noise data failed!\n");
@@ -4510,7 +4510,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_noise_p_data[iArrayIndex] < ph->config_Lmt_Doze_Diff_N)) {
                     doze_noise_p_result = NVT_MP_FAIL;
                     doze_noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_p_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_p_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_p_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     }
@@ -4526,7 +4526,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_noise_n_data[iArrayIndex] < ph->config_Lmt_Doze_Diff_N)) {
                     doze_noise_n_result = NVT_MP_FAIL;
                     doze_noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], ph->config_Lmt_Doze_Diff_N, ph->config_Lmt_Doze_Diff_P);
                     }
@@ -4542,7 +4542,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_noise_n_data[iArrayIndex] < doze_diff_rawdata_N[iArrayIndex])) {
                     doze_noise_p_result = NVT_MP_FAIL;
                     doze_noise_p_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Max Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     }
@@ -4557,7 +4557,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_noise_n_data[iArrayIndex] < doze_diff_rawdata_N[iArrayIndex])) {
                     doze_noise_n_result = NVT_MP_FAIL;
                     doze_noise_n_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze Noise RawData_Diff_Min Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_noise_n_data[iArrayIndex], doze_diff_rawdata_N[iArrayIndex], doze_diff_rawdata_P[iArrayIndex]);
                     }
@@ -4568,12 +4568,12 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Doze FW Rawdata Test---
-    TPD_INFO("Doze FW Rawdata Test \n");
+    TPD_DEBUG("Doze FW Rawdata Test \n");
     memset(doze_raw_data, 0, buf_len);
     memset(doze_raw_record, 0, record_len);
     doze_rawdata_result = NVT_MP_PASS;
     if(nvt_read_doze_baseline(chip_info, ph->doze_X_Channel, doze_raw_data, buf_len) != 0) {
-        TPD_INFO("read Doze FW Rawdata failed!\n");
+        TPD_DEBUG("read Doze FW Rawdata failed!\n");
         doze_rawdata_result = NVT_MP_FAIL_READ_DATA;
         seq_printf(s, "read Doze FW Rawdata failed!\n");
         err_cnt++;
@@ -4588,7 +4588,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_raw_data[iArrayIndex] < ph->config_Lmt_Doze_Rawdata_N)) {
                     doze_rawdata_result = NVT_MP_FAIL;
                     doze_raw_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
+                    TPD_DEBUG("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
                     if (!err_cnt) {
                         seq_printf(s, "Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], ph->config_Lmt_Doze_Rawdata_N, ph->config_Lmt_Doze_Rawdata_P);
                     }
@@ -4604,7 +4604,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (doze_raw_data[iArrayIndex] < doze_rawdata_N[iArrayIndex])) {
                     doze_rawdata_result = NVT_MP_FAIL;
                     doze_raw_record[iArrayIndex] = 1;
-                    TPD_INFO("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Doze FW Rawdata Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, doze_raw_data[iArrayIndex], doze_rawdata_N[iArrayIndex], doze_rawdata_P[iArrayIndex]);
                     }
@@ -4615,12 +4615,12 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //--Short Test---
-    TPD_INFO("FW Short Test \n");
+    TPD_DEBUG("FW Short Test \n");
     memset(short_data, 0, buf_len);
     memset(short_record, 0, record_len);
     short_result = NVT_MP_PASS;
     if (nvt_read_fw_short(chip_info, short_data, buf_len) != 0) {
-        TPD_INFO("read Short test data failed!\n");
+        TPD_DEBUG("read Short test data failed!\n");
         short_result = NVT_MP_FAIL_READ_DATA;
         seq_printf(s, "read Short test data failed!\n");
         err_cnt++;
@@ -4634,7 +4634,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (short_data[iArrayIndex] < ph->config_Lmt_Short_Rawdata_N)) {
                     short_result = NVT_MP_FAIL;
                     short_record[iArrayIndex] = 1;
-                    TPD_INFO("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
+                    TPD_DEBUG("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
                     if (!err_cnt) {
                         seq_printf(s, "Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], ph->config_Lmt_Short_Rawdata_N, ph->config_Lmt_Short_Rawdata_P);
                     }
@@ -4650,7 +4650,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                    || (short_data[iArrayIndex] < short_rawdata_N[iArrayIndex])) {
                     short_result = NVT_MP_FAIL;
                     short_record[iArrayIndex] = 1;
-                    TPD_INFO("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
+                    TPD_DEBUG("Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
                     if (!err_cnt) {
                         seq_printf(s, "Short Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, short_data[iArrayIndex], short_rawdata_N[iArrayIndex], short_rawdata_P[iArrayIndex]);
                     }
@@ -4661,12 +4661,12 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
     }
 
     //---Open Test---
-    TPD_INFO("FW Open Test \n");
+    TPD_DEBUG("FW Open Test \n");
     memset(open_data, 0, buf_len);
     memset(open_record, 0, record_len);
     open_result = NVT_MP_PASS;
     if (nvt_read_fw_open(chip_info, open_data, buf_len) != 0) {
-        TPD_INFO("read Open test data failed!\n");
+        TPD_DEBUG("read Open test data failed!\n");
         open_result = NVT_MP_FAIL_READ_DATA;
         seq_printf(s, "read Open test data failed!\n");
         err_cnt++;
@@ -4679,7 +4679,7 @@ static void nvt_auto_test(struct seq_file *s, void *chip_data, struct nvt_testda
                || (open_data[iArrayIndex] < open_rawdata_N[iArrayIndex])) {
                 open_result = NVT_MP_FAIL;
                 open_record[iArrayIndex] = 1;
-                TPD_INFO("Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, open_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
+                TPD_DEBUG("Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, open_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
                 if (!err_cnt) {
                     seq_printf(s, "Open Test failed at data[%d][%d] = %d [%d,%d]\n", i, j, open_data[iArrayIndex], open_rawdata_N[iArrayIndex], open_rawdata_P[iArrayIndex]);
                 }
@@ -4723,7 +4723,7 @@ TEST_END:
 #endif
 
     if (nvt_testdata->fd < 0) {
-        TPD_INFO("Open log file '%s' failed.\n", data_buf);
+        TPD_DEBUG("Open log file '%s' failed.\n", data_buf);
         //seq_printf(s, "Open log file '%s' failed.\n", data_buf);
         //err_cnt++;
         goto OUT;
@@ -4857,7 +4857,7 @@ RELEASE_DATA:
 RELEASE_FIRMWARE:
     seq_printf(s, "FW:0x%llx\n", nvt_testdata->TP_FW);
     seq_printf(s, "%d error(s). %s\n", err_cnt, err_cnt ? "" : "All test passed.");
-    TPD_INFO(" TP auto test %d error(s). %s\n", err_cnt, err_cnt ? "" : "All test passed.");
+    TPD_DEBUG(" TP auto test %d error(s). %s\n", err_cnt, err_cnt ? "" : "All test passed.");
     release_firmware(fw);
     kfree(fw_name_test);
     return;
@@ -5013,7 +5013,7 @@ static int  nova_apk_gesture_info(void *chip_data, char *buf, int len)
         y = y + (chip_info->ts->gesture_buf[i * 3 + 4] & 0x0F);
         //y = y * (chip_info->resolution_y) / ( 2);
 
-        //TPD_INFO("nova_apk_gesture_info:gesture x is %d,y is %d.\n", x, y);
+        //TPD_DEBUG("nova_apk_gesture_info:gesture x is %d,y is %d.\n", x, y);
 
         if (len < i * 4 + 2) {
             break;
@@ -5155,7 +5155,7 @@ static void nova_init_oplus_apk_op(struct touchpanel_data *ts)
         //apk_op->apk_debug_info = ili_apk_debug_info;
 
     } else {
-        TPD_INFO("Can not kzalloc apk op.\n");
+        TPD_DEBUG("Can not kzalloc apk op.\n");
     }
 }
 #endif // end of CONFIG_OPLUS_TP_APK
@@ -5168,12 +5168,12 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
     struct touchpanel_data *ts = NULL;
     int ret = -1;
 
-    TPD_INFO("%s  is called\n", __func__);
+    TPD_DEBUG("%s  is called\n", __func__);
 
     /* 1. alloc chip info */
     chip_info = kzalloc(sizeof(struct chip_data_nt36525b), GFP_KERNEL);
     if (chip_info == NULL) {
-        TPD_INFO("chip info kzalloc error\n");
+        TPD_DEBUG("chip info kzalloc error\n");
         ret = -ENOMEM;
         return ret;
     }
@@ -5183,7 +5183,7 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
     /* 2. Alloc common ts */
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto ts_malloc_failed;
     }
     memset(ts, 0, sizeof(*ts));
@@ -5191,7 +5191,7 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
     chip_info->g_fw_buf = vmalloc(128 * 1024);
 
     if (chip_info->g_fw_buf == NULL) {
-        TPD_INFO("fw buf vmalloc error\n");
+        TPD_DEBUG("fw buf vmalloc error\n");
         //ret = -ENOMEM;
         goto err_g_fw_buf;
     }
@@ -5199,7 +5199,7 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
 
     chip_info->fw_buf_dma = kzalloc(128 * 1024, GFP_KERNEL | GFP_DMA);
     if (chip_info->fw_buf_dma == NULL) {
-        TPD_INFO("fw kzalloc error\n");
+        TPD_DEBUG("fw kzalloc error\n");
         //ret = -ENOMEM;
         goto err_fw_dma;
     }
@@ -5225,7 +5225,7 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
 
     //---prepare for spi parameter---
     if (ts->s_client->master->flags & SPI_MASTER_HALF_DUPLEX) {
-        TPD_INFO("Full duplex not supported by master\n");
+        TPD_DEBUG("Full duplex not supported by master\n");
         ret = -EIO;
         goto err_spi_setup;
     }
@@ -5245,20 +5245,20 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
 
     ret = spi_setup(ts->s_client);
     if (ret < 0) {
-        TPD_INFO("Failed to perform SPI setup\n");
+        TPD_DEBUG("Failed to perform SPI setup\n");
         goto err_spi_setup;
     }
 #endif	//CONFIG_SPI_MT65XX
 #else // else of CONFIG_TOUCHPANEL_MTK_PLATFORM
     ret = spi_setup(ts->s_client);
     if (ret < 0) {
-        TPD_INFO("Failed to perform SPI setup\n");
+        TPD_DEBUG("Failed to perform SPI setup\n");
         goto err_spi_setup;
     }
 
 #endif // end of CONFIG_TOUCHPANEL_MTK_PLATFORM
 
-    TPD_INFO("mode=%d, max_speed_hz=%d\n", ts->s_client->mode, ts->s_client->max_speed_hz);
+    TPD_DEBUG("mode=%d, max_speed_hz=%d\n", ts->s_client->mode, ts->s_client->max_speed_hz);
 
     /* 4. file_operations callbacks binding */
     ts->ts_ops = &nvt_ops;
@@ -5280,7 +5280,7 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
     if (ts->esd_handle_support) {
         chip_info->esd_check_enabled = false;
         ts->esd_info.esd_work_time = msecs_to_jiffies(NVT_TOUCH_ESD_CHECK_PERIOD); // change esd check interval to 1.5s
-        TPD_INFO("%s:change esd handle time to %d s\n", __func__, ts->esd_info.esd_work_time / HZ);
+        TPD_DEBUG("%s:change esd handle time to %d s\n", __func__, ts->esd_info.esd_work_time / HZ);
     }
 
     /*6. create nvt test files*/
@@ -5299,15 +5299,15 @@ static int __maybe_unused nvt_tp_probe(struct spi_device *client)
     if (ts->boot_mode == MSM_BOOT_MODE__RECOVERY || is_oem_unlocked() || ts->fw_update_in_probe_with_headfile)
 #endif
     {
-        TPD_INFO("In Recovery mode, no-flash download fw by headfile\n");
+        TPD_DEBUG("In Recovery mode, no-flash download fw by headfile\n");
         ret = nvt_fw_update(chip_info, NULL, 0);
         if(ret > 0) {
-            TPD_INFO("fw update failed!\n");
+            TPD_DEBUG("fw update failed!\n");
         }
     }
 
     chip_info->probe_done = 1;
-    TPD_INFO("%s, probe normal end\n", __func__);
+    TPD_DEBUG("%s, probe normal end\n", __func__);
     return 0;
 
 err_register_driver:
@@ -5334,7 +5334,7 @@ ts_malloc_failed:
     chip_info = NULL;
     ret = -1;
 
-    TPD_INFO("%s, probe error\n", __func__);
+    TPD_DEBUG("%s, probe error\n", __func__);
     return ret;
 }
 
@@ -5342,7 +5342,7 @@ static int nvt_tp_remove(struct spi_device *client)
 {
     struct touchpanel_data *ts = spi_get_drvdata(client);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     kfree(ts);
 
     return 0;
@@ -5352,7 +5352,7 @@ static int nvt_spi_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
     tp_i2c_suspend(ts);
 
     return 0;
@@ -5362,7 +5362,7 @@ static int nvt_spi_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     tp_i2c_resume(ts);
 
     return 0;
@@ -5408,13 +5408,13 @@ static struct spi_driver tp_spi_driver = {
 
 static int32_t __init nvt_driver_init(void)
 {
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     if (!tp_judge_ic_match(TPD_DEVICE)) {
         return -1;
     }
 
     if (spi_register_driver(&tp_spi_driver) != 0) {
-        TPD_INFO("unable to add spi driver.\n");
+        TPD_DEBUG("unable to add spi driver.\n");
         return -1;
     }
     return 0;

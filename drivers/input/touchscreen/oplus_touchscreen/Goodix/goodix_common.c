@@ -58,7 +58,7 @@ int32_t *getpara_for_item(const struct firmware *fw, uint8_t item_index, uint32_
 
     /*step1: check item index is support or not*/
     if (!(test_header->test_item & (1 << item_index))) {
-        TPD_INFO("item_index:%d is not support\n", item_index);
+        TPD_DEBUG("item_index:%d is not support\n", item_index);
         return NULL;
     }
 
@@ -72,25 +72,25 @@ int32_t *getpara_for_item(const struct firmware *fw, uint8_t item_index, uint32_
     /*step3: find item_index offset from the limit img*/
     item_offset = search_for_item_offset(fw, item_cnt, item_index);
     if (item_offset == 0) {
-        TPD_INFO("search for item limit offset failed\n");
+        TPD_DEBUG("search for item limit offset failed\n");
         return NULL;
     }
 
     /*step4: check the item magic is support or not*/
     item_header = (struct auto_test_item_header *)(fw->data + item_offset);
     if (item_header->item_magic != Limit_ItemMagic && item_header->item_magic != Limit_ItemMagic_V2) {
-        TPD_INFO("test item: %d magic number(%4x) is wrong\n", item_index, item_header->item_magic);
+        TPD_DEBUG("test item: %d magic number(%4x) is wrong\n", item_index, item_header->item_magic);
         return NULL;
     }
 
     /*step5: get the parameter from the limit img*/
     if (item_header->para_num == 0) {
-        TPD_INFO("item: %d has %d no parameter\n", item_index, item_header->para_num);
+        TPD_DEBUG("item: %d has %d no parameter\n", item_index, item_header->para_num);
         return NULL;
     } else {
         p_buffer = (int32_t *)(fw->data + item_offset + sizeof(struct auto_test_item_header));
         for (i = 0; i < item_header->para_num; i++) {
-            TPD_INFO("item: %d has parameter:%d\n", item_index, p_buffer[i]);
+            TPD_DEBUG("item: %d has parameter:%d\n", item_index, p_buffer[i]);
         }
     }
     *para_num = item_header->para_num;
@@ -123,7 +123,7 @@ struct test_item_info *get_test_item_info(const struct firmware *fw, uint8_t ite
     /*step1: check item index is support or not*/
     test_header = (struct auto_test_header *)fw->data;
     if (!(test_header->test_item & (1 << item_index))) {
-        TPD_INFO("item_index:%d is not support\n", item_index);
+        TPD_DEBUG("item_index:%d is not support\n", item_index);
         goto ERROR;
     }
     /*step2: get max item*/
@@ -136,7 +136,7 @@ struct test_item_info *get_test_item_info(const struct firmware *fw, uint8_t ite
     /*step3: find item_index offset from the limit img*/
     item_offset = search_for_item_offset(fw, item_cnt, item_index);
     if (item_offset == 0) {
-        TPD_INFO("search for item limit offset failed\n");
+        TPD_DEBUG("search for item limit offset failed\n");
         goto ERROR;
     }
     /*get item_offset*/
@@ -145,7 +145,7 @@ struct test_item_info *get_test_item_info(const struct firmware *fw, uint8_t ite
     /*step4: check the item magic is support or not*/
     item_header = (struct auto_test_item_header *)(fw->data + item_offset);
     if (item_header->item_magic != Limit_ItemMagic && item_header->item_magic != Limit_ItemMagic_V2) {
-        TPD_INFO("test item: %d magic number(%4x) is wrong\n", item_index, item_header->item_magic);
+        TPD_DEBUG("test item: %d magic number(%4x) is wrong\n", item_index, item_header->item_magic);
         goto ERROR;
     }
     /*get item_header*/
@@ -158,12 +158,12 @@ struct test_item_info *get_test_item_info(const struct firmware *fw, uint8_t ite
 
     /*step5: get the parameter from the limit img*/
     if (item_header->para_num == 0) {
-        TPD_INFO("item: %d has %d no parameter\n", item_index, item_header->para_num);
+        TPD_DEBUG("item: %d has %d no parameter\n", item_index, item_header->para_num);
         goto ERROR;
     } else {
         p_buffer = (int32_t *)(fw->data + item_offset + sizeof(struct auto_test_item_header));
         for (i = 0; i < item_header->para_num; i++) {
-            TPD_INFO("item: %d has parameter:%d\n", item_index, p_buffer[i]);
+            TPD_DEBUG("item: %d has parameter:%d\n", item_index, p_buffer[i]);
         }
     }
     /*get item para number and para buffer*/
@@ -258,7 +258,7 @@ int ClockWise(struct Coordinate *p, int n)
             count++;
     }
 
-    TPD_INFO("ClockWise count = %d\n", count);
+    TPD_DEBUG("ClockWise count = %d\n", count);
 
     if (count > 0)
         return 1;
@@ -329,14 +329,14 @@ static ssize_t proc_health_info_write(struct file *file, const char __user *buff
 
     if (kstrtoint(buf, 10, &temp))
     {
-        TPD_INFO("%s: kstrtoint error\n", __func__);
+        TPD_DEBUG("%s: kstrtoint error\n", __func__);
         return count;
     }
     if (temp > 2)
         return count;
 
     mutex_lock(&ts->mutex);
-    TPD_INFO("%s: value = %d\n", __func__, temp);
+    TPD_DEBUG("%s: value = %d\n", __func__, temp);
     goodix_ops->set_health_info_state(ts->chip_data, temp);
     mutex_unlock(&ts->mutex);
 
@@ -411,7 +411,7 @@ static ssize_t goodix_water_protect_read(struct file *file, char *buff, size_t l
 
     if (!syna_ops->goodix_water_protect_read) {
         if(copy_to_user(buff, "Not support auto-test proc node\n", strlen("Not support auto-test proc node\n")))
-            TPD_INFO("%s,here:%d\n", __func__, __LINE__);
+            TPD_DEBUG("%s,here:%d\n", __func__, __LINE__);
         return 0;
     }
 
@@ -433,7 +433,7 @@ static ssize_t goodix_water_protect_write(struct file *file, const char *buff, s
         return 0;
 
     if (!syna_ops->goodix_water_protect_write) {
-        TPD_INFO("Not support dd proc node %s %d\n", __func__, __LINE__);
+        TPD_DEBUG("Not support dd proc node %s %d\n", __func__, __LINE__);
         return 0;
     }
 
@@ -458,7 +458,7 @@ void goodix_limit_read(struct seq_file *s, struct touchpanel_data *ts)
 
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "Request failed, Check the path\n");
         return;
     }
@@ -466,7 +466,7 @@ void goodix_limit_read(struct seq_file *s, struct touchpanel_data *ts)
     ph = (struct auto_test_header *)(fw->data);
     p_item_offset = (uint32_t *)(fw->data + 16);
 	if ((ph->magic1 != 0x494D494C) || (ph->magic2 != 0x474D4954)) {
-        TPD_INFO("limit image is not generated by oplus\n");
+        TPD_DEBUG("limit image is not generated by oplus\n");
         seq_printf(s, "limit image is not generated by oplus\n");
         release_firmware(fw);
         return;
@@ -478,7 +478,7 @@ void goodix_limit_read(struct seq_file *s, struct touchpanel_data *ts)
         }
     }
     if (!item_cnt) {
-        TPD_INFO("limit image has no test item\n");
+        TPD_DEBUG("limit image has no test item\n");
         seq_printf(s, "limit image has no test item\n");
     }
 
@@ -596,7 +596,7 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
     //step3:request test limit data from userspace
     ret = request_firmware(&fw, ts->panel_data.test_limit_name, ts->dev);
     if (ret < 0) {
-        TPD_INFO("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
+        TPD_DEBUG("Request firmware failed - %s (%d)\n", ts->panel_data.test_limit_name, ret);
         seq_printf(s, "No limit IMG\n");
         mutex_unlock(&ts->mutex);
         if (ts->int_mode == BANNABLE) {
@@ -609,11 +609,11 @@ static int tp_auto_test_read_func(struct seq_file *s, void *v)
     test_head = (struct auto_test_header *)fw->data;
     p_data32 = (uint32_t *)(fw->data + 16);
     if ((test_head->magic1 != 0x494D494C) || (test_head->magic2 != 0x474D4954)) {
-        TPD_INFO("limit image is not generated by oplus\n");
+        TPD_DEBUG("limit image is not generated by oplus\n");
         seq_printf(s, "limit image is not generated by oplus\n");
         goto OUT;
     }
-    TPD_INFO("current test item: %llx\n", test_head->test_item);
+    TPD_DEBUG("current test item: %llx\n", test_head->test_item);
 
     //init goodix_testdata
     goodix_testdata.TX_NUM = ts->hw_res.TX_NUM;
@@ -664,38 +664,38 @@ int Goodix_create_proc(struct touchpanel_data *ts, struct goodix_proc_operations
     prEntry_tmp = proc_create_data("baseline_test", 0666, ts->prEntry_tp, &tp_auto_test_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     prEntry_tmp = proc_create_data("TP_AUTO_TEST_ID", 0777, ts->prEntry_tp, &gt1x_devices_check, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     prEntry_tmp = proc_create_data("health_info_enable", 0777, ts->prEntry_tp, &goodix_health_info_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     prEntry_gt = proc_mkdir("Goodix", ts->prEntry_tp);
     if (prEntry_gt == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create GT TP proc entry\n", __func__);
+        TPD_DEBUG("%s: Couldn't create GT TP proc entry\n", __func__);
     }
 
     //show config and firmware id interface
     prEntry_tmp = proc_create_data("config_version", 0666, prEntry_gt, &gt1x_tp_config_version_proc_fops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create proc entry, %d\n", __func__, __LINE__);
     }
 
     prEntry_tmp = proc_create_data("water_protect", 0666, prEntry_gt, &goodix_water_protect_debug_ops, ts);
     if (prEntry_tmp == NULL) {
         ret = -ENOMEM;
-        TPD_INFO("%s: Couldn't create water_protect proc entry, %d\n", __func__, __LINE__);
+        TPD_DEBUG("%s: Couldn't create water_protect proc entry, %d\n", __func__, __LINE__);
     }
 
     return ret;

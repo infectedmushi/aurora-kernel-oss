@@ -598,7 +598,7 @@ static inline int syna_tcm_realloc_mem(struct syna_tcm_buffer *buffer, unsigned 
 
         buffer->buf = kmalloc(size, GFP_KERNEL);
         if (!(buffer->buf)) {
-            TPD_INFO("%s: Failed to allocate memory\n", __func__);
+            TPD_DEBUG("%s: Failed to allocate memory\n", __func__);
             buffer->buf = temp;
             //kfree(temp);
             //buffer->buf_size = 0;
@@ -607,7 +607,7 @@ static inline int syna_tcm_realloc_mem(struct syna_tcm_buffer *buffer, unsigned 
 
         retval = secure_memcpy(buffer->buf, size, temp, buffer->buf_size, buffer->buf_size);
         if (retval < 0) {
-            TPD_INFO("%s: Failed to copy data\n", __func__);
+            TPD_DEBUG("%s: Failed to copy data\n", __func__);
             kfree(temp);
             //kfree(buffer->buf);
             buffer->buf_size = size;
@@ -627,7 +627,7 @@ static inline int syna_tcm_alloc_mem(struct syna_tcm_buffer *buffer, unsigned in
         kfree(buffer->buf);
         buffer->buf = kmalloc(size, GFP_KERNEL);
         if (!(buffer->buf)) {
-            TPD_INFO("%s: Failed to allocate memory, size %d\n", __func__, size);
+            TPD_DEBUG("%s: Failed to allocate memory, size %d\n", __func__, size);
             buffer->buf_size = 0;
             buffer->data_length = 0;
             return -ENOMEM;
@@ -638,7 +638,7 @@ static inline int syna_tcm_alloc_mem(struct syna_tcm_buffer *buffer, unsigned in
     if (buffer->buf) {
         memset(buffer->buf, 0, buffer->buf_size);
     } else {
-        TPD_INFO("%s: buffer->buf is NULL, size %d\n", __func__, buffer->buf_size);
+        TPD_DEBUG("%s: buffer->buf is NULL, size %d\n", __func__, buffer->buf_size);
     }
     buffer->data_length = 0;
 

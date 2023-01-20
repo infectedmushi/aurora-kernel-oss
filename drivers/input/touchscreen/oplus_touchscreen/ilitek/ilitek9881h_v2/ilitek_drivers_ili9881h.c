@@ -43,7 +43,7 @@ void ilitek_platform_disable_irq(void)
             ipd->isEnableIRQ = false;
             TPD_DEBUG("Disable IRQ: %d\n", ipd->isEnableIRQ);
         } else
-            TPD_INFO("The number of gpio to irq is incorrect\n");
+            TPD_DEBUG("The number of gpio to irq is incorrect\n");
     } else
         TPD_DEBUG("IRQ was already disabled\n");
 
@@ -65,7 +65,7 @@ void ilitek_platform_enable_irq(void)
             ipd->isEnableIRQ = true;
             TPD_DEBUG("Enable IRQ: %d\n", ipd->isEnableIRQ);
         } else
-            TPD_INFO("The number of gpio to irq is incorrect\n");
+            TPD_DEBUG("The number of gpio to irq is incorrect\n");
     } else
         TPD_DEBUG("IRQ was already enabled\n");
 
@@ -85,7 +85,7 @@ int ilitek_platform_tp_hw_reset(bool isEnable)
             core_config->ili_sleep_type = NOT_SLEEP_MODE;
             ret = core_firmware_get_hostdownload_data();
             if (ret < 0) {
-                TPD_INFO("get host download data fail use default data\n");
+                TPD_DEBUG("get host download data fail use default data\n");
                 //goto out;
             }
             for (i = 0; i < 3; i++) {
@@ -96,7 +96,7 @@ int ilitek_platform_tp_hw_reset(bool isEnable)
                 TPD_DEBUG("HW Reset: LOW\n");
                 gpio_set_value(ipd->hw_res->reset_gpio, 0);
                 mdelay(ipd->delay_time_low);
-                TPD_INFO("HW Reset: HIGH\n");
+                TPD_DEBUG("HW Reset: HIGH\n");
                 gpio_set_value(ipd->hw_res->reset_gpio, 1);
                 mdelay(ipd->edge_delay);
 
@@ -107,17 +107,17 @@ int ilitek_platform_tp_hw_reset(bool isEnable)
                     break;
                 }
                 else {
-                    TPD_INFO("upgrade fail retry = %d\n", i);
+                    TPD_DEBUG("upgrade fail retry = %d\n", i);
                 }
 #endif
             }
         } else {
-            TPD_INFO("HW Reset: LOW\n");
+            TPD_DEBUG("HW Reset: LOW\n");
             gpio_set_value(ipd->hw_res->reset_gpio, 0);
         }
     }
     else {
-        TPD_INFO("reset gpio is Invalid\n");
+        TPD_DEBUG("reset gpio is Invalid\n");
     }
     core_fr->handleint = false;
     core_fr->isEnableFR = true;
@@ -155,12 +155,12 @@ static int ilitek_core_spi_write_then_read(struct spi_device *spi, uint8_t * txb
     int retry = 2;
 
     if(!spi){
-        TPD_INFO("spi is Null\n");
+        TPD_DEBUG("spi is Null\n");
         return -1;
     }
     while(retry--) {
         if (spi_write_then_read(spi, txbuf, w_len, rxbuf, r_len) < 0) {
-            TPD_INFO("spi Write Error, retry = %d\n", retry);
+            TPD_DEBUG("spi Write Error, retry = %d\n", retry);
             msleep(20);
         }
         else {
@@ -192,18 +192,18 @@ static int core_Rx_check(struct spi_device *spi, uint16_t check)
         txbuf[4] = 0x2;
         if (ilitek_core_spi_write_then_read(spi, txbuf, 5, txbuf, 0) < 0) {
             size = -EIO;
-            TPD_INFO("spi Write Error, res = %d\n", size);
+            TPD_DEBUG("spi Write Error, res = %d\n", size);
             return size;
         }
         txbuf[0] = SPI_READ;
         if (ilitek_core_spi_write_then_read(spi, txbuf, 1, rxbuf, 4) < 0) {
             size = -EIO;
-            TPD_INFO("spi Write Error, res = %d\n", size);
+            TPD_DEBUG("spi Write Error, res = %d\n", size);
             return size;
         }
         status = (rxbuf[2] << 8) + rxbuf[3];
         size = (rxbuf[0] << 8) + rxbuf[1];
-        //TPD_INFO("count:%d,status =0x%x size: = %d\n", i, status, size);
+        //TPD_DEBUG("count:%d,status =0x%x size: = %d\n", i, status, size);
         if(status == check)
             return size;
         mdelay(1);
@@ -236,17 +236,17 @@ static int core_Tx_unlock_check(struct spi_device *spi)
         txbuf[4] = 0x2;
         if (ilitek_core_spi_write_then_read(spi, txbuf, 5, txbuf, 0) < 0) {
             res = -EIO;
-            TPD_INFO("spi Write Error, res = %d\n", res);
+            TPD_DEBUG("spi Write Error, res = %d\n", res);
             return res;
         }
         txbuf[0] = SPI_READ;
         if (ilitek_core_spi_write_then_read(spi, txbuf, 1, rxbuf, 4) < 0) {
             res = -EIO;
-            TPD_INFO("spi Write Error, res = %d\n", res);
+            TPD_DEBUG("spi Write Error, res = %d\n", res);
             return res;
         }
         unlock = (rxbuf[2] << 8) + rxbuf[3];
-        //TPD_INFO("count:%d,unlock =0x%x\n", i, unlock);
+        //TPD_DEBUG("count:%d,unlock =0x%x\n", i, unlock);
         if(unlock == 0x9881)
             return res;
         mdelay(1);
@@ -266,14 +266,14 @@ static int core_ice_mode_read_9881H11(struct spi_device *spi, uint8_t *data, uin
 
     if (ilitek_core_spi_write_then_read(spi, txbuf, 5, txbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         return res;
     }
     //read data
     txbuf[0] = SPI_READ;
     if (ilitek_core_spi_write_then_read(spi, txbuf, 1, data, size) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         return res;
     }
     //write data lock
@@ -288,7 +288,7 @@ static int core_ice_mode_read_9881H11(struct spi_device *spi, uint8_t *data, uin
     txbuf[8] = (char)0x81;
     if (ilitek_core_spi_write_then_read(spi, txbuf, 9, txbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
     }
     return res;
 }
@@ -302,7 +302,7 @@ static int core_ice_mode_write_9881H11(struct spi_device *spi, uint8_t *data, ui
 
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*size+9, GFP_KERNEL);
     if (ERR_ALLOC_MEM(txbuf)) {
-        TPD_INFO("Failed to allocate mem\n");
+        TPD_DEBUG("Failed to allocate mem\n");
         res = -ENOMEM;
         goto out;
     }
@@ -324,7 +324,7 @@ static int core_ice_mode_write_9881H11(struct spi_device *spi, uint8_t *data, ui
     }
     if (ilitek_core_spi_write_then_read(spi, txbuf, wsize + 5, txbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         goto out;
     }
     //write data lock
@@ -339,7 +339,7 @@ static int core_ice_mode_write_9881H11(struct spi_device *spi, uint8_t *data, ui
     txbuf[8] = (char)0xA5;
     if (ilitek_core_spi_write_then_read(spi, txbuf, 9, txbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
     }
 out:
     kfree(txbuf);
@@ -357,10 +357,10 @@ static int core_ice_mode_disable_9881H11(struct spi_device *spi)
     txbuf[3] = 0x10;
     txbuf[4] = 0x18;
 
-    //TPD_INFO("FW ICE Mode disable\n");
+    //TPD_DEBUG("FW ICE Mode disable\n");
     if (ilitek_core_spi_write_then_read(spi, txbuf, 5, txbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
     }
     return res;
 }
@@ -378,18 +378,18 @@ static int core_ice_mode_enable_9881H11(struct spi_device *spi)
 
     if (ilitek_core_spi_write_then_read(spi, txbuf, 1, rxbuf, 1) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         return res;
     }
     //check recover data
     if(rxbuf[0] == 0x82)
     {
-        TPD_INFO("recover data rxbuf:0x%x\n", rxbuf[0]);
+        TPD_DEBUG("recover data rxbuf:0x%x\n", rxbuf[0]);
         return CHECK_RECOVER;
     }
     if (ilitek_core_spi_write_then_read(spi, txbuf, 5, rxbuf, 0) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
     }
     return res;
 }
@@ -409,7 +409,7 @@ static int core_spi_check_read_size(void)
     size = core_Rx_check(temp_spi, 0x5AA5);
     if (size < 0) {
         res = -EIO;
-        TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+        TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
         goto out;
     }
     return size;
@@ -425,12 +425,12 @@ static int core_spi_read_data_after_checksize(uint8_t *pBuf, uint16_t nSize)
     temp_spi = ipd->spi;
     if (core_ice_mode_read_9881H11(temp_spi, pBuf, nSize) < 0) {
         res = -EIO;
-        TPD_INFO("spi read Error, res = %d\n", res);
+        TPD_DEBUG("spi read Error, res = %d\n", res);
         goto out;
     }
     if (core_ice_mode_disable_9881H11(temp_spi) < 0) {
         res = -EIO;
-        TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+        TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
         goto out;
     }
 out:
@@ -449,21 +449,21 @@ static int core_spi_read_9881H11(struct spi_device *spi, uint8_t *pBuf, uint16_t
     size = core_Rx_check(spi, 0x5AA5);
     if (size < 0) {
         res = -EIO;
-        TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+        TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
         goto out;
     }
     if (size > nSize) {
-        TPD_INFO("check read size > nSize  size = %d, nSize = %d\n", size, nSize);
+        TPD_DEBUG("check read size > nSize  size = %d, nSize = %d\n", size, nSize);
         size = nSize;
     }
     if (core_ice_mode_read_9881H11(spi, pBuf, size) < 0) {
         res = -EIO;
-        TPD_INFO("spi read Error, res = %d\n", res);
+        TPD_DEBUG("spi read Error, res = %d\n", res);
         goto out;
     }
     if (core_ice_mode_disable_9881H11(spi) < 0) {
         res = -EIO;
-        TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+        TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
         goto out;
     }
     out:
@@ -480,16 +480,16 @@ int core_spi_rx_check_test(void)
 
     res = core_ice_mode_enable_9881H11(temp_spi);
     if (res < 0) {
-        TPD_INFO("ice mode enable error\n");
+        TPD_DEBUG("ice mode enable error\n");
     }
     size = core_Rx_check(temp_spi, 0x5AA5);
     if (size < 0) {
         res = -EIO;
-        TPD_INFO("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
+        TPD_DEBUG("spi core_Rx_check(0x5AA5) Error, res = %d\n", res);
     }
     if (core_ice_mode_disable_9881H11(temp_spi) < 0) {
         res = -EIO;
-        TPD_INFO("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
+        TPD_DEBUG("spi core_ice_mode_disable_9881H11 Error, res = %d\n", res);
     }
     return res;
 }
@@ -504,7 +504,7 @@ static int core_spi_check_header(struct spi_device *spi, uint8_t *data, uint32_t
 
     if (ilitek_core_spi_write_then_read(spi, txbuf, 1, rxbuf, 1) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         return res;
     }
     data[0] = rxbuf[0];
@@ -512,7 +512,7 @@ static int core_spi_check_header(struct spi_device *spi, uint8_t *data, uint32_t
     //check recover data
     if(rxbuf[0] == 0x82)
     {
-        TPD_INFO("recover data rxbuf:0x%x\n", rxbuf[0]);
+        TPD_DEBUG("recover data rxbuf:0x%x\n", rxbuf[0]);
         return CHECK_RECOVER;
     }
     return 0;
@@ -526,7 +526,7 @@ static int core_spi_write_9881H11(struct spi_device *spi, uint8_t *pBuf, uint16_
 
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*nSize+5, GFP_KERNEL);
     if (ERR_ALLOC_MEM(txbuf)) {
-        TPD_INFO("Failed to allocate mem\n");
+        TPD_DEBUG("Failed to allocate mem\n");
         res = -ENOMEM;
         goto out;
     }
@@ -536,13 +536,13 @@ static int core_spi_write_9881H11(struct spi_device *spi, uint8_t *pBuf, uint16_
     }
     if (core_ice_mode_write_9881H11(spi, pBuf, nSize) < 0) {
         res = -EIO;
-        TPD_INFO("spi Write Error, res = %d\n", res);
+        TPD_DEBUG("spi Write Error, res = %d\n", res);
         goto out;
     }
     if(core_Tx_unlock_check(spi) < 0)
     {
         res = -ETXTBSY;
-        TPD_INFO("check TX unlock Fail, res = %d\n", res);
+        TPD_DEBUG("check TX unlock Fail, res = %d\n", res);
     }
 out:
     kfree(txbuf);
@@ -562,7 +562,7 @@ int core_spi_write(uint8_t *pBuf, uint16_t nSize)
 
     txbuf = (uint8_t*)kmalloc(sizeof(uint8_t)*nSize+1, GFP_KERNEL);
     if (ERR_ALLOC_MEM(txbuf)) {
-        TPD_INFO("Failed to allocate mem\n");
+        TPD_DEBUG("Failed to allocate mem\n");
         res = -ENOMEM;
         goto out;
     }
@@ -582,7 +582,7 @@ int core_spi_write(uint8_t *pBuf, uint16_t nSize)
             res = 0;
         } else {
             res = -EIO;
-            TPD_INFO("spi Write Error, res = %d\n", res);
+            TPD_DEBUG("spi Write Error, res = %d\n", res);
             goto out;
         }
     }
@@ -613,7 +613,7 @@ int core_spi_read(uint8_t *pBuf, uint16_t nSize)
             res = 0;
         } else {
             res = -EIO;
-            TPD_INFO("spi Read Error, res = %d\n", res);
+            TPD_DEBUG("spi Read Error, res = %d\n", res);
             goto out;
         }
     }
@@ -627,7 +627,7 @@ static int core_spi_init(struct spi_device *spi)
     int ret = 0;
 
     if(!spi){
-        TPD_INFO("core_spi_init:spi is Null\n");
+        TPD_DEBUG("core_spi_init:spi is Null\n");
         return -EINVAL;
     }
     spi->mode = SPI_MODE_0;
@@ -635,10 +635,10 @@ static int core_spi_init(struct spi_device *spi)
 
     ret = spi_setup(spi);
     if (ret < 0){
-        TPD_INFO("ERR: fail to setup spi\n");
+        TPD_DEBUG("ERR: fail to setup spi\n");
         return -ENODEV;
     }
-    TPD_INFO("%s:name=%s,bus_num=%d,cs=%d,mode=%d,speed=%d\n",__func__,spi->modalias,
+    TPD_DEBUG("%s:name=%s,bus_num=%d,cs=%d,mode=%d,speed=%d\n",__func__,spi->modalias,
      spi->master->bus_num, spi->chip_select, spi->mode, spi->max_speed_hz);
     return 0;
 }
@@ -675,8 +675,8 @@ static int parse_touch_package_v5_0(uint8_t pid)
     TPD_DEBUG("data = %x  ;  check_sum : %x\n", g_fr_node->data[g_fr_node->len - 1], check_sum);
 
     if (g_fr_node->data[g_fr_node->len - 1] != check_sum) {
-        TPD_INFO("Wrong checksum set pointid info = -1\n");
-        TPD_INFO("check sum error data is:");
+        TPD_DEBUG("Wrong checksum set pointid info = -1\n");
+        TPD_DEBUG("check sum error data is:");
         for (i = 0; i < g_fr_node->len; i++) {
             TPD_DEBUG_NTAG("0x%02X, ", g_fr_node->data[i]);
         }
@@ -706,7 +706,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
             }
             g_mutual_data.points[i].z = g_fr_node->data[(4 * i) + 4];
             if (g_mutual_data.points[i].z == 0) {
-                TPD_INFO("pressure = 0 force set 1\n");
+                TPD_DEBUG("pressure = 0 force set 1\n");
                 g_mutual_data.points[i].z = 1;
             }
             g_mutual_data.pointid_info = g_mutual_data.pointid_info | (1 << i);
@@ -745,7 +745,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
             }
             g_mutual_data.points[i].z = g_fr_node->data[(4 * i) + 4];
             if (g_mutual_data.points[i].z == 0) {
-                TPD_INFO("pressure = 0 force set 1\n");
+                TPD_DEBUG("pressure = 0 force set 1\n");
                 g_mutual_data.points[i].z = 1;
             }
             g_mutual_data.pointid_info = g_mutual_data.pointid_info | (1 << i);
@@ -780,7 +780,7 @@ static int parse_touch_package_v5_0(uint8_t pid)
     } else {
         if (pid != 0) {
             /* ignore the pid with 0x0 after enable irq at once */
-            TPD_INFO(" **** Unknown PID : 0x%x ****\n", pid);
+            TPD_DEBUG(" **** Unknown PID : 0x%x ****\n", pid);
             res = -1;
         }
     }
@@ -801,7 +801,7 @@ static int finger_report_ver_5_0(void)
     res = core_spi_read_data_after_checksize(g_fr_node->data, g_fr_node->len);
 
     if (res < 0) {
-        TPD_INFO("Failed to read finger report packet\n");
+        TPD_DEBUG("Failed to read finger report packet\n");
         g_mutual_data.pointid_info = -1;
         goto out;
     }
@@ -824,7 +824,7 @@ static int finger_report_ver_5_0(void)
 
     res = parse_touch_package_v5_0(pid);
     if (res < 0) {
-        TPD_INFO("Failed to parse packet of finger touch\n");
+        TPD_DEBUG("Failed to parse packet of finger touch\n");
         goto out;
     }
 
@@ -887,13 +887,13 @@ static void core_fr_handler(void)
         if (g_total_len > 0) {
             g_fr_node = kmalloc(sizeof(*g_fr_node), GFP_ATOMIC);
             if (ERR_ALLOC_MEM(g_fr_node)) {
-                TPD_INFO("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node));
+                TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node));
                 goto out;
             }
 
             g_fr_node->data = kcalloc(g_total_len, sizeof(uint8_t), GFP_ATOMIC);
             if (ERR_ALLOC_MEM(g_fr_node->data)) {
-                TPD_INFO("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node->data));
+                TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n", PTR_ERR(g_fr_node->data));
                 goto out;
             }
 
@@ -904,7 +904,7 @@ static void core_fr_handler(void)
                 if (protocol->major == fr_t[i].protocol_marjor_ver) {
                     res = fr_t[i].finger_report();
                     if (res < 0) {
-                        TPD_INFO("set pointid_info = -1\n");
+                        TPD_DEBUG("set pointid_info = -1\n");
                         g_mutual_data.pointid_info = -1;
                     }
                     /* 2048 is referred to the defination by user */
@@ -912,14 +912,14 @@ static void core_fr_handler(void)
                         //tdata = kmalloc(g_total_len, GFP_ATOMIC);
                         tdata = kmalloc(MAX_INT_DATA_LEN, GFP_ATOMIC);
                         if (ERR_ALLOC_MEM(tdata)) {
-                            TPD_INFO("Failed to allocate g_fr_node memory %ld\n",
+                            TPD_DEBUG("Failed to allocate g_fr_node memory %ld\n",
                                 PTR_ERR(tdata));
                             goto out;
                         }
 
                         memcpy(tdata, g_fr_node->data, g_fr_node->len);
                     } else {
-                        TPD_INFO("total length (%d) is too long than user can handle\n",
+                        TPD_DEBUG("total length (%d) is too long than user can handle\n",
                             g_total_len);
                         goto out;
                     }
@@ -937,14 +937,14 @@ static void core_fr_handler(void)
                             memcpy(ipd->debug_buf[ipd->debug_data_frame], tdata, g_total_len);
                         }
                         else {
-                            TPD_INFO("Failed to malloc debug_buf\n");
+                            TPD_DEBUG("Failed to malloc debug_buf\n");
                         }
                         ipd->debug_data_frame++;
                         if (ipd->debug_data_frame > 1) {
-                            TPD_INFO("ipd->debug_data_frame = %d\n", ipd->debug_data_frame);
+                            TPD_DEBUG("ipd->debug_data_frame = %d\n", ipd->debug_data_frame);
                         }
                         if (ipd->debug_data_frame >= MAX_DEBUG_DATA_FRAME) {
-                            TPD_INFO("ipd->debug_data_frame = %d > 1023\n",
+                            TPD_DEBUG("ipd->debug_data_frame = %d > 1023\n",
                                 ipd->debug_data_frame);
                             ipd->debug_data_frame = MAX_DEBUG_DATA_FRAME-1;
                         }
@@ -957,21 +957,21 @@ static void core_fr_handler(void)
             }
 
             if (i >= ARRAY_SIZE(fr_t))
-                TPD_INFO("Can't find any callback functions to handle INT event\n");
+                TPD_DEBUG("Can't find any callback functions to handle INT event\n");
         }
         else {
             g_mutual_data.pointid_info = -1;
-            TPD_INFO("Wrong the length of packet\n");
+            TPD_DEBUG("Wrong the length of packet\n");
         }
     } else {
-        TPD_INFO("The figner report was disabled\n");
+        TPD_DEBUG("The figner report was disabled\n");
         core_fr->handleint = true;
     }
 
 out:
     mutex_unlock(&ipd->plat_mutex);
     if (CHECK_RECOVER == g_total_len) {
-            TPD_INFO("==================Recover=================\n");
+            TPD_DEBUG("==================Recover=================\n");
             ilitek_reset_for_esd((void *)ipd);
     }
     ipio_kfree((void **)&tdata);
@@ -986,7 +986,7 @@ out:
 
 static void core_fr_remove(void)
 {
-    TPD_INFO("Remove core-FingerReport members\n");
+    TPD_DEBUG("Remove core-FingerReport members\n");
     ipio_kfree((void **)&core_fr);
 }
 
@@ -994,7 +994,7 @@ static int core_fr_init(void)
 {
     core_fr = kzalloc(sizeof(*core_fr), GFP_KERNEL);
     if (ERR_ALLOC_MEM(core_fr)) {
-        TPD_INFO("Failed to allocate core_fr mem, %ld\n", PTR_ERR(core_fr));
+        TPD_DEBUG("Failed to allocate core_fr mem, %ld\n", PTR_ERR(core_fr));
         core_fr_remove();
         return -ENOMEM;
     }
@@ -1015,13 +1015,13 @@ static int ilitek_ftm_process(void *chip_data)
 {
     int ret = -1;
 
-    TPD_INFO("\n");
+    TPD_DEBUG("\n");
     ret = core_firmware_boot_host_download(ipd);
     if (ret < 0) {
-        TPD_INFO("Failed to upgrade firmware, ret = %d\n", ret);
+        TPD_DEBUG("Failed to upgrade firmware, ret = %d\n", ret);
     }
 
-    TPD_INFO("FTM tp enter sleep\n");
+    TPD_DEBUG("FTM tp enter sleep\n");
     /*ftm sleep in */
     core_config->ili_sleep_type = SLEEP_IN_BEGIN_FTM;
     core_config_sleep_ctrl(false);
@@ -1041,11 +1041,11 @@ static void copy_fw_to_buffer(struct ilitek_chip_data_9881h *chip_info, const st
         //new fw data buffer
         chip_info->tp_firmware.data = kmalloc(fw->size, GFP_KERNEL);
         if (chip_info->tp_firmware.data == NULL) {
-            TPD_INFO("kmalloc tp firmware data error\n");
+            TPD_DEBUG("kmalloc tp firmware data error\n");
 
             chip_info->tp_firmware.data = kmalloc(fw->size, GFP_KERNEL);
             if (chip_info->tp_firmware.data == NULL) {
-                TPD_INFO("retry kmalloc tp firmware data error\n");
+                TPD_DEBUG("retry kmalloc tp firmware data error\n");
                 return;
             }
         }
@@ -1053,10 +1053,10 @@ static void copy_fw_to_buffer(struct ilitek_chip_data_9881h *chip_info, const st
         //copy bin fw to data buffer
         memcpy((u8 *)chip_info->tp_firmware.data, (u8 *)(fw->data), fw->size);
         if (0 == memcmp((u8 *)chip_info->tp_firmware.data, (u8 *)(fw->data), fw->size)) {
-            TPD_INFO("copy_fw_to_buffer fw->size=%zu\n", fw->size);
+            TPD_DEBUG("copy_fw_to_buffer fw->size=%zu\n", fw->size);
             chip_info->tp_firmware.size = fw->size;
         } else {
-            TPD_INFO("copy_fw_to_buffer fw error\n");
+            TPD_DEBUG("copy_fw_to_buffer fw error\n");
             chip_info->tp_firmware.size = 0;
         }
     }
@@ -1070,7 +1070,7 @@ int ilitek_reset(void *chip_data)
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
     const struct firmware *fw = NULL;
 
-    TPD_INFO("chip_info->fw_name=%s, chip_info->tp_firmware.size=%zu\n",
+    TPD_DEBUG("chip_info->fw_name=%s, chip_info->tp_firmware.size=%zu\n",
               chip_info->fw_name, chip_info->tp_firmware.size);
     core_gesture->entry = false;
 
@@ -1081,7 +1081,7 @@ int ilitek_reset(void *chip_data)
 
     ret = ilitek_fw_update(chip_info, fw, 0);
     if(ret < 0) {
-        TPD_INFO("fw update failed!\n");
+        TPD_DEBUG("fw update failed!\n");
     }
     return 0;
 }
@@ -1095,7 +1095,7 @@ static int ilitek_reset_for_esd(void *chip_data)
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
     const struct firmware *fw = NULL;
 
-    TPD_INFO("chip_info->fw_name=%s\n", chip_info->fw_name);
+    TPD_DEBUG("chip_info->fw_name=%s\n", chip_info->fw_name);
 
     core_gesture->entry = false;
     if (chip_info->tp_firmware.size && chip_info->tp_firmware.data) {
@@ -1104,14 +1104,14 @@ static int ilitek_reset_for_esd(void *chip_data)
     if (P5_0_FIRMWARE_GESTURE_MODE != core_firmware->enter_mode) {
         ret = ilitek_fw_update(chip_info, fw, 0);
         if(ret < 0) {
-            TPD_INFO("fw update failed!\n");
+            TPD_DEBUG("fw update failed!\n");
         }
     }
     else {
         core_firmware->esd_fail_enter_gesture = 1;
         ret = ilitek_fw_update(chip_info, fw, 0);
         if(ret < 0) {
-            TPD_INFO("fw update failed!\n");
+            TPD_DEBUG("fw update failed!\n");
         }
         else {
             core_fr->isEnableFR = false;
@@ -1126,7 +1126,7 @@ static int ilitek_reset_for_esd(void *chip_data)
                 mdelay(10);
             }
             if (retry <= 0) {
-                TPD_INFO("check  error 0x25FF8 read 0x%X\n", reg_data);
+                TPD_DEBUG("check  error 0x25FF8 read 0x%X\n", reg_data);
             }
             core_config_ice_mode_disable();
             core_gesture->entry = true;
@@ -1135,7 +1135,7 @@ static int ilitek_reset_for_esd(void *chip_data)
             temp[1] = 0x0A;
             temp[2] = 0x06;
             if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-                TPD_INFO("write command error\n");
+                TPD_DEBUG("write command error\n");
             }
             core_fr->isEnableFR = true;
         }
@@ -1147,7 +1147,7 @@ static int ilitek_reset_for_esd(void *chip_data)
 static int ilitek_power_control(void *chip_data, bool enable)
 {
 
-    TPD_INFO("set reset pin low\n");
+    TPD_DEBUG("set reset pin low\n");
     if (gpio_is_valid(ipd->hw_res->reset_gpio)) {
         gpio_direction_output(ipd->hw_res->reset_gpio, 0);
     }
@@ -1158,7 +1158,7 @@ static int ilitek_power_control(void *chip_data, bool enable)
 static int ilitek_get_chip_info(void *chip_data)
 {
     int ret = 0;
-    TPD_INFO("\n");
+    TPD_DEBUG("\n");
     ret = 0;//core_config_get_chip_id();
     return ret;
 }
@@ -1173,18 +1173,18 @@ static u8 ilitek_trigger_reason(void *chip_data, int gesture_enable, int is_susp
     chip_info->irq_timer = jiffies;    //reset esd check trigger base time
     if ((!ERR_ALLOC_MEM(core_mp) && (core_mp->run == true))) {
         chip_info->Mp_test_data_ready = true;
-        TPD_INFO("Mp test data ready ok, return IRQ_IGNORE\n");
+        TPD_DEBUG("Mp test data ready ok, return IRQ_IGNORE\n");
         return IRQ_IGNORE;
     }
     if ((gesture_enable == 1) && is_suspended) {
         if (gesture_process_ws) {
-            TPD_INFO("black gesture process wake lock\n");
+            TPD_DEBUG("black gesture process wake lock\n");
             __pm_stay_awake(gesture_process_ws);
         }
         mdelay(40);//wait for spi ok
         core_fr_handler();
         if (gesture_process_ws) {
-            TPD_INFO("black gesture process wake unlock\n");
+            TPD_DEBUG("black gesture process wake unlock\n");
             __pm_relax(gesture_process_ws);
         }
         return IRQ_GESTURE;
@@ -1194,7 +1194,7 @@ static u8 ilitek_trigger_reason(void *chip_data, int gesture_enable, int is_susp
 
     core_fr_handler();
     if (g_mutual_data.pointid_info == -1) {
-        TPD_INFO("get point info error ignore\n");
+        TPD_DEBUG("get point info error ignore\n");
         return IRQ_IGNORE;
     }
     return IRQ_TOUCH;
@@ -1225,7 +1225,7 @@ static int ilitek_get_gesture_info(void *chip_data, struct gesture_info * gestur
     memcpy(point_data, g_mutual_data.gesture_data, GESTURE_INFO_LENGTH);
 
     if (point_data[0] != P5_0_GESTURE_PACKET_ID) {
-        TPD_INFO("%s: read gesture data failed\n", __func__);
+        TPD_DEBUG("%s: read gesture data failed\n", __func__);
         return -1;
     }
 
@@ -1334,7 +1334,7 @@ static int ilitek_get_gesture_info(void *chip_data, struct gesture_info * gestur
         point_data[24], point_data[25], point_data[26], point_data[27], point_data[28], point_data[29], \
         point_data[30], point_data[31], point_data[32], point_data[33], point_data[34], point_data[35]);
 
-    TPD_INFO("gesture debug data 160-168 0x%02X 0x%02X "
+    TPD_DEBUG("gesture debug data 160-168 0x%02X 0x%02X "
         "0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X\n", \
         point_data[160], point_data[161], point_data[162], point_data[163], \
         point_data[164], point_data[165], point_data[166], point_data[167], point_data[168]);
@@ -1366,7 +1366,7 @@ static int ilitek_get_gesture_info(void *chip_data, struct gesture_info * gestur
         gesture->Point_4th.x = gesture->Point_4th.x * (chip_info->resolution_x) / TPD_WIDTH;
         gesture->Point_4th.y = gesture->Point_4th.y * (chip_info->resolution_y) / TPD_HEIGHT;
     }
-    TPD_INFO("gesture_id: 0x%x, score: %d, gesture_type: %d, clockwise: %d, points:"
+    TPD_DEBUG("gesture_id: 0x%x, score: %d, gesture_type: %d, clockwise: %d, points:"
         "(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)(%d, %d)\n", \
                 gesture_id, score, gesture->gesture_type, gesture->clockwise, \
                 gesture->Point_start.x, gesture->Point_start.y, \
@@ -1396,11 +1396,11 @@ static int ilitek_mode_switch(void *chip_data, work_mode mode, bool flag)
             break;
 
             case MODE_SLEEP:
-                TPD_INFO("MODE_SLEEP flag = %d\n", flag);
+                TPD_DEBUG("MODE_SLEEP flag = %d\n", flag);
 
                 //lcd will goto sleep when tp suspend, close lcd esd check
                 #ifndef CONFIG_TOUCHPANEL_MTK_PLATFORM
-                    TPD_INFO("disable_esd_thread by tp driver\n");
+                    TPD_DEBUG("disable_esd_thread by tp driver\n");
                     disable_esd_thread();
                 #endif
 
@@ -1418,14 +1418,14 @@ static int ilitek_mode_switch(void *chip_data, work_mode mode, bool flag)
             case MODE_GESTURE:
                 TPD_DEBUG("MODE_GESTURE flag = %d\n", flag);
                 if (core_config->ili_sleep_type == SLEEP_IN_DEEP) {
-                    TPD_INFO("TP in deep sleep mode is not support gesture mode flag = %d\n", flag);
+                    TPD_DEBUG("TP in deep sleep mode is not support gesture mode flag = %d\n", flag);
                     break;
                 }
                 core_config->isEnableGesture = flag;
                 if (flag) {
                     //lcd will goto sleep when tp suspend, close lcd esd check
                     #ifndef CONFIG_TOUCHPANEL_MTK_PLATFORM
-                    TPD_INFO("disable_esd_thread by tp driver\n");
+                    TPD_DEBUG("disable_esd_thread by tp driver\n");
                     disable_esd_thread();
                     #endif
 
@@ -1435,16 +1435,16 @@ static int ilitek_mode_switch(void *chip_data, work_mode mode, bool flag)
                     else {
                         temp[0] = 0xF6;
                         temp[1] = 0x0A;
-                         TPD_INFO("write prepare gesture command 0xF6 0x0A \n");
+                         TPD_DEBUG("write prepare gesture command 0xF6 0x0A \n");
                         if ((core_write(core_config->slave_i2c_addr, temp, 2)) < 0) {
-                            TPD_INFO("write prepare gesture command error\n");
+                            TPD_DEBUG("write prepare gesture command error\n");
                         }
                         temp[0] = 0x01;
                         temp[1] = 0x0A;
                         temp[2] = core_gesture->mode + 1;
-                        TPD_INFO("write gesture command 0x01 0x0A, 0x%02X\n", core_gesture->mode + 1);
+                        TPD_DEBUG("write gesture command 0x01 0x0A, 0x%02X\n", core_gesture->mode + 1);
                         if ((core_write(core_config->slave_i2c_addr, temp, 3)) < 0) {
-                            TPD_INFO("write gesture command error\n");
+                            TPD_DEBUG("write gesture command error\n");
                         }
                     }
                     core_fr->handleint = true;
@@ -1458,38 +1458,38 @@ static int ilitek_mode_switch(void *chip_data, work_mode mode, bool flag)
                 break;
 
             case MODE_HEADSET:
-                TPD_INFO("MODE_HEADSET flag = %d\n", flag);
+                TPD_DEBUG("MODE_HEADSET flag = %d\n", flag);
                 core_config_headset_ctrl(flag);
                 chip_info->headset_status = flag;
                 break;
 
             case MODE_CHARGE:
-                TPD_INFO("MODE_CHARGE flag = %d\n", flag);
+                TPD_DEBUG("MODE_CHARGE flag = %d\n", flag);
                 if (chip_info->plug_status != flag) {
                     core_config_plug_ctrl(!flag);
                 }
                 else {
-                    TPD_INFO("%s: already set plug status.\n", __func__);
+                    TPD_DEBUG("%s: already set plug status.\n", __func__);
                 }
                 chip_info->plug_status = flag;
                 break;
 
             case MODE_GAME:
-                TPD_INFO("MODE_GAME flag = %d\n", flag);
+                TPD_DEBUG("MODE_GAME flag = %d\n", flag);
                 if (chip_info->lock_point_status != flag) {
                     core_config_lock_point_ctrl(!flag);
                 }
                 else {
-                    TPD_INFO("%s: already set game status.\n", __func__);
+                    TPD_DEBUG("%s: already set game status.\n", __func__);
                 }
                 chip_info->lock_point_status = flag;
                 break;
 
             default:
-                TPD_INFO("%s: Wrong mode.\n", __func__);
+                TPD_DEBUG("%s: Wrong mode.\n", __func__);
         }
     }else {
-        TPD_INFO("not ready switch mode work_mode mode = %d flag = %d\n", mode, flag);
+        TPD_DEBUG("not ready switch mode work_mode mode = %d flag = %d\n", mode, flag);
     }
     mutex_unlock(&chip_info->plat_mutex);
     return ret;
@@ -1502,21 +1502,21 @@ static fw_check_state ilitek_fw_check(void *chip_data, struct resolution_info *r
     char dev_version[MAX_DEVICE_VERSION_LENGTH] = {0};
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
 
-    TPD_INFO("%s: call\n", __func__);
+    TPD_DEBUG("%s: call\n", __func__);
     ret = core_config_get_fw_ver(chip_info);
     if (ret < 0) {
-        TPD_INFO("%s: get fw info failed\n", __func__);
+        TPD_DEBUG("%s: get fw info failed\n", __func__);
     } else {
         panel_data->TP_FW = core_config->firmware_ver[3];
         sprintf(dev_version, "%02X", core_config->firmware_ver[3]);
-        TPD_INFO("core_config->firmware_ver = %02X\n",
+        TPD_DEBUG("core_config->firmware_ver = %02X\n",
                    core_config->firmware_ver[3]);
 
         if (panel_data->manufacture_info.version) {
             ver_len = strlen(panel_data->manufacture_info.version);
             strlcpy(&(panel_data->manufacture_info.version[12]), dev_version, 3);
         }
-        TPD_INFO("manufacture_info.version: %s\n", panel_data->manufacture_info.version);
+        TPD_DEBUG("manufacture_info.version: %s\n", panel_data->manufacture_info.version);
     }
     chip_info->fw_version = panel_data->manufacture_info.version;
     return FW_NORMAL;
@@ -1526,16 +1526,16 @@ static fw_update_state ilitek_fw_update(void *chip_data, const struct firmware *
 {
     int ret = 0;
 
-    TPD_INFO("%s start\n", __func__);
+    TPD_DEBUG("%s start\n", __func__);
     //request firmware failed, get from headfile
     if(fw == NULL) {
-        TPD_INFO("request firmware failed\n");
+        TPD_DEBUG("request firmware failed\n");
     }
     ipd->common_reset = 1;
     core_firmware->fw = fw;
     ret = ilitek_platform_tp_hw_reset(true);
     if (ret < 0) {
-        TPD_INFO("Failed to upgrade firmware, ret = %d\n", ret);
+        TPD_DEBUG("Failed to upgrade firmware, ret = %d\n", ret);
         return -1;
     }
     core_firmware->fw = NULL;
@@ -1547,11 +1547,11 @@ static fw_update_state ilitek_fw_update_common(void *chip_data, const struct fir
 {
     int ret = 0;
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
-    TPD_INFO("%s start\n", __func__);
+    TPD_DEBUG("%s start\n", __func__);
 
     //request firmware failed, get from headfile
     if(fw == NULL) {
-        TPD_INFO("request firmware failed\n");
+        TPD_DEBUG("request firmware failed\n");
     }
     ipd->common_reset = 1;
     core_firmware->fw = fw;
@@ -1559,7 +1559,7 @@ static fw_update_state ilitek_fw_update_common(void *chip_data, const struct fir
 
     ret = ilitek_platform_tp_hw_reset(true);
     if (ret < 0) {
-        TPD_INFO("Failed to upgrade firmware, ret = %d\n", ret);
+        TPD_DEBUG("Failed to upgrade firmware, ret = %d\n", ret);
         return -1;
     }
     core_firmware->fw = NULL;
@@ -1588,7 +1588,7 @@ static int ilitek_get_vendor(void *chip_data, struct panel_info *panel_data)
     chip_info->tp_type = panel_data->tp_type;
     /*get ftm firmware ini from touch.h*/
     chip_info->p_firmware_headfile = &panel_data->firmware_headfile;
-    TPD_INFO("chip_info->tp_type = %d, panel_data->fw_name = %s panel_data->test_limit_name = %s\n", \
+    TPD_DEBUG("chip_info->tp_type = %d, panel_data->fw_name = %s panel_data->test_limit_name = %s\n", \
         chip_info->tp_type, panel_data->fw_name, panel_data->test_limit_name);
 
     return 0;
@@ -1597,7 +1597,7 @@ static int ilitek_get_vendor(void *chip_data, struct panel_info *panel_data)
 static void ilitek_black_screen_test(void *chip_data, char *message)
 {
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
-    TPD_INFO("enter %s\n", __func__);
+    TPD_DEBUG("enter %s\n", __func__);
     ilitek_mp_black_screen_test(chip_info, message);
 }
 
@@ -1610,7 +1610,7 @@ static int ilitek_esd_handle(void *chip_data)
 
     mutex_lock(&chip_info->plat_mutex);
     if (!(chip_info->esd_check_enabled)) {
-        TPD_INFO("esd_check_enabled =  %d\n",chip_info->esd_check_enabled);
+        TPD_DEBUG("esd_check_enabled =  %d\n",chip_info->esd_check_enabled);
         goto out;
     }
     if ((timer > ILITEK_TOUCH_ESD_CHECK_PERIOD) && chip_info->esd_check_enabled) {
@@ -1625,7 +1625,7 @@ out:
     {
         tp_touch_btnkey_release();
         chip_info->esd_retry++;
-        TPD_INFO("Recover esd_retry = %d\n", chip_info->esd_retry);
+        TPD_DEBUG("Recover esd_retry = %d\n", chip_info->esd_retry);
         ilitek_reset_for_esd((void *)chip_info);
     }
     return 0;
@@ -1674,7 +1674,7 @@ static int ilitek_read_debug_data(struct seq_file *s, struct ilitek_chip_data_98
 
     chip_info->oplus_debug_buf = (int *)kzalloc((xch * ych) * sizeof(int), GFP_KERNEL);
     if (ERR_ALLOC_MEM(chip_info->oplus_debug_buf)) {
-        TPD_INFO("Failed to allocate oplus_debug_buf memory, %ld\n", PTR_ERR(chip_info->oplus_debug_buf));
+        TPD_DEBUG("Failed to allocate oplus_debug_buf memory, %ld\n", PTR_ERR(chip_info->oplus_debug_buf));
         return -ENOMEM;
     }
 
@@ -1697,7 +1697,7 @@ static int ilitek_read_debug_data(struct seq_file *s, struct ilitek_chip_data_98
 
     break;
     }
-    TPD_INFO("debug cmd 0x%X, 0x%X", test_cmd[0], test_cmd[1]);
+    TPD_DEBUG("debug cmd 0x%X, 0x%X", test_cmd[0], test_cmd[1]);
     core_write(core_config->slave_i2c_addr, test_cmd, 2);
     ilitek_platform_enable_irq();
     mutex_unlock(&ipd->ts->mutex);
@@ -1706,7 +1706,7 @@ static int ilitek_read_debug_data(struct seq_file *s, struct ilitek_chip_data_98
     for (i = 0; i < 1000; i++) {
         msleep(5);
         if (!chip_info->oplus_read_debug_data) {
-            TPD_INFO("already read debug data\n");
+            TPD_DEBUG("already read debug data\n");
             break;
         }
     }
@@ -1756,7 +1756,7 @@ static void ilitek_delta_read(struct seq_file *s, void *chip_data)
 static void ilitek_baseline_read(struct seq_file *s, void *chip_data)
 {
     struct ilitek_chip_data_9881h *chip_info = (struct ilitek_chip_data_9881h *)chip_data;
-    TPD_INFO("s->size = %d  s->count = %d\n", (int)s->size, (int)s->count);
+    TPD_DEBUG("s->size = %d  s->count = %d\n", (int)s->size, (int)s->count);
     if (s->size <= (MAX_DEBUG_NODE_LEN * 2)) {
         s->count = s->size;
         return;
@@ -1766,7 +1766,7 @@ static void ilitek_baseline_read(struct seq_file *s, void *chip_data)
 
 static void ilitek_main_register_read(struct seq_file *s, void *chip_data)
 {
-    TPD_INFO("\n");
+    TPD_DEBUG("\n");
 }
 
 static struct debug_info_proc_operations debug_info_proc_ops = {
@@ -1784,16 +1784,16 @@ static struct debug_info_proc_operations debug_info_proc_ops = {
  */
 static int ilitek_platform_core_init(void)
 {
-    TPD_INFO("Initialise core's components\n");
+    TPD_DEBUG("Initialise core's components\n");
 
     if (core_config_init() < 0 || core_protocol_init() < 0 ||
         core_firmware_init() < 0 || core_fr_init() < 0) {
-        TPD_INFO("Failed to initialise core components\n");
+        TPD_DEBUG("Failed to initialise core components\n");
         return -EINVAL;
     }
     if(core_spi_init(ipd->spi) < 0)
     {
-        TPD_INFO("Failed to initialise core components\n");
+        TPD_DEBUG("Failed to initialise core components\n");
         return -EINVAL;
     }
     return 0;
@@ -1804,7 +1804,7 @@ static int ilitek_platform_core_init(void)
  */
 static void ilitek_platform_core_remove(void)
 {
-    TPD_INFO("Remove all core's compoenets\n");
+    TPD_DEBUG("Remove all core's compoenets\n");
     ilitek_proc_remove();
     core_flash_remove();
     core_firmware_remove();
@@ -1825,25 +1825,25 @@ static int ilitek_platform_probe(struct spi_device *spi)
     int ret;
     struct touchpanel_data *ts = NULL;
 
-    TPD_INFO("Probe Enter\n");
+    TPD_DEBUG("Probe Enter\n");
     if (tp_register_times > 0)
 
     {
-        TPD_INFO("TP driver have success loaded %d times, exit\n", tp_register_times);
+        TPD_DEBUG("TP driver have success loaded %d times, exit\n", tp_register_times);
         return -1;
     }
 
     /*step1:Alloc chip_info*/
     ipd = kzalloc(sizeof(*ipd), GFP_KERNEL);
     if (ERR_ALLOC_MEM(ipd)) {
-        TPD_INFO("Failed to allocate ipd memory, %ld\n", PTR_ERR(ipd));
+        TPD_DEBUG("Failed to allocate ipd memory, %ld\n", PTR_ERR(ipd));
         return -ENOMEM;
     }
 
     /*step2:Alloc common ts*/
     ts = common_touch_data_alloc();
     if (ts == NULL) {
-        TPD_INFO("ts kzalloc error\n");
+        TPD_DEBUG("ts kzalloc error\n");
         goto err_ts_malloc;
     }
     memset(ts, 0, sizeof(*ts));
@@ -1859,8 +1859,8 @@ static int ilitek_platform_probe(struct spi_device *spi)
     ipd->chip_id = CHIP_TYPE_ILI9881;
     ipd->isEnableIRQ = true;
 
-    TPD_INFO("Driver Version : %s\n", DRIVER_VERSION);
-    TPD_INFO("Driver for Touch IC :  %x\n", CHIP_TYPE_ILI9881);
+    TPD_DEBUG("Driver Version : %s\n", DRIVER_VERSION);
+    TPD_DEBUG("Driver for Touch IC :  %x\n", CHIP_TYPE_ILI9881);
 
     /* 3. bind client and dev for easy operate */
     ts->debug_info_ops = &debug_info_proc_ops;
@@ -1903,7 +1903,7 @@ static int ilitek_platform_probe(struct spi_device *spi)
 
     /* If kernel failes to allocate memory to the core components, driver will be unloaded. */
     if (ilitek_platform_core_init() < 0) {
-        TPD_INFO("Failed to allocate cores' mem\n");
+        TPD_DEBUG("Failed to allocate cores' mem\n");
         goto err_spi_setup;
     }
 
@@ -1926,12 +1926,12 @@ static int ilitek_platform_probe(struct spi_device *spi)
     ipd->resolution_y = ts->resolution_info.max_y;
     ipd->fw_edge_limit_support = ts->fw_edge_limit_support;
 
-    TPD_INFO("reset_gpio = %d irq_gpio = %d irq = %d ipd->fw_name = %s\n", \
+    TPD_DEBUG("reset_gpio = %d irq_gpio = %d irq = %d ipd->fw_name = %s\n", \
         ipd->hw_res->reset_gpio, ipd->hw_res->irq_gpio, ipd->isr_gpio, ipd->fw_name);
-    TPD_INFO("resolution_x = %d resolution_y = %d\n", ipd->resolution_x, ipd->resolution_y);
+    TPD_DEBUG("resolution_x = %d resolution_y = %d\n", ipd->resolution_x, ipd->resolution_y);
 
     if (core_firmware_get_h_file_data() < 0)
-        TPD_INFO("Failed to get h file data\n");
+        TPD_DEBUG("Failed to get h file data\n");
 
     /* Create nodes for ipd debug*/
     ilitek_proc_init(ts);
@@ -1941,16 +1941,16 @@ static int ilitek_platform_probe(struct spi_device *spi)
 
     if (ts->esd_handle_support) {
         ts->esd_info.esd_work_time = msecs_to_jiffies(ILITEK_TOUCH_ESD_CHECK_PERIOD); // change esd check interval to 1.5s
-        TPD_INFO("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
+        TPD_DEBUG("%s:change esd handle time to %d ms\n", __func__, ts->esd_info.esd_work_time/HZ);
     }
     /* Register wake_lock for gesture */
     gesture_process_ws = wakeup_source_register("gesture_wake_lock");
     if (!gesture_process_ws) {
-        TPD_INFO("gesture_process_ws request failed\n");
+        TPD_DEBUG("gesture_process_ws request failed\n");
         goto err_spi_setup;
         return -1;
     }
-    TPD_INFO("end\n");
+    TPD_DEBUG("end\n");
     return 0;
 
 err_register_driver:
@@ -1958,7 +1958,7 @@ err_register_driver:
         || ts->boot_mode == MSM_BOOT_MODE__RF
         || ts->boot_mode == MSM_BOOT_MODE__WLAN)) {
         gesture_process_ws = wakeup_source_register("gesture_wake_lock");
-        TPD_INFO("ftm mode probe end ok\n");
+        TPD_DEBUG("ftm mode probe end ok\n");
         return 0;
     }
 
@@ -1981,7 +1981,7 @@ static int ilitek_platform_remove(struct spi_device *spi)
 {
     struct touchpanel_data *ts = spi_get_drvdata(spi);
 
-    TPD_INFO("Remove platform components\n");
+    TPD_DEBUG("Remove platform components\n");
 
     wakeup_source_unregister(gesture_process_ws);
 
@@ -2007,13 +2007,13 @@ static int ilitek_spi_suspend(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s: is called\n", __func__);
+    TPD_DEBUG("%s: is called\n", __func__);
 
     if ((ts->boot_mode == MSM_BOOT_MODE__FACTORY
         || ts->boot_mode == MSM_BOOT_MODE__RF
         || ts->boot_mode == MSM_BOOT_MODE__WLAN)) {
 
-        TPD_INFO("ilitek_spi_suspend do nothing in ftm\n");
+        TPD_DEBUG("ilitek_spi_suspend do nothing in ftm\n");
         return 0;
     }
 
@@ -2028,7 +2028,7 @@ void tp_goto_sleep_ftm(void)
     int ret = 0;
 
     if(ipd != NULL && ipd->ts != NULL) {
-        TPD_INFO("ipd->ts->boot_mode = %d\n", ipd->ts->boot_mode);
+        TPD_DEBUG("ipd->ts->boot_mode = %d\n", ipd->ts->boot_mode);
 
         if ((ipd->ts->boot_mode == MSM_BOOT_MODE__FACTORY
             || ipd->ts->boot_mode == MSM_BOOT_MODE__RF
@@ -2037,14 +2037,14 @@ void tp_goto_sleep_ftm(void)
 
             //lcd will goto sleep when tp suspend, close lcd esd check
             #ifndef CONFIG_TOUCHPANEL_MTK_PLATFORM
-            TPD_INFO("disable_esd_thread by tp driver\n");
+            TPD_DEBUG("disable_esd_thread by tp driver\n");
             disable_esd_thread();
             #endif
 
             core_config_ic_suspend_ftm();
 
             mdelay(60);
-            TPD_INFO("mdelay 60 ms test for ftm wait sleep\n");
+            TPD_DEBUG("mdelay 60 ms test for ftm wait sleep\n");
         }
     }
 }
@@ -2053,13 +2053,13 @@ static int ilitek_spi_resume(struct device *dev)
 {
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
 
     if ((ts->boot_mode == MSM_BOOT_MODE__FACTORY
         || ts->boot_mode == MSM_BOOT_MODE__RF
         || ts->boot_mode == MSM_BOOT_MODE__WLAN)) {
 
-        TPD_INFO("ilitek_spi_resume do nothing in ftm\n");
+        TPD_DEBUG("ilitek_spi_resume do nothing in ftm\n");
         return 0;
     }
     tp_i2c_resume(ts);
@@ -2089,18 +2089,18 @@ static int __init ilitek_platform_init(void)
 {
     int res = 0;
 
-    TPD_INFO("%s is called\n", __func__);
+    TPD_DEBUG("%s is called\n", __func__);
     if (!tp_judge_ic_match(TPD_DEVICE)) {
-        TPD_INFO("TP driver is already register\n");
+        TPD_DEBUG("TP driver is already register\n");
         return -1;
     }
     res = spi_register_driver(&tp_spi_driver);
     if (res < 0) {
-        TPD_INFO("Failed to add spi driver\n");
+        TPD_DEBUG("Failed to add spi driver\n");
         return -ENODEV;
     }
 
-    TPD_INFO("Succeed to add driver\n");
+    TPD_DEBUG("Succeed to add driver\n");
     return res;
 }
 
