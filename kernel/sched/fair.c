@@ -8365,7 +8365,7 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
 
 	/* If there is only one sensible candidate, select it now. */
 	cpu = cpumask_first(candidates);
-	if (weight == 1 && ((uclamp_latency_sensitive(p) && idle_cpu(cpu)) ||
+	if (weight == 1 && ((schedtune_prefer_idle(p) && idle_cpu(cpu)) ||
 			    (cpu == prev_cpu))) {
 		best_energy_cpu = cpu;
 		goto unlock;
@@ -8495,7 +8495,7 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 			     cpu_rq(cpu)->rd->max_cap_orig_cpu;
 			bool sync_boost = sync && cpu >= high_cap_cpu;
 
- 			if (uclamp_latency_sensitive(p) && !sched_feat(EAS_PREFER_IDLE) && !sync)
+ 			if (schedtune_prefer_idle(p) && !sched_feat(EAS_PREFER_IDLE) && !sync)
 				goto sd_loop;
 
 			new_cpu = find_energy_efficient_cpu(p, prev_cpu, sync,
