@@ -586,7 +586,7 @@ static inline int schedtune_filter_boost(struct task_struct *p)
 		return st->boost;
 	}
 
-	return st->boost;
+	return 0;
 }
 
 int schedtune_task_boost(struct task_struct *p)
@@ -627,8 +627,8 @@ int schedtune_prefer_idle_filter(struct task_struct *p)
 	char name_buf[NAME_MAX + 1];
 
 	cgroup_name(st->css.cgroup, name_buf, sizeof(name_buf));
-	if (unlikely(!strncmp(name_buf, "top-app", strlen("top-app")))
-		|| unlikely(!strncmp(name_buf, "foreground", strlen("foreground")))
+	if ((!strncmp(name_buf, "top-app", strlen("top-app")))
+		|| (!strncmp(name_buf, "foreground", strlen("foreground")))
 		) {
 		int adj = p->signal->oom_score_adj;
 		pr_debug("task is %s with adj %i\n", p->comm, adj);
@@ -648,7 +648,7 @@ int schedtune_prefer_idle_filter(struct task_struct *p)
 	     return 0;
 	}
 
-	return st->prefer_idle;
+	return 0;
 }
 
 int schedtune_prefer_idle(struct task_struct *p)
