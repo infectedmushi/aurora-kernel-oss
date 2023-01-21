@@ -33,6 +33,7 @@ struct mb_cache_entry {
 	/* Key in hash - stable during lifetime of the entry */
 	u32			e_key;
 	unsigned long		e_flags;
+	u32			e_reusable:1;
 	/* User provided value - stable during lifetime of the entry */
 	u64			e_value;
 };
