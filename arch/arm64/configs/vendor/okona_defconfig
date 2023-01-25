@@ -4,7 +4,7 @@
 #
 
 #
-# Compiler: Neutron clang version 16.0.0 (https://github.com/llvm/llvm-project.git 7f7a56b9a1ec300f9853dacb668362ab2770deef)
+# Compiler: Neutron clang version 16.0.0 (https://github.com/llvm/llvm-project.git f8d9097168b73e3befd94ac4e16cbc5f944afcec)
 #
 CONFIG_OPLUS_SYSTEM_KERNEL_QCOM=y
 # CONFIG_OPLUS_SYSTEM_KERNEL_MTK is not set
@@ -5407,7 +5407,9 @@ CONFIG_FAT_DEFAULT_IOCHARSET="iso8859-1"
 # CONFIG_FAT_DEFAULT_UTF8 is not set
 CONFIG_EXFAT_FS=y
 CONFIG_EXFAT_DEFAULT_IOCHARSET="utf8"
-# CONFIG_NTFS_FS is not set
+CONFIG_NTFS_FS=y
+# CONFIG_NTFS_DEBUG is not set
+CONFIG_NTFS_RW=y
 
 #
 # Pseudo filesystems
