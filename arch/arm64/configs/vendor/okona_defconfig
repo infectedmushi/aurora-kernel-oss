@@ -4994,7 +4994,7 @@ CONFIG_QCOM_SPMI_ADC5=y
 # Proximity and distance sensors
 #
 CONFIG_CH101=y
-CONFIG_CH101_I2C=y
+# CONFIG_CH101_I2C is not set
 # CONFIG_ISL29501 is not set
 # CONFIG_LIDAR_LITE_V2 is not set
 # CONFIG_RFD77402 is not set
