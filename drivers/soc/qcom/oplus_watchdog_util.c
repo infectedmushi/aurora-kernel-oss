@@ -19,12 +19,7 @@
 extern struct task_struct *oplus_get_cpu_task(int cpu);
 extern int oplus_get_work_cpu(struct work_struct *work);
 extern int cpu_idle_pc_state[NR_CPUS];
-
-unsigned int smp_call_any_cpu;
-unsigned long smp_call_many_cpumask;
 int recovery_tried;
-static int oplus_print_utc_cnt = 0;
-
 static const char *recoverable_procs[] = {"SearchDaemon", "libsu.so", "NotificationObs"};
 
 struct oplus_irq_counter {
@@ -60,27 +55,6 @@ int init_oplus_watchlog(void)
 
 	return 0;
 }
-
-/* replace android trigger utc time show, using watchdog print
- * petwatchdog 9s, 4 times print once
- */
-void oplus_show_utc_time(void)
-{
-	struct timespec ts;
-	struct rtc_time tm;
-	if(oplus_print_utc_cnt > 2)
-		oplus_print_utc_cnt = 0;
-	else {
-		oplus_print_utc_cnt ++;
-		return;
-	}
-	getnstimeofday(&ts);
-	rtc_time_to_tm(ts.tv_sec, &tm);
-	pr_warn("!@WatchDog: %d-%02d-%02d %02d:%02d:%02d.%09lu UTC\n",
-		tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-		tm.tm_hour, tm.tm_min, tm.tm_sec, ts.tv_nsec);
-}
-EXPORT_SYMBOL(oplus_show_utc_time);
 
 static void update_irq_counter(void)
 {
@@ -181,6 +155,8 @@ void get_cpu_ping_mask(cpumask_t *pmask)
 
 void print_smp_call_cpu(void)
 {
+	unsigned int smp_call_any_cpu;
+	unsigned long smp_call_many_cpumask;
 	printk(KERN_INFO "cpu of last smp_call_function_any: %d\n",
 		smp_call_any_cpu);
 	printk(KERN_INFO "cpumask of last smp_call_function_many: 0x%lx\n",
