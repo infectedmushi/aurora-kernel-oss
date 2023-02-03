@@ -186,7 +186,7 @@ static inline void netlink_exit(void)
 		nl_sk = NULL;
 	}
 
-	pr_info("self module exited\n");
+	pr_debug("self module exited\n");
 }
 
 static inline void gf_cleanup_notify_tpinfo_flag(struct gf_dev* gf_dev) {
@@ -458,7 +458,7 @@ static inline int gf_open(struct inode *inode, struct file *filp)
 
     list_for_each_entry(gf_dev, &device_list, device_entry) {
         if (gf_dev->devt == inode->i_rdev) {
-            pr_info("Found\n");
+            pr_debug("Found\n");
             status = 0;
             break;
         }
@@ -847,7 +847,7 @@ error_input:
 error_dev:
     if (gf_dev->devt != 0)
     {
-        pr_info("Err: status = %d\n", status);
+        pr_debug("Err: status = %d\n", status);
         mutex_lock(&device_list_lock);
         list_del(&gf_dev->device_entry);
         device_destroy(gf_class, gf_dev->devt);
