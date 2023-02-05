@@ -345,7 +345,6 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     int retval = 0;
     u8 netlink_route = NETLINK_TEST;
     struct gf_ioc_chip_info info;
-    struct gf_key gf_key;
 
     if (_IOC_TYPE(cmd) != GF_IOC_MAGIC) {
         return -ENODEV;
@@ -761,7 +760,6 @@ static int gf_probe(struct platform_device *pdev)
     int status = -EINVAL;
     unsigned long minor;
     int boot_mode = 0;
-    int i;
     /* Initialize the driver data */
     INIT_LIST_HEAD(&gf_dev->device_entry);
     gf_dev->spi = pdev;
