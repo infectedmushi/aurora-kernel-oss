@@ -5433,7 +5433,7 @@ int kgsl_device_platform_probe(struct kgsl_device *device)
 #else
 	device->events_wq = alloc_workqueue("kgsl-events",
 		WQ_UNBOUND | WQ_MEM_RECLAIM | WQ_SYSFS | WQ_HIGHPRI, 0);
-	
+#endif
 	if (!device->events_wq) {
 		dev_err(device->dev, "Failed to allocate events workqueue\n");
 		status = -ENOMEM;
