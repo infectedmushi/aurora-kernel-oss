@@ -100,13 +100,6 @@ of_cpufreq_cooling_register(struct cpufreq_policy *policy)
 {
 	return NULL;
 }
-
-static inline struct thermal_cooling_device *
-cpufreq_platform_cooling_register(struct cpufreq_policy *policy,
-					struct cpu_cooling_ops *ops)
-{
-	return NULL;
-}
 #endif /* defined(CONFIG_THERMAL_OF) && defined(CONFIG_CPU_THERMAL) */
 
 #ifdef CONFIG_QTI_CPU_ISOLATE_COOLING_DEVICE
