@@ -4,7 +4,7 @@
 #
 
 #
-# Compiler: Neutron clang version 17.0.0 (https://github.com/llvm/llvm-project.git d62cdfadc05436cc4ea0bb6e1875a4c621f33a14)
+# Compiler: Neutron clang version 17.0.0 (https://github.com/llvm/llvm-project.git d8e9a1a12557cd5e80c3d713d9cbbba0f7406882)
 #
 CONFIG_OPLUS_SYSTEM_KERNEL_QCOM=y
 # CONFIG_OPLUS_SYSTEM_KERNEL_MTK is not set
@@ -4602,7 +4602,7 @@ CONFIG_RPMH_MODEM_SLEEPINFO_BUFFER=y
 # CONFIG_MSM_JTAGV8 is not set
 CONFIG_QTEE_SHM_BRIDGE=y
 # CONFIG_MEM_SHARE_QMI_SERVICE is not set
-CONFIG_MSM_PERFORMANCE=y
+# CONFIG_MSM_PERFORMANCE is not set
 CONFIG_QCOM_CDSP_RM=y
 # CONFIG_QCOM_QHEE_ENABLE_MEM_PROTECTION is not set
 # CONFIG_QCOM_CX_IPEAK is not set
