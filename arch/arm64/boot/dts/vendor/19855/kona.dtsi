@@ -352,7 +352,7 @@
 	};
 
 	chosen {
-		bootargs = "noirqdebug norandmaps nodebugmon rcu_nocbs=0-3 kasan_multi_shot kpti=off rcupdate.rcu_normal_after_boot=1 cgroup_disable=pressure";
+		bootargs = "noirqdebug norandmaps nodebugmon rcu_nocbs=0-3 kasan_multi_shot kpti=off rcupdate.rcu_normal_after_boot=1 cgroup_disable=pressure,memory";
 	};
 
 	firmware: firmware {
