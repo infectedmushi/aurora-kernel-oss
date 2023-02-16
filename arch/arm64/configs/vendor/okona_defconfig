@@ -494,7 +494,7 @@ CONFIG_RANDOMIZE_BASE=y
 #
 # Boot options
 #
-CONFIG_CMDLINE="cgroup_disable=pressure androidboot.vbmeta.device_state=unlocked"
+CONFIG_CMDLINE="noirqdebug norandmaps nodebugmon rcu_nocbs=0-3 kasan_multi_shot kpti=off rcupdate.rcu_normal_after_boot=1 cgroup_disable=pressure,memory cgroup.memory=nokmem androidboot.vbmeta.device_state=unlocked"
 # CONFIG_CMDLINE_FROM_BOOTLOADER is not set
 CONFIG_CMDLINE_EXTEND=y
 # CONFIG_CMDLINE_FORCE is not set
@@ -5470,8 +5470,6 @@ CONFIG_CC_HAS_AUTO_VAR_INIT_PATTERN=y
 CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO_BARE=y
 CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO=y
 # CONFIG_INIT_STACK_NONE is not set
-# CONFIG_INIT_STACK_ALL_PATTERN is not set
-CONFIG_INIT_STACK_ALL_ZERO=y
 CONFIG_INIT_ON_ALLOC_DEFAULT_ON=y
 # CONFIG_INIT_ON_FREE_DEFAULT_ON is not set
 CONFIG_XOR_BLOCKS=y
