@@ -1,10 +1,10 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.19.272 Kernel Configuration
+# Linux/arm64 4.19.273 Kernel Configuration
 #
 
 #
-# Compiler: Neutron clang version 17.0.0 (https://github.com/llvm/llvm-project.git d8e9a1a12557cd5e80c3d713d9cbbba0f7406882)
+# Compiler: Neutron clang version 17.0.0 (https://github.com/llvm/llvm-project.git c42eda5d3692fcd67fc3d043ab37f1950ea653b9)
 #
 CONFIG_OPLUS_SYSTEM_KERNEL_QCOM=y
 # CONFIG_OPLUS_SYSTEM_KERNEL_MTK is not set
