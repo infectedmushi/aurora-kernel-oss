@@ -10,10 +10,10 @@ rm -rfv $KBUILD_OUTPUT
 export PATH="/mnt/Hawai/toolchains/proton-clang-16/bin:$PATH"
 export USE_CCACHE=1
 export ARCH=arm64
-export VARIANT="aurora-r03"
+export VARIANT="aurora-kernel-r03"
 export HASH=`git rev-parse --short=4 HEAD`
 export KERNEL_ZIP="$VARIANT-$HASH"
-export LOCALVERSION="~aurora-r03"
+export LOCALVERSION="~aurora-kernel-r03"
 make O=out CC=clang LLVM=1 LLVM_IAS=1 vendor/okona_defconfig
 make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM=1 LLVM_IAS=1 -j32 CROSS_COMPILE=/mnt/Hawai/toolchains/gcc-linaro-12.2.1-2023.01-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- CROSS_COMPILE_ARM32=/mnt/Hawai/toolchains/gcc-linaro-12.2.1-2023.01_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 cp -v $KBUILD_OUTPUT/arch/arm64/boot/Image $ZIP_DIR/Image
