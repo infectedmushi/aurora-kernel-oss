@@ -2459,19 +2459,19 @@ static int __init init_elf_binfmt(void)
 {
 	register_binfmt(&elf_format);
 
-#ifdef OPLUS_BUG_STABILITY
+#ifdef CONFIG_COREDUMP
 	oplus_coredump_addr = kvmalloc(PREALLOC_DUMPMEM_SIZE, GFP_KERNEL);
-#endif /* OPLUS_BUG_STABILITY */
+#endif /* CONFIG_COREDUMP */
 
 	return 0;
 }
 
 static void __exit exit_elf_binfmt(void)
 {
-#ifdef OPLUS_BUG_STABILITY
+#ifdef CONFIG_COREDUMP
 	if (oplus_coredump_addr)
 		kvfree(oplus_coredump_addr);
-#endif /* OPLUS_BUG_STABILITY */
+#endif /* CONFIG_COREDUMP */
 
 	/* Remove the COFF and ELF loaders. */
 	unregister_binfmt(&elf_format);
