@@ -1509,7 +1509,7 @@ static struct regulator_ops qpnp_lcdb_ncp_ops = {
 
 static int qpnp_lcdb_regulator_register(struct qpnp_lcdb *lcdb, u8 type)
 {
-	int rc = 0, off_on_delay = 0, voltage_step = VOLTAGE_STEP_50_MV;
+	int rc = 0, off_on_delay = 0;
 	struct regulator_init_data *init_data;
 	struct regulator_config cfg = {};
 	struct regulator_desc *rdesc;
@@ -1524,16 +1524,12 @@ static int qpnp_lcdb_regulator_register(struct qpnp_lcdb *lcdb, u8 type)
 		rdesc			= &lcdb->ldo.rdesc;
 		rdesc->ops		= &qpnp_lcdb_ldo_ops;
 		rdesc->off_on_delay	= off_on_delay;
-		rdesc->n_voltages = ((MAX_VOLTAGE_MV - MIN_VOLTAGE_MV)
-					/ voltage_step) + 1;
 		rdev			= lcdb->ldo.rdev;
 	} else if (type == NCP) {
 		node			= lcdb->ncp.node;
 		rdesc			= &lcdb->ncp.rdesc;
 		rdesc->ops		= &qpnp_lcdb_ncp_ops;
 		rdesc->off_on_delay	= off_on_delay;
-		rdesc->n_voltages = ((MAX_VOLTAGE_MV - MIN_VOLTAGE_MV)
-					/ voltage_step) + 1;
 		rdev			= lcdb->ncp.rdev;
 	} else {
 		pr_err("Invalid regulator type %d\n", type);
@@ -2344,10 +2340,8 @@ static int qpnp_lcdb_regulator_probe(struct platform_device *pdev)
 	mutex_init(&lcdb->read_write_mutex);
 
 	rc = qpnp_lcdb_parse_dt(lcdb);
-	if (rc < 0) {
-		pr_err("Failed to parse dt rc=%d\n", rc);
-		return rc;
-	}
+	if (rc < 0)
+		return dev_err_probe(&pdev->dev, rc, "Failed to parse dt rc=%d\n");
 
 	lcdb->lcdb_class.name = "lcd_bias";
 	lcdb->lcdb_class.owner = THIS_MODULE;
@@ -2389,6 +2383,7 @@ static struct platform_driver qpnp_lcdb_regulator_driver = {
 	.driver		= {
 		.name		= QPNP_LCDB_REGULATOR_DRIVER_NAME,
 		.of_match_table	= lcdb_match_table,
+		.probe_type	= PROBE_FORCE_SYNCHRONOUS,
 	},
 	.probe		= qpnp_lcdb_regulator_probe,
 	.remove		= qpnp_lcdb_regulator_remove,
@@ -2398,7 +2393,7 @@ static int __init qpnp_lcdb_regulator_init(void)
 {
 	return platform_driver_register(&qpnp_lcdb_regulator_driver);
 }
-arch_initcall(qpnp_lcdb_regulator_init);
+subsys_initcall(qpnp_lcdb_regulator_init);
 
 static void __exit qpnp_lcdb_regulator_exit(void)
 {

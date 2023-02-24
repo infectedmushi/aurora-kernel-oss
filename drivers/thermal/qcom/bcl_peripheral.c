@@ -514,7 +514,7 @@ static int bcl_read_soc(void *data, int *val)
 
 	*val = 100;
 	if (!batt_psy)
-		batt_psy = power_supply_get_by_name("battery");
+		batt_psy = power_supply_get_by_name("bms");
 	if (batt_psy) {
 		err = power_supply_get_property(batt_psy,
 				POWER_SUPPLY_PROP_CAPACITY, &ret);
@@ -547,9 +547,11 @@ static void bcl_evaluate_soc(struct work_struct *work)
 
 	perph_data->trip_val = battery_percentage;
 	mutex_unlock(&perph_data->state_trans_lock);
+
+	return; //return before thermal handle trips with percentage
+
 	of_thermal_handle_trip(perph_data->tz_dev);
 
-	return;
 eval_exit:
 	mutex_unlock(&perph_data->state_trans_lock);
 }
@@ -559,7 +561,7 @@ static int battery_supply_callback(struct notifier_block *nb,
 {
 	struct power_supply *psy = data;
 
-	if (strcmp(psy->desc->name, "battery"))
+	if (strcmp(psy->desc->name, "bms"))
 		return NOTIFY_OK;
 	schedule_work(&bcl_perph->soc_eval_work);
 

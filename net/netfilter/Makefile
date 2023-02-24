@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
-netfilter-objs := core.o nf_log.o nf_queue.o nf_sockopt.o utils.o
+netfilter-objs := core.o nf_queue.o nf_sockopt.o utils.o
+
+netfilter-$(CONFIG_DEBUG_KERNEL) += nf_log.o
 
 nf_conntrack-y	:= nf_conntrack_core.o nf_conntrack_standalone.o nf_conntrack_expect.o nf_conntrack_helper.o \
 		   nf_conntrack_proto.o nf_conntrack_proto_generic.o nf_conntrack_proto_tcp.o nf_conntrack_proto_udp.o \
@@ -126,6 +128,9 @@ obj-$(CONFIG_NF_FLOW_TABLE_INET) += nf_flow_table_inet.o
 
 # generic X tables 
 obj-$(CONFIG_NETFILTER_XTABLES) += x_tables.o xt_tcpudp.o
+
+# TTL
+obj-$(CONFIG_IP_NF_TARGET_TTL) += xt_HL.o
 
 # combos
 obj-$(CONFIG_NETFILTER_XT_MARK) += xt_mark.o

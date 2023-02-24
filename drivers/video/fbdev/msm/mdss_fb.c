@@ -1440,7 +1440,9 @@ static int mdss_fb_remove(struct platform_device *pdev)
 		return -EINVAL;
 
 	mdss_fb_unregister_input_handler(mfd);
+#ifdef CONFIG_DEBUG_FS
 	mdss_panel_debugfs_cleanup(mfd->panel_info);
+#endif
 
 	if (mdss_fb_suspend_sub(mfd))
 		pr_err("msm_fb_remove: can't stop the device %d\n",
@@ -1683,6 +1685,7 @@ static struct platform_driver mdss_fb_driver = {
 		.name = "mdss_fb",
 		.of_match_table = mdss_fb_dt_match,
 		.pm = &mdss_fb_pm_ops,
+		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},
 };
 
@@ -2757,7 +2760,9 @@ static int mdss_fb_register(struct msm_fb_data_type *mfd)
 
 	snprintf(panel_name, ARRAY_SIZE(panel_name), "mdss_panel_fb%d",
 		mfd->index);
+#ifdef CONFIG_DEBUG_FS
 	mdss_panel_debugfs_init(panel_info, panel_name);
+#endif
 	pr_debug("FrameBuffer[%d] %dx%d registered successfully!\n", mfd->index,
 					fbi->var.xres, fbi->var.yres);
 
@@ -3793,7 +3798,7 @@ static int __mdss_fb_display_thread(void *data)
 				mfd->index);
 
 	while (1) {
-		wait_event(mfd->commit_wait_q,
+		wait_event_interruptible(mfd->commit_wait_q,
 				(atomic_read(&mfd->commits_pending) ||
 				 kthread_should_stop()));
 

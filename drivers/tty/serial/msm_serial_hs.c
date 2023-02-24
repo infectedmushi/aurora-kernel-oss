@@ -263,7 +263,9 @@ static const struct of_device_id msm_hs_match_table[] = {
 #define RX_FLUSH_COMPLETE_TIMEOUT 300 /* In jiffies */
 #define BLSP_UART_CLK_FMAX 63160000
 
+#ifdef CONFIG_DEBUG_FS
 static struct dentry *debug_base;
+#endif
 static struct platform_driver msm_serial_hs_platform_driver;
 static struct uart_driver msm_hs_driver;
 static const struct uart_ops msm_hs_ops;
@@ -672,6 +674,8 @@ DEFINE_DEBUGFS_ATTRIBUTE(loopback_enable_fops, msm_serial_loopback_enable_get,
  * test scripts.
  * writing 0 disables the internal loopback mode. Default is disabled.
  */
+
+#ifdef CONFIG_DEBUG_FS
 static void msm_serial_debugfs_init(struct msm_hs_port *msm_uport,
 					   int id)
 {
@@ -688,6 +692,7 @@ static void msm_serial_debugfs_init(struct msm_hs_port *msm_uport,
 		MSM_HS_ERR("%s(): Cannot create loopback.%d debug entry\n",
 							__func__, id);
 }
+#endif /* CONFIG_DEBUG_FS */
 
 static int msm_hs_remove(struct platform_device *pdev)
 {
@@ -707,7 +712,9 @@ static int msm_hs_remove(struct platform_device *pdev)
 	dev = msm_uport->uport.dev;
 	sysfs_remove_file(&pdev->dev.kobj, &dev_attr_clock.attr);
 	sysfs_remove_file(&pdev->dev.kobj, &dev_attr_debug_mask.attr);
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove(msm_uport->loopback_dir);
+#endif
 
 	dma_free_coherent(msm_uport->uport.dev,
 			UART_DMA_DESC_NR * UARTDM_RX_BUF_SIZE,
@@ -2761,7 +2768,7 @@ static int uartdm_init_port(struct uart_port *uport)
 	kthread_init_worker(&tx->kworker);
 	tx->task = kthread_run(kthread_worker_fn,
 			&tx->kworker, "msm_serial_hs_%d_tx_work", uport->line);
-	if (IS_ERR(rx->task)) {
+	if (IS_ERR(tx->task)) {
 		MSM_HS_ERR("%s(): error creating task\n", __func__);
 		goto exit_lh_init;
 	}
@@ -2810,25 +2817,25 @@ struct msm_serial_hs_platform_data
 	pdata->uart_tx_gpio = of_get_named_gpio(node,
 					"qcom,tx-gpio", 0);
 	if (pdata->uart_tx_gpio < 0)
-		pr_err("uart_tx_gpio is not available\n");
+		pr_debug("uart_tx_gpio is not available\n");
 
 	/* UART RX GPIO */
 	pdata->uart_rx_gpio = of_get_named_gpio(node,
 					"qcom,rx-gpio", 0);
 	if (pdata->uart_rx_gpio < 0)
-		pr_err("uart_rx_gpio is not available\n");
+		pr_debug("uart_rx_gpio is not available\n");
 
 	/* UART CTS GPIO */
 	pdata->uart_cts_gpio = of_get_named_gpio(node,
 					"qcom,cts-gpio", 0);
 	if (pdata->uart_cts_gpio < 0)
-		pr_err("uart_cts_gpio is not available\n");
+		pr_debug("uart_cts_gpio is not available\n");
 
 	/* UART RFR GPIO */
 	pdata->uart_rfr_gpio = of_get_named_gpio(node,
 					"qcom,rfr-gpio", 0);
 	if (pdata->uart_rfr_gpio < 0)
-		pr_err("uart_rfr_gpio is not available\n");
+		pr_debug("uart_rfr_gpio is not available\n");
 
 	pdata->no_suspend_delay = of_property_read_bool(node,
 				"qcom,no-suspend-delay");
@@ -3572,8 +3579,9 @@ static int msm_hs_probe(struct platform_device *pdev)
 		MSM_HS_ERR("Probe Failed as sysfs failed\n");
 		goto err_clock;
 	}
-
+#ifdef CONFIG_DEBUG_FS
 	msm_serial_debugfs_init(msm_uport, pdev->id);
+#endif
 	msm_hs_unconfig_uart_gpios(uport);
 
 	uport->line = pdev->id;
@@ -3618,14 +3626,17 @@ static int __init msm_serial_hs_init(void)
 		pr_err("%s failed to load\n", __func__);
 		return ret;
 	}
+#ifdef CONFIG_DEBUG_FS
 	debug_base = debugfs_create_dir("msm_serial_hs", NULL);
 	if (IS_ERR_OR_NULL(debug_base))
 		pr_err("msm_serial_hs: Cannot create debugfs dir\n");
-
+#endif
 	ret = platform_driver_register(&msm_serial_hs_platform_driver);
 	if (ret) {
 		pr_err("%s failed to load\n", __func__);
+#ifdef CONFIG_DEBUG_FS
 		debugfs_remove_recursive(debug_base);
+#endif
 		uart_unregister_driver(&msm_hs_driver);
 		return ret;
 	}
@@ -3746,7 +3757,9 @@ static void msm_hs_shutdown(struct uart_port *uport)
 static void __exit msm_serial_hs_exit(void)
 {
 	pr_debug("msm_serial_hs module removed\n");
+#ifdef CONFIG_DEBUG_FS
 	debugfs_remove_recursive(debug_base);
+#endif
 	platform_driver_unregister(&msm_serial_hs_platform_driver);
 	uart_unregister_driver(&msm_hs_driver);
 }

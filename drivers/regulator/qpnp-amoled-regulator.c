@@ -563,10 +563,8 @@ static int qpnp_amoled_regulator_probe(struct platform_device *pdev)
 	dev_set_drvdata(&pdev->dev, chip);
 
 	rc = qpnp_amoled_parse_dt(chip);
-	if (rc < 0) {
-		dev_err(chip->dev, "Failed to parse DT params rc=%d\n", rc);
-		goto error;
-	}
+	if (rc < 0) 
+		return dev_err_probe(&pdev->dev, rc, "Failed to parse dt rc=%d\n");
 
 	rc = qpnp_amoled_hw_init(chip);
 	if (rc < 0)
@@ -590,6 +588,7 @@ static struct platform_driver qpnp_amoled_regulator_driver = {
 	.driver		= {
 		.name		= QPNP_AMOLED_REGULATOR_DRIVER_NAME,
 		.of_match_table	= amoled_match_table,
+		.probe_type	= PROBE_FORCE_SYNCHRONOUS,
 	},
 	.probe		= qpnp_amoled_regulator_probe,
 	.remove		= qpnp_amoled_regulator_remove,
@@ -608,5 +607,5 @@ static void __exit qpnp_amoled_regulator_exit(void)
 MODULE_DESCRIPTION("QPNP AMOLED regulator driver");
 MODULE_LICENSE("GPL v2");
 
-arch_initcall(qpnp_amoled_regulator_init);
+subsys_initcall(qpnp_amoled_regulator_init);
 module_exit(qpnp_amoled_regulator_exit);

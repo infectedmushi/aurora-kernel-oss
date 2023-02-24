@@ -35,27 +35,9 @@
 #define LOGLEVEL_DEBUG 7
 #define LOGLEVEL_ERR 3
 
-#define log_event(log_level, x...)					\
-do {									\
-	unsigned long flags;						\
-	char *buf;							\
-	if (log_level == LOGLEVEL_DEBUG)				\
-		pr_debug(x);						\
-	else if (log_level == LOGLEVEL_ERR)				\
-		pr_err(x);						\
-	if (ENABLE_EVENT_LOG) {						\
-		write_lock_irqsave(&usb_bam_dbg.lck, flags);		\
-		buf = usb_bam_dbg.buf[usb_bam_dbg.idx];			\
-		put_timestamp(buf);					\
-		snprintf(&buf[TIME_BUF_LEN - 1], DBG_EVENT_LEN, x);	\
-		usb_bam_dbg.idx = (usb_bam_dbg.idx + 1) % DBG_MAX_MSG;	\
-		write_unlock_irqrestore(&usb_bam_dbg.lck, flags);	\
-	}								\
-} while (0)
-
-#define log_event_none(x, ...) log_event(LOGLEVEL_NONE, x, ##__VA_ARGS__)
-#define log_event_dbg(x, ...) log_event(LOGLEVEL_DEBUG, x, ##__VA_ARGS__)
-#define log_event_err(x, ...) log_event(LOGLEVEL_ERR, x, ##__VA_ARGS__)
+#define log_event_none(x, ...)
+#define log_event_dbg(x, ...)
+#define log_event_err(x, ...)
 
 /* Reset BAM with pipes connected */
 #define SPS_BAM_FORCE_RESET         (1UL << 11)
@@ -305,15 +287,6 @@ static int __usb_bam_register_wake_cb(enum usb_ctrl bam_type, int idx,
 
 static void wait_for_prod_release(enum usb_ctrl cur_bam);
 static void usb_bam_start_suspend(struct usb_bam_ipa_handshake_info *info_ptr);
-
-static struct {
-	char buf[DBG_MAX_MSG][DBG_MSG_LEN];   /* buffer */
-	unsigned int idx;   /* index */
-	rwlock_t lck;   /* lock */
-} __maybe_unused usb_bam_dbg = {
-	.idx = 0,
-	.lck = __RW_LOCK_UNLOCKED(lck)
-};
 
 /*put_timestamp - writes time stamp to buffer */
 static void __maybe_unused put_timestamp(char *tbuf)
@@ -2756,7 +2729,6 @@ int usb_bam_disconnect_ipa(enum usb_ctrl cur_bam,
 	u8 idx = 0;
 	struct usb_bam_ctx_type *ctx = &msm_usb_bam[cur_bam];
 	struct usb_bam_pipe_connect *pipe_connect;
-	struct device *bam_dev = &ctx->usb_bam_pdev->dev;
 	enum usb_bam_mode bam_mode;
 
 	if (!is_ipa_handle_valid(ipa_params->prod_clnt_hdl) &&
