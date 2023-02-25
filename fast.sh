@@ -6,9 +6,9 @@ export ZIP_DIR="/home/deepongi/Android/AnyKernel3"
 export ZIP_OUT_DIR="/home/deepongi/Android/Out_Zips"
 rm -rfv /home/deepongi/Android/AnyKernel3/Image
 rm -rfv /home/deepongi/Android/AnyKernel3/dtbo.img
-make O=out clean
-make O=out mrproper
-rm -rfv out
+#make O=out clean
+#make O=out mrproper
+#rm -rfv out
 export PATH="/home/deepongi/Android/neutron-clang/bin:$PATH"
 export USE_CCACHE=1
 export ARCH=arm64
@@ -28,18 +28,15 @@ echo "-------------------"
 echo "Build Completed"
 echo "-------------------"
 echo -e "${restore}"
-echo "                                                     "
-echo "  _       __        _          _     _      _        "
-echo " (_)_ _  / _|___ __| |_ ___ __| |___| |__ _| |__ ___ "
-echo " | | ' \|  _/ -_) _|  _/ -_) _  |___| / _  | '_ (_-< "
-echo " |_|_||_|_| \___\__|\__\___\__,_|   |_\__,_|_.__/__/ "
-echo "                                                     "
-echo "                                                     "
-                                               
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
+echo "                                                                                                             "
+echo " ██     ▄   █▄▄▄▄ ████▄ █▄▄▄▄ ██       █  █▀ ▄███▄   █▄▄▄▄   ▄   ▄███▄   █         ████▄    ▄▄▄▄▄    ▄▄▄▄▄   "   
+echo " █ █     █  █  ▄▀ █   █ █  ▄▀ █ █      █▄█   █▀   ▀  █  ▄▀    █  █▀   ▀  █         █   █   █     ▀▄ █     ▀▄ "    
+echo " █▄▄█ █   █ █▀▀▌  █   █ █▀▀▌  █▄▄█     █▀▄   ██▄▄    █▀▀▌ ██   █ ██▄▄    █         █   █ ▄  ▀▀▀▀▄ ▄  ▀▀▀▀▄   "    
+echo " █  █ █   █ █  █  ▀████ █  █  █  █     █  █  █▄   ▄▀ █  █ █ █  █ █▄   ▄▀ ███▄      ▀████  ▀▄▄▄▄▀   ▀▄▄▄▄▀    "
+echo "    █ █▄ ▄█   █           █      █       █   ▀███▀     █  █  █ █ ▀███▀       ▀                               "    
+echo "   █   ▀▀▀   ▀           ▀      █       ▀             ▀   █   ██                                             "   
+echo "  ▀                            ▀                                                                             "   
+                                                    
                                                                                                     
                                                                                                     
                                                                                                     
