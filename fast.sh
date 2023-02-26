@@ -6,16 +6,16 @@ export ZIP_DIR="/home/deepongi/Android/AnyKernel3"
 export ZIP_OUT_DIR="/home/deepongi/Android/Out_Zips"
 rm -rfv /home/deepongi/Android/AnyKernel3/Image
 rm -rfv /home/deepongi/Android/AnyKernel3/dtbo.img
-#make O=out clean
-#make O=out mrproper
-#rm -rfv out
-export PATH="/home/deepongi/Android/neutron-clang/bin:$PATH"
+make O=out clean
+make O=out mrproper
+rm -rfv out
+export PATH="/mnt/Hawai/toolchains/proton-clang-16/bin:$PATH"
 export USE_CCACHE=1
 export ARCH=arm64
-export VARIANT="aurora-kernel-r07.5"
+export VARIANT="aurora-kernel-r08"
 export HASH=`git rev-parse --short=4 HEAD`
 export KERNEL_ZIP="$VARIANT-$HASH"
-export LOCALVERSION="~aurora-kernel-r07.5"
+export LOCALVERSION="~aurora-kernel-r08"
 make O=out CC=clang LLVM=1 LLVM_IAS=1 vendor/okona_defconfig
 make O=out CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM=1 LLVM_IAS=1 -j32 CROSS_COMPILE=/mnt/Hawai/toolchains/gcc-linaro-12.2.1-2023.01-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu- CROSS_COMPILE_ARM32=/mnt/Hawai/toolchains/gcc-linaro-12.2.1-2023.01_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 cp -v $KBUILD_OUTPUT/arch/arm64/boot/Image $ZIP_DIR/Image
