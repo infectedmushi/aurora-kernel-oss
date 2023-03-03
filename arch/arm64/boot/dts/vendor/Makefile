@@ -23,7 +23,7 @@ subdir-y += 20809
 subdir-y += 20828
 # SM7250
 # Nord
-subdir-y += 20801
+#subdir-y += 20801
 # Nord CE
-subdir-y += 20813
+#subdir-y += 20813
 #endif
