@@ -1809,19 +1809,17 @@ static void qcom_glink_rx_close(struct qcom_glink *glink, unsigned int rcid)
 	spin_unlock_irqrestore(&glink->idr_lock, flags);
 	if (WARN(!channel, "close request on unknown channel\n"))
 		return;
-	CH_INFO(channel, "\n");
 
 	/* cancel pending rx_done work */
-	kthread_cancel_work_sync(&channel->intent_work);
+	cancel_work_sync(&channel->intent_work);
 
 	if (channel->rpdev) {
-		strlcpy(chinfo.name, channel->name, sizeof(chinfo.name));
+		strscpy_pad(chinfo.name, channel->name, sizeof(chinfo.name));
 		chinfo.src = RPMSG_ADDR_ANY;
 		chinfo.dst = RPMSG_ADDR_ANY;
 
 		rpmsg_unregister_device(glink->dev, &chinfo);
 	}
-	channel->rpdev = NULL;
 
 	qcom_glink_send_close_ack(glink, channel->rcid);
 
