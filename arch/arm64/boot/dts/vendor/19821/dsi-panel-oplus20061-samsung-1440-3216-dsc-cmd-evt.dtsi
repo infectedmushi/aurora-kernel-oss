@@ -2807,6 +2807,7 @@
 	qcom,platform-panel-te-esd-gpio = <&tlmm 109 0>;
 	qcom,platform-panel-vddr-aod-en-gpio = <&tlmm 139 0>;
 	qcom,ulps-enabled;
+	qcom,panel-allow-phy-poweroff;
 	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
 
 	oplus,dsi-fod-brightness = <0 0xff>,

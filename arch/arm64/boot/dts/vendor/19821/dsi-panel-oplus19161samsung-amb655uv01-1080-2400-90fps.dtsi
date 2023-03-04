@@ -605,6 +605,7 @@
 				<1023 0x2A>;
 
 	qcom,ulps-enabled;
+	qcom,panel-allow-phy-poweroff;
 	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0",
 				"src_byte_clk0", "src_pixel_clk0",
 				"shadow_byte_clk0", "shadow_pixel_clk0";
