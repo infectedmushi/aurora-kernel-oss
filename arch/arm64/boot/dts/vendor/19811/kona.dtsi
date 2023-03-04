@@ -675,6 +675,10 @@
 	thermal_zones: thermal-zones {
 	};
 
+	qcom,msm_fastrpc {
+		/delete-property/ qcom,fastrpc-adsp-sensors-pdr;
+	};
+
 	slim_aud: slim@3ac0000 {
 		cell-index = <1>;
 		compatible = "qcom,slim-ngd";
