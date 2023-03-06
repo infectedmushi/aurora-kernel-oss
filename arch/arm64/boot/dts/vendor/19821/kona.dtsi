@@ -352,7 +352,7 @@
 	};
 
 	chosen {
-		bootargs = "androidboot.vbmeta.device_state=unlocked noirqdebug kpti=off nosoftlockup mce=ignore_ce rcupdate.rcu_normal_after_boot=1 quiet cgroup_disable=pressure rcu_nocbs=0-7 kasan_multi_shot";
+		bootargs = "audit=0 androidboot.vbmeta.device_state=unlocked noirqdebug kpti=off nosoftlockup mce=ignore_ce rcupdate.rcu_normal_after_boot=1 quiet cgroup_disable=pressure rcu_nocbs=0-7 kasan_multi_shot";
 	};
 
 	firmware: firmware {
